@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MockupUploadDialog } from "./MockupUploadDialog";
+import { ImprintDialog, ImprintItem } from "./ImprintDialog";
 import { toast } from "sonner";
 
 interface ItemMockup {
@@ -42,9 +43,15 @@ interface Item {
   mockups: ItemMockup[];
 }
 
+interface Imprint {
+  id: string;
+  imprintItems: ImprintItem[];
+}
+
 interface ItemGroup {
   id: string;
   items: Item[];
+  imprints: Imprint[];
 }
 
 export function QuoteItemsSection() {
@@ -72,12 +79,16 @@ export function QuoteItemsSection() {
           total: 0,
           mockups: []
         }
-      ]
+      ],
+      imprints: []
     }
   ]);
 
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [currentItemIndex, setCurrentItemIndex] = useState<{groupIndex: number, itemIndex: number} | null>(null);
+  
+  const [imprintDialogOpen, setImprintDialogOpen] = useState(false);
+  const [currentGroupIndex, setCurrentGroupIndex] = useState<number | null>(null);
 
   const handleInputChange = (groupIndex: number, itemIndex: number, field: string, value: string | number | boolean) => {
     const newItemGroups = [...itemGroups];
@@ -151,7 +162,8 @@ export function QuoteItemsSection() {
           total: 0,
           mockups: []
         }
-      ]
+      ],
+      imprints: []
     }]);
   };
 
@@ -212,6 +224,28 @@ export function QuoteItemsSection() {
     });
     
     toast.success("Mockup removed successfully");
+  };
+
+  const handleOpenImprintDialog = (groupIndex: number) => {
+    setCurrentGroupIndex(groupIndex);
+    setImprintDialogOpen(true);
+  };
+
+  const handleSaveImprints = (imprintItems: ImprintItem[]) => {
+    if (currentGroupIndex !== null) {
+      const newImprints = {
+        id: "imprint-" + Math.random().toString(36).substring(2, 9),
+        imprintItems: imprintItems
+      };
+
+      setItemGroups(prevItemGroups => {
+        const updatedGroups = [...prevItemGroups];
+        updatedGroups[currentGroupIndex].imprints.push(newImprints);
+        return updatedGroups;
+      });
+      
+      toast.success("Imprint saved successfully");
+    }
   };
 
   const renderItemGroup = (group: ItemGroup, groupIndex: number) => {
@@ -427,6 +461,54 @@ export function QuoteItemsSection() {
                 </React.Fragment>
               );
             })}
+
+            {group.imprints.length > 0 && group.imprints.map((imprint) => (
+              <TableRow key={imprint.id} className="border-b bg-slate-50">
+                <TableCell colSpan={16} className="p-4">
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-sm">Imprint Details</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {imprint.imprintItems.map((item) => (
+                        <div key={item.id} className="border rounded-md p-3 bg-white">
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div>
+                              <span className="font-medium">Matrix:</span> {item.matrix || "Not specified"}
+                            </div>
+                            <div>
+                              <span className="font-medium">Column:</span> {item.column || "Not specified"}
+                            </div>
+                            <div>
+                              <span className="font-medium">Type of Work:</span> {item.typeOfWork || "Not specified"}
+                            </div>
+                          </div>
+                          {item.details && (
+                            <div className="mt-2 text-sm">
+                              <span className="font-medium">Details:</span> {item.details}
+                            </div>
+                          )}
+                          {item.mockups.length > 0 && (
+                            <div className="mt-2">
+                              <span className="font-medium text-sm">Mockups:</span>
+                              <div className="flex flex-wrap gap-2 mt-1">
+                                {item.mockups.map((mockup) => (
+                                  <div key={mockup.id} className="w-16 h-16 border rounded-md overflow-hidden">
+                                    <img 
+                                      src={mockup.url} 
+                                      alt={mockup.name}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
         
@@ -435,7 +517,11 @@ export function QuoteItemsSection() {
             <Plus className="h-4 w-4" />
             Line Item
           </Button>
-          <Button variant="outline" className="gap-2">
+          <Button 
+            variant="outline" 
+            className="gap-2"
+            onClick={() => handleOpenImprintDialog(groupIndex)}
+          >
             <Plus className="h-4 w-4" />
             Imprint
           </Button>
@@ -461,6 +547,15 @@ export function QuoteItemsSection() {
         open={uploadDialogOpen}
         onOpenChange={setUploadDialogOpen}
         onUpload={handleUploadComplete}
+      />
+
+      <ImprintDialog
+        open={imprintDialogOpen}
+        onOpenChange={setImprintDialogOpen}
+        onSave={handleSaveImprints}
+        initialImprints={currentGroupIndex !== null && itemGroups[currentGroupIndex]?.imprints.length > 0 
+          ? itemGroups[currentGroupIndex].imprints[itemGroups[currentGroupIndex].imprints.length - 1].imprintItems 
+          : undefined}
       />
     </div>
   );
