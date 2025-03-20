@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, MoreVertical, Trash2, Copy, Image, X } from "lucide-react";
@@ -169,7 +168,6 @@ export function QuoteItemsSection() {
       newItemGroups[groupIndex].items = newItemGroups[groupIndex].items.filter((_, i) => i !== itemIndex);
       setItemGroups(newItemGroups);
     } else if (itemGroups.length > 1) {
-      // If it's the last item in the group, remove the entire group
       newItemGroups.splice(groupIndex, 1);
       setItemGroups(newItemGroups);
     }
@@ -450,17 +448,8 @@ export function QuoteItemsSection() {
       
       {itemGroups.map((group, groupIndex) => renderItemGroup(group, groupIndex))}
       
-      <div className="flex gap-4 mt-4">
-        <Button variant="outline" className="gap-2" onClick={() => addItem(0)}>
-          <Plus className="h-4 w-4" />
-          Line Item
-        </Button>
-        <Button variant="outline" className="gap-2">
-          <Plus className="h-4 w-4" />
-          Imprint
-        </Button>
-        <div className="flex-1"></div>
-        <Button variant="outline" className="gap-2 ml-auto" onClick={addItemGroup}>
+      <div className="flex justify-end mt-4">
+        <Button variant="outline" className="gap-2" onClick={addItemGroup}>
           <Plus className="h-4 w-4" />
           Line Item Group
         </Button>
