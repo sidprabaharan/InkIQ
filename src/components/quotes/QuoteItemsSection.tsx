@@ -5,6 +5,7 @@ import { Plus, MoreVertical } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export function QuoteItemsSection() {
   const [items, setItems] = useState([
@@ -80,7 +81,7 @@ export function QuoteItemsSection() {
   return (
     <div className="space-y-4">
       <h3 className="text-base font-medium">Quote Items</h3>
-      <div className="border rounded-md">
+      <div className="border rounded-md overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50">
@@ -104,13 +105,13 @@ export function QuoteItemsSection() {
           </TableHeader>
           <TableBody>
             {items.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell>
+              <TableRow key={index} className="border-b">
+                <TableCell className="p-2">
                   <Select 
                     value={item.category} 
                     onValueChange={(value) => handleInputChange(index, "category", value)}
                   >
-                    <SelectTrigger className="border-0 w-24 p-0 h-8">
+                    <SelectTrigger className="border-0 h-8 w-full p-0 focus:ring-0">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
@@ -119,120 +120,118 @@ export function QuoteItemsSection() {
                     </SelectContent>
                   </Select>
                 </TableCell>
-                <TableCell>
+                <TableCell className="p-2">
                   <Input 
-                    className="h-8 border-0 p-1 text-sm" 
+                    className="h-8 border-0 p-1 focus:ring-0" 
                     value={item.itemNumber}
                     onChange={(e) => handleInputChange(index, "itemNumber", e.target.value)}
-                    placeholder="Item #"
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell className="p-2">
                   <Input 
-                    className="h-8 border-0 p-1 text-sm" 
+                    className="h-8 border-0 p-1 focus:ring-0" 
                     value={item.color}
                     onChange={(e) => handleInputChange(index, "color", e.target.value)}
-                    placeholder="Color"
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell className="p-2">
                   <Input 
-                    className="h-8 border-0 p-1 text-sm" 
+                    className="h-8 border-0 p-1 focus:ring-0" 
                     value={item.description}
                     onChange={(e) => handleInputChange(index, "description", e.target.value)}
-                    placeholder="Description"
                   />
                 </TableCell>
-                <TableCell className="text-center">
+                <TableCell className="p-2 text-center">
                   <Input 
-                    className="h-8 border-0 p-1 text-sm w-10 text-center mx-auto" 
+                    className="h-8 border-0 p-1 w-10 text-center mx-auto focus:ring-0" 
                     type="number" 
                     value={item.sizes.xs || ""}
                     onChange={(e) => handleInputChange(index, "sizes.xs", e.target.value)}
                     min="0"
                   />
                 </TableCell>
-                <TableCell className="text-center">
+                <TableCell className="p-2 text-center">
                   <Input 
-                    className="h-8 border-0 p-1 text-sm w-10 text-center mx-auto" 
+                    className="h-8 border-0 p-1 w-10 text-center mx-auto focus:ring-0" 
                     type="number" 
                     value={item.sizes.s || ""}
                     onChange={(e) => handleInputChange(index, "sizes.s", e.target.value)}
                     min="0"
                   />
                 </TableCell>
-                <TableCell className="text-center">
+                <TableCell className="p-2 text-center">
                   <Input 
-                    className="h-8 border-0 p-1 text-sm w-10 text-center mx-auto" 
+                    className="h-8 border-0 p-1 w-10 text-center mx-auto focus:ring-0" 
                     type="number" 
                     value={item.sizes.m || ""}
                     onChange={(e) => handleInputChange(index, "sizes.m", e.target.value)}
                     min="0"
                   />
                 </TableCell>
-                <TableCell className="text-center">
+                <TableCell className="p-2 text-center">
                   <Input 
-                    className="h-8 border-0 p-1 text-sm w-10 text-center mx-auto" 
+                    className="h-8 border-0 p-1 w-10 text-center mx-auto focus:ring-0" 
                     type="number" 
                     value={item.sizes.l || ""}
                     onChange={(e) => handleInputChange(index, "sizes.l", e.target.value)}
                     min="0"
                   />
                 </TableCell>
-                <TableCell className="text-center">
+                <TableCell className="p-2 text-center">
                   <Input 
-                    className="h-8 border-0 p-1 text-sm w-10 text-center mx-auto" 
+                    className="h-8 border-0 p-1 w-10 text-center mx-auto focus:ring-0" 
                     type="number" 
                     value={item.sizes.xl || ""}
                     onChange={(e) => handleInputChange(index, "sizes.xl", e.target.value)}
                     min="0"
                   />
                 </TableCell>
-                <TableCell className="text-center">
+                <TableCell className="p-2 text-center">
                   <Input 
-                    className="h-8 border-0 p-1 text-sm w-10 text-center mx-auto" 
+                    className="h-8 border-0 p-1 w-10 text-center mx-auto focus:ring-0" 
                     type="number" 
                     value={item.sizes.xxl || ""}
                     onChange={(e) => handleInputChange(index, "sizes.xxl", e.target.value)}
                     min="0"
                   />
                 </TableCell>
-                <TableCell className="text-center">
+                <TableCell className="p-2 text-center">
                   <Input 
-                    className="h-8 border-0 p-1 text-sm w-10 text-center mx-auto" 
+                    className="h-8 border-0 p-1 w-10 text-center mx-auto focus:ring-0" 
                     type="number" 
                     value={item.sizes.xxxl || ""}
                     onChange={(e) => handleInputChange(index, "sizes.xxxl", e.target.value)}
                     min="0"
                   />
                 </TableCell>
-                <TableCell className="text-center">
-                  <div className="text-sm">{item.quantity}</div>
+                <TableCell className="p-2 text-center">
+                  <div className="text-sm font-medium">{item.quantity}</div>
                 </TableCell>
-                <TableCell>
-                  <Input 
-                    className="h-8 border-0 p-1 text-sm w-16" 
-                    type="number"
-                    value={item.price || ""}
-                    onChange={(e) => handleInputChange(index, "price", e.target.value)}
-                    min="0"
-                    step="0.01"
-                    placeholder="$"
-                  />
+                <TableCell className="p-2">
+                  <div className="flex items-center">
+                    <span className="text-gray-500 mr-1">$</span>
+                    <Input 
+                      className="h-8 border-0 p-1 w-16 focus:ring-0" 
+                      type="number"
+                      value={item.price || ""}
+                      onChange={(e) => handleInputChange(index, "price", e.target.value)}
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
                 </TableCell>
-                <TableCell className="text-center">
-                  <input 
-                    type="checkbox" 
-                    className="h-4 w-4" 
+                <TableCell className="p-2 text-center">
+                  <Checkbox
                     checked={item.taxed}
-                    onChange={(e) => handleInputChange(index, "taxed", e.target.checked)}
+                    onCheckedChange={(checked) => handleInputChange(index, "taxed", !!checked)}
+                    className="h-4 w-4 mx-auto"
                   />
                 </TableCell>
-                <TableCell>
-                  <div className="text-sm">${item.total.toFixed(2)}</div>
+                <TableCell className="p-2">
+                  <div className="text-sm font-medium">${item.total.toFixed(2)}</div>
                 </TableCell>
-                <TableCell>
-                  <MoreVertical className="h-5 w-5 text-gray-400" />
+                <TableCell className="p-2">
+                  <MoreVertical className="h-5 w-5 text-gray-400 mx-auto cursor-pointer" />
                 </TableCell>
               </TableRow>
             ))}
