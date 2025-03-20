@@ -1,15 +1,12 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { 
-  Dialog, 
-  DialogContent,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronRight, MoreVertical, Plus } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function NewQuote() {
   const navigate = useNavigate();
@@ -27,7 +24,7 @@ export default function NewQuote() {
             Cancel
           </Button>
           <Button variant="outline" className="text-gray-500">Preview</Button>
-          <Button className="bg-inkiq-primary hover:bg-inkiq-primary/90">Save & Finish</Button>
+          <Button className="bg-blue-500 hover:bg-blue-600 text-white">Save & Finish</Button>
         </div>
       </div>
 
@@ -38,7 +35,7 @@ export default function NewQuote() {
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <h3 className="text-base font-medium">Customers</h3>
-              <Button variant="outline" className="text-inkiq-primary">New Customer</Button>
+              <Button variant="outline" className="text-blue-500 border-blue-500">New Customer</Button>
             </div>
             <Select>
               <SelectTrigger className="w-full">
@@ -109,31 +106,31 @@ export default function NewQuote() {
           {/* Quote Items */}
           <div className="space-y-4">
             <h3 className="text-base font-medium">Quote Items</h3>
-            <div className="overflow-x-auto border rounded-md">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item#</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Color</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">XS</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">S</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">M</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">L</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">XL</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">2XL</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">3XL</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Taxed</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  <tr>
-                    <td className="px-4 py-3 text-sm text-gray-900">
+            <div className="border rounded-md">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50">
+                    <TableHead className="py-3 text-xs uppercase">Category</TableHead>
+                    <TableHead className="py-3 text-xs uppercase">Item#</TableHead>
+                    <TableHead className="py-3 text-xs uppercase">Color</TableHead>
+                    <TableHead className="py-3 text-xs uppercase">Description</TableHead>
+                    <TableHead className="py-3 text-xs uppercase text-center">XS</TableHead>
+                    <TableHead className="py-3 text-xs uppercase text-center">S</TableHead>
+                    <TableHead className="py-3 text-xs uppercase text-center">M</TableHead>
+                    <TableHead className="py-3 text-xs uppercase text-center">L</TableHead>
+                    <TableHead className="py-3 text-xs uppercase text-center">XL</TableHead>
+                    <TableHead className="py-3 text-xs uppercase text-center">2XL</TableHead>
+                    <TableHead className="py-3 text-xs uppercase text-center">3XL</TableHead>
+                    <TableHead className="py-3 text-xs uppercase text-center">Quantity</TableHead>
+                    <TableHead className="py-3 text-xs uppercase text-center">Price</TableHead>
+                    <TableHead className="py-3 text-xs uppercase text-center">Taxed</TableHead>
+                    <TableHead className="py-3 text-xs uppercase text-center">Total</TableHead>
+                    <TableHead className="py-3 text-xs uppercase"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>
                       <Select>
                         <SelectTrigger className="border-0 w-24 p-0 h-8">
                           <SelectValue placeholder="Select" />
@@ -143,29 +140,29 @@ export default function NewQuote() {
                           <SelectItem value="category2">Category 2</SelectItem>
                         </SelectContent>
                       </Select>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-500"></td>
-                    <td className="px-4 py-3 text-sm text-gray-500"></td>
-                    <td className="px-4 py-3 text-sm text-gray-500"></td>
-                    <td className="px-4 py-3 text-sm text-gray-500"></td>
-                    <td className="px-4 py-3 text-sm text-gray-500"></td>
-                    <td className="px-4 py-3 text-sm text-gray-500"></td>
-                    <td className="px-4 py-3 text-sm text-gray-500"></td>
-                    <td className="px-4 py-3 text-sm text-gray-500"></td>
-                    <td className="px-4 py-3 text-sm text-gray-500"></td>
-                    <td className="px-4 py-3 text-sm text-gray-500"></td>
-                    <td className="px-4 py-3 text-sm text-gray-500"></td>
-                    <td className="px-4 py-3 text-sm text-gray-500">$$</td>
-                    <td className="px-4 py-3 text-sm text-gray-500 text-center">
+                    </TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell>$$</TableCell>
+                    <TableCell className="text-center">
                       <input type="checkbox" className="h-4 w-4" />
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">$$</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
+                    </TableCell>
+                    <TableCell>$$</TableCell>
+                    <TableCell>
                       <MoreVertical className="h-5 w-5 text-gray-400" />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             </div>
             <div className="flex gap-4">
               <Button variant="outline" className="gap-2">
