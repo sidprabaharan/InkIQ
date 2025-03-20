@@ -239,192 +239,194 @@ export function QuoteItemsSection() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {group.items.map((item, itemIndex) => (
-              <React.Fragment key={`${group.id}-item-${itemIndex}`}>
-                <TableRow className="border-b hover:bg-gray-50">
-                  <TableCell className="p-0 border-r border-gray-200">
-                    <Select 
-                      value={item.category} 
-                      onValueChange={(value) => handleInputChange(groupIndex, itemIndex, "category", value)}
-                    >
-                      <SelectTrigger className="border-0 h-8 w-full rounded-none focus:ring-0">
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="category1">Category 1</SelectItem>
-                        <SelectItem value="category2">Category 2</SelectItem>
-                        <SelectItem value="shirts">Shirts</SelectItem>
-                        <SelectItem value="hoody">Hoody</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell className="p-0 border-r border-gray-200">
-                    <Input 
-                      className="h-8 border-0 rounded-none w-full focus:ring-0" 
-                      value={item.itemNumber}
-                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "itemNumber", e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell className="p-0 border-r border-gray-200">
-                    <Input 
-                      className="h-8 border-0 rounded-none w-full focus:ring-0" 
-                      value={item.color}
-                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "color", e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell className="p-0 border-r border-gray-200">
-                    <Input 
-                      className="h-8 border-0 rounded-none w-full focus:ring-0" 
-                      value={item.description}
-                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "description", e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell className="p-0 text-center border-r border-gray-200">
-                    <Input 
-                      className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                      type="number" 
-                      value={item.sizes.xs || ""}
-                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xs", e.target.value)}
-                      min="0"
-                    />
-                  </TableCell>
-                  <TableCell className="p-0 text-center border-r border-gray-200">
-                    <Input 
-                      className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                      type="number" 
-                      value={item.sizes.s || ""}
-                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.s", e.target.value)}
-                      min="0"
-                    />
-                  </TableCell>
-                  <TableCell className="p-0 text-center border-r border-gray-200">
-                    <Input 
-                      className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                      type="number" 
-                      value={item.sizes.m || ""}
-                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.m", e.target.value)}
-                      min="0"
-                    />
-                  </TableCell>
-                  <TableCell className="p-0 text-center border-r border-gray-200">
-                    <Input 
-                      className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                      type="number" 
-                      value={item.sizes.l || ""}
-                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.l", e.target.value)}
-                      min="0"
-                    />
-                  </TableCell>
-                  <TableCell className="p-0 text-center border-r border-gray-200">
-                    <Input 
-                      className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                      type="number" 
-                      value={item.sizes.xl || ""}
-                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xl", e.target.value)}
-                      min="0"
-                    />
-                  </TableCell>
-                  <TableCell className="p-0 text-center border-r border-gray-200">
-                    <Input 
-                      className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                      type="number" 
-                      value={item.sizes.xxl || ""}
-                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xxl", e.target.value)}
-                      min="0"
-                    />
-                  </TableCell>
-                  <TableCell className="p-0 text-center border-r border-gray-200">
-                    <Input 
-                      className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                      type="number" 
-                      value={item.sizes.xxxl || ""}
-                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xxxl", e.target.value)}
-                      min="0"
-                    />
-                  </TableCell>
-                  <TableCell className="p-0 text-center border-r border-gray-200">
-                    <div className="text-sm font-medium h-8 flex items-center justify-center">{item.quantity}</div>
-                  </TableCell>
-                  <TableCell className="p-0 border-r border-gray-200">
-                    <div className="flex items-center h-8">
-                      <span className="text-gray-500 ml-2 mr-0">$</span>
-                      <Input 
-                        className="h-8 border-0 rounded-none pl-0 w-full focus:ring-0" 
-                        type="number"
-                        value={item.price || ""}
-                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "price", e.target.value)}
-                        min="0"
-                        step="0.01"
-                      />
-                    </div>
-                  </TableCell>
-                  <TableCell className="p-0 text-center border-r border-gray-200">
-                    <div className="h-8 flex items-center justify-center">
-                      <Checkbox
-                        checked={item.taxed}
-                        onCheckedChange={(checked) => handleInputChange(groupIndex, itemIndex, "taxed", !!checked)}
-                        className="h-4 w-4"
-                      />
-                    </div>
-                  </TableCell>
-                  <TableCell className="p-0 border-r border-gray-200">
-                    <div className="text-sm font-medium h-8 flex items-center justify-center">${item.total.toFixed(2)}</div>
-                  </TableCell>
-                  <TableCell className="p-0 text-center">
-                    <div className="h-8 flex items-center justify-center">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="h-5 w-5 flex items-center justify-center focus:outline-none">
-                            <MoreVertical className="h-5 w-5 text-gray-400 cursor-pointer" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[180px]">
-                          <DropdownMenuItem onClick={() => handleAttachMockups(groupIndex, itemIndex)} className="gap-2">
-                            <Image className="h-4 w-4" />
-                            Attach Mockups
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => duplicateItem(groupIndex, itemIndex)} className="gap-2">
-                            <Copy className="h-4 w-4" />
-                            Duplicate
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => deleteItem(groupIndex, itemIndex)} className="gap-2 text-red-500">
-                            <Trash2 className="h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </TableCell>
-                </TableRow>
-                
-                {item.mockups.length > 0 && (
+            {group.items.map((item, itemIndex) => {
+              return (
+                <React.Fragment key={`${group.id}-item-${itemIndex}`}>
                   <TableRow className="border-b hover:bg-gray-50">
-                    <TableCell colSpan={16} className="p-2 bg-gray-50">
-                      <div className="flex flex-wrap gap-2 p-2">
-                        {item.mockups.map((mockup) => (
-                          <div 
-                            key={mockup.id} 
-                            className="relative w-20 h-20 border rounded-md overflow-hidden group"
-                          >
-                            <img 
-                              src={mockup.url} 
-                              alt={mockup.name}
-                              className="w-full h-full object-cover"
-                            />
-                            <button
-                              onClick={() => handleRemoveMockup(groupIndex, itemIndex, mockup.id)}
-                              className="absolute top-1 right-1 bg-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <X className="h-3 w-3" />
+                    <TableCell className="p-0 border-r border-gray-200">
+                      <Select 
+                        value={item.category} 
+                        onValueChange={(value) => handleInputChange(groupIndex, itemIndex, "category", value)}
+                      >
+                        <SelectTrigger className="border-0 h-8 w-full rounded-none focus:ring-0">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="category1">Category 1</SelectItem>
+                          <SelectItem value="category2">Category 2</SelectItem>
+                          <SelectItem value="shirts">Shirts</SelectItem>
+                          <SelectItem value="hoody">Hoody</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell className="p-0 border-r border-gray-200">
+                      <Input 
+                        className="h-8 border-0 rounded-none w-full focus:ring-0" 
+                        value={item.itemNumber}
+                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "itemNumber", e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell className="p-0 border-r border-gray-200">
+                      <Input 
+                        className="h-8 border-0 rounded-none w-full focus:ring-0" 
+                        value={item.color}
+                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "color", e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell className="p-0 border-r border-gray-200">
+                      <Input 
+                        className="h-8 border-0 rounded-none w-full focus:ring-0" 
+                        value={item.description}
+                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "description", e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell className="p-0 text-center border-r border-gray-200">
+                      <Input 
+                        className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
+                        type="number" 
+                        value={item.sizes.xs || ""}
+                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xs", e.target.value)}
+                        min="0"
+                      />
+                    </TableCell>
+                    <TableCell className="p-0 text-center border-r border-gray-200">
+                      <Input 
+                        className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
+                        type="number" 
+                        value={item.sizes.s || ""}
+                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.s", e.target.value)}
+                        min="0"
+                      />
+                    </TableCell>
+                    <TableCell className="p-0 text-center border-r border-gray-200">
+                      <Input 
+                        className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
+                        type="number" 
+                        value={item.sizes.m || ""}
+                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.m", e.target.value)}
+                        min="0"
+                      />
+                    </TableCell>
+                    <TableCell className="p-0 text-center border-r border-gray-200">
+                      <Input 
+                        className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
+                        type="number" 
+                        value={item.sizes.l || ""}
+                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.l", e.target.value)}
+                        min="0"
+                      />
+                    </TableCell>
+                    <TableCell className="p-0 text-center border-r border-gray-200">
+                      <Input 
+                        className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
+                        type="number" 
+                        value={item.sizes.xl || ""}
+                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xl", e.target.value)}
+                        min="0"
+                      />
+                    </TableCell>
+                    <TableCell className="p-0 text-center border-r border-gray-200">
+                      <Input 
+                        className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
+                        type="number" 
+                        value={item.sizes.xxl || ""}
+                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xxl", e.target.value)}
+                        min="0"
+                      />
+                    </TableCell>
+                    <TableCell className="p-0 text-center border-r border-gray-200">
+                      <Input 
+                        className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
+                        type="number" 
+                        value={item.sizes.xxxl || ""}
+                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xxxl", e.target.value)}
+                        min="0"
+                      />
+                    </TableCell>
+                    <TableCell className="p-0 text-center border-r border-gray-200">
+                      <div className="text-sm font-medium h-8 flex items-center justify-center">{item.quantity}</div>
+                    </TableCell>
+                    <TableCell className="p-0 border-r border-gray-200">
+                      <div className="flex items-center h-8">
+                        <span className="text-gray-500 ml-2 mr-0">$</span>
+                        <Input 
+                          className="h-8 border-0 rounded-none pl-0 w-full focus:ring-0" 
+                          type="number"
+                          value={item.price || ""}
+                          onChange={(e) => handleInputChange(groupIndex, itemIndex, "price", e.target.value)}
+                          min="0"
+                          step="0.01"
+                        />
+                      </div>
+                    </TableCell>
+                    <TableCell className="p-0 text-center border-r border-gray-200">
+                      <div className="h-8 flex items-center justify-center">
+                        <Checkbox
+                          checked={item.taxed}
+                          onCheckedChange={(checked) => handleInputChange(groupIndex, itemIndex, "taxed", !!checked)}
+                          className="h-4 w-4"
+                        />
+                      </div>
+                    </TableCell>
+                    <TableCell className="p-0 border-r border-gray-200">
+                      <div className="text-sm font-medium h-8 flex items-center justify-center">${item.total.toFixed(2)}</div>
+                    </TableCell>
+                    <TableCell className="p-0 text-center">
+                      <div className="h-8 flex items-center justify-center">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="h-5 w-5 flex items-center justify-center focus:outline-none">
+                              <MoreVertical className="h-5 w-5 text-gray-400 cursor-pointer" />
                             </button>
-                          </div>
-                        ))}
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-[180px]">
+                            <DropdownMenuItem onClick={() => handleAttachMockups(groupIndex, itemIndex)} className="gap-2">
+                              <Image className="h-4 w-4" />
+                              Attach Mockups
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => duplicateItem(groupIndex, itemIndex)} className="gap-2">
+                              <Copy className="h-4 w-4" />
+                              Duplicate
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => deleteItem(groupIndex, itemIndex)} className="gap-2 text-red-500">
+                              <Trash2 className="h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </TableCell>
                   </TableRow>
-                )}
-              </React.Fragment>
-            ))}
+                  
+                  {item.mockups.length > 0 && (
+                    <TableRow className="border-b hover:bg-gray-50">
+                      <TableCell colSpan={16} className="p-2 bg-gray-50">
+                        <div className="flex flex-wrap gap-2 p-2">
+                          {item.mockups.map((mockup) => (
+                            <div 
+                              key={mockup.id} 
+                              className="relative w-20 h-20 border rounded-md overflow-hidden group"
+                            >
+                              <img 
+                                src={mockup.url} 
+                                alt={mockup.name}
+                                className="w-full h-full object-cover"
+                              />
+                              <button
+                                onClick={() => handleRemoveMockup(groupIndex, itemIndex, mockup.id)}
+                                className="absolute top-1 right-1 bg-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
+              );
+            })}
           </TableBody>
         </Table>
         
