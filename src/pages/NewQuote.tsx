@@ -53,13 +53,17 @@ export default function NewQuote() {
             <NickNameSection />
             <NotesSection title="Customer Notes" />
             <NotesSection title="Production Note" />
-            <InvoiceSummarySection />
           </div>
         </div>
         
         {/* Quote Items Section - Full Width */}
         <div className="mt-6">
           <QuoteItemsSection />
+        </div>
+        
+        {/* Invoice Summary Section - Full Width but with right alignment */}
+        <div className="mt-6 md:w-1/3 md:ml-auto">
+          <InvoiceSummarySection />
         </div>
       </div>
     </div>
