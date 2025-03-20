@@ -22,7 +22,7 @@ export function QuoteHeader({ onCancel, onPreview, onSave }: QuoteHeaderProps) {
   };
   
   return (
-    <div className="flex justify-between items-center p-4 border-b">
+    <div className="flex justify-between items-center p-4 border-b bg-white">
       <div className="flex items-center gap-2">
         <span className="text-sm text-gray-500">Quotes</span>
         <ChevronRight className="h-4 w-4 text-gray-400" />

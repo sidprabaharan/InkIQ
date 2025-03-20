@@ -8,7 +8,7 @@ export function CustomerSection() {
     <div className="space-y-2">
       <div className="flex justify-between items-center">
         <h3 className="text-base font-medium">Customers</h3>
-        <Button variant="outline" className="text-blue-500 border-blue-500">New Customer</Button>
+        <Button variant="outline" className="text-blue-500">New Customer</Button>
       </div>
       <Select>
         <SelectTrigger className="w-full">

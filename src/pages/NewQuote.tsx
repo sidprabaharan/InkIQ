@@ -30,30 +30,32 @@ export default function NewQuote() {
   };
 
   return (
-    <div className="p-0 bg-white min-h-full">
+    <div className="p-0 bg-gray-50 min-h-full">
       <QuoteHeader 
         onCancel={handleCancel}
         onPreview={handlePreview}
         onSave={handleSave}
       />
 
-      <div className="grid grid-cols-12 gap-6 p-6">
-        {/* Left Content - 8 columns */}
-        <div className="col-span-8 space-y-6">
-          <CustomerSection />
-          <BillingSection />
-          <ShippingSection />
-          <QuoteItemsSection />
-        </div>
+      <div className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Left Content - 8 columns (2/3 of grid) */}
+          <div className="md:col-span-2 space-y-6">
+            <CustomerSection />
+            <BillingSection />
+            <ShippingSection />
+            <QuoteItemsSection />
+          </div>
 
-        {/* Right Content - 4 columns */}
-        <div className="col-span-4 space-y-6">
-          <QuotationHeader />
-          <QuotationDetailsSection />
-          <NickNameSection />
-          <NotesSection title="Customer Notes" />
-          <NotesSection title="Production Note" />
-          <InvoiceSummarySection />
+          {/* Right Content - 4 columns (1/3 of grid) */}
+          <div className="md:col-span-1 space-y-6">
+            <QuotationHeader />
+            <QuotationDetailsSection />
+            <NickNameSection />
+            <NotesSection title="Customer Notes" />
+            <NotesSection title="Production Note" />
+            <InvoiceSummarySection />
+          </div>
         </div>
       </div>
     </div>
