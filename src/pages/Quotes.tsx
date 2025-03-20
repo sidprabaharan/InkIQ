@@ -3,10 +3,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { QuoteSummaryCard } from "@/components/quotes/QuoteSummaryCard";
 import { QuotationTable } from "@/components/quotes/QuotationTable";
-import { QuoteFormDialog } from "@/components/quotes/QuoteFormDialog";
+import { useNavigate } from "react-router-dom";
 
 export default function Quotes() {
-  const [isQuoteFormOpen, setIsQuoteFormOpen] = useState(false);
+  const navigate = useNavigate();
   
   const summaryCards = [
     {
@@ -41,7 +41,7 @@ export default function Quotes() {
         <h1 className="text-2xl font-semibold">Quotations</h1>
         <Button 
           className="bg-inkiq-primary hover:bg-inkiq-primary/90"
-          onClick={() => setIsQuoteFormOpen(true)}
+          onClick={() => navigate("/quotes/new")}
         >
           New Quote
         </Button>
@@ -60,11 +60,6 @@ export default function Quotes() {
       </div>
 
       <QuotationTable />
-      
-      <QuoteFormDialog 
-        open={isQuoteFormOpen} 
-        onOpenChange={setIsQuoteFormOpen} 
-      />
     </div>
   );
 }

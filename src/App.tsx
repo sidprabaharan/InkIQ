@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Quotes from "./pages/Quotes";
+import NewQuote from "./pages/NewQuote";
 import { AppLayout } from "./components/layout/AppLayout";
 
 const queryClient = new QueryClient();
@@ -20,6 +21,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<AppLayout><Index /></AppLayout>} />
           <Route path="/quotes" element={<AppLayout><Quotes /></AppLayout>} />
+          <Route path="/quotes/new" element={<AppLayout><NewQuote /></AppLayout>} />
           {/* Routes for all the sidebar items */}
           <Route path="/dashboard" element={<AppLayout><Index /></AppLayout>} />
           <Route path="/calendar" element={<AppLayout><Index /></AppLayout>} />
