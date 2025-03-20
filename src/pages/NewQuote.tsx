@@ -47,12 +47,14 @@ export default function NewQuote() {
           </div>
 
           {/* Right Content - 4 columns (1/3 of grid) */}
-          <div className="md:col-span-1 space-y-6">
+          <div className="md:col-span-1 space-y-4">
             <QuotationHeader />
             <QuotationDetailsSection />
             <NickNameSection />
-            <NotesSection title="Customer Notes" />
-            <NotesSection title="Production Note" />
+            <div className="space-y-4">
+              <NotesSection title="Customer Notes" />
+              <NotesSection title="Production Note" />
+            </div>
           </div>
         </div>
         

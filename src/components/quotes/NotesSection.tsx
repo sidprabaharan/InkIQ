@@ -9,9 +9,9 @@ interface NotesSectionProps {
 
 export function NotesSection({ title, placeholder = "Write text here ..." }: NotesSectionProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <h3 className="text-base font-medium">{title}</h3>
-      <Textarea placeholder={placeholder} className="min-h-[100px]" />
+      <Textarea placeholder={placeholder} className="min-h-[80px]" />
     </div>
   );
 }
