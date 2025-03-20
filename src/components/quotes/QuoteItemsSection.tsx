@@ -1,12 +1,16 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, MoreVertical } from "lucide-react";
+import { Plus, MoreVertical, Trash2, Copy, Image } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function QuoteItemsSection() {
   const [items, setItems] = useState([
@@ -41,15 +45,12 @@ export function QuoteItemsSection() {
         [size]: typeof value === 'string' ? parseInt(value) || 0 : value
       };
       
-      // Recalculate quantity based on sizes
       const totalQuantity = Object.values(newItems[index].sizes).reduce((sum, val) => sum + (val as number), 0);
       newItems[index].quantity = totalQuantity;
     } else {
-      // @ts-ignore - dynamic field assignment
       newItems[index][field] = value;
     }
     
-    // Calculate total
     if (field === 'price' || field.startsWith('sizes.')) {
       newItems[index].total = newItems[index].quantity * newItems[index].price;
     }
@@ -77,6 +78,21 @@ export function QuoteItemsSection() {
       taxed: false,
       total: 0
     }]);
+  };
+
+  const duplicateItem = (index: number) => {
+    const itemToDuplicate = {...items[index]};
+    setItems([...items.slice(0, index + 1), itemToDuplicate, ...items.slice(index + 1)]);
+  };
+
+  const deleteItem = (index: number) => {
+    if (items.length > 1) {
+      setItems(items.filter((_, i) => i !== index));
+    }
+  };
+
+  const attachMockups = (index: number) => {
+    console.log("Attach mockups for item at index:", index);
   };
 
   return (
@@ -235,7 +251,27 @@ export function QuoteItemsSection() {
                 </TableCell>
                 <TableCell className="p-0 text-center">
                   <div className="h-8 flex items-center justify-center">
-                    <MoreVertical className="h-5 w-5 text-gray-400 cursor-pointer" />
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="h-5 w-5 flex items-center justify-center focus:outline-none">
+                          <MoreVertical className="h-5 w-5 text-gray-400 cursor-pointer" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-[180px]">
+                        <DropdownMenuItem onClick={() => attachMockups(index)} className="gap-2">
+                          <Image className="h-4 w-4" />
+                          Attach Mockups
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => duplicateItem(index)} className="gap-2">
+                          <Copy className="h-4 w-4" />
+                          Duplicate
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => deleteItem(index)} className="gap-2 text-red-500">
+                          <Trash2 className="h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </TableCell>
               </TableRow>
