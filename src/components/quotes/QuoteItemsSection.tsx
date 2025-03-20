@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, MoreVertical, Trash2, Copy, Image } from "lucide-react";
+import { Plus, MoreVertical, Trash2, Copy, Image, X } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -14,8 +14,36 @@ import {
 import { MockupUploadDialog } from "./MockupUploadDialog";
 import { toast } from "sonner";
 
+interface ItemMockup {
+  id: string;
+  name: string;
+  url: string;
+  type: string;
+}
+
+interface Item {
+  category: string;
+  itemNumber: string;
+  color: string;
+  description: string;
+  sizes: {
+    xs: number;
+    s: number;
+    m: number;
+    l: number;
+    xl: number;
+    xxl: number;
+    xxxl: number;
+  };
+  quantity: number;
+  price: number;
+  taxed: boolean;
+  total: number;
+  mockups: ItemMockup[];
+}
+
 export function QuoteItemsSection() {
-  const [items, setItems] = useState([
+  const [items, setItems] = useState<Item[]>([
     {
       category: "",
       itemNumber: "",
@@ -33,7 +61,8 @@ export function QuoteItemsSection() {
       quantity: 0,
       price: 0,
       taxed: false,
-      total: 0
+      total: 0,
+      mockups: []
     }
   ]);
 
@@ -81,7 +110,8 @@ export function QuoteItemsSection() {
       quantity: 0,
       price: 0,
       taxed: false,
-      total: 0
+      total: 0,
+      mockups: []
     }]);
   };
 
@@ -103,12 +133,37 @@ export function QuoteItemsSection() {
 
   const handleUploadComplete = (files: File[]) => {
     if (files.length > 0 && currentItemIndex !== null) {
-      toast.success(`${files.length} mockup${files.length > 1 ? 's' : ''} attached successfully`);
-      console.log(`Files attached to item ${currentItemIndex}:`, files);
+      const newMockups = files.map(file => ({
+        id: Math.random().toString(36).substring(2, 9),
+        name: file.name,
+        url: URL.createObjectURL(file),
+        type: file.type
+      }));
       
-      // Here you would typically upload the files to a server
-      // and save the references to the item
+      setItems(prevItems => {
+        const newItems = [...prevItems];
+        newItems[currentItemIndex] = {
+          ...newItems[currentItemIndex],
+          mockups: [...newItems[currentItemIndex].mockups, ...newMockups]
+        };
+        return newItems;
+      });
+
+      toast.success(`${files.length} mockup${files.length > 1 ? 's' : ''} attached successfully`);
     }
+  };
+
+  const handleRemoveMockup = (itemIndex: number, mockupId: string) => {
+    setItems(prevItems => {
+      const newItems = [...prevItems];
+      newItems[itemIndex] = {
+        ...newItems[itemIndex],
+        mockups: newItems[itemIndex].mockups.filter(mockup => mockup.id !== mockupId)
+      };
+      return newItems;
+    });
+    
+    toast.success("Mockup removed successfully");
   };
 
   return (
@@ -137,160 +192,189 @@ export function QuoteItemsSection() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {items.map((item, index) => (
-              <TableRow key={index} className="border-b hover:bg-gray-50">
-                <TableCell className="p-0 border-r border-gray-200">
-                  <Select 
-                    value={item.category} 
-                    onValueChange={(value) => handleInputChange(index, "category", value)}
-                  >
-                    <SelectTrigger className="border-0 h-8 w-full rounded-none focus:ring-0">
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="category1">Category 1</SelectItem>
-                      <SelectItem value="category2">Category 2</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell className="p-0 border-r border-gray-200">
-                  <Input 
-                    className="h-8 border-0 rounded-none w-full focus:ring-0" 
-                    value={item.itemNumber}
-                    onChange={(e) => handleInputChange(index, "itemNumber", e.target.value)}
-                  />
-                </TableCell>
-                <TableCell className="p-0 border-r border-gray-200">
-                  <Input 
-                    className="h-8 border-0 rounded-none w-full focus:ring-0" 
-                    value={item.color}
-                    onChange={(e) => handleInputChange(index, "color", e.target.value)}
-                  />
-                </TableCell>
-                <TableCell className="p-0 border-r border-gray-200">
-                  <Input 
-                    className="h-8 border-0 rounded-none w-full focus:ring-0" 
-                    value={item.description}
-                    onChange={(e) => handleInputChange(index, "description", e.target.value)}
-                  />
-                </TableCell>
-                <TableCell className="p-0 text-center border-r border-gray-200">
-                  <Input 
-                    className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                    type="number" 
-                    value={item.sizes.xs || ""}
-                    onChange={(e) => handleInputChange(index, "sizes.xs", e.target.value)}
-                    min="0"
-                  />
-                </TableCell>
-                <TableCell className="p-0 text-center border-r border-gray-200">
-                  <Input 
-                    className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                    type="number" 
-                    value={item.sizes.s || ""}
-                    onChange={(e) => handleInputChange(index, "sizes.s", e.target.value)}
-                    min="0"
-                  />
-                </TableCell>
-                <TableCell className="p-0 text-center border-r border-gray-200">
-                  <Input 
-                    className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                    type="number" 
-                    value={item.sizes.m || ""}
-                    onChange={(e) => handleInputChange(index, "sizes.m", e.target.value)}
-                    min="0"
-                  />
-                </TableCell>
-                <TableCell className="p-0 text-center border-r border-gray-200">
-                  <Input 
-                    className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                    type="number" 
-                    value={item.sizes.l || ""}
-                    onChange={(e) => handleInputChange(index, "sizes.l", e.target.value)}
-                    min="0"
-                  />
-                </TableCell>
-                <TableCell className="p-0 text-center border-r border-gray-200">
-                  <Input 
-                    className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                    type="number" 
-                    value={item.sizes.xl || ""}
-                    onChange={(e) => handleInputChange(index, "sizes.xl", e.target.value)}
-                    min="0"
-                  />
-                </TableCell>
-                <TableCell className="p-0 text-center border-r border-gray-200">
-                  <Input 
-                    className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                    type="number" 
-                    value={item.sizes.xxl || ""}
-                    onChange={(e) => handleInputChange(index, "sizes.xxl", e.target.value)}
-                    min="0"
-                  />
-                </TableCell>
-                <TableCell className="p-0 text-center border-r border-gray-200">
-                  <Input 
-                    className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                    type="number" 
-                    value={item.sizes.xxxl || ""}
-                    onChange={(e) => handleInputChange(index, "sizes.xxxl", e.target.value)}
-                    min="0"
-                  />
-                </TableCell>
-                <TableCell className="p-0 text-center border-r border-gray-200">
-                  <div className="text-sm font-medium h-8 flex items-center justify-center">{item.quantity}</div>
-                </TableCell>
-                <TableCell className="p-0 border-r border-gray-200">
-                  <div className="flex items-center h-8">
-                    <span className="text-gray-500 ml-2 mr-0">$</span>
+            {items.map((item, itemIndex) => (
+              <React.Fragment key={itemIndex}>
+                <TableRow className="border-b hover:bg-gray-50">
+                  <TableCell className="p-0 border-r border-gray-200">
+                    <Select 
+                      value={item.category} 
+                      onValueChange={(value) => handleInputChange(itemIndex, "category", value)}
+                    >
+                      <SelectTrigger className="border-0 h-8 w-full rounded-none focus:ring-0">
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="category1">Category 1</SelectItem>
+                        <SelectItem value="category2">Category 2</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell className="p-0 border-r border-gray-200">
                     <Input 
-                      className="h-8 border-0 rounded-none pl-0 w-full focus:ring-0" 
-                      type="number"
-                      value={item.price || ""}
-                      onChange={(e) => handleInputChange(index, "price", e.target.value)}
+                      className="h-8 border-0 rounded-none w-full focus:ring-0" 
+                      value={item.itemNumber}
+                      onChange={(e) => handleInputChange(itemIndex, "itemNumber", e.target.value)}
+                    />
+                  </TableCell>
+                  <TableCell className="p-0 border-r border-gray-200">
+                    <Input 
+                      className="h-8 border-0 rounded-none w-full focus:ring-0" 
+                      value={item.color}
+                      onChange={(e) => handleInputChange(itemIndex, "color", e.target.value)}
+                    />
+                  </TableCell>
+                  <TableCell className="p-0 border-r border-gray-200">
+                    <Input 
+                      className="h-8 border-0 rounded-none w-full focus:ring-0" 
+                      value={item.description}
+                      onChange={(e) => handleInputChange(itemIndex, "description", e.target.value)}
+                    />
+                  </TableCell>
+                  <TableCell className="p-0 text-center border-r border-gray-200">
+                    <Input 
+                      className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
+                      type="number" 
+                      value={item.sizes.xs || ""}
+                      onChange={(e) => handleInputChange(itemIndex, "sizes.xs", e.target.value)}
                       min="0"
-                      step="0.01"
                     />
-                  </div>
-                </TableCell>
-                <TableCell className="p-0 text-center border-r border-gray-200">
-                  <div className="h-8 flex items-center justify-center">
-                    <Checkbox
-                      checked={item.taxed}
-                      onCheckedChange={(checked) => handleInputChange(index, "taxed", !!checked)}
-                      className="h-4 w-4"
+                  </TableCell>
+                  <TableCell className="p-0 text-center border-r border-gray-200">
+                    <Input 
+                      className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
+                      type="number" 
+                      value={item.sizes.s || ""}
+                      onChange={(e) => handleInputChange(itemIndex, "sizes.s", e.target.value)}
+                      min="0"
                     />
-                  </div>
-                </TableCell>
-                <TableCell className="p-0 border-r border-gray-200">
-                  <div className="text-sm font-medium h-8 flex items-center justify-center">${item.total.toFixed(2)}</div>
-                </TableCell>
-                <TableCell className="p-0 text-center">
-                  <div className="h-8 flex items-center justify-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="h-5 w-5 flex items-center justify-center focus:outline-none">
-                          <MoreVertical className="h-5 w-5 text-gray-400 cursor-pointer" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-[180px]">
-                        <DropdownMenuItem onClick={() => handleAttachMockups(index)} className="gap-2">
-                          <Image className="h-4 w-4" />
-                          Attach Mockups
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => duplicateItem(index)} className="gap-2">
-                          <Copy className="h-4 w-4" />
-                          Duplicate
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => deleteItem(index)} className="gap-2 text-red-500">
-                          <Trash2 className="h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </TableCell>
-              </TableRow>
+                  </TableCell>
+                  <TableCell className="p-0 text-center border-r border-gray-200">
+                    <Input 
+                      className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
+                      type="number" 
+                      value={item.sizes.m || ""}
+                      onChange={(e) => handleInputChange(itemIndex, "sizes.m", e.target.value)}
+                      min="0"
+                    />
+                  </TableCell>
+                  <TableCell className="p-0 text-center border-r border-gray-200">
+                    <Input 
+                      className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
+                      type="number" 
+                      value={item.sizes.l || ""}
+                      onChange={(e) => handleInputChange(itemIndex, "sizes.l", e.target.value)}
+                      min="0"
+                    />
+                  </TableCell>
+                  <TableCell className="p-0 text-center border-r border-gray-200">
+                    <Input 
+                      className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
+                      type="number" 
+                      value={item.sizes.xl || ""}
+                      onChange={(e) => handleInputChange(itemIndex, "sizes.xl", e.target.value)}
+                      min="0"
+                    />
+                  </TableCell>
+                  <TableCell className="p-0 text-center border-r border-gray-200">
+                    <Input 
+                      className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
+                      type="number" 
+                      value={item.sizes.xxl || ""}
+                      onChange={(e) => handleInputChange(itemIndex, "sizes.xxl", e.target.value)}
+                      min="0"
+                    />
+                  </TableCell>
+                  <TableCell className="p-0 text-center border-r border-gray-200">
+                    <Input 
+                      className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
+                      type="number" 
+                      value={item.sizes.xxxl || ""}
+                      onChange={(e) => handleInputChange(itemIndex, "sizes.xxxl", e.target.value)}
+                      min="0"
+                    />
+                  </TableCell>
+                  <TableCell className="p-0 text-center border-r border-gray-200">
+                    <div className="text-sm font-medium h-8 flex items-center justify-center">{item.quantity}</div>
+                  </TableCell>
+                  <TableCell className="p-0 border-r border-gray-200">
+                    <div className="flex items-center h-8">
+                      <span className="text-gray-500 ml-2 mr-0">$</span>
+                      <Input 
+                        className="h-8 border-0 rounded-none pl-0 w-full focus:ring-0" 
+                        type="number"
+                        value={item.price || ""}
+                        onChange={(e) => handleInputChange(itemIndex, "price", e.target.value)}
+                        min="0"
+                        step="0.01"
+                      />
+                    </div>
+                  </TableCell>
+                  <TableCell className="p-0 text-center border-r border-gray-200">
+                    <div className="h-8 flex items-center justify-center">
+                      <Checkbox
+                        checked={item.taxed}
+                        onCheckedChange={(checked) => handleInputChange(itemIndex, "taxed", !!checked)}
+                        className="h-4 w-4"
+                      />
+                    </div>
+                  </TableCell>
+                  <TableCell className="p-0 border-r border-gray-200">
+                    <div className="text-sm font-medium h-8 flex items-center justify-center">${item.total.toFixed(2)}</div>
+                  </TableCell>
+                  <TableCell className="p-0 text-center">
+                    <div className="h-8 flex items-center justify-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="h-5 w-5 flex items-center justify-center focus:outline-none">
+                            <MoreVertical className="h-5 w-5 text-gray-400 cursor-pointer" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[180px]">
+                          <DropdownMenuItem onClick={() => handleAttachMockups(itemIndex)} className="gap-2">
+                            <Image className="h-4 w-4" />
+                            Attach Mockups
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => duplicateItem(itemIndex)} className="gap-2">
+                            <Copy className="h-4 w-4" />
+                            Duplicate
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => deleteItem(itemIndex)} className="gap-2 text-red-500">
+                            <Trash2 className="h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableCell>
+                </TableRow>
+                
+                {item.mockups.length > 0 && (
+                  <TableRow className="border-b hover:bg-gray-50">
+                    <TableCell colSpan={16} className="p-2 bg-gray-50">
+                      <div className="flex flex-wrap gap-2 p-2">
+                        {item.mockups.map((mockup) => (
+                          <div 
+                            key={mockup.id} 
+                            className="relative w-20 h-20 border rounded-md overflow-hidden group"
+                          >
+                            <img 
+                              src={mockup.url} 
+                              alt={mockup.name}
+                              className="w-full h-full object-cover"
+                            />
+                            <button
+                              onClick={() => handleRemoveMockup(itemIndex, mockup.id)}
+                              className="absolute top-1 right-1 bg-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </React.Fragment>
             ))}
           </TableBody>
         </Table>

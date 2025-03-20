@@ -4,6 +4,8 @@ import {
   Dialog, 
   DialogContent,
   DialogClose, 
+  DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CloudIcon, X, Upload, Pencil, Trash2, Plus } from "lucide-react";
@@ -68,8 +70,12 @@ export function MockupUploadDialog({ open, onOpenChange, onUpload }: MockupUploa
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
+        <DialogTitle className="text-lg font-semibold">Upload Attachment</DialogTitle>
+        <DialogDescription className="sr-only">
+          Upload mockup files for your quote item
+        </DialogDescription>
+        
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Upload Attachment</h2>
           <DialogClose asChild>
             <Button variant="ghost" className="h-8 w-8 p-0" aria-label="Close">
               <X className="h-4 w-4" />
