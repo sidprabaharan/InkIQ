@@ -11,7 +11,10 @@ export function NotesSection({ title, placeholder = "Write text here ..." }: Not
   return (
     <div className="space-y-2">
       <h3 className="text-base font-medium">{title}</h3>
-      <Textarea placeholder={placeholder} className="min-h-[60px]" />
+      <Textarea 
+        placeholder={placeholder} 
+        className="min-h-[160px]" // Increased height from 60px to 160px
+      />
     </div>
   );
 }
