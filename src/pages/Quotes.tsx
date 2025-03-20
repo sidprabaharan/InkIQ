@@ -1,9 +1,13 @@
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { QuoteSummaryCard } from "@/components/quotes/QuoteSummaryCard";
 import { QuotationTable } from "@/components/quotes/QuotationTable";
+import { QuoteFormDialog } from "@/components/quotes/QuoteFormDialog";
 
 export default function Quotes() {
+  const [isQuoteFormOpen, setIsQuoteFormOpen] = useState(false);
+  
   const summaryCards = [
     {
       title: "Total Opportunity",
@@ -35,7 +39,10 @@ export default function Quotes() {
     <div className="p-6 bg-gray-50 min-h-full">
       <div className="mb-6 flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Quotations</h1>
-        <Button className="bg-inkiq-primary hover:bg-inkiq-primary/90">
+        <Button 
+          className="bg-inkiq-primary hover:bg-inkiq-primary/90"
+          onClick={() => setIsQuoteFormOpen(true)}
+        >
           New Quote
         </Button>
       </div>
@@ -53,6 +60,11 @@ export default function Quotes() {
       </div>
 
       <QuotationTable />
+      
+      <QuoteFormDialog 
+        open={isQuoteFormOpen} 
+        onOpenChange={setIsQuoteFormOpen} 
+      />
     </div>
   );
 }
