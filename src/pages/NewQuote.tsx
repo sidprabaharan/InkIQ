@@ -103,7 +103,7 @@ export default function NewQuote() {
             </div>
           </div>
 
-          {/* Quote Items */}
+          {/* Quote Items - Full width in the left column */}
           <div className="space-y-4">
             <h3 className="text-base font-medium">Quote Items</h3>
             <div className="border rounded-md">
