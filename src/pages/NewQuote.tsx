@@ -44,7 +44,6 @@ export default function NewQuote() {
             <CustomerSection />
             <BillingSection />
             <ShippingSection />
-            <QuoteItemsSection />
           </div>
 
           {/* Right Content - 4 columns (1/3 of grid) */}
@@ -56,6 +55,11 @@ export default function NewQuote() {
             <NotesSection title="Production Note" />
             <InvoiceSummarySection />
           </div>
+        </div>
+        
+        {/* Quote Items Section - Full Width */}
+        <div className="mt-6">
+          <QuoteItemsSection />
         </div>
       </div>
     </div>
