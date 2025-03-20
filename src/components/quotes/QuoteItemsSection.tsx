@@ -11,6 +11,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { MockupUploadDialog } from "./MockupUploadDialog";
+import { toast } from "sonner";
 
 export function QuoteItemsSection() {
   const [items, setItems] = useState([
@@ -34,6 +36,9 @@ export function QuoteItemsSection() {
       total: 0
     }
   ]);
+
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [currentItemIndex, setCurrentItemIndex] = useState<number | null>(null);
 
   const handleInputChange = (index: number, field: string, value: string | number | boolean) => {
     const newItems = [...items];
@@ -91,8 +96,19 @@ export function QuoteItemsSection() {
     }
   };
 
-  const attachMockups = (index: number) => {
-    console.log("Attach mockups for item at index:", index);
+  const handleAttachMockups = (index: number) => {
+    setCurrentItemIndex(index);
+    setUploadDialogOpen(true);
+  };
+
+  const handleUploadComplete = (files: File[]) => {
+    if (files.length > 0 && currentItemIndex !== null) {
+      toast.success(`${files.length} mockup${files.length > 1 ? 's' : ''} attached successfully`);
+      console.log(`Files attached to item ${currentItemIndex}:`, files);
+      
+      // Here you would typically upload the files to a server
+      // and save the references to the item
+    }
   };
 
   return (
@@ -258,7 +274,7 @@ export function QuoteItemsSection() {
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-[180px]">
-                        <DropdownMenuItem onClick={() => attachMockups(index)} className="gap-2">
+                        <DropdownMenuItem onClick={() => handleAttachMockups(index)} className="gap-2">
                           <Image className="h-4 w-4" />
                           Attach Mockups
                         </DropdownMenuItem>
@@ -294,6 +310,12 @@ export function QuoteItemsSection() {
           Line Item Group
         </Button>
       </div>
+      
+      <MockupUploadDialog 
+        open={uploadDialogOpen}
+        onOpenChange={setUploadDialogOpen}
+        onUpload={handleUploadComplete}
+      />
     </div>
   );
 }
