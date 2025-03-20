@@ -3,8 +3,7 @@ import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Plus, Image } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Plus, Image, Trash2, X } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MockupUploadDialog } from "./MockupUploadDialog";
@@ -12,8 +11,6 @@ import { toast } from "sonner";
 
 export interface ImprintItem {
   id: string;
-  matrix: string;
-  column: string;
   typeOfWork: string;
   details: string;
   mockups: ImprintMockup[];
@@ -38,8 +35,6 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
     initialImprints : 
     [{
       id: `imprint-${Math.random().toString(36).substring(2, 9)}`,
-      matrix: "",
-      column: "",
       typeOfWork: "",
       details: "",
       mockups: []
@@ -52,8 +47,6 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
   const addNewImprint = () => {
     setImprints([...imprints, {
       id: `imprint-${Math.random().toString(36).substring(2, 9)}`,
-      matrix: "",
-      column: "",
       typeOfWork: "",
       details: "",
       mockups: []
@@ -72,6 +65,17 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
   const handleAttachMockup = (index: number) => {
     setCurrentImprintIndex(index);
     setUploadDialogOpen(true);
+  };
+
+  const handleDeleteImprint = (index: number) => {
+    // Only allow deletion if there's more than one imprint
+    if (imprints.length > 1) {
+      const updatedImprints = imprints.filter((_, i) => i !== index);
+      setImprints(updatedImprints);
+      toast.success("Imprint deleted successfully");
+    } else {
+      toast.error("Cannot delete the only imprint");
+    }
   };
 
   const handleUploadComplete = (files: File[]) => {
@@ -96,6 +100,17 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
     }
   };
 
+  const handleRemoveMockup = (imprintIndex: number, mockupId: string) => {
+    setImprints(prevImprints => {
+      const updatedImprints = [...prevImprints];
+      updatedImprints[imprintIndex] = {
+        ...updatedImprints[imprintIndex],
+        mockups: updatedImprints[imprintIndex].mockups.filter(mockup => mockup.id !== mockupId)
+      };
+      return updatedImprints;
+    });
+  };
+
   const handleSave = () => {
     onSave(imprints);
     onOpenChange(false);
@@ -112,40 +127,17 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
           <ScrollArea className="max-h-[60vh] pr-4">
             {imprints.map((imprint, index) => (
               <div key={imprint.id} className="space-y-4 pb-6 border-b border-gray-200 mb-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor={`matrix-${index}`} className="block text-sm font-medium mb-1">Matrix</label>
-                    <Select 
-                      value={imprint.matrix} 
-                      onValueChange={(value) => handleImprintChange(index, "matrix", value)}
-                    >
-                      <SelectTrigger id={`matrix-${index}`} className="w-full">
-                        <SelectValue placeholder="Select Matrix" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="matrix1">Matrix 1</SelectItem>
-                        <SelectItem value="matrix2">Matrix 2</SelectItem>
-                        <SelectItem value="matrix3">Matrix 3</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <label htmlFor={`column-${index}`} className="block text-sm font-medium mb-1">Column</label>
-                    <Select 
-                      value={imprint.column} 
-                      onValueChange={(value) => handleImprintChange(index, "column", value)}
-                    >
-                      <SelectTrigger id={`column-${index}`} className="w-full">
-                        <SelectValue placeholder="Select Column" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="column1">Column 1</SelectItem>
-                        <SelectItem value="column2">Column 2</SelectItem>
-                        <SelectItem value="column3">Column 3</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="flex justify-between items-center">
+                  <h3 className="text-sm font-medium">Imprint {index + 1}</h3>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                    onClick={() => handleDeleteImprint(index)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Delete imprint</span>
+                  </Button>
                 </div>
 
                 <div>
@@ -194,12 +186,18 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
                   {imprint.mockups.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                       {imprint.mockups.map((mockup) => (
-                        <div key={mockup.id} className="relative w-16 h-16 border rounded-md overflow-hidden">
+                        <div key={mockup.id} className="relative w-16 h-16 border rounded-md overflow-hidden group">
                           <img 
                             src={mockup.url} 
                             alt={mockup.name}
                             className="w-full h-full object-cover"
                           />
+                          <button
+                            onClick={() => handleRemoveMockup(index, mockup.id)}
+                            className="absolute top-1 right-1 bg-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
                         </div>
                       ))}
                     </div>

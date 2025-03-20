@@ -470,13 +470,7 @@ export function QuoteItemsSection() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {imprint.imprintItems.map((item) => (
                         <div key={item.id} className="border rounded-md p-3 bg-white">
-                          <div className="grid grid-cols-2 gap-2 text-sm">
-                            <div>
-                              <span className="font-medium">Matrix:</span> {item.matrix || "Not specified"}
-                            </div>
-                            <div>
-                              <span className="font-medium">Column:</span> {item.column || "Not specified"}
-                            </div>
+                          <div className="grid grid-cols-1 gap-2 text-sm">
                             <div>
                               <span className="font-medium">Type of Work:</span> {item.typeOfWork || "Not specified"}
                             </div>
