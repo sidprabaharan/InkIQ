@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, MoreVertical, Trash2, Copy, Image, X } from "lucide-react";
@@ -42,58 +43,69 @@ interface Item {
   mockups: ItemMockup[];
 }
 
+interface ItemGroup {
+  id: string;
+  items: Item[];
+}
+
 export function QuoteItemsSection() {
-  const [items, setItems] = useState<Item[]>([
+  const [itemGroups, setItemGroups] = useState<ItemGroup[]>([
     {
-      category: "",
-      itemNumber: "",
-      color: "",
-      description: "",
-      sizes: {
-        xs: 0,
-        s: 0,
-        m: 0,
-        l: 0,
-        xl: 0,
-        xxl: 0,
-        xxxl: 0
-      },
-      quantity: 0,
-      price: 0,
-      taxed: false,
-      total: 0,
-      mockups: []
+      id: "group-" + Math.random().toString(36).substring(2, 9),
+      items: [
+        {
+          category: "",
+          itemNumber: "",
+          color: "",
+          description: "",
+          sizes: {
+            xs: 0,
+            s: 0,
+            m: 0,
+            l: 0,
+            xl: 0,
+            xxl: 0,
+            xxxl: 0
+          },
+          quantity: 0,
+          price: 0,
+          taxed: false,
+          total: 0,
+          mockups: []
+        }
+      ]
     }
   ]);
 
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
-  const [currentItemIndex, setCurrentItemIndex] = useState<number | null>(null);
+  const [currentItemIndex, setCurrentItemIndex] = useState<{groupIndex: number, itemIndex: number} | null>(null);
 
-  const handleInputChange = (index: number, field: string, value: string | number | boolean) => {
-    const newItems = [...items];
+  const handleInputChange = (groupIndex: number, itemIndex: number, field: string, value: string | number | boolean) => {
+    const newItemGroups = [...itemGroups];
     
     if (field.startsWith("sizes.")) {
       const size = field.split(".")[1];
-      newItems[index].sizes = {
-        ...newItems[index].sizes,
+      newItemGroups[groupIndex].items[itemIndex].sizes = {
+        ...newItemGroups[groupIndex].items[itemIndex].sizes,
         [size]: typeof value === 'string' ? parseInt(value) || 0 : value
       };
       
-      const totalQuantity = Object.values(newItems[index].sizes).reduce((sum, val) => sum + (val as number), 0);
-      newItems[index].quantity = totalQuantity;
+      const totalQuantity = Object.values(newItemGroups[groupIndex].items[itemIndex].sizes).reduce((sum, val) => sum + (val as number), 0);
+      newItemGroups[groupIndex].items[itemIndex].quantity = totalQuantity;
     } else {
-      newItems[index][field] = value;
+      newItemGroups[groupIndex].items[itemIndex][field] = value;
     }
     
     if (field === 'price' || field.startsWith('sizes.')) {
-      newItems[index].total = newItems[index].quantity * newItems[index].price;
+      newItemGroups[groupIndex].items[itemIndex].total = newItemGroups[groupIndex].items[itemIndex].quantity * newItemGroups[groupIndex].items[itemIndex].price;
     }
     
-    setItems(newItems);
+    setItemGroups(newItemGroups);
   };
 
-  const addItem = () => {
-    setItems([...items, {
+  const addItem = (groupIndex: number) => {
+    const newItemGroups = [...itemGroups];
+    newItemGroups[groupIndex].items.push({
       category: "",
       itemNumber: "",
       color: "",
@@ -112,27 +124,65 @@ export function QuoteItemsSection() {
       taxed: false,
       total: 0,
       mockups: []
+    });
+    setItemGroups(newItemGroups);
+  };
+
+  const addItemGroup = () => {
+    setItemGroups([...itemGroups, {
+      id: "group-" + Math.random().toString(36).substring(2, 9),
+      items: [
+        {
+          category: "",
+          itemNumber: "",
+          color: "",
+          description: "",
+          sizes: {
+            xs: 0,
+            s: 0,
+            m: 0,
+            l: 0,
+            xl: 0,
+            xxl: 0,
+            xxxl: 0
+          },
+          quantity: 0,
+          price: 0,
+          taxed: false,
+          total: 0,
+          mockups: []
+        }
+      ]
     }]);
   };
 
-  const duplicateItem = (index: number) => {
-    const itemToDuplicate = {...items[index]};
-    setItems([...items.slice(0, index + 1), itemToDuplicate, ...items.slice(index + 1)]);
+  const duplicateItem = (groupIndex: number, itemIndex: number) => {
+    const newItemGroups = [...itemGroups];
+    const itemToDuplicate = {...newItemGroups[groupIndex].items[itemIndex]};
+    newItemGroups[groupIndex].items.splice(itemIndex + 1, 0, itemToDuplicate);
+    setItemGroups(newItemGroups);
   };
 
-  const deleteItem = (index: number) => {
-    if (items.length > 1) {
-      setItems(items.filter((_, i) => i !== index));
+  const deleteItem = (groupIndex: number, itemIndex: number) => {
+    const newItemGroups = [...itemGroups];
+    if (newItemGroups[groupIndex].items.length > 1) {
+      newItemGroups[groupIndex].items = newItemGroups[groupIndex].items.filter((_, i) => i !== itemIndex);
+      setItemGroups(newItemGroups);
+    } else if (itemGroups.length > 1) {
+      // If it's the last item in the group, remove the entire group
+      newItemGroups.splice(groupIndex, 1);
+      setItemGroups(newItemGroups);
     }
   };
 
-  const handleAttachMockups = (index: number) => {
-    setCurrentItemIndex(index);
+  const handleAttachMockups = (groupIndex: number, itemIndex: number) => {
+    setCurrentItemIndex({ groupIndex, itemIndex });
     setUploadDialogOpen(true);
   };
 
   const handleUploadComplete = (files: File[]) => {
     if (files.length > 0 && currentItemIndex !== null) {
+      const { groupIndex, itemIndex } = currentItemIndex;
       const newMockups = files.map(file => ({
         id: Math.random().toString(36).substring(2, 9),
         name: file.name,
@@ -140,36 +190,35 @@ export function QuoteItemsSection() {
         type: file.type
       }));
       
-      setItems(prevItems => {
-        const newItems = [...prevItems];
-        newItems[currentItemIndex] = {
-          ...newItems[currentItemIndex],
-          mockups: [...newItems[currentItemIndex].mockups, ...newMockups]
+      setItemGroups(prevItemGroups => {
+        const newItemGroups = [...prevItemGroups];
+        newItemGroups[groupIndex].items[itemIndex] = {
+          ...newItemGroups[groupIndex].items[itemIndex],
+          mockups: [...newItemGroups[groupIndex].items[itemIndex].mockups, ...newMockups]
         };
-        return newItems;
+        return newItemGroups;
       });
 
       toast.success(`${files.length} mockup${files.length > 1 ? 's' : ''} attached successfully`);
     }
   };
 
-  const handleRemoveMockup = (itemIndex: number, mockupId: string) => {
-    setItems(prevItems => {
-      const newItems = [...prevItems];
-      newItems[itemIndex] = {
-        ...newItems[itemIndex],
-        mockups: newItems[itemIndex].mockups.filter(mockup => mockup.id !== mockupId)
+  const handleRemoveMockup = (groupIndex: number, itemIndex: number, mockupId: string) => {
+    setItemGroups(prevItemGroups => {
+      const newItemGroups = [...prevItemGroups];
+      newItemGroups[groupIndex].items[itemIndex] = {
+        ...newItemGroups[groupIndex].items[itemIndex],
+        mockups: newItemGroups[groupIndex].items[itemIndex].mockups.filter(mockup => mockup.id !== mockupId)
       };
-      return newItems;
+      return newItemGroups;
     });
     
     toast.success("Mockup removed successfully");
   };
 
-  return (
-    <div className="space-y-2">
-      <h3 className="text-base font-medium">Quote Items</h3>
-      <div className="border rounded-md overflow-x-auto">
+  const renderItemGroup = (group: ItemGroup, groupIndex: number) => {
+    return (
+      <div key={group.id} className="mb-8 border rounded-md overflow-hidden">
         <Table className="w-full table-fixed">
           <TableHeader>
             <TableRow className="bg-gray-50">
@@ -192,13 +241,13 @@ export function QuoteItemsSection() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {items.map((item, itemIndex) => (
-              <React.Fragment key={itemIndex}>
+            {group.items.map((item, itemIndex) => (
+              <React.Fragment key={`${group.id}-item-${itemIndex}`}>
                 <TableRow className="border-b hover:bg-gray-50">
                   <TableCell className="p-0 border-r border-gray-200">
                     <Select 
                       value={item.category} 
-                      onValueChange={(value) => handleInputChange(itemIndex, "category", value)}
+                      onValueChange={(value) => handleInputChange(groupIndex, itemIndex, "category", value)}
                     >
                       <SelectTrigger className="border-0 h-8 w-full rounded-none focus:ring-0">
                         <SelectValue placeholder="Select" />
@@ -206,6 +255,8 @@ export function QuoteItemsSection() {
                       <SelectContent>
                         <SelectItem value="category1">Category 1</SelectItem>
                         <SelectItem value="category2">Category 2</SelectItem>
+                        <SelectItem value="shirts">Shirts</SelectItem>
+                        <SelectItem value="hoody">Hoody</SelectItem>
                       </SelectContent>
                     </Select>
                   </TableCell>
@@ -213,21 +264,21 @@ export function QuoteItemsSection() {
                     <Input 
                       className="h-8 border-0 rounded-none w-full focus:ring-0" 
                       value={item.itemNumber}
-                      onChange={(e) => handleInputChange(itemIndex, "itemNumber", e.target.value)}
+                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "itemNumber", e.target.value)}
                     />
                   </TableCell>
                   <TableCell className="p-0 border-r border-gray-200">
                     <Input 
                       className="h-8 border-0 rounded-none w-full focus:ring-0" 
                       value={item.color}
-                      onChange={(e) => handleInputChange(itemIndex, "color", e.target.value)}
+                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "color", e.target.value)}
                     />
                   </TableCell>
                   <TableCell className="p-0 border-r border-gray-200">
                     <Input 
                       className="h-8 border-0 rounded-none w-full focus:ring-0" 
                       value={item.description}
-                      onChange={(e) => handleInputChange(itemIndex, "description", e.target.value)}
+                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "description", e.target.value)}
                     />
                   </TableCell>
                   <TableCell className="p-0 text-center border-r border-gray-200">
@@ -235,7 +286,7 @@ export function QuoteItemsSection() {
                       className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
                       type="number" 
                       value={item.sizes.xs || ""}
-                      onChange={(e) => handleInputChange(itemIndex, "sizes.xs", e.target.value)}
+                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xs", e.target.value)}
                       min="0"
                     />
                   </TableCell>
@@ -244,7 +295,7 @@ export function QuoteItemsSection() {
                       className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
                       type="number" 
                       value={item.sizes.s || ""}
-                      onChange={(e) => handleInputChange(itemIndex, "sizes.s", e.target.value)}
+                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.s", e.target.value)}
                       min="0"
                     />
                   </TableCell>
@@ -253,7 +304,7 @@ export function QuoteItemsSection() {
                       className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
                       type="number" 
                       value={item.sizes.m || ""}
-                      onChange={(e) => handleInputChange(itemIndex, "sizes.m", e.target.value)}
+                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.m", e.target.value)}
                       min="0"
                     />
                   </TableCell>
@@ -262,7 +313,7 @@ export function QuoteItemsSection() {
                       className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
                       type="number" 
                       value={item.sizes.l || ""}
-                      onChange={(e) => handleInputChange(itemIndex, "sizes.l", e.target.value)}
+                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.l", e.target.value)}
                       min="0"
                     />
                   </TableCell>
@@ -271,7 +322,7 @@ export function QuoteItemsSection() {
                       className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
                       type="number" 
                       value={item.sizes.xl || ""}
-                      onChange={(e) => handleInputChange(itemIndex, "sizes.xl", e.target.value)}
+                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xl", e.target.value)}
                       min="0"
                     />
                   </TableCell>
@@ -280,7 +331,7 @@ export function QuoteItemsSection() {
                       className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
                       type="number" 
                       value={item.sizes.xxl || ""}
-                      onChange={(e) => handleInputChange(itemIndex, "sizes.xxl", e.target.value)}
+                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xxl", e.target.value)}
                       min="0"
                     />
                   </TableCell>
@@ -289,7 +340,7 @@ export function QuoteItemsSection() {
                       className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
                       type="number" 
                       value={item.sizes.xxxl || ""}
-                      onChange={(e) => handleInputChange(itemIndex, "sizes.xxxl", e.target.value)}
+                      onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xxxl", e.target.value)}
                       min="0"
                     />
                   </TableCell>
@@ -303,7 +354,7 @@ export function QuoteItemsSection() {
                         className="h-8 border-0 rounded-none pl-0 w-full focus:ring-0" 
                         type="number"
                         value={item.price || ""}
-                        onChange={(e) => handleInputChange(itemIndex, "price", e.target.value)}
+                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "price", e.target.value)}
                         min="0"
                         step="0.01"
                       />
@@ -313,7 +364,7 @@ export function QuoteItemsSection() {
                     <div className="h-8 flex items-center justify-center">
                       <Checkbox
                         checked={item.taxed}
-                        onCheckedChange={(checked) => handleInputChange(itemIndex, "taxed", !!checked)}
+                        onCheckedChange={(checked) => handleInputChange(groupIndex, itemIndex, "taxed", !!checked)}
                         className="h-4 w-4"
                       />
                     </div>
@@ -330,15 +381,15 @@ export function QuoteItemsSection() {
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-[180px]">
-                          <DropdownMenuItem onClick={() => handleAttachMockups(itemIndex)} className="gap-2">
+                          <DropdownMenuItem onClick={() => handleAttachMockups(groupIndex, itemIndex)} className="gap-2">
                             <Image className="h-4 w-4" />
                             Attach Mockups
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => duplicateItem(itemIndex)} className="gap-2">
+                          <DropdownMenuItem onClick={() => duplicateItem(groupIndex, itemIndex)} className="gap-2">
                             <Copy className="h-4 w-4" />
                             Duplicate
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => deleteItem(itemIndex)} className="gap-2 text-red-500">
+                          <DropdownMenuItem onClick={() => deleteItem(groupIndex, itemIndex)} className="gap-2 text-red-500">
                             <Trash2 className="h-4 w-4" />
                             Delete
                           </DropdownMenuItem>
@@ -363,7 +414,7 @@ export function QuoteItemsSection() {
                               className="w-full h-full object-cover"
                             />
                             <button
-                              onClick={() => handleRemoveMockup(itemIndex, mockup.id)}
+                              onClick={() => handleRemoveMockup(groupIndex, itemIndex, mockup.id)}
                               className="absolute top-1 right-1 bg-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                             >
                               <X className="h-3 w-3" />
@@ -378,9 +429,29 @@ export function QuoteItemsSection() {
             ))}
           </TableBody>
         </Table>
+        
+        <div className="flex gap-4 mt-2 mb-2 px-2">
+          <Button variant="outline" className="gap-2" onClick={() => addItem(groupIndex)}>
+            <Plus className="h-4 w-4" />
+            Line Item
+          </Button>
+          <Button variant="outline" className="gap-2">
+            <Plus className="h-4 w-4" />
+            Imprint
+          </Button>
+        </div>
       </div>
-      <div className="flex gap-4 mt-2">
-        <Button variant="outline" className="gap-2" onClick={addItem}>
+    );
+  };
+
+  return (
+    <div className="space-y-2">
+      <h3 className="text-base font-medium">Quote Items</h3>
+      
+      {itemGroups.map((group, groupIndex) => renderItemGroup(group, groupIndex))}
+      
+      <div className="flex gap-4 mt-4">
+        <Button variant="outline" className="gap-2" onClick={() => addItem(0)}>
           <Plus className="h-4 w-4" />
           Line Item
         </Button>
@@ -389,7 +460,7 @@ export function QuoteItemsSection() {
           Imprint
         </Button>
         <div className="flex-1"></div>
-        <Button variant="outline" className="gap-2 ml-auto">
+        <Button variant="outline" className="gap-2 ml-auto" onClick={addItemGroup}>
           <Plus className="h-4 w-4" />
           Line Item Group
         </Button>
