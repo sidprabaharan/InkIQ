@@ -13,7 +13,7 @@ export function NotesSection({ title, placeholder = "Write text here ..." }: Not
       <h3 className="text-base font-medium">{title}</h3>
       <Textarea 
         placeholder={placeholder} 
-        className="min-h-[80px]" // Adjusted height from 100px to 80px
+        className="min-h-[100px]" // Adjusted height from 80px to 100px
       />
     </div>
   );
