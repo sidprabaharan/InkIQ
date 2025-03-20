@@ -1,7 +1,10 @@
 
+import { useState } from 'react';
 import {
   BarChart2,
   Calendar,
+  ChevronLeft,
+  ChevronRight,
   CreditCard,
   DollarSign,
   FileText,
@@ -18,7 +21,12 @@ import {
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
-export function Sidebar() {
+interface SidebarProps {
+  collapsed: boolean;
+  toggleCollapse: () => void;
+}
+
+export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
   const location = useLocation();
   
   const navigationItems = [
@@ -113,26 +121,38 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="w-[230px] border-r h-full flex flex-col bg-white">
-      <div className="p-4 flex items-center gap-2 border-b">
+    <aside className={`${collapsed ? 'w-[64px]' : 'w-[230px]'} border-r h-full flex flex-col bg-white transition-width duration-300`}>
+      <div className={`p-4 flex items-center gap-2 border-b ${collapsed ? 'justify-center' : ''}`}>
         <PlayCircle size={24} className="text-inkiq-primary fill-inkiq-primary" />
-        <span className="font-semibold text-xl">InkIQ</span>
+        {!collapsed && <span className="font-semibold text-xl">InkIQ</span>}
+      </div>
+      
+      <div className="relative">
+        <button
+          onClick={toggleCollapse}
+          className="absolute -right-3 top-4 bg-white border rounded-full p-1 shadow-md z-10 hover:bg-gray-50"
+        >
+          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        </button>
       </div>
       
       <nav className="flex-1 overflow-y-auto py-2">
-        <ul className="space-y-1 px-2">
+        <ul className={`space-y-1 ${collapsed ? 'px-1' : 'px-2'}`}>
           {navigationItems.map((item) => (
             <li key={item.name}>
               <Link
                 to={item.path}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                title={collapsed ? item.name : undefined}
+                className={`flex items-center gap-3 rounded-md text-sm font-medium transition-colors ${
+                  collapsed ? 'justify-center p-2' : 'px-3 py-2'
+                } ${
                   location.pathname === item.path
                     ? 'bg-inkiq-primary/10 text-inkiq-primary'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
                 <item.icon size={18} />
-                <span>{item.name}</span>
+                {!collapsed && <span>{item.name}</span>}
               </Link>
             </li>
           ))}
@@ -140,15 +160,18 @@ export function Sidebar() {
       </nav>
       
       <div className="border-t py-2">
-        <ul className="space-y-1 px-2">
+        <ul className={`space-y-1 ${collapsed ? 'px-1' : 'px-2'}`}>
           {bottomItems.map((item) => (
             <li key={item.name}>
               <Link
                 to={item.path}
-                className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+                title={collapsed ? item.name : undefined}
+                className={`flex items-center gap-3 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors ${
+                  collapsed ? 'justify-center p-2' : 'px-3 py-2'
+                }`}
               >
                 <item.icon size={18} />
-                <span>{item.name}</span>
+                {!collapsed && <span>{item.name}</span>}
               </Link>
             </li>
           ))}
