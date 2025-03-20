@@ -11,12 +11,8 @@ export function ShippingSection() {
         <Input placeholder="Company" />
         <Input placeholder="Name" />
         <Input placeholder="Address" />
+        <Input placeholder="Address" />
         <div className="grid grid-cols-2 gap-4">
-          <Input placeholder="City" />
-          <Input placeholder="Input text" />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <Input placeholder="Zip Code" />
           <Select>
             <SelectTrigger>
               <SelectValue placeholder="Country" />
@@ -27,6 +23,11 @@ export function ShippingSection() {
               <SelectItem value="uk">United Kingdom</SelectItem>
             </SelectContent>
           </Select>
+          <Input placeholder="State/ Province" />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <Input placeholder="City" />
+          <Input placeholder="Zip Code Postal Code" />
         </div>
       </div>
     </div>
