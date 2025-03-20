@@ -144,7 +144,10 @@ export function QuotationTable() {
           </thead>
           <tbody>
             {quotationsData.map((quotation) => (
-              <tr key={quotation.id} className="border-b">
+              <tr 
+                key={quotation.id} 
+                className="border-b hover:bg-gray-50 transition-colors cursor-pointer"
+              >
                 <td className="px-4 py-3 text-sm text-gray-500">
                   {quotation.id}
                   {quotation.norisId && (
