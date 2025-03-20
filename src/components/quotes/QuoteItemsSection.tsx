@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 
 export function QuoteItemsSection() {
   const [items, setItems] = useState([
@@ -106,7 +107,7 @@ export function QuoteItemsSection() {
           <TableBody>
             {items.map((item, index) => (
               <TableRow key={index} className="border-b hover:bg-gray-50">
-                <TableCell className="p-0">
+                <TableCell className="p-0 border-r border-gray-200">
                   <Select 
                     value={item.category} 
                     onValueChange={(value) => handleInputChange(index, "category", value)}
@@ -120,28 +121,28 @@ export function QuoteItemsSection() {
                     </SelectContent>
                   </Select>
                 </TableCell>
-                <TableCell className="p-0">
+                <TableCell className="p-0 border-r border-gray-200">
                   <Input 
                     className="h-8 border-0 rounded-none w-full focus:ring-0" 
                     value={item.itemNumber}
                     onChange={(e) => handleInputChange(index, "itemNumber", e.target.value)}
                   />
                 </TableCell>
-                <TableCell className="p-0">
+                <TableCell className="p-0 border-r border-gray-200">
                   <Input 
                     className="h-8 border-0 rounded-none w-full focus:ring-0" 
                     value={item.color}
                     onChange={(e) => handleInputChange(index, "color", e.target.value)}
                   />
                 </TableCell>
-                <TableCell className="p-0">
+                <TableCell className="p-0 border-r border-gray-200">
                   <Input 
                     className="h-8 border-0 rounded-none w-full focus:ring-0" 
                     value={item.description}
                     onChange={(e) => handleInputChange(index, "description", e.target.value)}
                   />
                 </TableCell>
-                <TableCell className="p-0 text-center">
+                <TableCell className="p-0 text-center border-r border-gray-200">
                   <Input 
                     className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
                     type="number" 
@@ -150,7 +151,7 @@ export function QuoteItemsSection() {
                     min="0"
                   />
                 </TableCell>
-                <TableCell className="p-0 text-center">
+                <TableCell className="p-0 text-center border-r border-gray-200">
                   <Input 
                     className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
                     type="number" 
@@ -159,7 +160,7 @@ export function QuoteItemsSection() {
                     min="0"
                   />
                 </TableCell>
-                <TableCell className="p-0 text-center">
+                <TableCell className="p-0 text-center border-r border-gray-200">
                   <Input 
                     className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
                     type="number" 
@@ -168,7 +169,7 @@ export function QuoteItemsSection() {
                     min="0"
                   />
                 </TableCell>
-                <TableCell className="p-0 text-center">
+                <TableCell className="p-0 text-center border-r border-gray-200">
                   <Input 
                     className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
                     type="number" 
@@ -177,7 +178,7 @@ export function QuoteItemsSection() {
                     min="0"
                   />
                 </TableCell>
-                <TableCell className="p-0 text-center">
+                <TableCell className="p-0 text-center border-r border-gray-200">
                   <Input 
                     className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
                     type="number" 
@@ -186,7 +187,7 @@ export function QuoteItemsSection() {
                     min="0"
                   />
                 </TableCell>
-                <TableCell className="p-0 text-center">
+                <TableCell className="p-0 text-center border-r border-gray-200">
                   <Input 
                     className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
                     type="number" 
@@ -195,7 +196,7 @@ export function QuoteItemsSection() {
                     min="0"
                   />
                 </TableCell>
-                <TableCell className="p-0 text-center">
+                <TableCell className="p-0 text-center border-r border-gray-200">
                   <Input 
                     className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
                     type="number" 
@@ -204,10 +205,10 @@ export function QuoteItemsSection() {
                     min="0"
                   />
                 </TableCell>
-                <TableCell className="p-0 text-center">
+                <TableCell className="p-0 text-center border-r border-gray-200">
                   <div className="text-sm font-medium h-8 flex items-center justify-center">{item.quantity}</div>
                 </TableCell>
-                <TableCell className="p-0">
+                <TableCell className="p-0 border-r border-gray-200">
                   <div className="flex items-center h-8">
                     <span className="text-gray-500 ml-2 mr-0">$</span>
                     <Input 
@@ -220,7 +221,7 @@ export function QuoteItemsSection() {
                     />
                   </div>
                 </TableCell>
-                <TableCell className="p-0 text-center">
+                <TableCell className="p-0 text-center border-r border-gray-200">
                   <div className="h-8 flex items-center justify-center">
                     <Checkbox
                       checked={item.taxed}
@@ -229,7 +230,7 @@ export function QuoteItemsSection() {
                     />
                   </div>
                 </TableCell>
-                <TableCell className="p-0">
+                <TableCell className="p-0 border-r border-gray-200">
                   <div className="text-sm font-medium h-8 flex items-center justify-center">${item.total.toFixed(2)}</div>
                 </TableCell>
                 <TableCell className="p-0 text-center">
