@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Printer, Copy, ListChecks, MessageCircle, Edit, Link, File, Trash, Download, DollarSign, Truck } from "lucide-react";
+import { ChevronRight, Printer, Copy, ListChecks, MessageCircle, Edit, Link, File, Trash, Download, DollarSign, Truck, Package, ListPlus, Wrench, Box } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -198,6 +198,7 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
               {documentType} Link
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handlePackingSlip}>
+              <Package className="h-4 w-4 mr-2" />
               Packing Slip
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleShipping}>
@@ -205,12 +206,15 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
               Shipping
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleAddLineItemsToPO}>
+              <ListPlus className="h-4 w-4 mr-2" />
               Add Line Items to PO
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleWorkOrder}>
+              <Wrench className="h-4 w-4 mr-2" />
               Work Order
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handlePrintBoxLabels}>
+              <Box className="h-4 w-4 mr-2" />
               Print Box Labels
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handlePrint}>
