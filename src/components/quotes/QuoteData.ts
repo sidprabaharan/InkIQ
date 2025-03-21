@@ -98,7 +98,7 @@ export const quotationData: QuotationData = {
   nickname: "Project Care Quote",
   company: {
     name: "15493315 Canada Inc",
-    logo: "/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png",
+    logo: "/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png",
     address: "226 Rue du Domaine",
     city: "Laval",
     region: "Quebec",
