@@ -80,6 +80,7 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
   };
   
   const submitCustomerForm = () => {
+    // Create the new customer
     const newCustomer = addCustomer({
       companyName,
       email,
@@ -112,7 +113,7 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
       }
     });
     
-    // Select the newly created customer
+    // Automatically select the new customer to populate billing and shipping forms
     selectCustomer(newCustomer.id);
     
     // Reset form and close dialog
