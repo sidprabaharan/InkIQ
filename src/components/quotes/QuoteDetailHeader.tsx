@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Printer, Copy, ListChecks, MessageCircle, Edit, Link, File, Trash, Download, DollarSign, Truck, Package, ListPlus, Wrench, Box } from "lucide-react";
 import {
@@ -51,10 +50,7 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
   };
   
   const handleEditDocument = () => {
-    toast({
-      title: `Edit ${documentType}`,
-      description: `Editing ${documentType.toLowerCase()} #${quoteId}`,
-    });
+    navigate(`/quotes/${quoteId}/edit`);
   };
   
   const handleDocumentLink = () => {
