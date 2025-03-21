@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Printer, Copy, ListChecks, MessageCircle, Edit, Link, File, Trash, Download, DollarSign, Truck, Package, ListPlus, Wrench, Box } from "lucide-react";
 import {
@@ -20,6 +21,7 @@ import {
 import { StatusDropdown } from "./StatusDropdown";
 import { useState } from "react";
 import { PackingSlip } from "./PackingSlip";
+import { ShippingLabelDialog } from "./ShippingLabelDialog";
 
 interface QuoteDetailHeaderProps {
   quoteId: string;
@@ -38,6 +40,7 @@ export function QuoteDetailHeader({
   const { toast } = useToast();
   const [status, setStatus] = useState(initialStatus);
   const [packingSlipOpen, setPackingSlipOpen] = useState(false);
+  const [shippingLabelOpen, setShippingLabelOpen] = useState(false);
   
   const isInvoice = !status.toLowerCase().startsWith('quote');
   const documentType = isInvoice ? "Invoice" : "Quote";
@@ -74,6 +77,10 @@ export function QuoteDetailHeader({
   
   const handlePackingSlip = () => {
     setPackingSlipOpen(true);
+  };
+  
+  const handleShipping = () => {
+    setShippingLabelOpen(true);
   };
   
   const handleAddLineItemsToPO = () => {
@@ -124,13 +131,6 @@ export function QuoteDetailHeader({
       description: `The ${documentType.toLowerCase()} has been deleted`,
     });
     navigate("/quotes");
-  };
-  
-  const handleShipping = () => {
-    toast({
-      title: "Shipping",
-      description: `Managing shipping for ${documentType.toLowerCase()} #${quoteId}`,
-    });
   };
   
   const handleStatusChange = (newStatus: string) => {
@@ -253,6 +253,13 @@ export function QuoteDetailHeader({
         quoteId={quoteId}
         customerInfo={customerInfo}
         items={items || []}
+      />
+      
+      <ShippingLabelDialog
+        open={shippingLabelOpen}
+        onOpenChange={setShippingLabelOpen}
+        quoteId={quoteId}
+        customerInfo={customerInfo}
       />
     </div>
   );
