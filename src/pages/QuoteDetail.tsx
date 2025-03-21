@@ -225,23 +225,23 @@ export default function QuoteDetail() {
         <div className="grid grid-cols-3 gap-6">
           {/* Left Column - 2/3 width */}
           <div className="col-span-2 space-y-6">
-            {/* Quotation Header */}
+            {/* Company Information - Updated as requested */}
             <div className="bg-white p-6 rounded-lg border">
-              <div className="flex justify-between">
-                <div>
-                  <h2 className="text-xl font-semibold">Quotation</h2>
-                  <p className="text-gray-500 text-sm">#{quote.id} - {quote.nickname}</p>
-                  
-                  {/* Company Logo and Info */}
-                  <div className="mt-4">
-                    <img src={quote.company.logo} alt="Company Logo" className="h-16 mb-2" />
-                    <p>{quote.company.address}</p>
-                    <p>{quote.company.city}, {quote.company.region} {quote.company.postalCode}</p>
-                    <p>{quote.company.phone}</p>
-                    <p>{quote.company.website}</p>
-                    <p>{quote.company.email}</p>
-                  </div>
-                </div>
+              <h2 className="text-xl font-bold mb-3">15493315 Canada Inc</h2>
+              <div className="space-y-1 text-gray-700">
+                <p>226 Rue du Domaine</p>
+                <p>Laval, Quebec H7X 3R9</p>
+                <p>5148346659</p>
+                <p>
+                  <a href="https://www.stitchandink.ca" className="text-blue-600 hover:underline">
+                    https://www.stitchandink.ca
+                  </a>
+                </p>
+                <p>
+                  <a href="mailto:a.thompson@stitchandink.com" className="text-blue-600 hover:underline">
+                    a.thompson@stitchandink.com
+                  </a>
+                </p>
               </div>
             </div>
             
