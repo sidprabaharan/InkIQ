@@ -376,7 +376,7 @@ export default function QuoteDetail() {
                   <span>{quote.summary.itemTotal}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Fees Total</span>
+                  <span className="text-gray-600">Shipping</span>
                   <span>{quote.summary.feesTotal}</span>
                 </div>
                 <div className="flex justify-between">

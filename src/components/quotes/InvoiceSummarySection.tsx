@@ -41,6 +41,10 @@ export function InvoiceSummarySection() {
           <span className="text-sm">${subTotal.toFixed(2)}</span>
         </div>
         <div className="flex justify-between items-center">
+          <span className="text-sm">Shipping</span>
+          <span className="text-sm">$0.00</span>
+        </div>
+        <div className="flex justify-between items-center">
           <span className="text-sm">Discount</span>
           <div className="flex items-center gap-2">
             <ToggleGroup type="single" value={discountType} onValueChange={(value) => value && setDiscountType(value as "percentage" | "fixed")}>
