@@ -76,7 +76,7 @@ export default function NewQuote() {
             <div className="md:col-span-1 space-y-4">
               <QuotationHeader />
               <QuotationDetailsSection />
-              <NickNameSection onChange={handleNicknameChange} />
+              <NickNameSection value={nickname} onChange={handleNicknameChange} />
               <div className="space-y-4">
                 <NotesSection title="Customer Notes" />
                 <NotesSection title="Production Note" />
