@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Printer, Copy, ListChecks, MessageCircle, Edit, Link, File, Trash, Download, DollarSign, Truck, Package, ListPlus, Wrench, Box } from "lucide-react";
 import {
@@ -20,16 +19,25 @@ import {
 } from "@/components/ui/sheet";
 import { StatusDropdown } from "./StatusDropdown";
 import { useState } from "react";
+import { PackingSlip } from "./PackingSlip";
 
 interface QuoteDetailHeaderProps {
   quoteId: string;
   status: string;
+  customerInfo?: any;
+  items?: any[];
 }
 
-export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetailHeaderProps) {
+export function QuoteDetailHeader({ 
+  quoteId, 
+  status: initialStatus, 
+  customerInfo, 
+  items = [] 
+}: QuoteDetailHeaderProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [status, setStatus] = useState(initialStatus);
+  const [packingSlipOpen, setPackingSlipOpen] = useState(false);
   
   const isInvoice = !status.toLowerCase().startsWith('quote');
   const documentType = isInvoice ? "Invoice" : "Quote";
@@ -65,10 +73,7 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
   };
   
   const handlePackingSlip = () => {
-    toast({
-      title: "Packing Slip",
-      description: `Generating packing slip for ${documentType.toLowerCase()} #${quoteId}`,
-    });
+    setPackingSlipOpen(true);
   };
   
   const handleAddLineItemsToPO = () => {
@@ -241,6 +246,21 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      
+      <PackingSlip
+        open={packingSlipOpen}
+        onOpenChange={setPackingSlipOpen}
+        quoteId={quoteId}
+        customerInfo={customerInfo?.shipping || {
+          name: "Customer",
+          address1: "",
+          city: "",
+          stateProvince: "",
+          zipCode: "",
+          country: ""
+        }}
+        items={items || []}
+      />
     </div>
   );
 }
