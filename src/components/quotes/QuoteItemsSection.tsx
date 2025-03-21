@@ -1,9 +1,11 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, MoreVertical, Trash2, Copy, Image, X } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { 
   DropdownMenu,
@@ -11,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from "@/components/ui/resizable";
 import { MockupUploadDialog } from "./MockupUploadDialog";
 import { ImprintDialog, ImprintItem } from "./ImprintDialog";
 import { toast } from "sonner";
@@ -307,9 +310,10 @@ export function QuoteItemsSection() {
                         onChange={(e) => handleInputChange(groupIndex, itemIndex, "color", e.target.value)}
                       />
                     </TableCell>
-                    <TableCell className="p-0 border-r border-gray-200">
-                      <Input 
-                        className="h-8 border-0 rounded-none w-full focus:ring-0" 
+                    <TableCell className="p-0 border-r border-gray-200 relative">
+                      <Textarea 
+                        className="min-h-[32px] border-0 rounded-none w-full focus:ring-0 resize-both overflow-auto"
+                        style={{ height: '32px' }}
                         value={item.description}
                         onChange={(e) => handleInputChange(groupIndex, itemIndex, "description", e.target.value)}
                       />
