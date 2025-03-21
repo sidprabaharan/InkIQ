@@ -26,7 +26,7 @@ export default function NewQuote() {
 
   const handleSave = () => {
     console.log("Save quote");
-    // Navigate to the sample quote detail page
+    // Navigate to a demo quote detail page
     navigate("/quotes/3032");
   };
 

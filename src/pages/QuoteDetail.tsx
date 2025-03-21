@@ -18,13 +18,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-// Dummy data for our first sample quote with id 3032
+// Dummy data - in a real app, this would come from an API or context
 const quotationData = {
-  id: "3032",
-  nickname: "Project Care Quote",
+  id: "26048957",
+  nickname: "Noraiz Invoice",
   company: {
     name: "STITCHINK",
-    logo: "/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png",
+    logo: "public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png",
     address: "15493315 Canada Inc 226 Rue du Domaine",
     city: "Laval",
     region: "Quebec",
@@ -35,86 +35,71 @@ const quotationData = {
   },
   customer: {
     billing: {
-      name: "Project Care",
-      company: "Project Care Foundation",
-      contact: "Noraiz Shahid",
+      name: "Noraiz shahid",
+      company: "RedPoint Capital - McGill",
+      contact: "Erolyn Thong",
       address: "8426 165 Street",
       city: "Surrey",
       region: "British Columbia",
       postalCode: "V4N 3H3",
       phone: "6044017380",
-      email: "contact@projectcare.org"
+      email: "erolyn.thong@mail.mcgill.ca"
     },
     shipping: {
-      company: "Project Care Foundation",
-      contact: "Noraiz Shahid",
-      address: "8426 165 Street",
-      unit: "",
-      city: "Surrey",
-      region: "V4N 3H3"
+      company: "RedPoint Capital - McGill",
+      contact: "Jasmine Ma",
+      address: "1288 Avenue des Canadiens-de-Montréal",
+      unit: "Unit 2501",
+      city: "Montréal",
+      region: "H3B 3B3"
     }
   },
   details: {
     owner: "Noraiz shahid",
     deliveryMethod: "Home Delivery",
+    alternateDeliveryMethod: "Amazon Delivery",
     productionDueDate: "10-07-2024",
     paymentDueDate: "09-09-2024",
     invoiceDate: "03-22-2024"
   },
   notes: {
-    customer: "Customer has requested expedited processing due to upcoming event on July 15th. Ensure delivery by July 10th.",
-    production: "Use heat transfer for logo placement as discussed with client."
+    customer: "In one form or another all the plays are written as pieces of physical theatre. Students should be encouraged to experiment with physical action, stylised movement and dance drama. This should also include using actors to play objects.",
+    production: "In one form or another all the plays are written as pieces of physical theatre. Students should"
   },
   items: [
     {
       category: "Shirts",
-      itemNumber: "SH-001",
+      itemNumber: "24",
       color: "Red",
-      description: "Crew Neck T-shirt with logo",
-      xs: "50",
-      s: "75",
-      m: "100",
-      l: "75",
-      xl: "50",
-      xxl: "0",
-      xxxl: "0",
-      quantity: "350",
-      price: "$12.50",
-      taxed: true,
-      total: "$4,375.00"
-    },
-    {
-      category: "Hats",
-      itemNumber: "HT-003",
-      color: "Black",
-      description: "Snapback with embroidered logo",
-      xs: "-",
+      description: "Customer Order to Create",
+      xs: "224",
       s: "-",
-      m: "-",
-      l: "-",
-      xl: "-",
-      xxl: "-",
-      xxxl: "-",
-      quantity: "200",
-      price: "$18.00",
+      m: "",
+      l: "",
+      xl: "",
+      xxl: "224",
+      xxxl: "",
+      quantity: "222",
+      price: "$222",
       taxed: true,
-      total: "$3,600.00"
+      total: "$819191"
     }
   ],
   summary: {
-    itemTotal: "$7,975.00",
-    feesTotal: "$500.00",
-    subTotal: "$8,475.00",
-    discount: "$425.00",
-    salesTax: "$402.50",
-    totalDue: "$8,452.50"
+    itemTotal: "$89,282",
+    feesTotal: "15%",
+    subTotal: "$89,282",
+    discount: "15%",
+    salesTax: "5%",
+    totalDue: "$323,282"
   },
-  status: "Artwork- SP/DTF"
+  status: "Quote Approved Sent"
 };
 
 export default function QuoteDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  // In a real app, we would fetch the quote data based on the ID
   const quote = quotationData;
   
   return (
@@ -129,7 +114,7 @@ export default function QuoteDetail() {
       {/* Top action bar */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex gap-4 items-center">
-          <h1 className="text-2xl font-semibold">Quotation #{quote.id}</h1>
+          <h1 className="text-2xl font-semibold">Quotation</h1>
           <div className="flex items-center">
             <div className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
               {quote.status}
@@ -201,7 +186,7 @@ export default function QuoteDetail() {
                 <p>{quote.customer.shipping.company}</p>
                 <p>{quote.customer.shipping.contact}</p>
                 <p>{quote.customer.shipping.address}</p>
-                {quote.customer.shipping.unit && <p>{quote.customer.shipping.unit}</p>}
+                <p>{quote.customer.shipping.unit}</p>
                 <p>{quote.customer.shipping.city}, {quote.customer.shipping.region}</p>
               </div>
             </div>
