@@ -13,6 +13,8 @@ export interface Customer {
   faxNumber: string;
   industry: string;
   invoiceOwner: string;
+  jobTitle?: string;
+  department?: string;
   contacts: Contact[];
   billingAddress: {
     address1: string;

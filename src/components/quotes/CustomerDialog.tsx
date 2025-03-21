@@ -32,6 +32,8 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
   const [faxNumber, setFaxNumber] = useState("");
   const [industry, setIndustry] = useState("");
   const [invoiceOwner, setInvoiceOwner] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
+  const [department, setDepartment] = useState("");
   
   // Billing address
   const [billingAddress1, setBillingAddress1] = useState("");
@@ -90,6 +92,8 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
       faxNumber,
       industry,
       invoiceOwner,
+      jobTitle,
+      department,
       billingAddress: {
         address1: billingAddress1,
         address2: billingAddress2,
@@ -134,6 +138,8 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
     setFaxNumber("");
     setIndustry("");
     setInvoiceOwner("");
+    setJobTitle("");
+    setDepartment("");
     setBillingAddress1("");
     setBillingAddress2("");
     setBillingCity("");
@@ -244,6 +250,25 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
                     placeholder="Enter Fax Number"
                     value={faxNumber}
                     onChange={(e) => setFaxNumber(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm mb-1">Job Title</label>
+                  <Input 
+                    placeholder="Enter Job Title"
+                    value={jobTitle}
+                    onChange={(e) => setJobTitle(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm mb-1">Department</label>
+                  <Input 
+                    placeholder="Enter Department"
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
                   />
                 </div>
               </div>
