@@ -38,14 +38,115 @@ export interface Customer {
 interface CustomersContextType {
   customers: Customer[];
   selectedCustomer: Customer | null;
-  addCustomer: (customer: Omit<Customer, "id">) => Customer; // Update return type to Customer
+  addCustomer: (customer: Omit<Customer, "id">) => Customer;
   selectCustomer: (customerId: string) => void;
+  getCustomerById: (customerId: string) => Customer | undefined;
 }
+
+// Example customers data
+const exampleCustomers: Customer[] = [
+  {
+    id: "customer-1",
+    companyName: "Nestle Print",
+    firstName: "John",
+    lastName: "Doe",
+    email: "john.doe@nestleprint.com",
+    phoneNumber: "+1 (416) 555-1234",
+    faxNumber: "+1 (416) 555-1235",
+    industry: "tech",
+    invoiceOwner: "Finance Department",
+    billingAddress: {
+      address1: "123 Print Avenue",
+      address2: "Suite 400",
+      city: "Toronto",
+      stateProvince: "Ontario",
+      zipCode: "M5V 2H1",
+      country: "Canada"
+    },
+    shippingAddress: {
+      address1: "123 Print Avenue",
+      address2: "Suite 400",
+      city: "Toronto",
+      stateProvince: "Ontario",
+      zipCode: "M5V 2H1",
+      country: "Canada"
+    },
+    taxInfo: {
+      taxId: "CA123456789",
+      taxRate: "13",
+      taxExemptionNumber: ""
+    }
+  },
+  {
+    id: "customer-2",
+    companyName: "Tech Innovators",
+    firstName: "Emma",
+    lastName: "Wilson",
+    email: "emma@techinnovators.com",
+    phoneNumber: "+1 (415) 555-7890",
+    faxNumber: "+1 (415) 555-7891",
+    industry: "tech",
+    invoiceOwner: "Accounts Payable",
+    billingAddress: {
+      address1: "456 Innovation Drive",
+      address2: "Floor 10",
+      city: "San Francisco",
+      stateProvince: "California",
+      zipCode: "94105",
+      country: "USA"
+    },
+    shippingAddress: {
+      address1: "456 Innovation Drive",
+      address2: "Floor 10",
+      city: "San Francisco",
+      stateProvince: "California",
+      zipCode: "94105",
+      country: "USA"
+    },
+    taxInfo: {
+      taxId: "US987654321",
+      taxRate: "8.5",
+      taxExemptionNumber: ""
+    }
+  },
+  {
+    id: "customer-3",
+    companyName: "Global Retail Solutions",
+    firstName: "Michael",
+    lastName: "Chen",
+    email: "michael.chen@globalretail.com",
+    phoneNumber: "+44 20 7946 0958",
+    faxNumber: "+44 20 7946 0959",
+    industry: "retail",
+    invoiceOwner: "Finance",
+    billingAddress: {
+      address1: "789 Retail Row",
+      address2: "Building C",
+      city: "London",
+      stateProvince: "",
+      zipCode: "EC1A 1BB",
+      country: "United Kingdom"
+    },
+    shippingAddress: {
+      address1: "789 Retail Row",
+      address2: "Building C",
+      city: "London",
+      stateProvince: "",
+      zipCode: "EC1A 1BB",
+      country: "United Kingdom"
+    },
+    taxInfo: {
+      taxId: "GB123456789",
+      taxRate: "20",
+      taxExemptionNumber: ""
+    }
+  }
+];
 
 const CustomersContext = createContext<CustomersContextType | undefined>(undefined);
 
 export function CustomersProvider({ children }: { children: React.ReactNode }) {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>(exampleCustomers);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
   const addCustomer = (customer: Omit<Customer, "id">) => {
@@ -55,7 +156,7 @@ export function CustomersProvider({ children }: { children: React.ReactNode }) {
     };
     
     setCustomers(prev => [...prev, newCustomer]);
-    return newCustomer; // Ensure we're returning the new customer
+    return newCustomer;
   };
 
   const selectCustomer = (customerId: string) => {
@@ -63,12 +164,17 @@ export function CustomersProvider({ children }: { children: React.ReactNode }) {
     setSelectedCustomer(customer);
   };
 
+  const getCustomerById = (customerId: string) => {
+    return customers.find(c => c.id === customerId);
+  };
+
   return (
     <CustomersContext.Provider value={{ 
       customers, 
       selectedCustomer, 
       addCustomer, 
-      selectCustomer
+      selectCustomer,
+      getCustomerById
     }}>
       {children}
     </CustomersContext.Provider>
