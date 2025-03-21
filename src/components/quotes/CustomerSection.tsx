@@ -1,13 +1,32 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CustomerDialog } from "./CustomerDialog";
 import { useCustomers } from "@/context/CustomersContext";
 
-export function CustomerSection() {
+interface CustomerSectionProps {
+  initialCustomer?: any; // Using any since we don't have the exact type definition
+}
+
+export function CustomerSection({ initialCustomer }: CustomerSectionProps = {}) {
   const [openDialog, setOpenDialog] = useState(false);
   const { customers, selectedCustomer, selectCustomer } = useCustomers();
+  
+  // If initialCustomer is provided, use it to select a customer
+  useEffect(() => {
+    if (initialCustomer && customers.length > 0) {
+      // Try to find a customer that matches the initialCustomer
+      // This is a basic example, you might need more sophisticated matching
+      const matchingCustomer = customers.find(
+        customer => customer.companyName === initialCustomer.company
+      );
+      
+      if (matchingCustomer) {
+        selectCustomer(matchingCustomer.id);
+      }
+    }
+  }, [initialCustomer, customers, selectCustomer]);
 
   return (
     <div className="space-y-2">

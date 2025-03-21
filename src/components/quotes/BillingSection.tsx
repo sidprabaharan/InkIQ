@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCustomers } from "@/context/CustomersContext";
@@ -202,8 +202,20 @@ const countries = [
   { code: "zw", name: "Zimbabwe" }
 ];
 
-export function BillingSection() {
+interface BillingSectionProps {
+  initialBillingInfo?: any; // Using any since we don't have the exact type definition
+}
+
+export function BillingSection({ initialBillingInfo }: BillingSectionProps = {}) {
   const { selectedCustomer, updateCustomer } = useCustomers();
+  const [billingInfo, setBillingInfo] = useState(initialBillingInfo || {});
+
+  // Update state when initialBillingInfo changes
+  useEffect(() => {
+    if (initialBillingInfo) {
+      setBillingInfo(initialBillingInfo);
+    }
+  }, [initialBillingInfo]);
 
   const handleCountryChange = (value: string) => {
     if (selectedCustomer) {
@@ -222,27 +234,29 @@ export function BillingSection() {
       <div className="space-y-4">
         <Input 
           placeholder="Company" 
-          value={selectedCustomer?.companyName || ""}
+          value={selectedCustomer?.companyName || billingInfo?.company || ""}
           readOnly={!!selectedCustomer}
         />
         <Input 
           placeholder="Name" 
-          value={selectedCustomer ? `${selectedCustomer.firstName} ${selectedCustomer.lastName}` : ""}
+          value={selectedCustomer 
+            ? `${selectedCustomer.firstName} ${selectedCustomer.lastName}` 
+            : billingInfo?.name || ""}
           readOnly={!!selectedCustomer}
         />
         <Input 
           placeholder="Address" 
-          value={selectedCustomer?.billingAddress.address1 || ""}
+          value={selectedCustomer?.billingAddress?.address1 || billingInfo?.address || ""}
           readOnly={!!selectedCustomer}
         />
         <Input 
           placeholder="Address" 
-          value={selectedCustomer?.billingAddress.address2 || ""}
+          value={selectedCustomer?.billingAddress?.address2 || ""}
           readOnly={!!selectedCustomer}
         />
         <div className="grid grid-cols-2 gap-4">
           <Select 
-            value={selectedCustomer?.billingAddress.country || ""}
+            value={selectedCustomer?.billingAddress?.country || billingInfo?.country || ""}
             onValueChange={handleCountryChange}
           >
             <SelectTrigger>
@@ -258,19 +272,19 @@ export function BillingSection() {
           </Select>
           <Input 
             placeholder="State/ Province" 
-            value={selectedCustomer?.billingAddress.stateProvince || ""}
+            value={selectedCustomer?.billingAddress?.stateProvince || billingInfo?.region || ""}
             readOnly={!!selectedCustomer}
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Input 
             placeholder="City" 
-            value={selectedCustomer?.billingAddress.city || ""}
+            value={selectedCustomer?.billingAddress?.city || billingInfo?.city || ""}
             readOnly={!!selectedCustomer}
           />
           <Input 
             placeholder="Zip Code Postal Code" 
-            value={selectedCustomer?.billingAddress.zipCode || ""}
+            value={selectedCustomer?.billingAddress?.zipCode || billingInfo?.postalCode || ""}
             readOnly={!!selectedCustomer}
           />
         </div>

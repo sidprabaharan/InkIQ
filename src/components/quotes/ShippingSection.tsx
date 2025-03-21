@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCustomers } from "@/context/CustomersContext";
@@ -202,8 +202,20 @@ const countries = [
   { code: "zw", name: "Zimbabwe" }
 ];
 
-export function ShippingSection() {
+interface ShippingSectionProps {
+  initialShippingInfo?: any; // Using any since we don't have the exact type definition
+}
+
+export function ShippingSection({ initialShippingInfo }: ShippingSectionProps = {}) {
   const { selectedCustomer, updateCustomer } = useCustomers();
+  const [shippingInfo, setShippingInfo] = useState(initialShippingInfo || {});
+
+  // Update state when initialShippingInfo changes
+  useEffect(() => {
+    if (initialShippingInfo) {
+      setShippingInfo(initialShippingInfo);
+    }
+  }, [initialShippingInfo]);
 
   const handleCountryChange = (value: string) => {
     if (selectedCustomer) {
@@ -222,27 +234,29 @@ export function ShippingSection() {
       <div className="space-y-4">
         <Input 
           placeholder="Company" 
-          value={selectedCustomer?.companyName || ""}
+          value={selectedCustomer?.companyName || shippingInfo?.company || ""}
           readOnly={!!selectedCustomer}
         />
         <Input 
           placeholder="Name" 
-          value={selectedCustomer ? `${selectedCustomer.firstName} ${selectedCustomer.lastName}` : ""}
+          value={selectedCustomer 
+            ? `${selectedCustomer.firstName} ${selectedCustomer.lastName}` 
+            : shippingInfo?.contact || ""}
           readOnly={!!selectedCustomer}
         />
         <Input 
           placeholder="Address" 
-          value={selectedCustomer?.shippingAddress.address1 || ""}
+          value={selectedCustomer?.shippingAddress?.address1 || shippingInfo?.address || ""}
           readOnly={!!selectedCustomer}
         />
         <Input 
           placeholder="Address" 
-          value={selectedCustomer?.shippingAddress.address2 || ""}
+          value={selectedCustomer?.shippingAddress?.address2 || shippingInfo?.unit || ""}
           readOnly={!!selectedCustomer}
         />
         <div className="grid grid-cols-2 gap-4">
           <Select 
-            value={selectedCustomer?.shippingAddress.country || ""}
+            value={selectedCustomer?.shippingAddress?.country || ""}
             onValueChange={handleCountryChange}
           >
             <SelectTrigger>
@@ -258,19 +272,19 @@ export function ShippingSection() {
           </Select>
           <Input 
             placeholder="State/ Province" 
-            value={selectedCustomer?.shippingAddress.stateProvince || ""}
+            value={selectedCustomer?.shippingAddress?.stateProvince || shippingInfo?.region || ""}
             readOnly={!!selectedCustomer}
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Input 
             placeholder="City" 
-            value={selectedCustomer?.shippingAddress.city || ""}
+            value={selectedCustomer?.shippingAddress?.city || shippingInfo?.city || ""}
             readOnly={!!selectedCustomer}
           />
           <Input 
             placeholder="Zip Code Postal Code" 
-            value={selectedCustomer?.shippingAddress.zipCode || ""}
+            value={selectedCustomer?.shippingAddress?.zipCode || ""}
             readOnly={!!selectedCustomer}
           />
         </div>
