@@ -28,6 +28,7 @@ export default function QuoteDetail() {
       <QuoteHeader
         quoteId={quoteId}
         isNewQuote={false}
+        status={status}
       />
       
       <div className="p-6">

@@ -19,6 +19,7 @@ interface QuoteHeaderProps {
   onSave?: () => void;
   quoteId?: string;
   isNewQuote?: boolean;
+  status?: string;
 }
 
 export function QuoteHeader({ 
@@ -26,10 +27,14 @@ export function QuoteHeader({
   onPreview, 
   onSave,
   quoteId,
-  isNewQuote = true
+  isNewQuote = true,
+  status = "Quote"
 }: QuoteHeaderProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  const isInvoice = !status.toLowerCase().startsWith('quote');
+  const documentType = isInvoice ? "Invoice" : "Quote";
   
   const handleCancel = () => {
     if (onCancel) {
@@ -45,8 +50,8 @@ export function QuoteHeader({
       
       // Show success toast
       toast({
-        title: "Quote saved successfully",
-        description: isNewQuote ? "New quote has been created" : "Quote has been updated",
+        title: `${documentType} saved successfully`,
+        description: isNewQuote ? `New ${documentType.toLowerCase()} has been created` : `${documentType} has been updated`,
       });
       
       // Navigate to the quote detail page if we have a quoteId
@@ -59,8 +64,8 @@ export function QuoteHeader({
     } else {
       // Show success toast
       toast({
-        title: "Quote saved successfully",
-        description: "New quote has been created",
+        title: `${documentType} saved successfully`,
+        description: `New ${documentType.toLowerCase()} has been created`,
       });
       
       // Navigate to the first quote as a demo
@@ -75,7 +80,7 @@ export function QuoteHeader({
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink onClick={() => navigate("/quotes")} className="text-sm text-gray-500 cursor-pointer hover:underline">
-                Quotes
+                {isInvoice ? "Invoices" : "Quotes"}
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator>
@@ -83,7 +88,7 @@ export function QuoteHeader({
             </BreadcrumbSeparator>
             <BreadcrumbItem>
               <BreadcrumbPage className="text-sm">
-                {isNewQuote ? "Create Quotation" : `Quote #${quoteId}`}
+                {isNewQuote ? `Create ${documentType}` : `${documentType} #${quoteId}`}
               </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
@@ -104,7 +109,7 @@ export function QuoteHeader({
           </Button>
         ) : (
           <Button variant="outline" className="text-gray-500" onClick={() => navigate(`/quotes/new`)}>
-            Create New Quote
+            Create New {documentType}
           </Button>
         )}
       </div>

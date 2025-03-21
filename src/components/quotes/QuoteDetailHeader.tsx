@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Printer, Copy, ListChecks, MessageCircle, Edit, Link, File, Trash, Download, DollarSign, Truck } from "lucide-react";
 import {
@@ -30,32 +31,35 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
   const { toast } = useToast();
   const [status, setStatus] = useState(initialStatus);
   
+  const isInvoice = !status.toLowerCase().startsWith('quote');
+  const documentType = isInvoice ? "Invoice" : "Quote";
+  
   const handleDuplicate = () => {
     toast({
-      title: "Quote duplicated",
-      description: "A new quote has been created based on this one",
+      title: `${documentType} duplicated`,
+      description: `A new ${documentType.toLowerCase()} has been created based on this one`,
     });
     navigate("/quotes/new");
   };
   
   const handlePrint = () => {
     toast({
-      title: "Printing quote",
-      description: "The quote would be sent to the printer in a real application",
+      title: `Printing ${documentType.toLowerCase()}`,
+      description: `The ${documentType.toLowerCase()} would be sent to the printer in a real application`,
     });
     window.print();
   };
   
-  const handleEditQuotation = () => {
+  const handleEditDocument = () => {
     toast({
-      title: "Edit Quote",
-      description: "Editing quote #" + quoteId,
+      title: `Edit ${documentType}`,
+      description: `Editing ${documentType.toLowerCase()} #${quoteId}`,
     });
   };
   
-  const handleQuotationLink = () => {
+  const handleDocumentLink = () => {
     toast({
-      title: "Quote Link Generated",
+      title: `${documentType} Link Generated`,
       description: "Link copied to clipboard",
     });
   };
@@ -63,7 +67,7 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
   const handlePackingSlip = () => {
     toast({
       title: "Packing Slip",
-      description: "Generating packing slip for quote #" + quoteId,
+      description: `Generating packing slip for ${documentType.toLowerCase()} #${quoteId}`,
     });
   };
   
@@ -77,42 +81,42 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
   const handleWorkOrder = () => {
     toast({
       title: "Work Order",
-      description: "Creating work order for quote #" + quoteId,
+      description: `Creating work order for ${documentType.toLowerCase()} #${quoteId}`,
     });
   };
   
   const handlePrintBoxLabels = () => {
     toast({
       title: "Print Box Labels",
-      description: "Printing box labels for quote #" + quoteId,
+      description: `Printing box labels for ${documentType.toLowerCase()} #${quoteId}`,
     });
   };
   
   const handleDownloadPDF = () => {
     toast({
       title: "Download PDF",
-      description: "Downloading quote PDF",
+      description: `Downloading ${documentType.toLowerCase()} PDF`,
     });
   };
   
   const handlePaymentExpenses = () => {
     toast({
       title: "Payment/Expenses",
-      description: "Managing payment and expenses for quote #" + quoteId,
+      description: `Managing payment and expenses for ${documentType.toLowerCase()} #${quoteId}`,
     });
   };
   
   const handleApproval = () => {
     toast({
       title: "Approval",
-      description: "Processing approval for quote #" + quoteId,
+      description: `Processing approval for ${documentType.toLowerCase()} #${quoteId}`,
     });
   };
   
   const handleDelete = () => {
     toast({
-      title: "Quote deleted",
-      description: "The quote has been deleted",
+      title: `${documentType} deleted`,
+      description: `The ${documentType.toLowerCase()} has been deleted`,
     });
     navigate("/quotes");
   };
@@ -120,7 +124,7 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
   const handleShipping = () => {
     toast({
       title: "Shipping",
-      description: "Managing shipping for quote #" + quoteId,
+      description: `Managing shipping for ${documentType.toLowerCase()} #${quoteId}`,
     });
   };
   
@@ -131,7 +135,7 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="flex gap-4 items-center">
-        <h1 className="text-2xl font-semibold">Quote #{quoteId}</h1>
+        <h1 className="text-2xl font-semibold">{documentType} #{quoteId}</h1>
         
         <Sheet>
           <SheetTrigger asChild>
@@ -142,9 +146,9 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
           </SheetTrigger>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Tasks for Quote #{quoteId}</SheetTitle>
+              <SheetTitle>Tasks for {documentType} #{quoteId}</SheetTitle>
               <SheetDescription>
-                View and manage tasks associated with this quote.
+                View and manage tasks associated with this {documentType.toLowerCase()}.
               </SheetDescription>
             </SheetHeader>
             <div className="py-6">
@@ -162,9 +166,9 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
           </SheetTrigger>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Messages for Quote #{quoteId}</SheetTitle>
+              <SheetTitle>Messages for {documentType} #{quoteId}</SheetTitle>
               <SheetDescription>
-                Communicate with your customer about this quote.
+                Communicate with your customer about this {documentType.toLowerCase()}.
               </SheetDescription>
             </SheetHeader>
             <div className="py-6">
@@ -185,13 +189,13 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
             <DropdownMenuItem onClick={handleApproval}>
               Approval
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleEditQuotation}>
+            <DropdownMenuItem onClick={handleEditDocument}>
               <Edit className="h-4 w-4 mr-2" />
-              Edit Quotation
+              Edit
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleQuotationLink}>
+            <DropdownMenuItem onClick={handleDocumentLink}>
               <Link className="h-4 w-4 mr-2" />
-              Quotation Link
+              {documentType} Link
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handlePackingSlip}>
               Packing Slip
@@ -211,7 +215,7 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handlePrint}>
               <Printer className="h-4 w-4 mr-2" />
-              Print Quotation
+              Print
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleDownloadPDF}>
               <Download className="h-4 w-4 mr-2" />
@@ -228,7 +232,7 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleDelete} className="text-red-600">
               <Trash className="h-4 w-4 mr-2" />
-              Delete Quotation
+              Delete {documentType}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
