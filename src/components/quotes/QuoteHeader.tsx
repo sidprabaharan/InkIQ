@@ -4,6 +4,14 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 interface QuoteHeaderProps {
   onCancel?: () => void;
@@ -63,9 +71,23 @@ export function QuoteHeader({
   return (
     <div className="flex justify-between items-center p-4 border-b bg-white">
       <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-500">Quotes</span>
-        <ChevronRight className="h-4 w-4 text-gray-400" />
-        <span className="text-sm">{isNewQuote ? "Create Quotation" : `Quote #${quoteId}`}</span>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink onClick={() => navigate("/quotes")} className="text-sm text-gray-500 cursor-pointer hover:underline">
+                Quotes
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator>
+              <ChevronRight className="h-4 w-4 text-gray-400" />
+            </BreadcrumbSeparator>
+            <BreadcrumbItem>
+              <BreadcrumbPage className="text-sm">
+                {isNewQuote ? "Create Quotation" : `Quote #${quoteId}`}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
       <div className="flex items-center gap-2">
         <Button variant="ghost" className="text-gray-500" onClick={handleCancel}>
