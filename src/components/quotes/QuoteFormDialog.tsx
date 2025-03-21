@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronRight, MoreVertical, Plus } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { ChevronRight, MoreVertical, Plus, Percent, DollarSign } from "lucide-react";
 
 interface QuoteFormDialogProps {
   open: boolean;
@@ -16,6 +17,31 @@ interface QuoteFormDialogProps {
 }
 
 export function QuoteFormDialog({ open, onOpenChange }: QuoteFormDialogProps) {
+  const [discountType, setDiscountType] = useState<"percentage" | "fixed">("percentage");
+  const [discountValue, setDiscountValue] = useState<string>("");
+  const [salesTax, setSalesTax] = useState<string>("");
+
+  // Dummy values for demonstration
+  const subTotal = 1250.00;
+  
+  // Calculate discount amount
+  const discountAmount = discountValue 
+    ? discountType === "percentage" 
+      ? (subTotal * parseFloat(discountValue) / 100) 
+      : parseFloat(discountValue)
+    : 0;
+  
+  // Calculate new sub total
+  const newSubTotal = subTotal - discountAmount;
+  
+  // Calculate sales tax amount
+  const salesTaxAmount = salesTax 
+    ? (newSubTotal * parseFloat(salesTax) / 100)
+    : 0;
+  
+  // Calculate total due
+  const totalDue = newSubTotal + salesTaxAmount;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[1100px] p-0 h-[90vh] overflow-y-auto">
@@ -255,23 +281,49 @@ export function QuoteFormDialog({ open, onOpenChange }: QuoteFormDialogProps) {
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Sub Total</span>
-                  <span className="text-sm">$0.00</span>
+                  <span className="text-sm">${subTotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Discount</span>
-                  <div className="flex items-center">
-                    <Input className="w-16 h-8 text-xs" placeholder="%" />
+                  <div className="flex items-center gap-2">
+                    <ToggleGroup type="single" value={discountType} onValueChange={(value) => value && setDiscountType(value as "percentage" | "fixed")}>
+                      <ToggleGroupItem value="percentage" size="sm" className="h-8 w-8 p-0">
+                        <Percent className="h-4 w-4" />
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="fixed" size="sm" className="h-8 w-8 p-0">
+                        <DollarSign className="h-4 w-4" />
+                      </ToggleGroupItem>
+                    </ToggleGroup>
+                    <Input 
+                      className="w-16 h-8 text-xs" 
+                      placeholder={discountType === "percentage" ? "%" : "$"}
+                      value={discountValue}
+                      onChange={(e) => setDiscountValue(e.target.value)}
+                    />
                   </div>
                 </div>
+                
+                {parseFloat(discountValue) > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">New Sub Total</span>
+                    <span className="text-sm">${newSubTotal.toFixed(2)}</span>
+                  </div>
+                )}
+                
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Sales Tax</span>
                   <div className="flex items-center">
-                    <Input className="w-16 h-8 text-xs" placeholder="%" />
+                    <Input 
+                      className="w-16 h-8 text-xs" 
+                      placeholder="%" 
+                      value={salesTax}
+                      onChange={(e) => setSalesTax(e.target.value)}
+                    />
                   </div>
                 </div>
                 <div className="flex justify-between items-center font-medium">
                   <span>Total Due</span>
-                  <span>$0.00</span>
+                  <span>${totalDue.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -281,4 +333,3 @@ export function QuoteFormDialog({ open, onOpenChange }: QuoteFormDialogProps) {
     </Dialog>
   );
 }
-
