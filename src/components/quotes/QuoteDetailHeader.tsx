@@ -1,6 +1,5 @@
-
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Printer, Copy, ListChecks, MessageCircle, Edit, Link, File, Trash, Download, DollarSign } from "lucide-react";
+import { ChevronRight, Printer, Copy, ListChecks, MessageCircle, Edit, Link, File, Trash, Download, DollarSign, Truck } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -115,12 +114,18 @@ export function QuoteDetailHeader({ quoteId, status }: QuoteDetailHeaderProps) {
     navigate("/quotes");
   };
   
+  const handleShipping = () => {
+    toast({
+      title: "Shipping",
+      description: "Managing shipping for quote #" + quoteId,
+    });
+  };
+  
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="flex gap-4 items-center">
         <h1 className="text-2xl font-semibold">Quote #{quoteId}</h1>
         
-        {/* New Tasks Button with Sheet */}
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline" size="sm" className="gap-1">
@@ -141,7 +146,6 @@ export function QuoteDetailHeader({ quoteId, status }: QuoteDetailHeaderProps) {
           </SheetContent>
         </Sheet>
         
-        {/* New Messages Button with Sheet */}
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline" size="sm" className="gap-1">
@@ -186,6 +190,10 @@ export function QuoteDetailHeader({ quoteId, status }: QuoteDetailHeaderProps) {
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handlePackingSlip}>
               Packing Slip
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleShipping}>
+              <Truck className="h-4 w-4 mr-2" />
+              Shipping
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleAddLineItemsToPO}>
               Add Line Items to PO
