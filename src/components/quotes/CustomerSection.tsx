@@ -1,24 +1,13 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CustomerDialog } from "./CustomerDialog";
 import { useCustomers } from "@/context/CustomersContext";
 
-interface CustomerSectionProps {
-  initialCustomerId?: string;
-}
-
-export function CustomerSection({ initialCustomerId }: CustomerSectionProps) {
+export function CustomerSection() {
   const [openDialog, setOpenDialog] = useState(false);
   const { customers, selectedCustomer, selectCustomer } = useCustomers();
-
-  // Set initial customer when component mounts
-  useEffect(() => {
-    if (initialCustomerId) {
-      selectCustomer(initialCustomerId);
-    }
-  }, [initialCustomerId, selectCustomer]);
 
   return (
     <div className="space-y-2">

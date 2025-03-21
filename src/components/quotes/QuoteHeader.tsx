@@ -20,7 +20,6 @@ interface QuoteHeaderProps {
   quoteId?: string;
   isNewQuote?: boolean;
   status?: string;
-  title?: string;
 }
 
 export function QuoteHeader({ 
@@ -29,8 +28,7 @@ export function QuoteHeader({
   onSave,
   quoteId,
   isNewQuote = true,
-  status = "Quote",
-  title
+  status = "Quote"
 }: QuoteHeaderProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -90,7 +88,7 @@ export function QuoteHeader({
             </BreadcrumbSeparator>
             <BreadcrumbItem>
               <BreadcrumbPage className="text-sm">
-                {title || (isNewQuote ? `Create ${documentType}` : `${documentType} #${quoteId}`)}
+                {isNewQuote ? `Create ${documentType}` : `${documentType} #${quoteId}`}
               </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
@@ -100,12 +98,12 @@ export function QuoteHeader({
         <Button variant="ghost" className="text-gray-500" onClick={handleCancel}>
           Cancel
         </Button>
-        {(isNewQuote || title === "Edit Quote") && (
+        {isNewQuote && (
           <Button variant="outline" className="text-gray-500" onClick={onPreview}>
             Preview
           </Button>
         )}
-        {(isNewQuote || title === "Edit Quote") ? (
+        {isNewQuote ? (
           <Button className="bg-inkiq-primary hover:bg-inkiq-primary/90 text-white" onClick={handleSave}>
             Save & Finish
           </Button>

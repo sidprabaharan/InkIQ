@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+
+import React from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCustomers } from "@/context/CustomersContext";
-import { CustomerBilling } from "@/components/quotes/QuoteData";
 
 // List of countries with priority countries at the top
 const countries = [
@@ -202,28 +202,8 @@ const countries = [
   { code: "zw", name: "Zimbabwe" }
 ];
 
-interface BillingSectionProps {
-  initialBillingData?: CustomerBilling;
-}
-
-export function BillingSection({ initialBillingData }: BillingSectionProps) {
+export function BillingSection() {
   const { selectedCustomer, updateCustomer } = useCustomers();
-
-  // Load initial billing data if provided
-  useEffect(() => {
-    if (initialBillingData && selectedCustomer) {
-      updateCustomer(selectedCustomer.id, {
-        billingAddress: {
-          country: initialBillingData.region || selectedCustomer.billingAddress.country,
-          address1: initialBillingData.address || selectedCustomer.billingAddress.address1,
-          address2: initialBillingData.company || selectedCustomer.billingAddress.address2,
-          city: initialBillingData.city || selectedCustomer.billingAddress.city,
-          stateProvince: initialBillingData.region || selectedCustomer.billingAddress.stateProvince,
-          zipCode: initialBillingData.postalCode || selectedCustomer.billingAddress.zipCode
-        }
-      });
-    }
-  }, [initialBillingData, selectedCustomer, updateCustomer]);
 
   const handleCountryChange = (value: string) => {
     if (selectedCustomer) {
