@@ -74,7 +74,12 @@ export function StatusDropdown({ currentStatus, onStatusChange }: StatusDropdown
     if (isArtworkStatus) {
       currentStatusData = statusOptions.find(option => option.name === "Artwork");
     } else {
-      currentStatusData = { color: "bg-gray-500 text-white", icon: <Tag className="h-4 w-4 mr-2" /> };
+      // Fix: Add the required 'name' property to the default fallback object
+      currentStatusData = { 
+        name: "Unknown Status", 
+        color: "bg-gray-500 text-white", 
+        icon: <Tag className="h-4 w-4 mr-2" /> 
+      };
     }
   }
 
