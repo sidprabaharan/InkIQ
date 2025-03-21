@@ -22,6 +22,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Define the schema for the contact form
 const contactSchema = z.object({
@@ -42,6 +49,15 @@ interface AddContactDialogProps {
   onAddContact: (contact: ContactFormValues) => void;
   customerId: string;
 }
+
+// Mock data for sales representatives (contact owners)
+const salesRepresentatives = [
+  { id: "1", name: "John Smith" },
+  { id: "2", name: "Sarah Johnson" },
+  { id: "3", name: "Michael Brown" },
+  { id: "4", name: "Jessica Davis" },
+  { id: "5", name: "David Wilson" },
+];
 
 export function AddContactDialog({ 
   open, 
@@ -172,9 +188,23 @@ export function AddContactDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Contact Owner</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter contact owner" {...field} />
-                  </FormControl>
+                  <Select 
+                    onValueChange={field.onChange} 
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a sales representative" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {salesRepresentatives.map((rep) => (
+                        <SelectItem key={rep.id} value={rep.name}>
+                          {rep.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
