@@ -260,7 +260,7 @@ export function QuoteItemsSection() {
               <TableHead className="py-2 text-xs uppercase w-[10%]">Category</TableHead>
               <TableHead className="py-2 text-xs uppercase w-[7.5%]">Item#</TableHead>
               <TableHead className="py-2 text-xs uppercase w-[7.5%]">Color</TableHead>
-              <TableHead className="py-2 text-xs uppercase w-[22%]">Description</TableHead>
+              <TableHead className="py-2 text-xs uppercase w-[20%]">Description</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">XS</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">S</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">M</TableHead>
@@ -269,7 +269,7 @@ export function QuoteItemsSection() {
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">2XL</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">3XL</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[6%]">Price</TableHead>
-              <TableHead className="py-2 text-xs uppercase w-[4%] flex justify-center">Taxed</TableHead>
+              <TableHead className="py-2 text-xs uppercase text-center w-[6%]">Taxed</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[8%]">Total</TableHead>
               <TableHead className="py-2 text-xs uppercase w-[2%]"></TableHead>
             </TableRow>
