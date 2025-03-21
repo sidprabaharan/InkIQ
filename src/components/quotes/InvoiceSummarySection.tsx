@@ -10,10 +10,6 @@ export function InvoiceSummarySection() {
       </div>
       <div className="space-y-2">
         <div className="flex justify-between items-center">
-          <span className="text-sm">Item Total</span>
-          <span className="text-sm">$0.00</span>
-        </div>
-        <div className="flex justify-between items-center">
           <span className="text-sm">Sub Total</span>
           <span className="text-sm">$0.00</span>
         </div>
