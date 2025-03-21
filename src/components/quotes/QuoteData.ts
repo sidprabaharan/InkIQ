@@ -1,4 +1,3 @@
-
 export interface CompanyInfo {
   name: string;
   logo?: string;
@@ -9,6 +8,10 @@ export interface CompanyInfo {
   phone: string;
   website: string;
   email: string;
+  taxNumbers?: {
+    gst?: string;
+    qst?: string;
+  };
 }
 
 export interface CustomerBilling {
@@ -102,7 +105,11 @@ export const quotationData: QuotationData = {
     postalCode: "H7X 3R9",
     phone: "5148346659",
     website: "https://www.stitchandink.ca",
-    email: "a.thompson@stitchandink.com"
+    email: "a.thompson@stitchandink.com",
+    taxNumbers: {
+      gst: "123456789 RT0001",
+      qst: "1234567890 TQ0001"
+    }
   },
   customer: {
     billing: {

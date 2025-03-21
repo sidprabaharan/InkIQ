@@ -11,6 +11,10 @@ interface CompanyInfo {
   phone: string;
   website: string;
   email: string;
+  taxNumbers?: {
+    gst?: string;
+    qst?: string;
+  };
 }
 
 interface CompanyInfoCardProps {
@@ -49,6 +53,16 @@ export function CompanyInfoCard({ company }: CompanyInfoCardProps) {
             {company.email}
           </a>
         </p>
+        {company.taxNumbers && (
+          <>
+            {company.taxNumbers.gst && (
+              <p>GST: {company.taxNumbers.gst}</p>
+            )}
+            {company.taxNumbers.qst && (
+              <p>QST: {company.taxNumbers.qst}</p>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
