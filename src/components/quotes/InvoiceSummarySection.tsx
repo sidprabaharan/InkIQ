@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { InvoiceSummary } from "./QuoteData";
 
@@ -5,7 +6,7 @@ interface InvoiceSummarySectionProps {
   initialSummary?: InvoiceSummary;
 }
 
-export function InvoiceSummarySection({ initialSummary }: InvoiceSummarySectionProps = {}) {
+export function InvoiceSummarySection({ initialSummary }: InvoiceSummarySectionProps) {
   const [summary, setSummary] = useState<InvoiceSummary | undefined>(initialSummary);
 
   useEffect(() => {

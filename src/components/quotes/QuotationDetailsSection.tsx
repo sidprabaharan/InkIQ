@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -10,7 +11,7 @@ interface QuotationDetailsSectionProps {
   initialDetails?: QuoteDetails;
 }
 
-export function QuotationDetailsSection({ initialDetails }: QuotationDetailsSectionProps = {}) {
+export function QuotationDetailsSection({ initialDetails }: QuotationDetailsSectionProps) {
   const [details, setDetails] = useState({
     owner: initialDetails?.owner || "",
     deliveryMethod: initialDetails?.deliveryMethod || "",
