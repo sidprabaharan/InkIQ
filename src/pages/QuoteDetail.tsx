@@ -31,7 +31,7 @@ export default function QuoteDetail() {
     address1: quote.customer.shipping.address,
     city: quote.customer.shipping.city,
     stateProvince: quote.customer.shipping.region,
-    zipCode: quote.customer.shipping.postalCode || "",
+    zipCode: quote.customer.billing.postalCode || "", // Use billing postal code since shipping doesn't have one
     country: "Canada", // Default to Canada if not specified
     companyName: quote.customer.shipping.company
   };
