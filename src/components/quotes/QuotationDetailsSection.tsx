@@ -1,136 +1,181 @@
 
-import React, { useState, useEffect } from "react";
-import { Label } from "@/components/ui/label";
+import React, { useState } from "react";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger 
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "lucide-react";
-import { QuoteDetails } from "./QuoteData";
+import { cn } from "@/lib/utils";
 
-interface QuotationDetailsSectionProps {
-  initialDetails?: QuoteDetails;
-}
-
-export function QuotationDetailsSection({ initialDetails }: QuotationDetailsSectionProps) {
-  const [details, setDetails] = useState({
-    owner: initialDetails?.owner || "",
-    deliveryMethod: initialDetails?.deliveryMethod || "",
-    productionDueDate: initialDetails?.productionDueDate || "",
-    paymentDueDate: initialDetails?.paymentDueDate || "",
-    invoiceDate: initialDetails?.invoiceDate || ""
-  });
-
-  // Update state when initialDetails changes
-  useEffect(() => {
-    if (initialDetails) {
-      setDetails({
-        owner: initialDetails.owner || "",
-        deliveryMethod: initialDetails.deliveryMethod || "",
-        productionDueDate: initialDetails.productionDueDate || "",
-        paymentDueDate: initialDetails.paymentDueDate || "",
-        invoiceDate: initialDetails.invoiceDate || ""
-      });
-    }
-  }, [initialDetails]);
-
-  const handleChange = (field: string, value: string) => {
-    setDetails(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+export function QuotationDetailsSection() {
+  const [created, setCreated] = useState<Date | undefined>(undefined);
+  const [productionDueDate, setProductionDueDate] = useState<Date | undefined>(undefined);
+  const [customerDueDate, setCustomerDueDate] = useState<Date | undefined>(undefined);
+  const [paymentDueDate, setPaymentDueDate] = useState<Date | undefined>(undefined);
+  const [invoiceDate, setInvoiceDate] = useState<Date | undefined>(undefined);
 
   return (
-    <div className="bg-white p-4 rounded-md space-y-4">
+    <div className="space-y-4">
       <h3 className="text-base font-medium">Quotation Details</h3>
-      
-      <div className="space-y-3">
-        <div className="space-y-2">
-          <Label htmlFor="owner">Owner</Label>
-          <Input 
-            id="owner"
-            placeholder="Owner" 
-            value={details.owner}
-            onChange={(e) => handleChange('owner', e.target.value)}
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="deliveryMethod">Delivery Method</Label>
-          <Select 
-            value={details.deliveryMethod} 
-            onValueChange={(value) => handleChange('deliveryMethod', value)}
-          >
-            <SelectTrigger id="deliveryMethod">
-              <SelectValue placeholder="Select delivery method" />
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <Select>
+            <SelectTrigger>
+              <SelectValue placeholder="Owner" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="pickup">Pickup</SelectItem>
-              <SelectItem value="delivery">Delivery</SelectItem>
-              <SelectItem value="shipping">Shipping</SelectItem>
+              <SelectItem value="owner1">Owner 1</SelectItem>
+              <SelectItem value="owner2">Owner 2</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select>
+            <SelectTrigger>
+              <SelectValue placeholder="Delivery Method" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="method1">Method 1</SelectItem>
+              <SelectItem value="method2">Method 2</SelectItem>
             </SelectContent>
           </Select>
         </div>
+        <Input placeholder="PO Number" />
         
-        <div className="space-y-2">
-          <Label htmlFor="productionDueDate">Production Due Date</Label>
-          <div className="relative">
-            <Input 
-              id="productionDueDate"
-              placeholder="MM-DD-YYYY" 
-              value={details.productionDueDate}
-              onChange={(e) => handleChange('productionDueDate', e.target.value)}
-            />
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="absolute right-0 top-0"
-              type="button"
+        {/* Created Date Picker */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !created && "text-muted-foreground"
+              )}
             >
-              <Calendar className="h-4 w-4" />
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {created ? format(created, "PPP") : <span>Created</span>}
             </Button>
-          </div>
-        </div>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={created}
+              onSelect={setCreated}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
         
-        <div className="space-y-2">
-          <Label htmlFor="paymentDueDate">Payment Due Date</Label>
-          <div className="relative">
-            <Input 
-              id="paymentDueDate"
-              placeholder="MM-DD-YYYY" 
-              value={details.paymentDueDate}
-              onChange={(e) => handleChange('paymentDueDate', e.target.value)}
-            />
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="absolute right-0 top-0"
-              type="button"
+        {/* Production Due Date Picker */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !productionDueDate && "text-muted-foreground"
+              )}
             >
-              <Calendar className="h-4 w-4" />
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {productionDueDate ? format(productionDueDate, "PPP") : <span>Production Due Date</span>}
             </Button>
-          </div>
-        </div>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={productionDueDate}
+              onSelect={setProductionDueDate}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
         
-        <div className="space-y-2">
-          <Label htmlFor="invoiceDate">Invoice Date</Label>
-          <div className="relative">
-            <Input 
-              id="invoiceDate"
-              placeholder="MM-DD-YYYY" 
-              value={details.invoiceDate}
-              onChange={(e) => handleChange('invoiceDate', e.target.value)}
-            />
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="absolute right-0 top-0"
-              type="button"
+        {/* Customer Due Date Picker */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !customerDueDate && "text-muted-foreground"
+              )}
             >
-              <Calendar className="h-4 w-4" />
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {customerDueDate ? format(customerDueDate, "PPP") : <span>Customer Due Date</span>}
             </Button>
-          </div>
-        </div>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={customerDueDate}
+              onSelect={setCustomerDueDate}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
+        
+        {/* Payment Due Date Picker */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !paymentDueDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {paymentDueDate ? format(paymentDueDate, "PPP") : <span>Payment Due Date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={paymentDueDate}
+              onSelect={setPaymentDueDate}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
+        
+        {/* Invoice Date Picker */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !invoiceDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {invoiceDate ? format(invoiceDate, "PPP") : <span>Invoice Date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={invoiceDate}
+              onSelect={setInvoiceDate}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   );

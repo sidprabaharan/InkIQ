@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/sheet";
 import { StatusDropdown } from "./StatusDropdown";
 import { useState } from "react";
-import { quotationData } from "./QuoteData";
 
 interface QuoteDetailHeaderProps {
   quoteId: string;
@@ -52,8 +51,10 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
   };
   
   const handleEditDocument = () => {
-    // Navigate to the edit page instead of opening a dialog
-    navigate(`/quotes/edit/${quoteId}`);
+    toast({
+      title: `Edit ${documentType}`,
+      description: `Editing ${documentType.toLowerCase()} #${quoteId}`,
+    });
   };
   
   const handleDocumentLink = () => {

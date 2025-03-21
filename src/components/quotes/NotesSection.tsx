@@ -1,44 +1,19 @@
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Textarea } from "@/components/ui/textarea";
 
 interface NotesSectionProps {
   title: string;
   placeholder?: string;
-  initialContent?: string;
-  onChange?: (value: string) => void;
 }
 
-export function NotesSection({ 
-  title, 
-  placeholder = "Write text here ...", 
-  initialContent = "", 
-  onChange 
-}: NotesSectionProps) {
-  const [content, setContent] = useState(initialContent);
-  
-  // Update content when initialContent changes
-  useEffect(() => {
-    if (initialContent) {
-      setContent(initialContent);
-    }
-  }, [initialContent]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(e.target.value);
-    if (onChange) {
-      onChange(e.target.value);
-    }
-  };
-
+export function NotesSection({ title, placeholder = "Write text here ..." }: NotesSectionProps) {
   return (
     <div className="space-y-2">
       <h3 className="text-base font-medium">{title}</h3>
       <Textarea 
         placeholder={placeholder} 
-        className="min-h-[100px]"
-        value={content}
-        onChange={handleChange}
+        className="min-h-[100px]" // Adjusted height from 80px to 100px
       />
     </div>
   );
