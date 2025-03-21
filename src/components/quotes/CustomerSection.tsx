@@ -3,9 +3,11 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CustomerDialog } from "./CustomerDialog";
+import { useCustomers } from "@/context/CustomersContext";
 
 export function CustomerSection() {
   const [openDialog, setOpenDialog] = useState(false);
+  const { customers, selectedCustomer, selectCustomer } = useCustomers();
 
   return (
     <div className="space-y-2">
@@ -19,13 +21,19 @@ export function CustomerSection() {
           New Customer
         </Button>
       </div>
-      <Select>
+      <Select 
+        value={selectedCustomer?.id} 
+        onValueChange={selectCustomer}
+      >
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Select A Customer" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="customer1">Customer 1</SelectItem>
-          <SelectItem value="customer2">Customer 2</SelectItem>
+          {customers.map((customer) => (
+            <SelectItem key={customer.id} value={customer.id}>
+              {customer.companyName} ({customer.firstName} {customer.lastName})
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 
