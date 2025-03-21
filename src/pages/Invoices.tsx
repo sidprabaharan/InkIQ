@@ -5,32 +5,32 @@ import { QuoteSummaryCard } from "@/components/quotes/QuoteSummaryCard";
 import { QuotationTable } from "@/components/quotes/QuotationTable";
 import { useNavigate } from "react-router-dom";
 
-export default function Quotes() {
+export default function Invoices() {
   const navigate = useNavigate();
   
   const summaryCards = [
     {
-      title: "Total Opportunity",
-      amount: "$8282942",
-      percentage: 40,
+      title: "Total Invoices",
+      amount: "$5,347,821",
+      percentage: 32,
       period: "last month"
     },
     {
-      title: "Quotes Sent",
-      amount: "$4,125,320",
-      percentage: 25,
+      title: "Artwork Stage",
+      amount: "$287,442",
+      percentage: 15,
       period: "last month"
     },
     {
-      title: "Quote Approval Sent",
-      amount: "$2,834,291",
-      percentage: 35,
+      title: "Production",
+      amount: "$1,821,392",
+      percentage: 28,
       period: "last month"
     },
     {
-      title: "Quote Approved",
-      amount: "$1,323,331",
-      percentage: 18,
+      title: "Completed",
+      amount: "$2,983,211",
+      percentage: 45,
       period: "last month"
     }
   ];
@@ -38,12 +38,12 @@ export default function Quotes() {
   return (
     <div className="p-6 bg-gray-50 min-h-full">
       <div className="mb-6 flex justify-between items-center">
-        <h1 className="text-2xl font-semibold">Quotations</h1>
+        <h1 className="text-2xl font-semibold">Invoices</h1>
         <Button 
           className="bg-inkiq-primary hover:bg-inkiq-primary/90"
           onClick={() => navigate("/quotes/new")}
         >
-          New Quote
+          New Invoice
         </Button>
       </div>
 
@@ -59,7 +59,7 @@ export default function Quotes() {
         ))}
       </div>
 
-      <QuotationTable />
+      <QuotationTable isInvoicesPage={true} />
     </div>
   );
 }

@@ -92,7 +92,6 @@ export interface QuotationData {
   status: string;
 }
 
-// Sample data for the quote
 export const quotationData: QuotationData = {
   id: "3032",
   nickname: "Project Care Quote",
@@ -187,5 +186,5 @@ export const quotationData: QuotationData = {
     salesTax: "$563.17",
     totalDue: "$11,826.53"
   },
-  status: "Artwork"
+  status: "Quote"
 };

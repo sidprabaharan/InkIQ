@@ -17,7 +17,12 @@ interface Quotation {
   isPaid: boolean;
 }
 
-const quotationsData: Quotation[] = [
+// Define which statuses belong to quotes vs invoices
+const quoteStatuses = ["Quote", "Quote Approval Sent", "Quote Approved"];
+
+// Sample data for both quotes and invoices
+const allQuotationsData: Quotation[] = [
+  // Quotes data - will show on Quotes page
   {
     id: "3032",
     norisId: "Noris shahid",
@@ -26,9 +31,32 @@ const quotationsData: Quotation[] = [
     owner: "Noraiz shahid",
     total: "$278",
     outstanding: "$24",
-    status: "Artwork",
+    status: "Quote",
     isPaid: false,
   },
+  {
+    id: "3039",
+    norisId: "Noris shahid",
+    customer: "Care Pharmacy",
+    dueDate: "24-12-2024",
+    owner: "Tim",
+    total: "$12382",
+    outstanding: "$82",
+    status: "Quote Approval Sent",
+    isPaid: true,
+  },
+  {
+    id: "3045",
+    customer: "Montreal University",
+    dueDate: "15-01-2025",
+    owner: "Sarah",
+    total: "$3,450",
+    outstanding: "$3,450",
+    status: "Quote Approved",
+    isPaid: false,
+  },
+  
+  // Invoices data - will show on Invoices page
   {
     id: "3033",
     customer: "Cinemania",
@@ -93,30 +121,54 @@ const quotationsData: Quotation[] = [
     isPaid: true,
   },
   {
-    id: "3039",
-    norisId: "Noris shahid",
-    customer: "Care Pharmacy",
-    dueDate: "24-12-2024",
-    owner: "Tim",
-    total: "$12382",
-    outstanding: "$82",
-    status: "Quote Approval Sent",
+    id: "3040",
+    customer: "ABC Print Shop",
+    dueDate: "30-11-2024",
+    owner: "Jessica",
+    total: "$4,590",
+    outstanding: "$0",
+    status: "Complete",
     isPaid: true,
   },
   {
-    id: "3030",
-    customer: "Care Pharmacy",
-    dueDate: "24-12-2024",
-    owner: "Tim",
-    total: "$12382",
-    outstanding: "$1522",
-    status: "Artwork",
-    isPaid: true,
+    id: "3041",
+    customer: "Tech Innovators",
+    dueDate: "15-12-2024",
+    owner: "Michael",
+    total: "$2,750",
+    outstanding: "$1,250",
+    status: "Production",
+    isPaid: false,
+  },
+  {
+    id: "3042",
+    customer: "Global Retail Solutions",
+    dueDate: "05-01-2025",
+    owner: "Emma",
+    total: "$8,325",
+    outstanding: "$4,125",
+    status: "Shipping",
+    isPaid: false,
   },
 ];
 
-export function QuotationTable() {
+interface QuotationTableProps {
+  isInvoicesPage?: boolean;
+}
+
+export function QuotationTable({ isInvoicesPage = false }: QuotationTableProps) {
   const navigate = useNavigate();
+  
+  // Filter data based on whether we're on the Quotes or Invoices page
+  const quotationsData = allQuotationsData.filter(quotation => {
+    if (isInvoicesPage) {
+      // For invoices page, show everything that's NOT a quote status
+      return !quoteStatuses.includes(quotation.status);
+    } else {
+      // For quotes page, only show quote statuses
+      return quoteStatuses.includes(quotation.status);
+    }
+  });
   
   const handleRowClick = (quotationId: string) => {
     navigate(`/quotes/${quotationId}`);
@@ -125,7 +177,7 @@ export function QuotationTable() {
   return (
     <div className="bg-white rounded-lg border overflow-hidden">
       <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-xl font-semibold">Quotations</h2>
+        <h2 className="text-xl font-semibold">{isInvoicesPage ? "Invoices" : "Quotations"}</h2>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <input
