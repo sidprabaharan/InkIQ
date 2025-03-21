@@ -1,11 +1,10 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Search, Plus, ArrowLeft, Mail, Phone, FileText, Calendar, MessageSquare, File, Image, Folder, Code, PenTool, ShoppingCart } from "lucide-react";
+import { Search, Plus, ArrowLeft, Mail, Phone, FileText, Calendar, MessageSquare, File, Image, Folder, Code, PenTool, ShoppingCart, FileCheck } from "lucide-react";
 import { CustomerDialog } from "@/components/quotes/CustomerDialog";
 import { useCustomers } from "@/context/CustomersContext";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -16,12 +15,10 @@ export default function Customers() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Get the selected customer details if a customer is selected
   const selectedCustomer = selectedCustomerId 
     ? customers.find(c => c.id === selectedCustomerId) 
     : null;
 
-  // Filter customers based on search term
   const filteredCustomers = customers.filter(customer => 
     customer.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     customer.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -29,18 +26,15 @@ export default function Customers() {
     customer.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Function to get initials for avatar
   const getInitials = (companyName: string) => {
     return companyName.charAt(0).toUpperCase();
   };
 
-  // Function to get industry name
   const getIndustryName = (industryId: string) => {
     const industry = industries.find(i => i.id === industryId);
     return industry ? industry.name : industryId;
   };
 
-  // Mock customer orders data
   const customerOrders = [
     {
       id: "3032",
@@ -65,7 +59,30 @@ export default function Customers() {
     }
   ];
 
-  // Mock customer artwork files
+  const customerQuotes = [
+    {
+      id: "Q-5893",
+      date: "2023-09-05",
+      total: "$2,450.00",
+      status: "Pending Approval",
+      items: "Custom T-shirts (100), Embroidered Caps (50)"
+    },
+    {
+      id: "Q-5742",
+      date: "2023-08-28",
+      total: "$980.00",
+      status: "Draft",
+      items: "Polo Shirts (45)"
+    },
+    {
+      id: "Q-5621",
+      date: "2023-08-10",
+      total: "$3,200.00",
+      status: "Approved",
+      items: "Hoodies (80), Tote Bags (100)"
+    }
+  ];
+
   const artworkFiles = {
     mockups: [
       { name: "Tshirt-Front-Design.png", date: "2023-08-01", size: "2.4 MB" },
@@ -90,7 +107,6 @@ export default function Customers() {
   return (
     <div className="p-6">
       {!selectedCustomer ? (
-        // Customers List View
         <>
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-semibold">Customers</h1>
@@ -205,9 +221,7 @@ export default function Customers() {
           </div>
         </>
       ) : (
-        // Customer Detail View
         <div className="flex gap-6">
-          {/* Left Column - Customer Info */}
           <div className="w-1/3">
             <Button 
               variant="ghost" 
@@ -255,13 +269,13 @@ export default function Customers() {
             </Card>
           </div>
           
-          {/* Right Column - Details */}
           <div className="w-2/3">
             <h1 className="text-2xl font-semibold mb-6">Customer Detail</h1>
             
             <Tabs defaultValue="overview" className="w-full">
               <TabsList className="mb-4">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="quotes">Quotes</TabsTrigger>
                 <TabsTrigger value="orders">Orders</TabsTrigger>
                 <TabsTrigger value="artwork">Artwork & Files</TabsTrigger>
                 <TabsTrigger value="activities">Activities</TabsTrigger>
@@ -284,7 +298,7 @@ export default function Customers() {
                       </div>
                       <div className="bg-purple-50 p-4 rounded-lg">
                         <p className="text-gray-500 mb-1">Current Quotes Volume</p>
-                        <p className="text-2xl font-bold">$1,850.00</p>
+                        <p className="text-2xl font-bold">$6,630.00</p>
                       </div>
                     </div>
                   </CardContent>
@@ -384,6 +398,61 @@ export default function Customers() {
                         <p className="text-sm text-gray-500 mb-1">Tax Exemption Number</p>
                         <p>{selectedCustomer.taxInfo.taxExemptionNumber || "N/A"}</p>
                       </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="quotes">
+                <Card>
+                  <CardHeader className="pb-0">
+                    <div className="flex justify-between items-center">
+                      <CardTitle>Customer Quotes</CardTitle>
+                      <Button variant="outline" size="sm" className="text-blue-600">
+                        <Plus className="h-4 w-4 mr-2" />
+                        New Quote
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[100px]">Quote ID</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Items</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Amount</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {customerQuotes.map((quote) => (
+                          <TableRow key={quote.id} className="cursor-pointer hover:bg-gray-50">
+                            <TableCell className="font-medium">#{quote.id}</TableCell>
+                            <TableCell>{quote.date}</TableCell>
+                            <TableCell>{quote.items}</TableCell>
+                            <TableCell>
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                quote.status === 'Approved' 
+                                  ? 'bg-green-100 text-green-800'
+                                  : quote.status === 'Draft'
+                                    ? 'bg-gray-100 text-gray-800'
+                                    : 'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {quote.status}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-right">{quote.total}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                    
+                    <div className="flex justify-center mt-6">
+                      <Button variant="outline" className="text-blue-600">
+                        <FileCheck className="h-4 w-4 mr-2" />
+                        View All Quotes
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -678,3 +747,4 @@ const industries = [
   { id: "manufacturing", name: "Manufacturing" },
   { id: "ecommerce", name: "Ecommerce" },
 ];
+
