@@ -229,7 +229,7 @@ export function PackingSlip({
                       />
                     </div>
                   ) : (
-                    <>
+                    <div>
                       <p className="font-medium">{editedCustomerInfo.name}</p>
                       {editedCustomerInfo.companyName && <p>{editedCustomerInfo.companyName}</p>}
                       <p>{editedCustomerInfo.address1}</p>
@@ -237,7 +237,8 @@ export function PackingSlip({
                       <p>{editedCustomerInfo.city}, {editedCustomerInfo.stateProvince} {editedCustomerInfo.zipCode}</p>
                       <p>{editedCustomerInfo.country}</p>
                       {editedCustomerInfo.phone && <p>Phone: {editedCustomerInfo.phone}</p>}
-                    </>
+                      {editedCustomerInfo.email && <p>Email: {editedCustomerInfo.email}</p>}
+                    </div>
                   )}
                 </div>
               </div>

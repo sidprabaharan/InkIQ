@@ -23,17 +23,18 @@ export default function QuoteDetail() {
   const totalAmount = quote.summary.totalDue;
   const amountOutstanding = `$${(parseFloat(quote.summary.totalDue.replace(/[$,]/g, '')) * 0.75).toFixed(2)}`;
   
-  // Create customer name for packing slip from the billing contact field
-  // This fixes the error since we don't have firstName/lastName properties
+  // Create properly formatted customer shipping info for the packing slip
   const customerShipping = {
-    ...quote.customer.shipping,
     name: quote.customer.billing.contact || "Customer",
+    companyName: quote.customer.shipping.company,
     address1: quote.customer.shipping.address,
+    address2: quote.customer.shipping.unit,
     city: quote.customer.shipping.city,
     stateProvince: quote.customer.shipping.region,
     zipCode: quote.customer.billing.postalCode || "", // Use billing postal code since shipping doesn't have one
     country: "Canada", // Default to Canada if not specified
-    companyName: quote.customer.shipping.company
+    phone: quote.customer.billing.phone,
+    email: quote.customer.billing.email
   };
   
   return (

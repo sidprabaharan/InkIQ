@@ -251,14 +251,7 @@ export function QuoteDetailHeader({
         open={packingSlipOpen}
         onOpenChange={setPackingSlipOpen}
         quoteId={quoteId}
-        customerInfo={customerInfo?.shipping || {
-          name: "Customer",
-          address1: "",
-          city: "",
-          stateProvince: "",
-          zipCode: "",
-          country: ""
-        }}
+        customerInfo={customerInfo}
         items={items || []}
       />
     </div>
