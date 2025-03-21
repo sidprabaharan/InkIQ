@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Dialog, 
@@ -257,10 +256,6 @@ export function QuoteFormDialog({ open, onOpenChange }: QuoteFormDialogProps) {
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Item Total</span>
                   <span className="text-sm">$0.00</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Fees Total</span>
-                  <span className="text-sm">15%</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Sub Total</span>

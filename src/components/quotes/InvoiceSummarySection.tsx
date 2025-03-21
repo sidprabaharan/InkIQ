@@ -14,10 +14,6 @@ export function InvoiceSummarySection() {
           <span className="text-sm">$0.00</span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-sm">Fees Total</span>
-          <span className="text-sm">15%</span>
-        </div>
-        <div className="flex justify-between items-center">
           <span className="text-sm">Sub Total</span>
           <span className="text-sm">$0.00</span>
         </div>
