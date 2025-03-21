@@ -259,7 +259,7 @@ export function QuoteItemsSection() {
               <TableHead className="py-2 text-xs uppercase w-[10%]">Category</TableHead>
               <TableHead className="py-2 text-xs uppercase w-[7.5%]">Item#</TableHead>
               <TableHead className="py-2 text-xs uppercase w-[7.5%]">Color</TableHead>
-              <TableHead className="py-2 text-xs uppercase w-[20%]">Description</TableHead>
+              <TableHead className="py-2 text-xs uppercase w-[25%]">Description</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">XS</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">S</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">M</TableHead>
@@ -267,7 +267,6 @@ export function QuoteItemsSection() {
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">XL</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">2XL</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">3XL</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">QTY</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">Price</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[3%]">Taxed</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[7%]">Total</TableHead>
@@ -379,9 +378,6 @@ export function QuoteItemsSection() {
                         onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xxxl", e.target.value)}
                         min="0"
                       />
-                    </TableCell>
-                    <TableCell className="p-0 text-center border-r border-gray-200">
-                      <div className="text-sm font-medium h-8 flex items-center justify-center">{item.quantity}</div>
                     </TableCell>
                     <TableCell className="p-0 border-r border-gray-200">
                       <div className="flex items-center h-8">
@@ -557,3 +553,4 @@ export function QuoteItemsSection() {
     </div>
   );
 }
+

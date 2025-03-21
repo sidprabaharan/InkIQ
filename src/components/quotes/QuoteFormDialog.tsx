@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { 
   Dialog, 
@@ -143,7 +144,7 @@ export function QuoteFormDialog({ open, onOpenChange }: QuoteFormDialogProps) {
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">XL</th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">2XL</th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">3XL</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">QTY</th>
+                      {/* QTY column removed */}
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Taxed</th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
@@ -173,7 +174,7 @@ export function QuoteFormDialog({ open, onOpenChange }: QuoteFormDialogProps) {
                       <td className="px-4 py-3 text-sm text-gray-500"></td>
                       <td className="px-4 py-3 text-sm text-gray-500"></td>
                       <td className="px-4 py-3 text-sm text-gray-500"></td>
-                      <td className="px-4 py-3 text-sm text-gray-500"></td>
+                      {/* QTY cell removed */}
                       <td className="px-4 py-3 text-sm text-gray-500">$$</td>
                       <td className="px-4 py-3 text-sm text-gray-500 text-center">
                         <input type="checkbox" className="h-4 w-4" />
