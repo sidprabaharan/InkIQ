@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -230,7 +229,9 @@ export function ShippingSection() {
           readOnly={!!selectedCustomer}
         />
         <div className="grid grid-cols-2 gap-4">
-          <Select disabled={!!selectedCustomer} value={selectedCustomer?.shippingAddress.country || ""}>
+          <Select 
+            value={selectedCustomer?.shippingAddress.country || ""}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Country" />
             </SelectTrigger>
