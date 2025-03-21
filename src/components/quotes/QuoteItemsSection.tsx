@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, MoreVertical, Trash2, Copy, Image, X } from "lucide-react";
@@ -255,9 +256,9 @@ export function QuoteItemsSection() {
           <TableHeader>
             <TableRow className="bg-gray-50">
               <TableHead className="py-2 text-xs uppercase w-[10%]">Category</TableHead>
-              <TableHead className="py-2 text-xs uppercase w-[10%]">Item#</TableHead>
-              <TableHead className="py-2 text-xs uppercase w-[10%]">Color</TableHead>
-              <TableHead className="py-2 text-xs uppercase w-[15%]">Description</TableHead>
+              <TableHead className="py-2 text-xs uppercase w-[7.5%]">Item#</TableHead>
+              <TableHead className="py-2 text-xs uppercase w-[7.5%]">Color</TableHead>
+              <TableHead className="py-2 text-xs uppercase w-[20%]">Description</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">XS</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">S</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">M</TableHead>
