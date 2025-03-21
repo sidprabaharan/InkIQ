@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -202,7 +203,18 @@ const countries = [
 ];
 
 export function BillingSection() {
-  const { selectedCustomer } = useCustomers();
+  const { selectedCustomer, updateCustomer } = useCustomers();
+
+  const handleCountryChange = (value: string) => {
+    if (selectedCustomer) {
+      updateCustomer(selectedCustomer.id, {
+        billingAddress: {
+          ...selectedCustomer.billingAddress,
+          country: value
+        }
+      });
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -231,6 +243,7 @@ export function BillingSection() {
         <div className="grid grid-cols-2 gap-4">
           <Select 
             value={selectedCustomer?.billingAddress.country || ""}
+            onValueChange={handleCountryChange}
           >
             <SelectTrigger>
               <SelectValue placeholder="Country" />
