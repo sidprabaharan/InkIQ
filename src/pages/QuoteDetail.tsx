@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const quotationData = {
   id: "3032",
@@ -184,7 +191,7 @@ export default function QuoteDetail() {
             <h1 className="text-2xl font-semibold">Quote #{quoteId}</h1>
           </div>
           <div className="flex items-center gap-2">
-            <div className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm mr-2">
+            <div className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
               {quote.status}
             </div>
             <DropdownMenu>
@@ -217,7 +224,9 @@ export default function QuoteDetail() {
         </div>
 
         <div className="space-y-6">
+          {/* Company and Quote Details - top row */}
           <div className="grid grid-cols-2 gap-6">
+            {/* Company Information - top left */}
             <div className="bg-white p-6 rounded-lg border">
               <h2 className="text-xl font-bold mb-3">15493315 Canada Inc</h2>
               <div className="space-y-1 text-gray-700">
@@ -237,33 +246,64 @@ export default function QuoteDetail() {
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-6">
-              <div className="bg-white p-6 rounded-lg border">
-                <h3 className="font-medium mb-4">Customer Billing</h3>
-                <div>
-                  <p className="font-medium">{quote.customer.billing.name}</p>
-                  <p>{quote.customer.billing.company}</p>
-                  <p>{quote.customer.billing.contact}</p>
-                  <p>{quote.customer.billing.address}</p>
-                  <p>{quote.customer.billing.city}, {quote.customer.billing.region} {quote.customer.billing.postalCode}</p>
-                  <p>{quote.customer.billing.phone}</p>
-                  <p>{quote.customer.billing.email}</p>
+            {/* Quote Details - top right */}
+            <div className="bg-white p-6 rounded-lg border">
+              <h3 className="font-medium mb-4">Quotation Details</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Owner</span>
+                  <span>{quote.details.owner}</span>
                 </div>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg border">
-                <h3 className="font-medium mb-4">Customer Shipping</h3>
-                <div>
-                  <p>{quote.customer.shipping.company}</p>
-                  <p>{quote.customer.shipping.contact}</p>
-                  <p>{quote.customer.shipping.address}</p>
-                  <p>{quote.customer.shipping.unit}</p>
-                  <p>{quote.customer.shipping.city}, {quote.customer.shipping.region}</p>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Delivery Method</span>
+                  <span>{quote.details.deliveryMethod}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Production Due Date</span>
+                  <span>{quote.details.productionDueDate}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Payment Due Date</span>
+                  <span>{quote.details.paymentDueDate}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Invoice Date</span>
+                  <span>{quote.details.invoiceDate}</span>
                 </div>
               </div>
             </div>
           </div>
           
+          {/* Billing and Shipping - second row */}
+          <div className="grid grid-cols-2 gap-6">
+            {/* Billing Information */}
+            <div className="bg-white p-6 rounded-lg border">
+              <h3 className="font-medium mb-4">Customer Billing</h3>
+              <div>
+                <p className="font-medium">{quote.customer.billing.name}</p>
+                <p>{quote.customer.billing.company}</p>
+                <p>{quote.customer.billing.contact}</p>
+                <p>{quote.customer.billing.address}</p>
+                <p>{quote.customer.billing.city}, {quote.customer.billing.region} {quote.customer.billing.postalCode}</p>
+                <p>{quote.customer.billing.phone}</p>
+                <p>{quote.customer.billing.email}</p>
+              </div>
+            </div>
+            
+            {/* Shipping Information */}
+            <div className="bg-white p-6 rounded-lg border">
+              <h3 className="font-medium mb-4">Customer Shipping</h3>
+              <div>
+                <p>{quote.customer.shipping.company}</p>
+                <p>{quote.customer.shipping.contact}</p>
+                <p>{quote.customer.shipping.address}</p>
+                <p>{quote.customer.shipping.unit}</p>
+                <p>{quote.customer.shipping.city}, {quote.customer.shipping.region}</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Quote Items - full width */}
           <div className="bg-white p-6 rounded-lg border">
             <h3 className="font-medium mb-4">Quote Items</h3>
             <div className="overflow-x-auto">
@@ -312,79 +352,51 @@ export default function QuoteDetail() {
             </div>
           </div>
           
+          {/* Invoice Summary and Notes - bottom row */}
           <div className="grid grid-cols-3 gap-6">
-            <div className="col-span-2 space-y-6">
-              <div className="bg-white p-6 rounded-lg border">
-                <h3 className="font-medium mb-4">Quotation Details</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Owner</span>
-                    <span>{quote.details.owner}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Delivery Method</span>
-                    <span>{quote.details.deliveryMethod}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Production Due Date</span>
-                    <span>{quote.details.productionDueDate}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Payment Due Date</span>
-                    <span>{quote.details.paymentDueDate}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Invoice Date</span>
-                    <span>{quote.details.invoiceDate}</span>
-                  </div>
-                </div>
+            {/* Invoice Summary */}
+            <div className="bg-white p-6 rounded-lg border">
+              <div className="bg-blue-100 p-3 rounded-md mb-4">
+                <h3 className="font-medium text-center">Invoice Summary</h3>
               </div>
-              
-              <div className="grid grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-lg border">
-                  <h3 className="font-medium mb-4">Customer Notes</h3>
-                  <p className="text-sm text-gray-600">{quote.notes.customer}</p>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Item Total</span>
+                  <span>{quote.summary.itemTotal}</span>
                 </div>
-                
-                <div className="bg-white p-6 rounded-lg border">
-                  <h3 className="font-medium mb-4">Production Notes</h3>
-                  <p className="text-sm text-gray-600">{quote.notes.production}</p>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Shipping</span>
+                  <span>{quote.summary.feesTotal}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Sub Total</span>
+                  <span>{quote.summary.subTotal}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Discount</span>
+                  <span>{quote.summary.discount}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Sales Tax</span>
+                  <span>{quote.summary.salesTax}</span>
+                </div>
+                <div className="flex justify-between font-medium">
+                  <span>Total Due</span>
+                  <span>{quote.summary.totalDue}</span>
                 </div>
               </div>
             </div>
             
-            <div className="col-span-1">
-              <div className="bg-white p-6 rounded-lg border">
-                <div className="bg-blue-100 p-3 rounded-md mb-4">
-                  <h3 className="font-medium text-center">Invoice Summary</h3>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Item Total</span>
-                    <span>{quote.summary.itemTotal}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Shipping</span>
-                    <span>{quote.summary.feesTotal}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Sub Total</span>
-                    <span>{quote.summary.subTotal}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Discount</span>
-                    <span>{quote.summary.discount}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Sales Tax</span>
-                    <span>{quote.summary.salesTax}</span>
-                  </div>
-                  <div className="flex justify-between font-medium">
-                    <span>Total Due</span>
-                    <span>{quote.summary.totalDue}</span>
-                  </div>
-                </div>
-              </div>
+            {/* Customer Notes */}
+            <div className="bg-white p-6 rounded-lg border">
+              <h3 className="font-medium mb-4">Customer Notes</h3>
+              <p className="text-sm text-gray-600">{quote.notes.customer}</p>
+            </div>
+            
+            {/* Production Notes */}
+            <div className="bg-white p-6 rounded-lg border">
+              <h3 className="font-medium mb-4">Production Notes</h3>
+              <p className="text-sm text-gray-600">{quote.notes.production}</p>
             </div>
           </div>
         </div>
