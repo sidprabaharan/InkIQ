@@ -21,25 +21,20 @@ export function QuoteFormDialog({ open, onOpenChange }: QuoteFormDialogProps) {
   const [discountValue, setDiscountValue] = useState<string>("");
   const [salesTax, setSalesTax] = useState<string>("");
 
-  // Dummy values for demonstration
   const subTotal = 1250.00;
   
-  // Calculate discount amount
   const discountAmount = discountValue 
     ? discountType === "percentage" 
       ? (subTotal * parseFloat(discountValue) / 100) 
       : parseFloat(discountValue)
     : 0;
   
-  // Calculate new sub total
   const newSubTotal = subTotal - discountAmount;
   
-  // Calculate sales tax amount
   const salesTaxAmount = salesTax 
     ? (newSubTotal * parseFloat(salesTax) / 100)
     : 0;
   
-  // Calculate total due
   const totalDue = newSubTotal + salesTaxAmount;
 
   return (
@@ -61,9 +56,7 @@ export function QuoteFormDialog({ open, onOpenChange }: QuoteFormDialogProps) {
         </div>
 
         <div className="grid grid-cols-12 gap-6 p-6">
-          {/* Left Content - 8 columns */}
           <div className="col-span-8 space-y-6">
-            {/* Customers Section */}
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <h3 className="text-base font-medium">Customers</h3>
@@ -80,7 +73,6 @@ export function QuoteFormDialog({ open, onOpenChange }: QuoteFormDialogProps) {
               </Select>
             </div>
 
-            {/* Customer Billing Section */}
             <div className="space-y-4">
               <h3 className="text-base font-medium">Customer Billing</h3>
               <div className="space-y-4">
@@ -108,7 +100,6 @@ export function QuoteFormDialog({ open, onOpenChange }: QuoteFormDialogProps) {
               </div>
             </div>
 
-            {/* Customer Shipping Address */}
             <div className="space-y-4">
               <h3 className="text-base font-medium">Customer Shipping Address</h3>
               <div className="space-y-4">
@@ -135,7 +126,6 @@ export function QuoteFormDialog({ open, onOpenChange }: QuoteFormDialogProps) {
               </div>
             </div>
 
-            {/* Quote Items */}
             <div className="space-y-4">
               <h3 className="text-base font-medium">Quote Items</h3>
               <div className="overflow-x-auto border rounded-md">
@@ -153,7 +143,7 @@ export function QuoteFormDialog({ open, onOpenChange }: QuoteFormDialogProps) {
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">XL</th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">2XL</th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">3XL</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">QTY</th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Taxed</th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
@@ -214,15 +204,12 @@ export function QuoteFormDialog({ open, onOpenChange }: QuoteFormDialogProps) {
             </div>
           </div>
 
-          {/* Right Content - 4 columns */}
           <div className="col-span-4 space-y-6">
-            {/* Quotation Header */}
             <div className="bg-gray-50 p-4 rounded-md">
               <h2 className="text-xl font-semibold">Quotation</h2>
               <p className="text-sm text-gray-500">#26048957</p>
             </div>
 
-            {/* Quotation Details */}
             <div className="space-y-4">
               <h3 className="text-base font-medium">Quotation Details</h3>
               <div className="space-y-4">
@@ -255,25 +242,21 @@ export function QuoteFormDialog({ open, onOpenChange }: QuoteFormDialogProps) {
               </div>
             </div>
 
-            {/* Nick Name */}
             <div className="space-y-4">
               <h3 className="text-base font-medium">Nick Name</h3>
               <Input placeholder="Add a new Nick Name" />
             </div>
 
-            {/* Customer Notes */}
             <div className="space-y-4">
               <h3 className="text-base font-medium">Customer Notes</h3>
               <Textarea placeholder="Write text here ..." className="min-h-[100px]" />
             </div>
 
-            {/* Production Note */}
             <div className="space-y-4">
               <h3 className="text-base font-medium">Production Note</h3>
               <Textarea placeholder="Write text here ..." className="min-h-[100px]" />
             </div>
 
-            {/* Invoice Summary */}
             <div className="space-y-4">
               <div className="bg-blue-100 p-4 rounded-md">
                 <h3 className="text-base font-medium text-center">Invoice Summary</h3>
