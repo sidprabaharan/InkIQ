@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X, Calendar, ChevronDown, Truck } from "lucide-react";
 import {
   Dialog,
@@ -49,6 +49,15 @@ interface ShippingLabelDialogProps {
   };
 }
 
+interface PackageDetails {
+  length: string;
+  width: string;
+  height: string;
+  weight: string;
+  description: string;
+  specialHandling: boolean;
+}
+
 export function ShippingLabelDialog({
   open,
   onOpenChange,
@@ -80,12 +89,37 @@ export function ShippingLabelDialog({
   const [toCountry, setToCountry] = useState<string>(customerInfo?.country || "US");
   
   // Package details
-  const [packageLength, setPackageLength] = useState<string>("12");
-  const [packageWidth, setPackageWidth] = useState<string>("12");
-  const [packageHeight, setPackageHeight] = useState<string>("12");
-  const [packageWeight, setPackageWeight] = useState<string>("2");
-  const [packageDescription, setPackageDescription] = useState<string>("");
-  const [specialHandling, setSpecialHandling] = useState<boolean>(false);
+  const [packages, setPackages] = useState<PackageDetails[]>([{
+    length: "12",
+    width: "12",
+    height: "12",
+    weight: "2",
+    description: "",
+    specialHandling: false
+  }]);
+  
+  // Update packages array when number of boxes changes
+  useEffect(() => {
+    const boxCount = parseInt(numberOfBoxes) || 1;
+    if (packages.length < boxCount) {
+      // Add more packages
+      const newPackages = [...packages];
+      for (let i = packages.length; i < boxCount; i++) {
+        newPackages.push({
+          length: "12",
+          width: "12",
+          height: "12",
+          weight: "2",
+          description: "",
+          specialHandling: false
+        });
+      }
+      setPackages(newPackages);
+    } else if (packages.length > boxCount) {
+      // Remove excess packages
+      setPackages(packages.slice(0, boxCount));
+    }
+  }, [numberOfBoxes]);
   
   // Pickup details
   const [contactName, setContactName] = useState<string>("");
@@ -98,6 +132,15 @@ export function ShippingLabelDialog({
   const [closingTimeMinute, setClosingTimeMinute] = useState<string>("MM");
   const [closingTimePeriod, setClosingTimePeriod] = useState<string>("--");
   const [pickupInstructions, setPickupInstructions] = useState<string>("");
+  
+  const handleUpdatePackage = (index: number, field: keyof PackageDetails, value: string | boolean) => {
+    const updatedPackages = [...packages];
+    updatedPackages[index] = {
+      ...updatedPackages[index],
+      [field]: value
+    };
+    setPackages(updatedPackages);
+  };
   
   const handleCreateLabel = () => {
     toast({
@@ -273,18 +316,14 @@ export function ShippingLabelDialog({
             
             <div className="space-y-2 max-w-[200px]">
               <Label htmlFor="numberOfBoxes">Number of Boxes</Label>
-              <Select value={numberOfBoxes} onValueChange={setNumberOfBoxes}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select number of boxes" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">1</SelectItem>
-                  <SelectItem value="2">2</SelectItem>
-                  <SelectItem value="3">3</SelectItem>
-                  <SelectItem value="4">4</SelectItem>
-                  <SelectItem value="5">5</SelectItem>
-                </SelectContent>
-              </Select>
+              <Input
+                id="numberOfBoxes"
+                type="number"
+                value={numberOfBoxes}
+                onChange={(e) => setNumberOfBoxes(e.target.value)}
+                min="1"
+                max="20"
+              />
             </div>
             
             <div className="overflow-x-auto">
@@ -301,52 +340,54 @@ export function ShippingLabelDialog({
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td className="p-2">1</td>
-                    <td className="p-2">
-                      <Input 
-                        type="number" 
-                        value={packageLength} 
-                        onChange={(e) => setPackageLength(e.target.value)} 
-                      />
-                    </td>
-                    <td className="p-2">
-                      <Input 
-                        type="number" 
-                        value={packageWidth} 
-                        onChange={(e) => setPackageWidth(e.target.value)} 
-                      />
-                    </td>
-                    <td className="p-2">
-                      <Input 
-                        type="number" 
-                        value={packageHeight} 
-                        onChange={(e) => setPackageHeight(e.target.value)} 
-                      />
-                    </td>
-                    <td className="p-2">
-                      <Input 
-                        type="number" 
-                        value={packageWeight} 
-                        onChange={(e) => setPackageWeight(e.target.value)} 
-                      />
-                    </td>
-                    <td className="p-2">
-                      <Input 
-                        placeholder="Describe the item(s)" 
-                        value={packageDescription} 
-                        onChange={(e) => setPackageDescription(e.target.value)} 
-                      />
-                    </td>
-                    <td className="p-2 text-center">
-                      <Checkbox 
-                        id="specialHandling" 
-                        checked={specialHandling} 
-                        onCheckedChange={(checked) => setSpecialHandling(checked as boolean)} 
-                      />
-                      <Label htmlFor="specialHandling" className="ml-2">Required</Label>
-                    </td>
-                  </tr>
+                  {packages.map((pkg, index) => (
+                    <tr key={index}>
+                      <td className="p-2">{index + 1}</td>
+                      <td className="p-2">
+                        <Input 
+                          type="number" 
+                          value={pkg.length} 
+                          onChange={(e) => handleUpdatePackage(index, "length", e.target.value)} 
+                        />
+                      </td>
+                      <td className="p-2">
+                        <Input 
+                          type="number" 
+                          value={pkg.width} 
+                          onChange={(e) => handleUpdatePackage(index, "width", e.target.value)} 
+                        />
+                      </td>
+                      <td className="p-2">
+                        <Input 
+                          type="number" 
+                          value={pkg.height} 
+                          onChange={(e) => handleUpdatePackage(index, "height", e.target.value)} 
+                        />
+                      </td>
+                      <td className="p-2">
+                        <Input 
+                          type="number" 
+                          value={pkg.weight} 
+                          onChange={(e) => handleUpdatePackage(index, "weight", e.target.value)} 
+                        />
+                      </td>
+                      <td className="p-2">
+                        <Input 
+                          placeholder="Describe the item(s)" 
+                          value={pkg.description} 
+                          onChange={(e) => handleUpdatePackage(index, "description", e.target.value)} 
+                        />
+                      </td>
+                      <td className="p-2 text-center">
+                        <Checkbox 
+                          id={`specialHandling-${index}`} 
+                          checked={pkg.specialHandling} 
+                          onCheckedChange={(checked) => handleUpdatePackage(index, "specialHandling", checked as boolean)} 
+                        />
+                        <Label htmlFor={`specialHandling-${index}`} className="ml-2">Required</Label>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
