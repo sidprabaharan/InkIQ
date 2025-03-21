@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-// Dummy data - in a real app, this would come from an API or context
 const quotationData = {
   id: "3032",
   nickname: "Project Care Quote",
@@ -119,8 +117,6 @@ export default function QuoteDetail() {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // In a real app, we would fetch the quote data based on the ID
-  // For now, we'll use the dummy data
   const quoteId = id || "3032";
   const quote = quotationData;
   
@@ -141,7 +137,6 @@ export default function QuoteDetail() {
       title: "Printing quote",
       description: "The quote would be sent to the printer in a real application",
     });
-    // In a real app, this would open a print dialog
     window.print();
   };
   
@@ -150,7 +145,6 @@ export default function QuoteDetail() {
       title: "Converting to order",
       description: "Quote has been converted to an order",
     });
-    // In a real app, this would convert the quote to an order
   };
   
   const handleSendEmail = () => {
@@ -158,7 +152,6 @@ export default function QuoteDetail() {
       title: "Email sent",
       description: "Quote has been emailed to the customer",
     });
-    // In a real app, this would send an email with the quote
   };
   
   const handleDelete = () => {
@@ -167,7 +160,6 @@ export default function QuoteDetail() {
       description: "The quote has been deleted",
     });
     navigate("/quotes");
-    // In a real app, this would delete the quote
   };
   
   return (
@@ -178,7 +170,6 @@ export default function QuoteDetail() {
       />
       
       <div className="p-6">
-        {/* Top action bar */}
         <div className="flex justify-between items-center mb-6">
           <div className="flex gap-4 items-center">
             <Button 
@@ -191,21 +182,11 @@ export default function QuoteDetail() {
               Back to Quotes
             </Button>
             <h1 className="text-2xl font-semibold">Quote #{quoteId}</h1>
-            <div className="flex items-center">
-              <div className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-                {quote.status}
-              </div>
-            </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={handleDuplicate}>
-              <Copy className="h-4 w-4 mr-2" />
-              Duplicate
-            </Button>
-            <Button variant="outline" onClick={handlePrint}>
-              <Printer className="h-4 w-4 mr-2" />
-              Print
-            </Button>
+            <div className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm mr-2">
+              {quote.status}
+            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
@@ -213,19 +194,30 @@ export default function QuoteDetail() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={handleConvertToOrder}>Convert to Order</DropdownMenuItem>
-                <DropdownMenuItem onClick={handleSendEmail}>Send Email</DropdownMenuItem>
-                <DropdownMenuItem onClick={handleDelete}>Delete</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleDuplicate}>
+                  <Copy className="h-4 w-4 mr-2" />
+                  Duplicate
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handlePrint}>
+                  <Printer className="h-4 w-4 mr-2" />
+                  Print
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleConvertToOrder}>
+                  Convert to Order
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleSendEmail}>
+                  Send Email
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleDelete}>
+                  Delete
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
 
-        {/* Main content */}
         <div className="grid grid-cols-3 gap-6">
-          {/* Left Column - 2/3 width */}
           <div className="col-span-2 space-y-6">
-            {/* Company Information - Updated as requested */}
             <div className="bg-white p-6 rounded-lg border">
               <h2 className="text-xl font-bold mb-3">15493315 Canada Inc</h2>
               <div className="space-y-1 text-gray-700">
@@ -245,9 +237,7 @@ export default function QuoteDetail() {
               </div>
             </div>
             
-            {/* Customer Billing & Shipping */}
             <div className="grid grid-cols-2 gap-6">
-              {/* Customer Billing */}
               <div className="bg-white p-6 rounded-lg border">
                 <h3 className="font-medium mb-4">Customer Billing</h3>
                 <div>
@@ -261,7 +251,6 @@ export default function QuoteDetail() {
                 </div>
               </div>
               
-              {/* Customer Shipping */}
               <div className="bg-white p-6 rounded-lg border">
                 <h3 className="font-medium mb-4">Customer Shipping</h3>
                 <div>
@@ -274,7 +263,6 @@ export default function QuoteDetail() {
               </div>
             </div>
             
-            {/* Quote Items */}
             <div className="bg-white p-6 rounded-lg border">
               <h3 className="font-medium mb-4">Quote Items</h3>
               <div className="overflow-x-auto">
@@ -324,9 +312,7 @@ export default function QuoteDetail() {
             </div>
           </div>
           
-          {/* Right Column - 1/3 width */}
           <div className="col-span-1 space-y-6">
-            {/* Quotation Details */}
             <div className="bg-white p-6 rounded-lg border">
               <h3 className="font-medium mb-4">Quotation Details</h3>
               <div className="space-y-3">
@@ -353,19 +339,16 @@ export default function QuoteDetail() {
               </div>
             </div>
             
-            {/* Customer Notes */}
             <div className="bg-white p-6 rounded-lg border">
               <h3 className="font-medium mb-4">Customer Notes</h3>
               <p className="text-sm text-gray-600">{quote.notes.customer}</p>
             </div>
             
-            {/* Production Notes */}
             <div className="bg-white p-6 rounded-lg border">
               <h3 className="font-medium mb-4">Production Notes</h3>
               <p className="text-sm text-gray-600">{quote.notes.production}</p>
             </div>
             
-            {/* Invoice Summary */}
             <div className="bg-white p-6 rounded-lg border">
               <div className="bg-blue-100 p-3 rounded-md mb-4">
                 <h3 className="font-medium text-center">Invoice Summary</h3>
