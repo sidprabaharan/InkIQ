@@ -37,20 +37,16 @@ export function QuotationStatusBadge({ status }: QuotationStatusBadgeProps) {
   const getVariant = (status: string): string => {
     const normalizedStatus = status.toLowerCase().replace(/\s+/g, '');
     
-    // Map status to variant
+    // Map all artwork variations to a single "artwork" variant
+    if (normalizedStatus.includes('artwork')) {
+      return 'artwork';
+    }
+    
+    // Map other statuses
     const statusMap: Record<string, string> = {
       'quote': 'quote',
       'quoteapprovalsent': 'quoteApprovalSent',
       'quoteapproved': 'quoteApproved',
-      'artwork': 'artwork',
-      'artwork-specialty': 'artwork',
-      'artwork-emb': 'artwork',
-      'artwork-sp': 'artwork',
-      'artwork-dtf': 'artwork',
-      'artwork-embsp': 'artwork',
-      'artwork-embstf': 'artwork',
-      'artwork-spdtf': 'artwork',
-      'artwork-empspdtf': 'artwork',
       'purchaseorders': 'purchaseOrders',
       'production': 'production',
       'shipping': 'shipping',
@@ -67,9 +63,13 @@ export function QuotationStatusBadge({ status }: QuotationStatusBadgeProps) {
 
   const variant = getVariant(status);
   
+  // For display purposes, if the status contains "Artwork-" or similar variations,
+  // just show "Artwork" instead
+  const displayStatus = status.toLowerCase().includes('artwork') ? 'Artwork' : status;
+  
   return (
     <span className={statusVariants({ variant: variant as any })}>
-      {status}
+      {displayStatus}
     </span>
   );
 }

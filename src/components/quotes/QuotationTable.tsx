@@ -26,7 +26,7 @@ const quotationsData: Quotation[] = [
     owner: "Noraiz shahid",
     total: "$278",
     outstanding: "$24",
-    status: "Artwork- SP/DTF",
+    status: "Artwork",
     isPaid: false,
   },
   {
@@ -89,7 +89,7 @@ const quotationsData: Quotation[] = [
     owner: "Helper",
     total: "$9,9282",
     outstanding: "$2,421",
-    status: "Artwork- SP/DTF",
+    status: "Artwork",
     isPaid: true,
   },
   {
@@ -110,7 +110,7 @@ const quotationsData: Quotation[] = [
     owner: "Tim",
     total: "$12382",
     outstanding: "$1522",
-    status: "Artwork- EMB",
+    status: "Artwork",
     isPaid: true,
   },
 ];

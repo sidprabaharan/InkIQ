@@ -1,5 +1,5 @@
 
-import { Check, Image, Package, Tag, CheckCircle2, Ban, Clock, AlertCircle } from "lucide-react";
+import { Check, Image, Package, Tag, CheckCircle2, Ban, Clock, AlertCircle, Truck } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +33,7 @@ export function StatusDropdown({ currentStatus, onStatusChange }: StatusDropdown
     { name: "Quote Approval Sent", color: "bg-blue-500 text-white", icon: <Tag className="h-4 w-4 mr-2" /> },
     { name: "Quote Approved", color: "bg-blue-500 text-white", icon: <Tag className="h-4 w-4 mr-2" /> },
     
-    // Green statuses (artwork)
+    // Green statuses (simplified to just "Artwork")
     { name: "Artwork", color: "bg-green-500 text-white", icon: <Image className="h-4 w-4 mr-2" /> },
     
     // Purple statuses
@@ -43,7 +43,7 @@ export function StatusDropdown({ currentStatus, onStatusChange }: StatusDropdown
     { name: "Production", color: "bg-orange-400 text-white", icon: <Package className="h-4 w-4 mr-2" /> },
     
     // Purple statuses
-    { name: "Shipping", color: "bg-purple-500 text-white", icon: <Package className="h-4 w-4 mr-2" /> },
+    { name: "Shipping", color: "bg-purple-500 text-white", icon: <Truck className="h-4 w-4 mr-2" /> },
     
     // Yellow statuses
     { name: "Complete", color: "bg-yellow-400 text-white", icon: <CheckCircle2 className="h-4 w-4 mr-2" /> },
@@ -60,9 +60,23 @@ export function StatusDropdown({ currentStatus, onStatusChange }: StatusDropdown
     { name: "On Hold", color: "bg-red-600 text-white", icon: <Clock className="h-4 w-4 mr-2" /> },
   ];
 
+  // Determine if current status is any type of Artwork status
+  const isArtworkStatus = currentStatus.toLowerCase().includes('artwork');
+  
+  // Display status should be Artwork if it's any artwork variation
+  const displayStatus = isArtworkStatus ? "Artwork" : currentStatus;
+  
   // Find the class for the current status button
-  const currentStatusData = statusOptions.find(option => option.name === currentStatus) || 
-    { color: "bg-gray-500 text-white", icon: <Tag className="h-4 w-4 mr-2" /> };
+  let currentStatusData = statusOptions.find(option => option.name === displayStatus);
+  
+  // If not found (could be a custom or old status format), try to match by category
+  if (!currentStatusData) {
+    if (isArtworkStatus) {
+      currentStatusData = statusOptions.find(option => option.name === "Artwork");
+    } else {
+      currentStatusData = { color: "bg-gray-500 text-white", icon: <Tag className="h-4 w-4 mr-2" /> };
+    }
+  }
 
   return (
     <DropdownMenu>
@@ -71,7 +85,7 @@ export function StatusDropdown({ currentStatus, onStatusChange }: StatusDropdown
           variant="outline" 
           className={`px-3 py-1 h-auto rounded-full text-sm font-normal ${currentStatusData.color}`}
         >
-          {currentStatus}
+          {displayStatus}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 max-h-[70vh] overflow-y-auto bg-white">
@@ -83,7 +97,7 @@ export function StatusDropdown({ currentStatus, onStatusChange }: StatusDropdown
           >
             {status.icon}
             {status.name}
-            {status.name === currentStatus && <Check className="h-4 w-4 ml-auto" />}
+            {status.name === displayStatus && <Check className="h-4 w-4 ml-auto" />}
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />

@@ -15,6 +15,9 @@ export default function QuoteDetail() {
   const quoteId = id || "3032";
   const quote = quotationData;
   
+  // Simplify the artwork status if needed
+  const status = quote.status.toLowerCase().includes('artwork') ? 'Artwork' : quote.status;
+  
   // For demonstration purposes, we'll use the totalDue from the summary
   // and create a mock amount outstanding (75% of total)
   const totalAmount = quote.summary.totalDue;
@@ -28,7 +31,7 @@ export default function QuoteDetail() {
       />
       
       <div className="p-6">
-        <QuoteDetailHeader quoteId={quoteId} status={quote.status} />
+        <QuoteDetailHeader quoteId={quoteId} status={status} />
 
         <div className="space-y-6">
           {/* Company and Quote Details - top row */}

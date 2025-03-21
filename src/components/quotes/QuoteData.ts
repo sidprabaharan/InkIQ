@@ -187,5 +187,5 @@ export const quotationData: QuotationData = {
     salesTax: "$563.17",
     totalDue: "$11,826.53"
   },
-  status: "Artwork- SP/DTF"
+  status: "Artwork"
 };
