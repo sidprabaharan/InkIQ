@@ -1,11 +1,12 @@
 
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Printer, Copy, ListChecks, MessageCircle } from "lucide-react";
+import { ChevronRight, Printer, Copy, ListChecks, MessageCircle, Edit, Link, File, Trash, Download, DollarSign } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -43,17 +44,66 @@ export function QuoteDetailHeader({ quoteId, status }: QuoteDetailHeaderProps) {
     window.print();
   };
   
-  const handleConvertToOrder = () => {
+  const handleEditQuotation = () => {
     toast({
-      title: "Converting to order",
-      description: "Quote has been converted to an order",
+      title: "Edit Quote",
+      description: "Editing quote #" + quoteId,
     });
   };
   
-  const handleSendEmail = () => {
+  const handleQuotationLink = () => {
     toast({
-      title: "Email sent",
-      description: "Quote has been emailed to the customer",
+      title: "Quote Link Generated",
+      description: "Link copied to clipboard",
+    });
+  };
+  
+  const handlePackingSlip = () => {
+    toast({
+      title: "Packing Slip",
+      description: "Generating packing slip for quote #" + quoteId,
+    });
+  };
+  
+  const handleAddLineItemsToPO = () => {
+    toast({
+      title: "Add to PO",
+      description: "Adding line items to purchase order",
+    });
+  };
+  
+  const handleWorkOrder = () => {
+    toast({
+      title: "Work Order",
+      description: "Creating work order for quote #" + quoteId,
+    });
+  };
+  
+  const handlePrintBoxLabels = () => {
+    toast({
+      title: "Print Box Labels",
+      description: "Printing box labels for quote #" + quoteId,
+    });
+  };
+  
+  const handleDownloadPDF = () => {
+    toast({
+      title: "Download PDF",
+      description: "Downloading quote PDF",
+    });
+  };
+  
+  const handlePaymentExpenses = () => {
+    toast({
+      title: "Payment/Expenses",
+      description: "Managing payment and expenses for quote #" + quoteId,
+    });
+  };
+  
+  const handleApproval = () => {
+    toast({
+      title: "Approval",
+      description: "Processing approval for quote #" + quoteId,
     });
   };
   
@@ -122,23 +172,50 @@ export function QuoteDetailHeader({ quoteId, status }: QuoteDetailHeaderProps) {
               More Actions <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent className="w-56 bg-white">
+            <DropdownMenuItem onClick={handleApproval}>
+              Approval
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleEditQuotation}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit Quotation
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleQuotationLink}>
+              <Link className="h-4 w-4 mr-2" />
+              Quotation Link
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handlePackingSlip}>
+              Packing Slip
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleAddLineItemsToPO}>
+              Add Line Items to PO
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleWorkOrder}>
+              Work Order
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handlePrintBoxLabels}>
+              Print Box Labels
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handlePrint}>
+              <Printer className="h-4 w-4 mr-2" />
+              Print Quotation
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleDownloadPDF}>
+              <Download className="h-4 w-4 mr-2" />
+              Download PDF
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handlePaymentExpenses}>
+              <DollarSign className="h-4 w-4 mr-2" />
+              Payment/Expenses
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleDuplicate}>
               <Copy className="h-4 w-4 mr-2" />
               Duplicate
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handlePrint}>
-              <Printer className="h-4 w-4 mr-2" />
-              Print
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleConvertToOrder}>
-              Convert to Order
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleSendEmail}>
-              Send Email
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDelete}>
-              Delete
+            <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+              <Trash className="h-4 w-4 mr-2" />
+              Delete Quotation
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
