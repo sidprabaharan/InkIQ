@@ -305,8 +305,12 @@ export default function Customers() {
                 </Card>
                 
                 <Card>
-                  <CardHeader>
+                  <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle>Contact Information</CardTitle>
+                    <Button variant="outline" size="sm" className="text-blue-600">
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Add Contact
+                    </Button>
                   </CardHeader>
                   <CardContent className="p-6">
                     <div className="grid grid-cols-2 gap-6">
