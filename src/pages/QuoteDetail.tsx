@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -321,7 +320,6 @@ export default function QuoteDetail() {
                     <TableHead className="text-center">XL</TableHead>
                     <TableHead className="text-center">2XL</TableHead>
                     <TableHead className="text-center">3XL</TableHead>
-                    <TableHead className="text-center">Quant</TableHead>
                     <TableHead className="text-center">Price</TableHead>
                     <TableHead className="text-center">Taxed</TableHead>
                     <TableHead className="text-center">Total</TableHead>
@@ -341,7 +339,6 @@ export default function QuoteDetail() {
                       <TableCell className="text-center">{item.xl}</TableCell>
                       <TableCell className="text-center">{item.xxl}</TableCell>
                       <TableCell className="text-center">{item.xxxl}</TableCell>
-                      <TableCell className="text-center">{item.quantity}</TableCell>
                       <TableCell className="text-center">{item.price}</TableCell>
                       <TableCell className="text-center">{item.taxed ? '✓' : ''}</TableCell>
                       <TableCell className="text-center">{item.total}</TableCell>
