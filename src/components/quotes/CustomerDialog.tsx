@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Dialog, 
@@ -9,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X } from "lucide-react";
 
 interface CustomerDialogProps {
@@ -19,11 +19,25 @@ interface CustomerDialogProps {
 export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
   const [step, setStep] = useState<number>(1);
   
+  const industries = [
+    { id: "tech", name: "Technology" },
+    { id: "retail", name: "Retail" },
+    { id: "healthcare", name: "Healthcare" },
+    { id: "education", name: "Education" },
+    { id: "manufacturing", name: "Manufacturing" },
+  ];
+  
+  const salesReps = [
+    { id: "rep1", name: "John Doe" },
+    { id: "rep2", name: "Jane Smith" },
+    { id: "rep3", name: "Mike Johnson" },
+    { id: "rep4", name: "Sarah Williams" },
+  ];
+  
   const handleNextStep = () => {
     if (step < 4) {
       setStep(step + 1);
     } else {
-      // Submit form and close dialog
       onOpenChange(false);
     }
   };
@@ -103,12 +117,34 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
               
               <div className="mb-4">
                 <label className="block text-sm mb-1">Industry</label>
-                <Input placeholder="Industry Name" />
+                <Select>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Industry" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {industries.map((industry) => (
+                      <SelectItem key={industry.id} value={industry.id}>
+                        {industry.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               
               <div className="mb-4">
                 <label className="block text-sm mb-1">Invoice Owner</label>
-                <Input placeholder="Sales Representative Name" />
+                <Select>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Sales Representative" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {salesReps.map((rep) => (
+                      <SelectItem key={rep.id} value={rep.id}>
+                        {rep.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
