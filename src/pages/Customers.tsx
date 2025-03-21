@@ -90,23 +90,51 @@ export default function Customers() {
     }
   };
 
+  // Update these handler functions to ensure they pass non-optional values
   const handleEditBillingAddress = (data: AddressFormValues) => {
     if (selectedCustomerId) {
-      updateCustomer(selectedCustomerId, { billingAddress: data });
+      // Ensure all required fields are present
+      const billingAddress = {
+        address1: data.address1,
+        address2: data.address2 || "",
+        city: data.city,
+        stateProvince: data.stateProvince || "",
+        zipCode: data.zipCode,
+        country: data.country,
+      };
+      
+      updateCustomer(selectedCustomerId, { billingAddress });
       toast.success("Billing address updated successfully");
     }
   };
 
   const handleEditShippingAddress = (data: AddressFormValues) => {
     if (selectedCustomerId) {
-      updateCustomer(selectedCustomerId, { shippingAddress: data });
+      // Ensure all required fields are present
+      const shippingAddress = {
+        address1: data.address1,
+        address2: data.address2 || "",
+        city: data.city,
+        stateProvince: data.stateProvince || "",
+        zipCode: data.zipCode,
+        country: data.country,
+      };
+      
+      updateCustomer(selectedCustomerId, { shippingAddress });
       toast.success("Shipping address updated successfully");
     }
   };
 
   const handleEditTaxInfo = (data: TaxInfoFormValues) => {
     if (selectedCustomerId) {
-      updateCustomer(selectedCustomerId, { taxInfo: data });
+      // Ensure all required fields are present
+      const taxInfo = {
+        taxId: data.taxId || "",
+        taxRate: data.taxRate || "",
+        taxExemptionNumber: data.taxExemptionNumber || "",
+      };
+      
+      updateCustomer(selectedCustomerId, { taxInfo });
       toast.success("Tax information updated successfully");
     }
   };
