@@ -352,8 +352,20 @@ export default function QuoteDetail() {
             </div>
           </div>
           
-          {/* Invoice Summary and Notes - bottom row */}
+          {/* Invoice Summary and Notes - bottom row - UPDATED LAYOUT */}
           <div className="grid grid-cols-3 gap-6">
+            {/* Customer Notes */}
+            <div className="bg-white p-6 rounded-lg border">
+              <h3 className="font-medium mb-4">Customer Notes</h3>
+              <p className="text-sm text-gray-600">{quote.notes.customer}</p>
+            </div>
+            
+            {/* Production Notes */}
+            <div className="bg-white p-6 rounded-lg border">
+              <h3 className="font-medium mb-4">Production Notes</h3>
+              <p className="text-sm text-gray-600">{quote.notes.production}</p>
+            </div>
+            
             {/* Invoice Summary */}
             <div className="bg-white p-6 rounded-lg border">
               <div className="bg-blue-100 p-3 rounded-md mb-4">
@@ -385,18 +397,6 @@ export default function QuoteDetail() {
                   <span>{quote.summary.totalDue}</span>
                 </div>
               </div>
-            </div>
-            
-            {/* Customer Notes */}
-            <div className="bg-white p-6 rounded-lg border">
-              <h3 className="font-medium mb-4">Customer Notes</h3>
-              <p className="text-sm text-gray-600">{quote.notes.customer}</p>
-            </div>
-            
-            {/* Production Notes */}
-            <div className="bg-white p-6 rounded-lg border">
-              <h3 className="font-medium mb-4">Production Notes</h3>
-              <p className="text-sm text-gray-600">{quote.notes.production}</p>
             </div>
           </div>
         </div>
