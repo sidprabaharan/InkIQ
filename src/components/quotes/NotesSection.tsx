@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 
 interface NotesSectionProps {
@@ -17,6 +17,13 @@ export function NotesSection({
 }: NotesSectionProps) {
   const [content, setContent] = useState(initialContent);
   
+  // Update content when initialContent changes
+  useEffect(() => {
+    if (initialContent) {
+      setContent(initialContent);
+    }
+  }, [initialContent]);
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);
     if (onChange) {
