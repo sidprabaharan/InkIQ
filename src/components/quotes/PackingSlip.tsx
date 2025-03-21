@@ -11,6 +11,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useToast } from "@/components/ui/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface PackingSlipProps {
   open: boolean;
@@ -136,8 +137,8 @@ export function PackingSlip({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[90%] sm:max-w-[1000px]">
-        <SheetHeader>
+      <SheetContent className="w-[90%] sm:max-w-[1000px] p-0">
+        <SheetHeader className="p-6 pb-2">
           <SheetTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
             Packing Slip
@@ -147,7 +148,7 @@ export function PackingSlip({
           </SheetDescription>
         </SheetHeader>
         
-        <div className="mt-6">
+        <div className="px-6 pt-2 pb-4">
           <div className="flex gap-2 mb-4">
             <Button onClick={handlePrint} className="print-button">
               <Printer className="mr-2 h-4 w-4" />
@@ -162,7 +163,9 @@ export function PackingSlip({
               {isEditing ? "Save Changes" : "Edit Quantities"}
             </Button>
           </div>
-          
+        </div>
+        
+        <ScrollArea className="h-[calc(100vh-180px)] px-6 pb-6">
           <div id="packing-slip" className="bg-white p-6 border rounded-lg">
             <div className="text-center mb-6">
               <h1 className="text-2xl font-bold mb-1">Packing Slip</h1>
@@ -419,7 +422,7 @@ export function PackingSlip({
               )}
             </div>
           </div>
-        </div>
+        </ScrollArea>
       </SheetContent>
     </Sheet>
   );
