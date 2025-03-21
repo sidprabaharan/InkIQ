@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +19,7 @@ import { EditContactDialog } from "@/components/customers/EditContactDialog";
 import { EditCompanyDialog, CompanyFormValues } from "@/components/customers/EditCompanyDialog";
 import { EditAddressDialog, AddressFormValues } from "@/components/customers/EditAddressDialog";
 import { EditTaxInfoDialog, TaxInfoFormValues } from "@/components/customers/EditTaxInfoDialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 
 export default function Customers() {
@@ -29,7 +29,6 @@ export default function Customers() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   
-  // Edit dialog states
   const [editContactDialog, setEditContactDialog] = useState(false);
   const [editCompanyDialog, setEditCompanyDialog] = useState(false);
   const [editBillingAddressDialog, setEditBillingAddressDialog] = useState(false);
@@ -59,8 +58,6 @@ export default function Customers() {
 
   const handleAddContact = (data: ContactFormValues) => {
     if (selectedCustomerId) {
-      // Ensure all required fields are present
-      // The Contact type requires email, firstName, lastName, and phoneNumber to be required
       const newContact: Omit<Contact, "id"> = {
         firstName: data.firstName,
         lastName: data.lastName,
@@ -90,10 +87,8 @@ export default function Customers() {
     }
   };
 
-  // Update these handler functions to ensure they pass non-optional values
   const handleEditBillingAddress = (data: AddressFormValues) => {
     if (selectedCustomerId) {
-      // Ensure all required fields are present
       const billingAddress = {
         address1: data.address1,
         address2: data.address2 || "",
@@ -110,7 +105,6 @@ export default function Customers() {
 
   const handleEditShippingAddress = (data: AddressFormValues) => {
     if (selectedCustomerId) {
-      // Ensure all required fields are present
       const shippingAddress = {
         address1: data.address1,
         address2: data.address2 || "",
@@ -127,7 +121,6 @@ export default function Customers() {
 
   const handleEditTaxInfo = (data: TaxInfoFormValues) => {
     if (selectedCustomerId) {
-      // Ensure all required fields are present
       const taxInfo = {
         taxId: data.taxId || "",
         taxRate: data.taxRate || "",
@@ -141,7 +134,6 @@ export default function Customers() {
 
   const handleEditPrimaryContact = () => {
     if (selectedCustomer) {
-      // Create a partial update for the primary contact fields
       const data = {
         firstName: selectedCustomer.firstName,
         lastName: selectedCustomer.lastName,
@@ -149,7 +141,6 @@ export default function Customers() {
         phoneNumber: selectedCustomer.phoneNumber
       };
       
-      // We'll reuse the company dialog since it contains these fields
       setEditCompanyDialog(true);
     }
   };
@@ -224,7 +215,7 @@ export default function Customers() {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-full">
+    <div className="p-6 bg-gray-50 h-full">
       {!selectedCustomer ? (
         <>
           <div className="flex justify-between items-center mb-6">
@@ -663,212 +654,214 @@ export default function Customers() {
               </TabsContent>
               
               <TabsContent value="artwork">
-                <div className="space-y-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <Image className="h-5 w-5 mr-2" />
-                        Mockups
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>File Name</TableHead>
-                            <TableHead>Date Added</TableHead>
-                            <TableHead>Size</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {artworkFiles.mockups.map((file, index) => (
-                            <TableRow key={index}>
-                              <TableCell className="font-medium flex items-center">
-                                <Image className="h-4 w-4 mr-2 text-blue-500" />
-                                {file.name}
-                              </TableCell>
-                              <TableCell>{file.date}</TableCell>
-                              <TableCell>{file.size}</TableCell>
-                              <TableCell className="text-right">
-                                <Button variant="ghost" size="sm">
-                                  View
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  Download
-                                </Button>
-                              </TableCell>
+                <ScrollArea className="h-[calc(100vh-220px)]">
+                  <div className="space-y-6 pb-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center">
+                          <Image className="h-5 w-5 mr-2" />
+                          Mockups
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-6">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>File Name</TableHead>
+                              <TableHead>Date Added</TableHead>
+                              <TableHead>Size</TableHead>
+                              <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <File className="h-5 w-5 mr-2" />
-                        Logo Files
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>File Name</TableHead>
-                            <TableHead>Date Added</TableHead>
-                            <TableHead>Size</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {artworkFiles.logoFiles.map((file, index) => (
-                            <TableRow key={index}>
-                              <TableCell className="font-medium flex items-center">
-                                <File className="h-4 w-4 mr-2 text-blue-500" />
-                                {file.name}
-                              </TableCell>
-                              <TableCell>{file.date}</TableCell>
-                              <TableCell>{file.size}</TableCell>
-                              <TableCell className="text-right">
-                                <Button variant="ghost" size="sm">
-                                  View
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  Download
-                                </Button>
-                              </TableCell>
+                          </TableHeader>
+                          <TableBody>
+                            {artworkFiles.mockups.map((file, index) => (
+                              <TableRow key={index}>
+                                <TableCell className="font-medium flex items-center">
+                                  <Image className="h-4 w-4 mr-2 text-blue-500" />
+                                  {file.name}
+                                </TableCell>
+                                <TableCell>{file.date}</TableCell>
+                                <TableCell>{file.size}</TableCell>
+                                <TableCell className="text-right">
+                                  <Button variant="ghost" size="sm">
+                                    View
+                                  </Button>
+                                  <Button variant="ghost" size="sm">
+                                    Download
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center">
+                          <File className="h-5 w-5 mr-2" />
+                          Logo Files
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-6">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>File Name</TableHead>
+                              <TableHead>Date Added</TableHead>
+                              <TableHead>Size</TableHead>
+                              <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <PenTool className="h-5 w-5 mr-2" />
-                        Colour Separations
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>File Name</TableHead>
-                            <TableHead>Date Added</TableHead>
-                            <TableHead>Size</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {artworkFiles.colorSeparations.map((file, index) => (
-                            <TableRow key={index}>
-                              <TableCell className="font-medium flex items-center">
-                                <FileText className="h-4 w-4 mr-2 text-blue-500" />
-                                {file.name}
-                              </TableCell>
-                              <TableCell>{file.date}</TableCell>
-                              <TableCell>{file.size}</TableCell>
-                              <TableCell className="text-right">
-                                <Button variant="ghost" size="sm">
-                                  View
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  Download
-                                </Button>
-                              </TableCell>
+                          </TableHeader>
+                          <TableBody>
+                            {artworkFiles.logoFiles.map((file, index) => (
+                              <TableRow key={index}>
+                                <TableCell className="font-medium flex items-center">
+                                  <File className="h-4 w-4 mr-2 text-blue-500" />
+                                  {file.name}
+                                </TableCell>
+                                <TableCell>{file.date}</TableCell>
+                                <TableCell>{file.size}</TableCell>
+                                <TableCell className="text-right">
+                                  <Button variant="ghost" size="sm">
+                                    View
+                                  </Button>
+                                  <Button variant="ghost" size="sm">
+                                    Download
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center">
+                          <PenTool className="h-5 w-5 mr-2" />
+                          Colour Separations
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-6">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>File Name</TableHead>
+                              <TableHead>Date Added</TableHead>
+                              <TableHead>Size</TableHead>
+                              <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <Code className="h-5 w-5 mr-2" />
-                        Digitized Logos
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>File Name</TableHead>
-                            <TableHead>Date Added</TableHead>
-                            <TableHead>Size</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {artworkFiles.digitizedLogos.map((file, index) => (
-                            <TableRow key={index}>
-                              <TableCell className="font-medium flex items-center">
-                                <Code className="h-4 w-4 mr-2 text-blue-500" />
-                                {file.name}
-                              </TableCell>
-                              <TableCell>{file.date}</TableCell>
-                              <TableCell>{file.size}</TableCell>
-                              <TableCell className="text-right">
-                                <Button variant="ghost" size="sm">
-                                  View
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  Download
-                                </Button>
-                              </TableCell>
+                          </TableHeader>
+                          <TableBody>
+                            {artworkFiles.colorSeparations.map((file, index) => (
+                              <TableRow key={index}>
+                                <TableCell className="font-medium flex items-center">
+                                  <FileText className="h-4 w-4 mr-2 text-blue-500" />
+                                  {file.name}
+                                </TableCell>
+                                <TableCell>{file.date}</TableCell>
+                                <TableCell>{file.size}</TableCell>
+                                <TableCell className="text-right">
+                                  <Button variant="ghost" size="sm">
+                                    View
+                                  </Button>
+                                  <Button variant="ghost" size="sm">
+                                    Download
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center">
+                          <Code className="h-5 w-5 mr-2" />
+                          Digitized Logos
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-6">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>File Name</TableHead>
+                              <TableHead>Date Added</TableHead>
+                              <TableHead>Size</TableHead>
+                              <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <Folder className="h-5 w-5 mr-2" />
-                        DTF Gang Sheets
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>File Name</TableHead>
-                            <TableHead>Date Added</TableHead>
-                            <TableHead>Size</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {artworkFiles.dtfGangSheets.map((file, index) => (
-                            <TableRow key={index}>
-                              <TableCell className="font-medium flex items-center">
-                                <Folder className="h-4 w-4 mr-2 text-blue-500" />
-                                {file.name}
-                              </TableCell>
-                              <TableCell>{file.date}</TableCell>
-                              <TableCell>{file.size}</TableCell>
-                              <TableCell className="text-right">
-                                <Button variant="ghost" size="sm">
-                                  View
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  Download
-                                </Button>
-                              </TableCell>
+                          </TableHeader>
+                          <TableBody>
+                            {artworkFiles.digitizedLogos.map((file, index) => (
+                              <TableRow key={index}>
+                                <TableCell className="font-medium flex items-center">
+                                  <Code className="h-4 w-4 mr-2 text-blue-500" />
+                                  {file.name}
+                                </TableCell>
+                                <TableCell>{file.date}</TableCell>
+                                <TableCell>{file.size}</TableCell>
+                                <TableCell className="text-right">
+                                  <Button variant="ghost" size="sm">
+                                    View
+                                  </Button>
+                                  <Button variant="ghost" size="sm">
+                                    Download
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center">
+                          <Folder className="h-5 w-5 mr-2" />
+                          DTF Gang Sheets
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-6">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>File Name</TableHead>
+                              <TableHead>Date Added</TableHead>
+                              <TableHead>Size</TableHead>
+                              <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-                </div>
+                          </TableHeader>
+                          <TableBody>
+                            {artworkFiles.dtfGangSheets.map((file, index) => (
+                              <TableRow key={index}>
+                                <TableCell className="font-medium flex items-center">
+                                  <Folder className="h-4 w-4 mr-2 text-blue-500" />
+                                  {file.name}
+                                </TableCell>
+                                <TableCell>{file.date}</TableCell>
+                                <TableCell>{file.size}</TableCell>
+                                <TableCell className="text-right">
+                                  <Button variant="ghost" size="sm">
+                                    View
+                                  </Button>
+                                  <Button variant="ghost" size="sm">
+                                    Download
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </ScrollArea>
               </TabsContent>
               
               <TabsContent value="activities">
