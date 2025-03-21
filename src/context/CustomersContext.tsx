@@ -38,7 +38,7 @@ export interface Customer {
 interface CustomersContextType {
   customers: Customer[];
   selectedCustomer: Customer | null;
-  addCustomer: (customer: Omit<Customer, "id">) => void;
+  addCustomer: (customer: Omit<Customer, "id">) => Customer; // Update return type to Customer
   selectCustomer: (customerId: string) => void;
 }
 
@@ -55,7 +55,7 @@ export function CustomersProvider({ children }: { children: React.ReactNode }) {
     };
     
     setCustomers(prev => [...prev, newCustomer]);
-    return newCustomer;
+    return newCustomer; // Ensure we're returning the new customer
   };
 
   const selectCustomer = (customerId: string) => {

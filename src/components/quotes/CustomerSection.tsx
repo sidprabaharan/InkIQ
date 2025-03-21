@@ -22,8 +22,8 @@ export function CustomerSection() {
         </Button>
       </div>
       <Select 
-        value={selectedCustomer?.id} 
-        onValueChange={selectCustomer}
+        value={selectedCustomer?.id || ""} 
+        onValueChange={(value) => selectCustomer(value)}
       >
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Select A Customer" />
