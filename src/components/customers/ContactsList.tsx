@@ -3,7 +3,8 @@ import React from "react";
 import { Contact } from "@/types/customer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Mail, Phone, Briefcase, Building, UserCog } from "lucide-react";
+import { Mail, Phone, Briefcase, Building, UserCog, Edit } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface ContactsListProps {
   contacts: Contact[];
@@ -13,9 +14,16 @@ interface ContactsListProps {
     email: string;
     phoneNumber: string;
   };
+  onEditContact?: (contact: Contact) => void;
+  onEditPrimaryContact?: () => void;
 }
 
-export function ContactsList({ contacts, primaryContact }: ContactsListProps) {
+export function ContactsList({ 
+  contacts, 
+  primaryContact, 
+  onEditContact,
+  onEditPrimaryContact
+}: ContactsListProps) {
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
@@ -32,11 +40,24 @@ export function ContactsList({ contacts, primaryContact }: ContactsListProps) {
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <h4 className="font-medium">
-                    {primaryContact.firstName} {primaryContact.lastName}
-                  </h4>
-                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Primary</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-medium">
+                      {primaryContact.firstName} {primaryContact.lastName}
+                    </h4>
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Primary</span>
+                  </div>
+                  {onEditPrimaryContact && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 w-8 p-0"
+                      onClick={onEditPrimaryContact}
+                    >
+                      <Edit className="h-4 w-4" />
+                      <span className="sr-only">Edit primary contact</span>
+                    </Button>
+                  )}
                 </div>
                 <div className="mt-2 space-y-1 text-sm">
                   <div className="flex items-center gap-2">
@@ -64,9 +85,22 @@ export function ContactsList({ contacts, primaryContact }: ContactsListProps) {
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <h4 className="font-medium">
-                  {contact.firstName} {contact.lastName}
-                </h4>
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium">
+                    {contact.firstName} {contact.lastName}
+                  </h4>
+                  {onEditContact && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 w-8 p-0"
+                      onClick={() => onEditContact(contact)}
+                    >
+                      <Edit className="h-4 w-4" />
+                      <span className="sr-only">Edit contact</span>
+                    </Button>
+                  )}
+                </div>
                 <div className="mt-2 space-y-1 text-sm">
                   {contact.jobTitle && (
                     <div className="flex items-center gap-2">

@@ -5,20 +5,37 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Search, Plus, ArrowLeft, Mail, Phone, FileText, Calendar, MessageSquare, File, Image, Folder, Code, PenTool, ShoppingCart, FileCheck, UserPlus } from "lucide-react";
+import { 
+  Search, Plus, ArrowLeft, Mail, Phone, FileText, Calendar, MessageSquare, 
+  File, Image, Folder, Code, PenTool, ShoppingCart, FileCheck, UserPlus,
+  Edit, MapPin
+} from "lucide-react";
 import { CustomerDialog } from "@/components/quotes/CustomerDialog";
 import { useCustomers } from "@/context/CustomersContext";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AddContactDialog, ContactFormValues } from "@/components/customers/AddContactDialog";
 import { ContactsList } from "@/components/customers/ContactsList";
 import { Contact } from "@/types/customer";
+import { EditContactDialog } from "@/components/customers/EditContactDialog";
+import { EditCompanyDialog, CompanyFormValues } from "@/components/customers/EditCompanyDialog";
+import { EditAddressDialog, AddressFormValues } from "@/components/customers/EditAddressDialog";
+import { EditTaxInfoDialog, TaxInfoFormValues } from "@/components/customers/EditTaxInfoDialog";
+import { toast } from "sonner";
 
 export default function Customers() {
   const [openDialog, setOpenDialog] = useState(false);
   const [openContactDialog, setOpenContactDialog] = useState(false);
-  const { customers, addContactToCustomer } = useCustomers();
+  const { customers, addContactToCustomer, updateCustomer, updateCustomerContact } = useCustomers();
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // Edit dialog states
+  const [editContactDialog, setEditContactDialog] = useState(false);
+  const [editCompanyDialog, setEditCompanyDialog] = useState(false);
+  const [editBillingAddressDialog, setEditBillingAddressDialog] = useState(false);
+  const [editShippingAddressDialog, setEditShippingAddressDialog] = useState(false);
+  const [editTaxInfoDialog, setEditTaxInfoDialog] = useState(false);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
 
   const selectedCustomer = selectedCustomerId 
     ? customers.find(c => c.id === selectedCustomerId) 
@@ -55,6 +72,57 @@ export default function Customers() {
       };
       
       addContactToCustomer(selectedCustomerId, newContact);
+      toast.success("Contact added successfully");
+    }
+  };
+
+  const handleEditContact = (contactId: string, data: ContactFormValues) => {
+    if (selectedCustomerId) {
+      updateCustomerContact(selectedCustomerId, contactId, data);
+      toast.success("Contact updated successfully");
+    }
+  };
+
+  const handleEditCompany = (data: CompanyFormValues) => {
+    if (selectedCustomerId) {
+      updateCustomer(selectedCustomerId, data);
+      toast.success("Company information updated successfully");
+    }
+  };
+
+  const handleEditBillingAddress = (data: AddressFormValues) => {
+    if (selectedCustomerId) {
+      updateCustomer(selectedCustomerId, { billingAddress: data });
+      toast.success("Billing address updated successfully");
+    }
+  };
+
+  const handleEditShippingAddress = (data: AddressFormValues) => {
+    if (selectedCustomerId) {
+      updateCustomer(selectedCustomerId, { shippingAddress: data });
+      toast.success("Shipping address updated successfully");
+    }
+  };
+
+  const handleEditTaxInfo = (data: TaxInfoFormValues) => {
+    if (selectedCustomerId) {
+      updateCustomer(selectedCustomerId, { taxInfo: data });
+      toast.success("Tax information updated successfully");
+    }
+  };
+
+  const handleEditPrimaryContact = () => {
+    if (selectedCustomer) {
+      // Create a partial update for the primary contact fields
+      const data = {
+        firstName: selectedCustomer.firstName,
+        lastName: selectedCustomer.lastName,
+        email: selectedCustomer.email,
+        phoneNumber: selectedCustomer.phoneNumber
+      };
+      
+      // We'll reuse the company dialog since it contains these fields
+      setEditCompanyDialog(true);
     }
   };
 
@@ -257,6 +325,18 @@ export default function Customers() {
             
             <Card>
               <CardContent className="p-6 flex flex-col items-center text-center">
+                <div className="flex justify-end w-full">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 w-8 p-0"
+                    onClick={() => setEditCompanyDialog(true)}
+                  >
+                    <Edit className="h-4 w-4" />
+                    <span className="sr-only">Edit company</span>
+                  </Button>
+                </div>
+                
                 <Avatar className="h-24 w-24 my-4 bg-blue-100 text-blue-600">
                   <AvatarFallback className="text-2xl">
                     {getInitials(selectedCustomer.companyName)}
@@ -349,14 +429,28 @@ export default function Customers() {
                         email: selectedCustomer.email,
                         phoneNumber: selectedCustomer.phoneNumber
                       }}
+                      onEditContact={(contact) => {
+                        setSelectedContact(contact);
+                        setEditContactDialog(true);
+                      }}
+                      onEditPrimaryContact={handleEditPrimaryContact}
                     />
                   </CardContent>
                 </Card>
                 
                 <div className="grid grid-cols-2 gap-6">
                   <Card>
-                    <CardHeader>
+                    <CardHeader className="flex flex-row items-center justify-between">
                       <CardTitle>Billing Address</CardTitle>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0"
+                        onClick={() => setEditBillingAddressDialog(true)}
+                      >
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Edit billing address</span>
+                      </Button>
                     </CardHeader>
                     <CardContent className="p-6">
                       <div className="space-y-2">
@@ -375,8 +469,17 @@ export default function Customers() {
                   </Card>
                   
                   <Card>
-                    <CardHeader>
+                    <CardHeader className="flex flex-row items-center justify-between">
                       <CardTitle>Shipping Address</CardTitle>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0"
+                        onClick={() => setEditShippingAddressDialog(true)}
+                      >
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Edit shipping address</span>
+                      </Button>
                     </CardHeader>
                     <CardContent className="p-6">
                       <div className="space-y-2">
@@ -396,8 +499,17 @@ export default function Customers() {
                 </div>
                 
                 <Card>
-                  <CardHeader>
+                  <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle>Tax Information</CardTitle>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 w-8 p-0"
+                      onClick={() => setEditTaxInfoDialog(true)}
+                    >
+                      <Edit className="h-4 w-4" />
+                      <span className="sr-only">Edit tax information</span>
+                    </Button>
                   </CardHeader>
                   <CardContent className="p-6">
                     <div className="grid grid-cols-3 gap-6">
@@ -752,12 +864,57 @@ export default function Customers() {
       />
 
       {selectedCustomerId && (
-        <AddContactDialog 
-          open={openContactDialog}
-          onOpenChange={setOpenContactDialog}
-          onAddContact={handleAddContact}
-          customerId={selectedCustomerId}
-        />
+        <>
+          <AddContactDialog 
+            open={openContactDialog}
+            onOpenChange={setOpenContactDialog}
+            onAddContact={handleAddContact}
+            customerId={selectedCustomerId}
+          />
+          
+          {selectedContact && (
+            <EditContactDialog 
+              open={editContactDialog}
+              onOpenChange={setEditContactDialog}
+              onUpdateContact={handleEditContact}
+              contact={selectedContact}
+            />
+          )}
+          
+          {selectedCustomer && (
+            <>
+              <EditCompanyDialog 
+                open={editCompanyDialog}
+                onOpenChange={setEditCompanyDialog}
+                onUpdateCompany={handleEditCompany}
+                customer={selectedCustomer}
+              />
+              
+              <EditAddressDialog 
+                open={editBillingAddressDialog}
+                onOpenChange={setEditBillingAddressDialog}
+                onUpdateAddress={handleEditBillingAddress}
+                address={selectedCustomer.billingAddress}
+                title="Billing Address"
+              />
+              
+              <EditAddressDialog 
+                open={editShippingAddressDialog}
+                onOpenChange={setEditShippingAddressDialog}
+                onUpdateAddress={handleEditShippingAddress}
+                address={selectedCustomer.shippingAddress}
+                title="Shipping Address"
+              />
+              
+              <EditTaxInfoDialog 
+                open={editTaxInfoDialog}
+                onOpenChange={setEditTaxInfoDialog}
+                onUpdateTaxInfo={handleEditTaxInfo}
+                taxInfo={selectedCustomer.taxInfo}
+              />
+            </>
+          )}
+        </>
       )}
     </div>
   );

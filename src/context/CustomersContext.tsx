@@ -44,6 +44,8 @@ interface CustomersContextType {
   selectCustomer: (customerId: string) => void;
   getCustomerById: (customerId: string) => Customer | undefined;
   addContactToCustomer: (customerId: string, contact: Omit<Contact, "id">) => void;
+  updateCustomer: (customerId: string, data: Partial<Customer>) => void;
+  updateCustomerContact: (customerId: string, contactId: string, data: Partial<Contact>) => void;
 }
 
 // Example customers data
@@ -200,6 +202,57 @@ export function CustomersProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Add new function to update customer information
+  const updateCustomer = (customerId: string, data: Partial<Customer>) => {
+    setCustomers(prev => prev.map(customer => {
+      if (customer.id === customerId) {
+        const updatedCustomer = { ...customer, ...data };
+        
+        // If we're updating contacts directly (which is an array), make sure to handle it properly
+        if (data.contacts) {
+          updatedCustomer.contacts = data.contacts;
+        }
+        
+        return updatedCustomer;
+      }
+      return customer;
+    }));
+
+    // Update selectedCustomer if it's the one being modified
+    if (selectedCustomer && selectedCustomer.id === customerId) {
+      setSelectedCustomer(prev => prev ? { ...prev, ...data } : null);
+    }
+  };
+
+  // Add function to update a specific contact of a customer
+  const updateCustomerContact = (customerId: string, contactId: string, data: Partial<Contact>) => {
+    setCustomers(prev => prev.map(customer => {
+      if (customer.id === customerId) {
+        const updatedContacts = customer.contacts.map(contact => 
+          contact.id === contactId ? { ...contact, ...data } : contact
+        );
+        
+        return {
+          ...customer,
+          contacts: updatedContacts
+        };
+      }
+      return customer;
+    }));
+
+    // Update selectedCustomer if it's the one being modified
+    if (selectedCustomer && selectedCustomer.id === customerId) {
+      const updatedContacts = selectedCustomer.contacts.map(contact => 
+        contact.id === contactId ? { ...contact, ...data } : contact
+      );
+      
+      setSelectedCustomer({
+        ...selectedCustomer,
+        contacts: updatedContacts
+      });
+    }
+  };
+
   return (
     <CustomersContext.Provider value={{ 
       customers, 
@@ -207,7 +260,9 @@ export function CustomersProvider({ children }: { children: React.ReactNode }) {
       addCustomer, 
       selectCustomer,
       getCustomerById,
-      addContactToCustomer
+      addContactToCustomer,
+      updateCustomer,
+      updateCustomerContact
     }}>
       {children}
     </CustomersContext.Provider>
