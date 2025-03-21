@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { X, Calendar, ChevronDown, Truck } from "lucide-react";
 import {
@@ -70,6 +69,7 @@ export function ShippingLabelDialog({
   const [pickupDate, setPickupDate] = useState<Date | undefined>(undefined);
   const [numberOfBoxes, setNumberOfBoxes] = useState<string>("1");
   const [saveAsDefault, setSaveAsDefault] = useState<boolean>(false);
+  const [allSameBoxes, setAllSameBoxes] = useState<boolean>(false);
   
   // From (Pickup) address - could be pre-filled with company information
   const [fromCompany, setFromCompany] = useState<string>("Print Shop Name");
@@ -98,28 +98,54 @@ export function ShippingLabelDialog({
     specialHandling: false
   }]);
   
+  // Same as above states for each package
+  const [sameAsAbove, setSameAsAbove] = useState<boolean[]>([]);
+  
   // Update packages array when number of boxes changes
   useEffect(() => {
     const boxCount = parseInt(numberOfBoxes) || 1;
     if (packages.length < boxCount) {
       // Add more packages
       const newPackages = [...packages];
+      const newSameAsAbove = [...sameAsAbove];
+      
       for (let i = packages.length; i < boxCount; i++) {
-        newPackages.push({
-          length: "12",
-          width: "12",
-          height: "12",
-          weight: "2",
-          description: "",
-          specialHandling: false
-        });
+        if (allSameBoxes && packages.length > 0) {
+          // If "All the Same" is checked, copy values from the first package
+          newPackages.push({...packages[0]});
+        } else if (i > 0 && newSameAsAbove[i-1]) {
+          // If the previous package had "Same as Above" checked, copy its values
+          newPackages.push({...newPackages[i-1]});
+        } else {
+          // Otherwise, use default values
+          newPackages.push({
+            length: "12",
+            width: "12",
+            height: "12",
+            weight: "2",
+            description: "",
+            specialHandling: false
+          });
+        }
+        newSameAsAbove.push(false);
       }
       setPackages(newPackages);
+      setSameAsAbove(newSameAsAbove);
     } else if (packages.length > boxCount) {
       // Remove excess packages
       setPackages(packages.slice(0, boxCount));
+      setSameAsAbove(sameAsAbove.slice(0, boxCount));
     }
-  }, [numberOfBoxes]);
+  }, [numberOfBoxes, allSameBoxes]);
+  
+  // Handle "All the Same" checkbox change
+  useEffect(() => {
+    if (allSameBoxes && packages.length > 1) {
+      const firstPackage = packages[0];
+      const updatedPackages = packages.map(() => ({...firstPackage}));
+      setPackages(updatedPackages);
+    }
+  }, [allSameBoxes]);
   
   // Pickup details
   const [contactName, setContactName] = useState<string>("");
@@ -139,7 +165,41 @@ export function ShippingLabelDialog({
       ...updatedPackages[index],
       [field]: value
     };
-    setPackages(updatedPackages);
+    
+    // If "All the Same" is checked, update all packages with the same value
+    if (allSameBoxes && index === 0) {
+      setPackages(updatedPackages.map(() => ({...updatedPackages[0]})));
+    } else {
+      setPackages(updatedPackages);
+      
+      // If "Same as Above" is checked for any subsequent packages, update them
+      if (index > 0) {
+        const newSameAsAbove = [...sameAsAbove];
+        for (let i = index + 1; i < packages.length; i++) {
+          if (newSameAsAbove[i]) {
+            updatedPackages[i] = {...updatedPackages[i-1]};
+          } else {
+            break; // Stop propagation when we hit a package that's not "Same as Above"
+          }
+        }
+        setPackages(updatedPackages);
+      }
+    }
+  };
+  
+  const handleSameAsAboveChange = (index: number, checked: boolean) => {
+    if (index <= 0) return; // First package can't be "Same as Above"
+    
+    const newSameAsAbove = [...sameAsAbove];
+    newSameAsAbove[index] = checked;
+    setSameAsAbove(newSameAsAbove);
+    
+    if (checked) {
+      // Copy values from the package above
+      const updatedPackages = [...packages];
+      updatedPackages[index] = {...updatedPackages[index-1]};
+      setPackages(updatedPackages);
+    }
   };
   
   const handleCreateLabel = () => {
@@ -326,6 +386,17 @@ export function ShippingLabelDialog({
               />
             </div>
             
+            {parseInt(numberOfBoxes) > 1 && (
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="allSameBoxes" 
+                  checked={allSameBoxes} 
+                  onCheckedChange={(checked) => setAllSameBoxes(!!checked)} 
+                />
+                <Label htmlFor="allSameBoxes">All boxes are the same size and weight</Label>
+              </div>
+            )}
+            
             <div className="overflow-x-auto">
               <table className="w-full min-w-[600px]">
                 <thead>
@@ -342,12 +413,26 @@ export function ShippingLabelDialog({
                 <tbody>
                   {packages.map((pkg, index) => (
                     <tr key={index}>
-                      <td className="p-2">{index + 1}</td>
+                      <td className="p-2">
+                        {index + 1}
+                        {index > 0 && !allSameBoxes && (
+                          <div className="mt-2 flex items-center space-x-2">
+                            <Checkbox 
+                              id={`sameAsAbove-${index}`} 
+                              checked={sameAsAbove[index]} 
+                              onCheckedChange={(checked) => handleSameAsAboveChange(index, !!checked)} 
+                              disabled={allSameBoxes}
+                            />
+                            <Label htmlFor={`sameAsAbove-${index}`} className="text-xs">Same as Above</Label>
+                          </div>
+                        )}
+                      </td>
                       <td className="p-2">
                         <Input 
                           type="number" 
                           value={pkg.length} 
                           onChange={(e) => handleUpdatePackage(index, "length", e.target.value)} 
+                          disabled={index > 0 && (allSameBoxes || sameAsAbove[index])}
                         />
                       </td>
                       <td className="p-2">
@@ -355,6 +440,7 @@ export function ShippingLabelDialog({
                           type="number" 
                           value={pkg.width} 
                           onChange={(e) => handleUpdatePackage(index, "width", e.target.value)} 
+                          disabled={index > 0 && (allSameBoxes || sameAsAbove[index])}
                         />
                       </td>
                       <td className="p-2">
@@ -362,6 +448,7 @@ export function ShippingLabelDialog({
                           type="number" 
                           value={pkg.height} 
                           onChange={(e) => handleUpdatePackage(index, "height", e.target.value)} 
+                          disabled={index > 0 && (allSameBoxes || sameAsAbove[index])}
                         />
                       </td>
                       <td className="p-2">
@@ -369,6 +456,7 @@ export function ShippingLabelDialog({
                           type="number" 
                           value={pkg.weight} 
                           onChange={(e) => handleUpdatePackage(index, "weight", e.target.value)} 
+                          disabled={index > 0 && (allSameBoxes || sameAsAbove[index])}
                         />
                       </td>
                       <td className="p-2">
@@ -376,13 +464,15 @@ export function ShippingLabelDialog({
                           placeholder="Describe the item(s)" 
                           value={pkg.description} 
                           onChange={(e) => handleUpdatePackage(index, "description", e.target.value)} 
+                          disabled={index > 0 && (allSameBoxes || sameAsAbove[index])}
                         />
                       </td>
                       <td className="p-2 text-center">
                         <Checkbox 
                           id={`specialHandling-${index}`} 
                           checked={pkg.specialHandling} 
-                          onCheckedChange={(checked) => handleUpdatePackage(index, "specialHandling", checked as boolean)} 
+                          onCheckedChange={(checked) => handleUpdatePackage(index, "specialHandling", !!checked)} 
+                          disabled={index > 0 && (allSameBoxes || sameAsAbove[index])}
                         />
                         <Label htmlFor={`specialHandling-${index}`} className="ml-2">Required</Label>
                       </td>
@@ -556,7 +646,7 @@ export function ShippingLabelDialog({
                   <Checkbox 
                     id="saveAsDefault" 
                     checked={saveAsDefault} 
-                    onCheckedChange={(checked) => setSaveAsDefault(checked as boolean)} 
+                    onCheckedChange={(checked) => setSaveAsDefault(!!checked)} 
                   />
                   <Label htmlFor="saveAsDefault">Save as default</Label>
                 </div>
