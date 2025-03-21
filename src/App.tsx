@@ -1,7 +1,7 @@
 
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
-import AppLayout from "@/components/layout/AppLayout";
+import { AppLayout } from "@/components/layout/AppLayout";
 import Index from "@/pages/Index";
 import Quotes from "@/pages/Quotes";
 import NewQuote from "@/pages/NewQuote";

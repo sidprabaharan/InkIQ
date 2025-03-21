@@ -1,8 +1,8 @@
-
-import React from "react";
+import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCustomers } from "@/context/CustomersContext";
+import { CustomerShipping } from "@/components/quotes/QuoteData";
 
 // List of countries with priority countries at the top
 const countries = [
@@ -202,8 +202,27 @@ const countries = [
   { code: "zw", name: "Zimbabwe" }
 ];
 
-export function ShippingSection() {
+interface ShippingSectionProps {
+  initialShippingData?: CustomerShipping;
+}
+
+export function ShippingSection({ initialShippingData }: ShippingSectionProps) {
   const { selectedCustomer, updateCustomer } = useCustomers();
+
+  // Load initial shipping data if provided
+  useEffect(() => {
+    if (initialShippingData && selectedCustomer) {
+      updateCustomer(selectedCustomer.id, {
+        shippingAddress: {
+          country: initialShippingData.region || selectedCustomer.shippingAddress.country,
+          address1: initialShippingData.address || selectedCustomer.shippingAddress.address1,
+          address2: initialShippingData.unit || selectedCustomer.shippingAddress.address2,
+          city: initialShippingData.city || selectedCustomer.shippingAddress.city,
+          stateProvince: initialShippingData.region || selectedCustomer.shippingAddress.stateProvince
+        }
+      });
+    }
+  }, [initialShippingData, selectedCustomer, updateCustomer]);
 
   const handleCountryChange = (value: string) => {
     if (selectedCustomer) {

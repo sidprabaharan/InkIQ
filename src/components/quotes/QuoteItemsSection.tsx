@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, MoreVertical, Trash2, Copy, Image, X } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -17,6 +16,7 @@ import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from "@/componen
 import { MockupUploadDialog } from "./MockupUploadDialog";
 import { ImprintDialog, ImprintItem } from "./ImprintDialog";
 import { toast } from "sonner";
+import { QuoteItem } from "./QuoteData";
 
 interface ItemMockup {
   id: string;
@@ -57,7 +57,11 @@ interface ItemGroup {
   imprints: Imprint[];
 }
 
-export function QuoteItemsSection() {
+interface QuoteItemsSectionProps {
+  initialItems?: QuoteItem[];
+}
+
+export function QuoteItemsSection({ initialItems }: QuoteItemsSectionProps) {
   const [itemGroups, setItemGroups] = useState<ItemGroup[]>([
     {
       id: "group-" + Math.random().toString(36).substring(2, 9),
@@ -86,6 +90,39 @@ export function QuoteItemsSection() {
       imprints: []
     }
   ]);
+
+  useEffect(() => {
+    if (initialItems && initialItems.length > 0) {
+      const items = initialItems.map(item => ({
+        category: item.category || "",
+        itemNumber: item.itemNumber || "",
+        color: item.color || "",
+        description: item.description || "",
+        sizes: {
+          xs: parseInt(item.xs) || 0,
+          s: parseInt(item.s) || 0,
+          m: parseInt(item.m) || 0,
+          l: parseInt(item.l) || 0,
+          xl: parseInt(item.xl) || 0,
+          xxl: parseInt(item.xxl) || 0,
+          xxxl: parseInt(item.xxxl) || 0
+        },
+        quantity: parseInt(item.quantity) || 0,
+        price: parseFloat(item.price.replace(/[$,]/g, '')) || 0,
+        taxed: item.taxed || false,
+        total: parseFloat(item.total.replace(/[$,]/g, '')) || 0,
+        mockups: []
+      }));
+
+      setItemGroups([
+        {
+          id: "group-" + Math.random().toString(36).substring(2, 9),
+          items: items,
+          imprints: []
+        }
+      ]);
+    }
+  }, [initialItems]);
 
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [currentItemIndex, setCurrentItemIndex] = useState<{groupIndex: number, itemIndex: number} | null>(null);
