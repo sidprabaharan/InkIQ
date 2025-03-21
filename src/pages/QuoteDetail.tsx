@@ -23,10 +23,17 @@ export default function QuoteDetail() {
   const totalAmount = quote.summary.totalDue;
   const amountOutstanding = `$${(parseFloat(quote.summary.totalDue.replace(/[$,]/g, '')) * 0.75).toFixed(2)}`;
   
-  // Create customer name for packing slip
+  // Create customer name for packing slip from the billing contact field
+  // This fixes the error since we don't have firstName/lastName properties
   const customerShipping = {
     ...quote.customer.shipping,
-    name: `${quote.customer.billing.firstName} ${quote.customer.billing.lastName}`
+    name: quote.customer.billing.contact || "Customer",
+    address1: quote.customer.shipping.address,
+    city: quote.customer.shipping.city,
+    stateProvince: quote.customer.shipping.region,
+    zipCode: quote.customer.shipping.postalCode || "",
+    country: "Canada", // Default to Canada if not specified
+    companyName: quote.customer.shipping.company
   };
   
   return (
