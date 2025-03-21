@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { ChevronRight, ArrowLeft, Printer, Copy } from "lucide-react";
+import { ChevronRight, Printer, Copy } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,10 +18,6 @@ interface QuoteDetailHeaderProps {
 export function QuoteDetailHeader({ quoteId, status }: QuoteDetailHeaderProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
-  
-  const handleBackToQuotes = () => {
-    navigate("/quotes");
-  };
   
   const handleDuplicate = () => {
     toast({
@@ -64,15 +60,6 @@ export function QuoteDetailHeader({ quoteId, status }: QuoteDetailHeaderProps) {
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="flex gap-4 items-center">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="gap-2"
-          onClick={handleBackToQuotes}
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Quotes
-        </Button>
         <h1 className="text-2xl font-semibold">Quote #{quoteId}</h1>
       </div>
       <div className="flex items-center gap-2">
