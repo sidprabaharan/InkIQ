@@ -20,7 +20,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       <Sidebar collapsed={sidebarCollapsed} toggleCollapse={toggleSidebar} />
       <div className="flex flex-col flex-1 overflow-hidden">
         <TopBar />
-        <main className="flex-1 overflow-y-auto bg-gray-50">
+        <main className="flex-1 overflow-hidden bg-gray-50">
           {children}
         </main>
       </div>

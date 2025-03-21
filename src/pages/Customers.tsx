@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -215,7 +216,7 @@ export default function Customers() {
   };
 
   return (
-    <div className="p-6 bg-gray-50 h-full">
+    <div className="h-full overflow-auto bg-gray-50">
       {!selectedCustomer ? (
         <>
           <div className="flex justify-between items-center mb-6">
@@ -331,7 +332,7 @@ export default function Customers() {
           </div>
         </>
       ) : (
-        <div className="flex gap-6">
+        <div className="flex gap-6 h-full p-6 overflow-auto">
           <div className="w-1/3">
             <Button 
               variant="ghost" 
@@ -654,7 +655,7 @@ export default function Customers() {
               </TabsContent>
               
               <TabsContent value="artwork">
-                <ScrollArea className="h-[calc(100vh-220px)]">
+                <ScrollArea className="h-[calc(100vh-220px)] overflow-hidden">
                   <div className="space-y-6 pb-6">
                     <Card>
                       <CardHeader>
