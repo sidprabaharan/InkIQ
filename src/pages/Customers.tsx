@@ -8,10 +8,13 @@ import { Search, Plus, ArrowLeft, Mail, Phone, FileText, Calendar, MessageSquare
 import { CustomerDialog } from "@/components/quotes/CustomerDialog";
 import { useCustomers } from "@/context/CustomersContext";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { AddContactDialog, ContactFormValues } from "@/components/customers/AddContactDialog";
+import { ContactsList } from "@/components/customers/ContactsList";
 
 export default function Customers() {
   const [openDialog, setOpenDialog] = useState(false);
-  const { customers } = useCustomers();
+  const [openContactDialog, setOpenContactDialog] = useState(false);
+  const { customers, addContactToCustomer } = useCustomers();
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -33,6 +36,12 @@ export default function Customers() {
   const getIndustryName = (industryId: string) => {
     const industry = industries.find(i => i.id === industryId);
     return industry ? industry.name : industryId;
+  };
+
+  const handleAddContact = (data: ContactFormValues) => {
+    if (selectedCustomerId) {
+      addContactToCustomer(selectedCustomerId, data);
+    }
   };
 
   const customerOrders = [
@@ -307,38 +316,26 @@ export default function Customers() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle>Contact Information</CardTitle>
-                    <Button variant="outline" size="sm" className="text-blue-600">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-blue-600"
+                      onClick={() => setOpenContactDialog(true)}
+                    >
                       <UserPlus className="h-4 w-4 mr-2" />
                       Add Contact
                     </Button>
                   </CardHeader>
                   <CardContent className="p-6">
-                    <div className="grid grid-cols-2 gap-6">
-                      <div>
-                        <p className="text-sm text-gray-500 mb-1">Full Name</p>
-                        <p>{selectedCustomer.firstName} {selectedCustomer.lastName}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500 mb-1">Email Address</p>
-                        <p>{selectedCustomer.email}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500 mb-1">Phone Number</p>
-                        <p>{selectedCustomer.phoneNumber}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500 mb-1">Fax Number</p>
-                        <p>{selectedCustomer.faxNumber || "N/A"}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500 mb-1">Invoice Owner</p>
-                        <p>{selectedCustomer.invoiceOwner || "N/A"}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500 mb-1">Industry</p>
-                        <p>{getIndustryName(selectedCustomer.industry)}</p>
-                      </div>
-                    </div>
+                    <ContactsList 
+                      contacts={selectedCustomer.contacts || []}
+                      primaryContact={{
+                        firstName: selectedCustomer.firstName,
+                        lastName: selectedCustomer.lastName,
+                        email: selectedCustomer.email,
+                        phoneNumber: selectedCustomer.phoneNumber
+                      }}
+                    />
                   </CardContent>
                 </Card>
                 
@@ -739,6 +736,15 @@ export default function Customers() {
         open={openDialog}
         onOpenChange={setOpenDialog}
       />
+
+      {selectedCustomerId && (
+        <AddContactDialog 
+          open={openContactDialog}
+          onOpenChange={setOpenContactDialog}
+          onAddContact={handleAddContact}
+          customerId={selectedCustomerId}
+        />
+      )}
     </div>
   );
 }
@@ -751,3 +757,4 @@ const industries = [
   { id: "manufacturing", name: "Manufacturing" },
   { id: "ecommerce", name: "Ecommerce" },
 ];
+

@@ -1,5 +1,6 @@
 
 import React, { createContext, useContext, useState } from "react";
+import { Contact } from "@/types/customer";
 
 // Define the customer interface
 export interface Customer {
@@ -12,6 +13,7 @@ export interface Customer {
   faxNumber: string;
   industry: string;
   invoiceOwner: string;
+  contacts: Contact[];
   billingAddress: {
     address1: string;
     address2: string;
@@ -38,9 +40,10 @@ export interface Customer {
 interface CustomersContextType {
   customers: Customer[];
   selectedCustomer: Customer | null;
-  addCustomer: (customer: Omit<Customer, "id">) => Customer;
+  addCustomer: (customer: Omit<Customer, "id" | "contacts">) => Customer;
   selectCustomer: (customerId: string) => void;
   getCustomerById: (customerId: string) => Customer | undefined;
+  addContactToCustomer: (customerId: string, contact: Omit<Contact, "id">) => void;
 }
 
 // Example customers data
@@ -55,6 +58,7 @@ const exampleCustomers: Customer[] = [
     faxNumber: "+1 (416) 555-1235",
     industry: "tech",
     invoiceOwner: "Finance Department",
+    contacts: [],
     billingAddress: {
       address1: "123 Print Avenue",
       address2: "Suite 400",
@@ -87,6 +91,7 @@ const exampleCustomers: Customer[] = [
     faxNumber: "+1 (415) 555-7891",
     industry: "tech",
     invoiceOwner: "Accounts Payable",
+    contacts: [],
     billingAddress: {
       address1: "456 Innovation Drive",
       address2: "Floor 10",
@@ -119,6 +124,7 @@ const exampleCustomers: Customer[] = [
     faxNumber: "+44 20 7946 0959",
     industry: "retail",
     invoiceOwner: "Finance",
+    contacts: [],
     billingAddress: {
       address1: "789 Retail Row",
       address2: "Building C",
@@ -149,10 +155,11 @@ export function CustomersProvider({ children }: { children: React.ReactNode }) {
   const [customers, setCustomers] = useState<Customer[]>(exampleCustomers);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
-  const addCustomer = (customer: Omit<Customer, "id">) => {
+  const addCustomer = (customer: Omit<Customer, "id" | "contacts">) => {
     const newCustomer = {
       ...customer,
-      id: `customer-${Date.now()}`
+      id: `customer-${Date.now()}`,
+      contacts: []
     };
     
     setCustomers(prev => [...prev, newCustomer]);
@@ -168,13 +175,39 @@ export function CustomersProvider({ children }: { children: React.ReactNode }) {
     return customers.find(c => c.id === customerId);
   };
 
+  const addContactToCustomer = (customerId: string, contact: Omit<Contact, "id">) => {
+    const newContact = {
+      ...contact,
+      id: `contact-${Date.now()}`
+    };
+
+    setCustomers(prev => prev.map(customer => {
+      if (customer.id === customerId) {
+        return {
+          ...customer,
+          contacts: [...customer.contacts, newContact]
+        };
+      }
+      return customer;
+    }));
+
+    // Update selectedCustomer if it's the one being modified
+    if (selectedCustomer && selectedCustomer.id === customerId) {
+      setSelectedCustomer({
+        ...selectedCustomer,
+        contacts: [...selectedCustomer.contacts, newContact]
+      });
+    }
+  };
+
   return (
     <CustomersContext.Provider value={{ 
       customers, 
       selectedCustomer, 
       addCustomer, 
       selectCustomer,
-      getCustomerById
+      getCustomerById,
+      addContactToCustomer
     }}>
       {children}
     </CustomersContext.Provider>
