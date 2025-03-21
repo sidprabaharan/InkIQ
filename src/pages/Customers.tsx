@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Search, Plus, ArrowLeft, Mail, Phone, FileText, Calendar, MessageSquare, File, Image, Folder, Code, PenTool, ShoppingCart, FileCheck } from "lucide-react";
+import { Search, Plus, ArrowLeft, Mail, Phone, FileText, Calendar, MessageSquare, File, Image, Folder, Code, PenTool, ShoppingCart, FileCheck, UserPlus } from "lucide-react";
 import { CustomerDialog } from "@/components/quotes/CustomerDialog";
 import { useCustomers } from "@/context/CustomersContext";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -747,4 +747,3 @@ const industries = [
   { id: "manufacturing", name: "Manufacturing" },
   { id: "ecommerce", name: "Ecommerce" },
 ];
-
