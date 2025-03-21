@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -218,7 +219,8 @@ export function ShippingSection({ initialShippingData }: ShippingSectionProps) {
           address1: initialShippingData.address || selectedCustomer.shippingAddress.address1,
           address2: initialShippingData.unit || selectedCustomer.shippingAddress.address2,
           city: initialShippingData.city || selectedCustomer.shippingAddress.city,
-          stateProvince: initialShippingData.region || selectedCustomer.shippingAddress.stateProvince
+          stateProvince: initialShippingData.region || selectedCustomer.shippingAddress.stateProvince,
+          zipCode: selectedCustomer.shippingAddress.zipCode // Add the missing zipCode property
         }
       });
     }
