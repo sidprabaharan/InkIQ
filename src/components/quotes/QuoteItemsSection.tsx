@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, MoreVertical, Trash2, Copy, Image, X } from "lucide-react";
@@ -268,8 +267,8 @@ export function QuoteItemsSection() {
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">3XL</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">Quantity</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">Price</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">Taxed</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">Total</TableHead>
+              <TableHead className="py-2 text-xs uppercase text-center w-[3%]">Taxed</TableHead>
+              <TableHead className="py-2 text-xs uppercase text-center w-[7%]">Total</TableHead>
               <TableHead className="py-2 text-xs uppercase w-[2%]"></TableHead>
             </TableRow>
           </TableHeader>
