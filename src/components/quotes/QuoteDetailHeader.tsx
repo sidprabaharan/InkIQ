@@ -17,15 +17,18 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { StatusDropdown } from "./StatusDropdown";
+import { useState } from "react";
 
 interface QuoteDetailHeaderProps {
   quoteId: string;
   status: string;
 }
 
-export function QuoteDetailHeader({ quoteId, status }: QuoteDetailHeaderProps) {
+export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetailHeaderProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [status, setStatus] = useState(initialStatus);
   
   const handleDuplicate = () => {
     toast({
@@ -121,6 +124,10 @@ export function QuoteDetailHeader({ quoteId, status }: QuoteDetailHeaderProps) {
     });
   };
   
+  const handleStatusChange = (newStatus: string) => {
+    setStatus(newStatus);
+  };
+  
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="flex gap-4 items-center">
@@ -167,9 +174,7 @@ export function QuoteDetailHeader({ quoteId, status }: QuoteDetailHeaderProps) {
         </Sheet>
       </div>
       <div className="flex items-center gap-2">
-        <div className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-          {status}
-        </div>
+        <StatusDropdown currentStatus={status} onStatusChange={handleStatusChange} />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
