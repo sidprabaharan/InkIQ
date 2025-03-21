@@ -11,9 +11,11 @@ interface QuoteDetails {
 
 interface QuoteDetailsCardProps {
   details: QuoteDetails;
+  totalAmount?: string;
+  amountOutstanding?: string;
 }
 
-export function QuoteDetailsCard({ details }: QuoteDetailsCardProps) {
+export function QuoteDetailsCard({ details, totalAmount, amountOutstanding }: QuoteDetailsCardProps) {
   return (
     <div className="bg-white p-6 rounded-lg border">
       <h3 className="font-medium mb-4">Quotation Details</h3>
@@ -38,6 +40,20 @@ export function QuoteDetailsCard({ details }: QuoteDetailsCardProps) {
           <span className="text-gray-600">Invoice Date</span>
           <span>{details.invoiceDate}</span>
         </div>
+        
+        {totalAmount && (
+          <div className="flex justify-between font-medium">
+            <span className="text-gray-600">Total Amount</span>
+            <span>{totalAmount}</span>
+          </div>
+        )}
+        
+        {amountOutstanding && (
+          <div className="flex justify-between font-medium">
+            <span className="text-gray-600">Amount Outstanding</span>
+            <span className="text-amber-600">{amountOutstanding}</span>
+          </div>
+        )}
       </div>
     </div>
   );

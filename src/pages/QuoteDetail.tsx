@@ -15,6 +15,11 @@ export default function QuoteDetail() {
   const quoteId = id || "3032";
   const quote = quotationData;
   
+  // For demonstration purposes, we'll use the totalDue from the summary
+  // and create a mock amount outstanding (75% of total)
+  const totalAmount = quote.summary.totalDue;
+  const amountOutstanding = `$${(parseFloat(quote.summary.totalDue.replace(/[$,]/g, '')) * 0.75).toFixed(2)}`;
+  
   return (
     <div className="p-0 bg-gray-50 min-h-full">
       <QuoteHeader
@@ -32,7 +37,11 @@ export default function QuoteDetail() {
             <CompanyInfoCard company={quote.company} />
             
             {/* Quote Details - top right */}
-            <QuoteDetailsCard details={quote.details} />
+            <QuoteDetailsCard 
+              details={quote.details} 
+              totalAmount={totalAmount}
+              amountOutstanding={amountOutstanding}
+            />
           </div>
           
           {/* Billing and Shipping - second row */}
