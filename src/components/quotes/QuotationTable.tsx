@@ -3,6 +3,7 @@ import { Search } from "lucide-react";
 import { QuotationStatusBadge } from "./QuotationStatusBadge";
 import { PaymentStatusBadge } from "./PaymentStatusBadge";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface Quotation {
   id: string;
@@ -115,6 +116,12 @@ const quotationsData: Quotation[] = [
 ];
 
 export function QuotationTable() {
+  const navigate = useNavigate();
+  
+  const handleRowClick = (quotationId: string) => {
+    navigate(`/quotes/${quotationId}`);
+  };
+
   return (
     <div className="bg-white rounded-lg border overflow-hidden">
       <div className="flex justify-between items-center p-4 border-b">
@@ -147,6 +154,7 @@ export function QuotationTable() {
               <tr 
                 key={quotation.id} 
                 className="border-b hover:bg-gray-50 transition-colors cursor-pointer"
+                onClick={() => handleRowClick(quotation.id)}
               >
                 <td className="px-4 py-3 text-sm text-gray-500">
                   {quotation.id}

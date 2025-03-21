@@ -26,8 +26,8 @@ export default function NewQuote() {
 
   const handleSave = () => {
     console.log("Save quote");
-    // Navigate back to quotes page after saving
-    // navigate("/quotes");
+    // Navigate to a demo quote detail page
+    navigate("/quotes/3032");
   };
 
   return (

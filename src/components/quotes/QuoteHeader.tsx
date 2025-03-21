@@ -20,6 +20,16 @@ export function QuoteHeader({ onCancel, onPreview, onSave }: QuoteHeaderProps) {
       navigate("/quotes");
     }
   };
+
+  const handleSave = () => {
+    if (onSave) {
+      onSave();
+    } else {
+      // Navigate to the first quote as a demo
+      // In a real app, we would create a new quote and get its ID
+      navigate("/quotes/3032");
+    }
+  };
   
   return (
     <div className="flex justify-between items-center p-4 border-b bg-white">
@@ -35,7 +45,7 @@ export function QuoteHeader({ onCancel, onPreview, onSave }: QuoteHeaderProps) {
         <Button variant="outline" className="text-gray-500" onClick={onPreview}>
           Preview
         </Button>
-        <Button className="bg-blue-500 hover:bg-blue-600 text-white" onClick={onSave}>
+        <Button className="bg-inkiq-primary hover:bg-inkiq-primary/90 text-white" onClick={handleSave}>
           Save & Finish
         </Button>
       </div>
