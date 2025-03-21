@@ -105,6 +105,11 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
                 <label className="block text-sm mb-1">Industry</label>
                 <Input placeholder="Industry Name" />
               </div>
+              
+              <div className="mb-4">
+                <label className="block text-sm mb-1">Invoice Owner</label>
+                <Input placeholder="Sales Representative Name" />
+              </div>
             </div>
           </div>
         );
