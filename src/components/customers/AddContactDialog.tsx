@@ -9,7 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogClose
+  DialogClose,
+  DialogDescription
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,6 +71,9 @@ export function AddContactDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Add Contact</DialogTitle>
+          <DialogDescription>
+            Add a new contact person for this customer.
+          </DialogDescription>
         </DialogHeader>
         
         <Form {...form}>

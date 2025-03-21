@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import { useCustomers } from "@/context/CustomersContext";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AddContactDialog, ContactFormValues } from "@/components/customers/AddContactDialog";
 import { ContactsList } from "@/components/customers/ContactsList";
+import { Contact } from "@/types/customer";
 
 export default function Customers() {
   const [openDialog, setOpenDialog] = useState(false);
@@ -40,7 +42,18 @@ export default function Customers() {
 
   const handleAddContact = (data: ContactFormValues) => {
     if (selectedCustomerId) {
-      addContactToCustomer(selectedCustomerId, data);
+      // Ensure all required fields are present
+      // The Contact type requires email, firstName, lastName, and phoneNumber to be required
+      const newContact: Omit<Contact, "id"> = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        jobTitle: data.jobTitle,
+        department: data.department,
+      };
+      
+      addContactToCustomer(selectedCustomerId, newContact);
     }
   };
 
@@ -757,4 +770,3 @@ const industries = [
   { id: "manufacturing", name: "Manufacturing" },
   { id: "ecommerce", name: "Ecommerce" },
 ];
-
