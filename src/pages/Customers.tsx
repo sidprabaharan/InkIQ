@@ -224,7 +224,7 @@ export default function Customers() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-gray-50 min-h-full">
       {!selectedCustomer ? (
         <>
           <div className="flex justify-between items-center mb-6">
