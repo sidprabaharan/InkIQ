@@ -31,6 +31,7 @@ const contactSchema = z.object({
   phoneNumber: z.string().min(1, "Phone number is required"),
   jobTitle: z.string().optional(),
   department: z.string().optional(),
+  contactOwner: z.string().optional(),
 });
 
 export type ContactFormValues = z.infer<typeof contactSchema>;
@@ -57,6 +58,7 @@ export function AddContactDialog({
       phoneNumber: "",
       jobTitle: "",
       department: "",
+      contactOwner: "",
     },
   });
 
@@ -163,6 +165,20 @@ export function AddContactDialog({
                 )}
               />
             </div>
+            
+            <FormField
+              control={form.control}
+              name="contactOwner"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Contact Owner</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter contact owner" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             
             <DialogFooter className="pt-4">
               <DialogClose asChild>

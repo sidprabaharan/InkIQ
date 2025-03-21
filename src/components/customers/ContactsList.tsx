@@ -3,7 +3,7 @@ import React from "react";
 import { Contact } from "@/types/customer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Mail, Phone, Briefcase } from "lucide-react";
+import { Mail, Phone, Briefcase, Building, UserCog } from "lucide-react";
 
 interface ContactsListProps {
   contacts: Contact[];
@@ -73,8 +73,19 @@ export function ContactsList({ contacts, primaryContact }: ContactsListProps) {
                       <Briefcase className="h-4 w-4 text-gray-500" />
                       <span>
                         {contact.jobTitle}
-                        {contact.department && ` • ${contact.department}`}
                       </span>
+                    </div>
+                  )}
+                  {contact.department && (
+                    <div className="flex items-center gap-2">
+                      <Building className="h-4 w-4 text-gray-500" />
+                      <span>{contact.department}</span>
+                    </div>
+                  )}
+                  {contact.contactOwner && (
+                    <div className="flex items-center gap-2">
+                      <UserCog className="h-4 w-4 text-gray-500" />
+                      <span>Owner: {contact.contactOwner}</span>
                     </div>
                   )}
                   <div className="flex items-center gap-2">

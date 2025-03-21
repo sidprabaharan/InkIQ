@@ -51,6 +51,7 @@ export default function Customers() {
         phoneNumber: data.phoneNumber,
         jobTitle: data.jobTitle,
         department: data.department,
+        contactOwner: data.contactOwner,
       };
       
       addContactToCustomer(selectedCustomerId, newContact);

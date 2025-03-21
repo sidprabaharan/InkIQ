@@ -7,4 +7,5 @@ export interface Contact {
   phoneNumber: string;
   jobTitle?: string;
   department?: string;
+  contactOwner?: string;
 }
