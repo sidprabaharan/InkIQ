@@ -37,7 +37,16 @@ export function CompanyInfoCard({ company }: CompanyInfoCardProps) {
 
   return (
     <div className="bg-white p-6 rounded-lg border">
-      <h2 className="text-xl font-bold mb-3">{company.name}</h2>
+      {company.logo && (
+        <div className="mb-4 flex justify-center">
+          <img 
+            src={company.logo} 
+            alt={`${company.name} logo`} 
+            className="h-24 object-contain"
+          />
+        </div>
+      )}
+      <h2 className="text-lg font-semibold mb-3">{company.name}</h2>
       <div className="space-y-1 text-gray-700">
         <p>{company.address}</p>
         <p>{company.city}, {company.region}</p>
