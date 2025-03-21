@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/sheet";
 import { StatusDropdown } from "./StatusDropdown";
 import { useState } from "react";
-import { QuoteFormDialog } from "./QuoteFormDialog";
 import { quotationData } from "./QuoteData";
 
 interface QuoteDetailHeaderProps {
@@ -32,7 +31,6 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
   const navigate = useNavigate();
   const { toast } = useToast();
   const [status, setStatus] = useState(initialStatus);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
   
   const isInvoice = !status.toLowerCase().startsWith('quote');
   const documentType = isInvoice ? "Invoice" : "Quote";
@@ -54,7 +52,8 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
   };
   
   const handleEditDocument = () => {
-    setEditDialogOpen(true);
+    // Navigate to the edit page instead of opening a dialog
+    navigate(`/quotes/edit/${quoteId}`);
   };
   
   const handleDocumentLink = () => {
@@ -241,15 +240,6 @@ export function QuoteDetailHeader({ quoteId, status: initialStatus }: QuoteDetai
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      
-      {/* Edit Quote/Invoice Dialog */}
-      <QuoteFormDialog 
-        open={editDialogOpen} 
-        onOpenChange={setEditDialogOpen} 
-        initialData={quotationData}
-        isEditing={true}
-        quoteId={quoteId}
-      />
     </div>
   );
 }
