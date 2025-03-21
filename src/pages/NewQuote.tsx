@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { QuoteHeader } from "@/components/quotes/QuoteHeader";
@@ -21,6 +20,7 @@ const generateNewQuoteId = () => {
 };
 
 export default function NewQuote() {
+  
   const navigate = useNavigate();
   const { toast } = useToast();
   
