@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { QuoteHeader } from "@/components/quotes/QuoteHeader";
 import { CustomerSection } from "@/components/quotes/CustomerSection";
@@ -12,22 +12,44 @@ import { NickNameSection } from "@/components/quotes/NickNameSection";
 import { NotesSection } from "@/components/quotes/NotesSection";
 import { InvoiceSummarySection } from "@/components/quotes/InvoiceSummarySection";
 import { CustomersProvider } from "@/context/CustomersContext";
+import { useToast } from "@/components/ui/use-toast";
+
+// Sample data for demonstration purposes
+const generateNewQuoteId = () => {
+  // In a real app, this would be generated on the server
+  return Math.floor(3000 + Math.random() * 1000).toString();
+};
 
 export default function NewQuote() {
   const navigate = useNavigate();
-
+  const { toast } = useToast();
+  
+  // Generate a new quote ID for this quote
+  const [quoteId] = useState(generateNewQuoteId());
+  const [nickname, setNickname] = useState("New Quotation");
+  
   const handleCancel = () => {
     navigate("/quotes");
   };
 
   const handlePreview = () => {
     console.log("Preview quote");
+    toast({
+      title: "Preview mode",
+      description: "This would show a preview of the quote in a real application",
+    });
   };
 
   const handleSave = () => {
-    console.log("Save quote");
-    // Navigate to a demo quote detail page
-    navigate("/quotes/3032");
+    console.log("Save quote with ID:", quoteId);
+    
+    // In a real app, this would save the quote data to a database
+    // For demo purposes, we'll just navigate to the quote detail page
+    navigate(`/quotes/${quoteId}`);
+  };
+
+  const handleNicknameChange = (value: string) => {
+    setNickname(value);
   };
 
   return (
@@ -37,6 +59,8 @@ export default function NewQuote() {
           onCancel={handleCancel}
           onPreview={handlePreview}
           onSave={handleSave}
+          quoteId={quoteId}
+          isNewQuote={true}
         />
 
         <div className="p-6">
@@ -52,7 +76,7 @@ export default function NewQuote() {
             <div className="md:col-span-1 space-y-4">
               <QuotationHeader />
               <QuotationDetailsSection />
-              <NickNameSection />
+              <NickNameSection onChange={handleNicknameChange} />
               <div className="space-y-4">
                 <NotesSection title="Customer Notes" />
                 <NotesSection title="Production Note" />

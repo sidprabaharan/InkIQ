@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "@/pages/Index";
 import Quotes from "@/pages/Quotes";
 import NewQuote from "@/pages/NewQuote";
+import QuoteDetail from "@/pages/QuoteDetail";
 import Customers from "@/pages/Customers";
 import NotFound from "@/pages/NotFound";
 import { CustomersProvider } from "./context/CustomersContext";
@@ -27,6 +28,7 @@ function App() {
                 <Route path="/" element={<Index />} />
                 <Route path="/quotes" element={<Quotes />} />
                 <Route path="/quotes/new" element={<NewQuote />} />
+                <Route path="/quotes/:id" element={<QuoteDetail />} />
                 <Route path="/customers" element={<Customers />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
