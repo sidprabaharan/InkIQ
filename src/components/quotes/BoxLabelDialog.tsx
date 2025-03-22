@@ -93,12 +93,25 @@ function BoxLabel({
       {/* Removed the Box Label title that was circled in red */}
 
       <div className="flex flex-col h-full">
-        <div className="space-y-4 flex-grow">
-          <div>
+        {/* Added QR code at the top right corner */}
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex-grow">
             <div className="text-xs font-semibold">Customer:</div>
             <div className="text-lg font-bold">{customerCompany}</div>
           </div>
-          
+          <div className="flex-shrink-0">
+            <QRCodeSVG 
+              value={window.location.origin + workOrderUrl}
+              size={100}
+              level={"H"}
+            />
+            <div className="text-xs text-center">
+              Scan for Work Order
+            </div>
+          </div>
+        </div>
+        
+        <div className="space-y-4 flex-grow">
           <div>
             <div className="text-xs font-semibold">Customer #:</div>
             <div className="text-lg font-bold">{customerNumber}</div>
@@ -118,25 +131,15 @@ function BoxLabel({
             <div className="text-xs font-semibold">Nickname:</div>
             <div className="text-lg font-bold truncate">{orderNickname}</div>
           </div>
-          
-          <div className="mt-auto">
-            <div className="text-xs font-semibold">Box:</div>
-            <div className="text-3xl font-bold flex items-center">
-              <div className="border-b-2 border-black w-12 inline-block"></div>
-              <span className="px-2">of</span>
-              <div className="border-b-2 border-black w-12 inline-block"></div>
-            </div>
-          </div>
         </div>
         
-        <div className="flex flex-col items-center justify-center mt-4">
-          <QRCodeSVG 
-            value={window.location.origin + workOrderUrl}
-            size={150}
-            level={"H"}
-          />
-          <div className="mt-2 text-xs text-center">
-            Scan for Work Order
+        {/* Made the Box section larger and centered at the bottom */}
+        <div className="mt-auto w-full flex flex-col items-center justify-center">
+          <div className="text-sm font-semibold">Box:</div>
+          <div className="text-4xl font-bold flex items-center">
+            <div className="border-b-2 border-black w-16 inline-block"></div>
+            <span className="px-2">of</span>
+            <div className="border-b-2 border-black w-16 inline-block"></div>
           </div>
         </div>
       </div>
