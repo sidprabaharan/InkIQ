@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { 
@@ -5,7 +6,12 @@ import {
   Plus,
   Search,
   Check,
-  ChevronDown
+  ChevronDown,
+  Calendar,
+  Clock,
+  Edit,
+  Save,
+  X
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -15,8 +21,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   Select, 
   SelectTrigger, 
@@ -35,20 +42,68 @@ type TaskProps = {
   status: TaskStatus;
   customer: string;
   priority: TaskPriority;
+  notes?: string;
+  assignedDate?: string;
 };
 
 export default function Tasks() {
   const [searchQuery, setSearchQuery] = useState('');
   
   const mockTasks: TaskProps[] = [
-    { id: '1', title: 'Follow up with ABC Corp', dueDate: '2023-09-15', status: 'pending', customer: 'ABC Corporation', priority: 'high' },
-    { id: '2', title: 'Send revised quote', dueDate: '2023-09-18', status: 'pending', customer: 'XYZ Inc', priority: 'medium' },
-    { id: '3', title: 'Schedule installation', dueDate: '2023-09-20', status: 'pending', customer: '123 Industries', priority: 'low' },
-    { id: '4', title: 'Collect payment', dueDate: '2023-09-10', status: 'completed', customer: 'Smith Design', priority: 'high' },
-    { id: '5', title: 'Order materials', dueDate: '2023-09-12', status: 'in-progress', customer: 'Johnson Printing', priority: 'medium' },
+    { 
+      id: '1', 
+      title: 'Follow up with ABC Corp', 
+      dueDate: '2023-09-15', 
+      assignedDate: '2023-09-10',
+      status: 'pending', 
+      customer: 'ABC Corporation', 
+      priority: 'high',
+      notes: 'Need to discuss pricing and timeline for the new project.' 
+    },
+    { 
+      id: '2', 
+      title: 'Send revised quote', 
+      dueDate: '2023-09-18', 
+      assignedDate: '2023-09-12',
+      status: 'pending', 
+      customer: 'XYZ Inc', 
+      priority: 'medium',
+      notes: 'Include the additional services they requested in the meeting.' 
+    },
+    { 
+      id: '3', 
+      title: 'Schedule installation', 
+      dueDate: '2023-09-20', 
+      assignedDate: '2023-09-05',
+      status: 'pending', 
+      customer: '123 Industries', 
+      priority: 'low',
+      notes: 'Verify their availability for the installation date.' 
+    },
+    { 
+      id: '4', 
+      title: 'Collect payment', 
+      dueDate: '2023-09-10', 
+      assignedDate: '2023-08-25',
+      status: 'completed', 
+      customer: 'Smith Design', 
+      priority: 'high',
+      notes: 'Invoice #12345 has been sent.' 
+    },
+    { 
+      id: '5', 
+      title: 'Order materials', 
+      dueDate: '2023-09-12', 
+      assignedDate: '2023-09-01',
+      status: 'in-progress', 
+      customer: 'Johnson Printing', 
+      priority: 'medium',
+      notes: 'Check inventory before placing the order.' 
+    },
   ];
 
   const [tasks, setTasks] = useState<TaskProps[]>(mockTasks);
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   
   const filteredTasks = tasks.filter(task => 
     task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -74,6 +129,20 @@ export default function Tasks() {
     toast({
       description: "Task priority updated successfully",
     });
+  };
+
+  const updateTask = (taskId: string, updatedFields: Partial<TaskProps>) => {
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, ...updatedFields } : task
+    );
+    setTasks(updatedTasks);
+    toast({
+      description: "Task updated successfully",
+    });
+  };
+
+  const toggleExpandTask = (taskId: string) => {
+    setExpandedTaskId(expandedTaskId === taskId ? null : taskId);
   };
 
   return (
@@ -115,6 +184,9 @@ export default function Tasks() {
                 task={task} 
                 onStatusChange={(status) => updateTaskStatus(task.id, status)}
                 onPriorityChange={(priority) => updateTaskPriority(task.id, priority)}
+                onTaskUpdate={(fields) => updateTask(task.id, fields)}
+                isExpanded={expandedTaskId === task.id}
+                onToggleExpand={() => toggleExpandTask(task.id)}
               />
             ))
           ) : (
@@ -132,6 +204,9 @@ export default function Tasks() {
                   task={task} 
                   onStatusChange={(status) => updateTaskStatus(task.id, status)}
                   onPriorityChange={(priority) => updateTaskPriority(task.id, priority)}
+                  onTaskUpdate={(fields) => updateTask(task.id, fields)}
+                  isExpanded={expandedTaskId === task.id}
+                  onToggleExpand={() => toggleExpandTask(task.id)}
                 />
               ))
           ) : (
@@ -149,6 +224,9 @@ export default function Tasks() {
                   task={task} 
                   onStatusChange={(status) => updateTaskStatus(task.id, status)}
                   onPriorityChange={(priority) => updateTaskPriority(task.id, priority)}
+                  onTaskUpdate={(fields) => updateTask(task.id, fields)}
+                  isExpanded={expandedTaskId === task.id}
+                  onToggleExpand={() => toggleExpandTask(task.id)}
                 />
               ))
           ) : (
@@ -166,6 +244,9 @@ export default function Tasks() {
                   task={task} 
                   onStatusChange={(status) => updateTaskStatus(task.id, status)}
                   onPriorityChange={(priority) => updateTaskPriority(task.id, priority)}
+                  onTaskUpdate={(fields) => updateTask(task.id, fields)}
+                  isExpanded={expandedTaskId === task.id}
+                  onToggleExpand={() => toggleExpandTask(task.id)}
                 />
               ))
           ) : (
@@ -181,9 +262,22 @@ interface TaskCardProps {
   task: TaskProps;
   onStatusChange: (status: TaskStatus) => void;
   onPriorityChange: (priority: TaskPriority) => void;
+  onTaskUpdate: (fields: Partial<TaskProps>) => void;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
 }
 
-function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
+function TaskCard({ 
+  task, 
+  onStatusChange, 
+  onPriorityChange, 
+  onTaskUpdate,
+  isExpanded,
+  onToggleExpand
+}: TaskCardProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTask, setEditedTask] = useState(task);
+
   const priorityColors: Record<TaskPriority, string> = {
     high: 'bg-red-100 text-red-800',
     medium: 'bg-yellow-100 text-yellow-800',
@@ -207,13 +301,48 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
       : status.charAt(0).toUpperCase() + status.slice(1);
   };
 
+  const handleEditSave = () => {
+    if (isEditing) {
+      onTaskUpdate(editedTask);
+    }
+    setIsEditing(!isEditing);
+  };
+
+  const handleCancel = () => {
+    setEditedTask(task);
+    setIsEditing(false);
+  };
+
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card 
+      className={`hover:shadow-md transition-all cursor-pointer ${isExpanded ? 'scale-[1.02]' : ''}`}
+      onClick={() => !isEditing && onToggleExpand()}
+    >
       <CardContent className="p-4">
         <div className="flex justify-between items-start">
           <div className="space-y-1">
-            <h3 className="font-medium">{task.title}</h3>
-            <p className="text-sm text-gray-500">Responsible: {task.customer}</p>
+            {isEditing ? (
+              <Input 
+                value={editedTask.title}
+                onChange={(e) => setEditedTask({...editedTask, title: e.target.value})}
+                onClick={(e) => e.stopPropagation()}
+                className="font-medium"
+              />
+            ) : (
+              <h3 className="font-medium">{task.title}</h3>
+            )}
+            <p className="text-sm text-gray-500">
+              {isEditing ? (
+                <Input 
+                  value={editedTask.customer}
+                  onChange={(e) => setEditedTask({...editedTask, customer: e.target.value})}
+                  onClick={(e) => e.stopPropagation()}
+                  className="text-sm"
+                />
+              ) : (
+                `Responsible: ${task.customer}`
+              )}
+            </p>
           </div>
           <div className="flex gap-2">
             <Select
@@ -222,6 +351,7 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
                 console.log(`Select changing priority to: ${value}`);
                 onPriorityChange(value);
               }}
+              onClick={(e) => e.stopPropagation()}
             >
               <SelectTrigger className={`h-8 text-xs min-w-16 ${priorityColors[task.priority]}`}>
                 <SelectValue placeholder="Priority" />
@@ -239,6 +369,7 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
                 console.log(`Select changing status to: ${value}`);
                 onStatusChange(value);
               }}
+              onClick={(e) => e.stopPropagation()}
             >
               <SelectTrigger 
                 className={`h-8 text-xs ${statusColors[task.status]} ${
@@ -259,11 +390,82 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
                 <SelectItem value="completed">Completed</SelectItem>
               </SelectContent>
             </Select>
+            
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEditSave();
+              }}
+              className="h-8"
+            >
+              {isEditing ? <Save className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
+            </Button>
+            
+            {isEditing && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCancel();
+                }}
+                className="h-8"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         </div>
         <div className="mt-2">
-          <p className="text-sm">Due: {formatDate(task.dueDate)}</p>
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-gray-400" />
+            {isEditing ? (
+              <Input 
+                type="date"
+                value={editedTask.dueDate}
+                onChange={(e) => setEditedTask({...editedTask, dueDate: e.target.value})}
+                onClick={(e) => e.stopPropagation()}
+                className="text-sm h-8"
+              />
+            ) : (
+              <p className="text-sm">Due: {formatDate(task.dueDate)}</p>
+            )}
+          </div>
         </div>
+
+        {isExpanded && (
+          <div className="mt-4 space-y-3 animate-fade-in">
+            <div>
+              {isEditing ? (
+                <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+                  <label className="text-sm font-medium">Notes:</label>
+                  <Textarea 
+                    value={editedTask.notes || ''}
+                    onChange={(e) => setEditedTask({...editedTask, notes: e.target.value})}
+                    placeholder="Add notes here..."
+                    className="mt-1"
+                  />
+                </div>
+              ) : (
+                <>
+                  {task.notes && (
+                    <div className="mt-2">
+                      <p className="text-sm font-medium">Notes:</p>
+                      <p className="text-sm mt-1 bg-gray-50 p-2 rounded">{task.notes}</p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-gray-400" />
+              <p className="text-sm">Assigned: {task.assignedDate ? formatDate(task.assignedDate) : 'Not assigned'}</p>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
