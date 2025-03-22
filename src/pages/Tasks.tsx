@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { 
@@ -50,14 +51,14 @@ export default function Tasks() {
     { id: '5', title: 'Order materials', dueDate: '2023-09-12', status: 'in-progress', customer: 'Johnson Printing', priority: 'medium' },
   ];
 
+  // State for tasks with the proper type annotation
+  const [tasks, setTasks] = useState<TaskProps[]>(mockTasks);
+  
   // Filter tasks based on search query
-  const filteredTasks = mockTasks.filter(task => 
+  const filteredTasks = tasks.filter(task => 
     task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     task.customer.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  // State for tasks with the proper type annotation
-  const [tasks, setTasks] = useState<TaskProps[]>(mockTasks);
 
   // Function to update task status with proper typing
   const updateTaskStatus = (taskId: string, newStatus: TaskStatus) => {
@@ -72,6 +73,7 @@ export default function Tasks() {
 
   // Function to update task priority with proper typing
   const updateTaskPriority = (taskId: string, newPriority: TaskPriority) => {
+    console.log(`Updating task ${taskId} priority to ${newPriority}`);
     const updatedTasks = tasks.map(task => 
       task.id === taskId ? { ...task, priority: newPriority } : task
     );
@@ -226,7 +228,10 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
             {/* Priority Select */}
             <Select
               value={task.priority}
-              onValueChange={(value: TaskPriority) => onPriorityChange(value)}
+              onValueChange={(value: TaskPriority) => {
+                console.log(`Select changing priority to: ${value}`);
+                onPriorityChange(value);
+              }}
             >
               <SelectTrigger className={`h-8 text-xs ${priorityColors[task.priority]}`}>
                 <SelectValue placeholder="Priority" />
@@ -241,7 +246,10 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
             {/* Status Select */}
             <Select
               value={task.status}
-              onValueChange={(value: TaskStatus) => onStatusChange(value)}
+              onValueChange={(value: TaskStatus) => {
+                console.log(`Select changing status to: ${value}`);
+                onStatusChange(value);
+              }}
             >
               <SelectTrigger className={`h-8 text-xs ${statusColors[task.status]}`}>
                 <SelectValue placeholder="Status">
@@ -283,3 +291,4 @@ function EmptyState({ query, status }: { query: string, status?: string }) {
     </div>
   );
 }
+
