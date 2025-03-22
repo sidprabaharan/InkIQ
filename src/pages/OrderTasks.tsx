@@ -1,9 +1,11 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { 
   ListChecks, 
-  Search,
+  ArrowLeft,
+  Search
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,97 +13,51 @@ import { toast } from "@/hooks/use-toast";
 import { CreateTaskDialog } from "@/components/tasks/CreateTaskDialog";
 import { TaskCard } from "@/components/tasks/TaskCard";
 import { TaskPriority, TaskProps, TaskStatus } from "@/types/task";
+import { USERS } from "@/pages/Tasks";
 
-export const USERS = [
-  { id: '1', name: 'John Manager' },
-  { id: '2', name: 'Sarah Director' },
-  { id: '3', name: 'Mike Supervisor' },
-  { id: '4', name: 'Emma Coordinator' },
-  { id: '5', name: 'David Team Lead' },
-  { id: '6', name: 'Jennifer Specialist' },
-  { id: '7', name: 'Michael Executive' },
-  { id: '8', name: 'Olivia Associate' },
-  { id: '9', name: 'Daniel Administrator' },
-  { id: '10', name: 'Sophia Analyst' },
-  { id: '11', name: 'James Consultant' },
-  { id: '12', name: 'Emily Project Manager' },
-];
-
-export default function Tasks() {
+export default function OrderTasks() {
+  const { id } = useParams<{ id: string }>();
   const [searchQuery, setSearchQuery] = useState('');
-  
-  const mockTasks: TaskProps[] = [
-    { 
-      id: '1', 
-      title: 'Follow up with ABC Corp', 
-      dueDate: '2023-09-15T15:30:00', 
-      assignedDate: '2023-09-10T09:15:00',
-      status: 'pending', 
-      responsible: 'Emma Coordinator',
-      priority: 'high',
-      notes: 'Need to discuss pricing and timeline for the new project.',
-      assignedBy: 'John Manager',
-      orderNumber: '12345',
-      orderId: '12345',
-      images: [
-        { id: 'img1', url: '/placeholder.svg', name: 'Sample Document.jpg' }
-      ]
-    },
-    { 
-      id: '2', 
-      title: 'Send revised quote', 
-      dueDate: '2023-09-18T17:00:00', 
-      assignedDate: '2023-09-12T11:30:00',
-      status: 'pending', 
-      responsible: 'David Team Lead',
-      priority: 'medium',
-      notes: 'Include the additional services they requested in the meeting.',
-      assignedBy: 'Sarah Director'
-    },
-    { 
-      id: '3', 
-      title: 'Schedule installation', 
-      dueDate: '2023-09-20T10:00:00', 
-      assignedDate: '2023-09-05T14:45:00',
-      status: 'pending', 
-      responsible: 'Jennifer Specialist',
-      priority: 'low',
-      notes: 'Verify their availability for the installation date.',
-      assignedBy: 'Mike Supervisor'
-    },
-    { 
-      id: '4', 
-      title: 'Collect payment', 
-      dueDate: '2023-09-10T12:00:00', 
-      assignedDate: '2023-08-25T13:20:00',
-      status: 'completed', 
-      responsible: 'Michael Executive',
-      priority: 'high',
-      notes: 'Invoice #12345 has been sent.',
-      assignedBy: 'Daniel Administrator'
-    },
-    { 
-      id: '5', 
-      title: 'Order materials', 
-      dueDate: '2023-09-12T16:30:00', 
-      assignedDate: '2023-09-01T08:45:00',
-      status: 'in-progress', 
-      responsible: 'Olivia Associate',
-      priority: 'medium',
-      notes: 'Check inventory before placing the order.',
-      assignedBy: 'James Consultant'
-    },
-  ];
-
-  const [tasks, setTasks] = useState<TaskProps[]>(mockTasks);
+  const [tasks, setTasks] = useState<TaskProps[]>([]);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   
+  // In a real application, you would fetch tasks for this order from an API
+  useEffect(() => {
+    // For demonstration, creating mock tasks with this order ID
+    const mockOrderTasks: TaskProps[] = [
+      { 
+        id: '101', 
+        title: 'Verify order details', 
+        dueDate: new Date().toISOString(),
+        status: 'pending', 
+        responsible: 'Emma Coordinator',
+        priority: 'high',
+        notes: 'Ensure all measurements are correct before proceeding',
+        orderNumber: id,
+        orderId: id
+      },
+      { 
+        id: '102', 
+        title: 'Schedule client consultation', 
+        dueDate: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
+        status: 'pending', 
+        responsible: 'Jennifer Specialist',
+        priority: 'medium',
+        orderNumber: id,
+        orderId: id
+      }
+    ];
+    
+    setTasks(mockOrderTasks);
+  }, [id]);
+
+  // Function to filter tasks based on search query
   const filteredTasks = tasks.filter(task => 
     task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    task.responsible.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (task.orderNumber && task.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()))
+    task.responsible.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Handle task status updates
   const updateTaskStatus = (taskId: string, newStatus: TaskStatus) => {
     const updatedTasks = tasks.map(task => 
       task.id === taskId ? { ...task, status: newStatus } : task
@@ -112,6 +68,7 @@ export default function Tasks() {
     });
   };
 
+  // Handle task priority updates
   const updateTaskPriority = (taskId: string, newPriority: TaskPriority) => {
     const updatedTasks = tasks.map(task => 
       task.id === taskId ? { ...task, priority: newPriority } : task
@@ -122,6 +79,7 @@ export default function Tasks() {
     });
   };
 
+  // Handle general task updates
   const updateTask = (taskId: string, updatedFields: Partial<TaskProps>) => {
     const updatedTasks = tasks.map(task => 
       task.id === taskId ? { ...task, ...updatedFields } : task
@@ -132,12 +90,21 @@ export default function Tasks() {
     });
   };
 
+  // Toggle expanded task view
   const toggleExpandTask = (taskId: string) => {
     setExpandedTaskId(expandedTaskId === taskId ? null : taskId);
   };
 
+  // Add a new task for this order
   const addTask = (newTask: TaskProps) => {
-    setTasks([newTask, ...tasks]);
+    // Ensure the task is associated with this order
+    const taskWithOrderId = {
+      ...newTask,
+      orderId: id,
+      orderNumber: newTask.orderNumber || id
+    };
+    
+    setTasks([taskWithOrderId, ...tasks]);
     toast({
       description: "New task created successfully",
     });
@@ -147,16 +114,23 @@ export default function Tasks() {
     <div className="container py-6 space-y-6">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
+          <Link to={`/work-orders/${id}`} className="flex items-center text-inkiq-primary hover:underline mr-2">
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            <span>Back to Order</span>
+          </Link>
           <ListChecks className="h-6 w-6 text-inkiq-primary" />
-          <h1 className="text-2xl font-bold">Tasks</h1>
+          <h1 className="text-2xl font-bold">Order #{id} Tasks</h1>
         </div>
-        <CreateTaskDialog onCreateTask={addTask} />
+        <CreateTaskDialog 
+          onCreateTask={addTask} 
+          initialOrderNumber={id?.toString()} 
+        />
       </div>
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input
-          placeholder="Search tasks by title, responsible person, or order number..."
+          placeholder="Search tasks..."
           className="pl-10"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -185,7 +159,7 @@ export default function Tasks() {
               />
             ))
           ) : (
-            <EmptyState query={searchQuery} />
+            <EmptyState query={searchQuery} orderId={id} />
           )}
         </TabsContent>
         
@@ -205,7 +179,7 @@ export default function Tasks() {
                 />
               ))
           ) : (
-            <EmptyState query={searchQuery} status="pending" />
+            <EmptyState query={searchQuery} status="pending" orderId={id} />
           )}
         </TabsContent>
         
@@ -225,7 +199,7 @@ export default function Tasks() {
                 />
               ))
           ) : (
-            <EmptyState query={searchQuery} status="in-progress" />
+            <EmptyState query={searchQuery} status="in-progress" orderId={id} />
           )}
         </TabsContent>
         
@@ -245,7 +219,7 @@ export default function Tasks() {
                 />
               ))
           ) : (
-            <EmptyState query={searchQuery} status="completed" />
+            <EmptyState query={searchQuery} status="completed" orderId={id} />
           )}
         </TabsContent>
       </Tabs>
@@ -256,15 +230,16 @@ export default function Tasks() {
 interface EmptyStateProps {
   query: string;
   status?: string;
+  orderId?: string;
 }
 
-function EmptyState({ query, status }: EmptyStateProps) {
+function EmptyState({ query, status, orderId }: EmptyStateProps) {
   let message = "No tasks found";
   
   if (query) {
     message = `No tasks found matching "${query}"`;
   } else if (status) {
-    message = `No ${status} tasks`;
+    message = `No ${status} tasks for Order #${orderId}`;
   }
   
   return (

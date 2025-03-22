@@ -13,6 +13,7 @@ import WorkOrder from "@/pages/WorkOrder";
 import Invoices from "@/pages/Invoices";
 import Customers from "@/pages/Customers";
 import Tasks from "@/pages/Tasks";
+import OrderTasks from "@/pages/OrderTasks";  // Add import for OrderTasks
 import NotFound from "@/pages/NotFound";
 import { CustomersProvider } from "./context/CustomersContext";
 
@@ -32,6 +33,7 @@ function App() {
               <Route path="/quotes/new" element={<AppLayout><NewQuote /></AppLayout>} />
               <Route path="/quotes/:id" element={<AppLayout><QuoteDetail /></AppLayout>} />
               <Route path="/work-orders/:id" element={<WorkOrder />} />
+              <Route path="/work-orders/:id/tasks" element={<AppLayout><OrderTasks /></AppLayout>} />  {/* Add new route */}
               <Route path="/invoices" element={<AppLayout><Invoices /></AppLayout>} />
               <Route path="/customers" element={<AppLayout><Customers /></AppLayout>} />
               <Route path="/tasks" element={<AppLayout><Tasks /></AppLayout>} />
