@@ -20,6 +20,6 @@ export interface TaskProps {
   assignedDate?: string; // ISO format date-time string
   assignedBy?: string;
   orderNumber?: string;
-  orderId?: string; // Added orderId to match the usage in OrderTasksDialog
+  orderId?: string;
   images?: TaskImage[];
 }
