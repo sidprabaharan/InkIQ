@@ -12,17 +12,14 @@ import { useToast } from "@/components/ui/use-toast";
 
 interface StatusDropdownProps {
   currentStatus: string;
-  onStatusChange?: (newStatus: string) => void;
+  onStatusChange: (newStatus: string) => void;
 }
 
 export function StatusDropdown({ currentStatus, onStatusChange }: StatusDropdownProps) {
   const { toast } = useToast();
   
   const handleStatusSelect = (status: string) => {
-    if (onStatusChange) {
-      onStatusChange(status);
-    }
-    
+    onStatusChange(status);
     toast({
       title: "Status Updated",
       description: `Quote status changed to "${status}"`,
@@ -63,14 +60,11 @@ export function StatusDropdown({ currentStatus, onStatusChange }: StatusDropdown
     { name: "On Hold", color: "bg-red-600 text-white", icon: <Clock className="h-4 w-4 mr-2" /> },
   ];
 
-  // Guard against undefined currentStatus with a default value
-  const safeCurrentStatus = currentStatus || "Quote";
-  
   // Determine if current status is any type of Artwork status
-  const isArtworkStatus = safeCurrentStatus.toLowerCase().includes('artwork');
+  const isArtworkStatus = currentStatus.toLowerCase().includes('artwork');
   
   // Display status should be Artwork if it's any artwork variation
-  const displayStatus = isArtworkStatus ? "Artwork" : safeCurrentStatus;
+  const displayStatus = isArtworkStatus ? "Artwork" : currentStatus;
   
   // Find the class for the current status button
   let currentStatusData = statusOptions.find(option => option.name === displayStatus);

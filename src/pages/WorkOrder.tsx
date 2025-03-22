@@ -8,8 +8,6 @@ import { NotesCard } from "@/components/quotes/NotesCard";
 import { quotationData } from "@/components/quotes/QuoteData";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
-import { PrintStyles } from "@/components/layout/PrintStyles";
-import { QRCodeSVG } from "qrcode.react";
 
 export default function WorkOrder() {
   const { id } = useParams();
@@ -46,9 +44,6 @@ export default function WorkOrder() {
     window.print();
   };
   
-  // Generate a QR code URL for this work order
-  const workOrderUrl = window.location.href;
-  
   return (
     <div className="p-0 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center p-4 border-b bg-white">
@@ -62,14 +57,6 @@ export default function WorkOrder() {
       <div className="p-6">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-semibold">Work Order #{quoteId}</h1>
-          <div className="qr-code">
-            <QRCodeSVG 
-              value={workOrderUrl} 
-              size={60}
-              level="M"
-              includeMargin={false}
-            />
-          </div>
         </div>
 
         <div className="space-y-6">
@@ -116,8 +103,16 @@ export default function WorkOrder() {
         </div>
       </div>
       
-      {/* Use the PrintStyles component instead of inline styles */}
-      <PrintStyles />
+      <style jsx global>{`
+        @media print {
+          body {
+            background-color: white;
+          }
+          .print\\:hidden {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
