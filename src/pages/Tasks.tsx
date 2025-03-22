@@ -539,13 +539,13 @@ function TaskCard({
                     </PopoverContent>
                   </Popover>
                   
-                  <div className="relative w-full md:w-[180px]">
+                  <div className="relative w-full md:w-[200px]">
                     <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
                       type="time"
                       value={format(new Date(editedTask.dueDate), "HH:mm")}
                       onChange={handleTimeChange}
-                      className="pl-10 bg-white border-gray-300 time-input h-10 text-base"
+                      className="pl-10 bg-white border-gray-300 time-input h-10 text-base font-medium"
                     />
                   </div>
                 </div>
