@@ -38,6 +38,7 @@ import {
 import { format } from "date-fns";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
 
 type TaskStatus = 'pending' | 'in-progress' | 'completed';
 type TaskPriority = 'low' | 'medium' | 'high';
@@ -435,7 +436,7 @@ function TaskCard({
             <p className="text-sm text-gray-500">
               {isEditing ? (
                 <div onClick={stopPropagation} className="mt-4">
-                  <label className="text-sm font-medium block mb-2">Responsible:</label>
+                  <Label className="block font-medium mb-2 text-foreground">Responsible:</Label>
                   <Select
                     value={editedTask.responsible}
                     onValueChange={(value: string) => setEditedTask({...editedTask, responsible: value})}
@@ -649,7 +650,7 @@ function TaskCard({
             <div>
               {isEditing ? (
                 <div className="mt-2" onClick={stopPropagation}>
-                  <label className="text-sm font-medium block mb-2">Notes:</label>
+                  <Label className="block font-medium mb-2 text-foreground">Notes:</Label>
                   <Textarea 
                     value={editedTask.notes || ''}
                     onChange={(e) => setEditedTask({...editedTask, notes: e.target.value})}
@@ -683,7 +684,7 @@ function TaskCard({
 
             {isEditing && (
               <div onClick={stopPropagation} className="mt-2">
-                <label className="text-sm font-medium block mb-2">Assigned By:</label>
+                <Label className="block font-medium mb-2 text-foreground">Assigned By:</Label>
                 <Select
                   value={editedTask.assignedBy || ''}
                   onValueChange={(value: string) => setEditedTask({...editedTask, assignedBy: value})}
