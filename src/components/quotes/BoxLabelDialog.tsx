@@ -133,10 +133,10 @@ function BoxLabel({
           </div>
         </div>
         
-        {/* Made the Box section larger and centered at the bottom */}
+        {/* Modified the Box section to align lines with the bottom of "of" */}
         <div className="mt-auto w-full flex flex-col items-center justify-center">
           <div className="text-sm font-semibold">Box:</div>
-          <div className="text-4xl font-bold flex items-center">
+          <div className="text-4xl font-bold flex items-end">
             <div className="border-b-2 border-black w-16 inline-block"></div>
             <span className="px-2">of</span>
             <div className="border-b-2 border-black w-16 inline-block"></div>
