@@ -6,8 +6,8 @@ export const PrintStyles: React.FC = () => (
     __html: `
     @media print {
       @page {
-        size: auto;
-        margin: 0.5cm;
+        size: 4in 6in;
+        margin: 0;
       }
       
       body {
@@ -18,6 +18,21 @@ export const PrintStyles: React.FC = () => (
       
       .print\\:hidden {
         display: none !important;
+      }
+      
+      /* Hide everything except the box label when printing */
+      body > *:not(#boxLabel) {
+        display: none !important;
+      }
+      
+      #boxLabel {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4in !important;
+        height: 6in !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
     }
   `}} />

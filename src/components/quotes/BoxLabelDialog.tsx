@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -33,9 +33,58 @@ export function BoxLabelDialog({
   const orderNumber = `ORD-${quoteId}`;
   const workOrderUrl = `/work-orders/${quoteId}`;
   const customerCompany = customerInfo?.billing?.company || "Customer";
+  const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = () => {
-    window.print();
+    const printContent = printRef.current;
+    if (!printContent) return;
+    
+    // Create a new window for printing just the label
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('Please allow popups for this website');
+      return;
+    }
+    
+    // Add necessary styles and content to the new window
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Box Label</title>
+          <style>
+            @page {
+              size: 4in 6in;
+              margin: 0;
+            }
+            body {
+              margin: 0;
+              padding: 0;
+              width: 4in;
+              height: 6in;
+            }
+            .box-label-container {
+              width: 4in;
+              height: 6in;
+              box-sizing: border-box;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="box-label-container">
+            ${printContent.innerHTML}
+          </div>
+        </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.focus();
+    
+    // Print after a short delay to ensure content is loaded
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
   };
 
   return (
@@ -48,7 +97,7 @@ export function BoxLabelDialog({
           
           {/* Preview of the label - reduced height to add scroll functionality */}
           <ScrollArea className="h-[480px] rounded-md border p-4">
-            <div id="boxLabel" className="w-full" style={{ width: "4in", height: "6in", margin: "0 auto" }}>
+            <div ref={printRef} id="boxLabel" className="w-full" style={{ width: "4in", height: "6in", margin: "0 auto" }}>
               <BoxLabel
                 customerNumber={customerNumber}
                 orderNumber={orderNumber}
@@ -68,7 +117,6 @@ export function BoxLabelDialog({
           </div>
         </DialogContent>
       </Dialog>
-      <PrintStyles />
     </>
   );
 }
