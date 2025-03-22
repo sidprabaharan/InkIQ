@@ -93,8 +93,19 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  
+  /* Add custom focus styles for form elements */
+  *:focus {
+    outline: none;
+  }
+  
+  /* Override default focus styles in all browsers */
+  *:focus-visible {
+    outline: none;
+  }
 }
 
+/* Keep the rest of the CSS classes the same */
 .status-badge {
   @apply px-3 py-1 text-white text-sm font-medium rounded-md;
 }
