@@ -534,28 +534,37 @@ function TaskCard({
                         selected={date}
                         onSelect={handleDateSelect}
                         initialFocus
-                        className="p-3"
+                        className="p-3 pointer-events-auto"
                       />
                     </PopoverContent>
                   </Popover>
                   
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "justify-start text-left font-normal bg-white border-gray-300 w-full md:w-[140px] h-10",
-                    )}
-                    onClick={stopPropagation}
-                    type="button"
-                  >
-                    <Clock className="mr-2 h-4 w-4" />
-                    <Input
-                      type="time"
-                      value={format(new Date(editedTask.dueDate), "HH:mm")}
-                      onChange={handleTimeChange}
-                      className="bg-transparent border-none p-0 m-0 focus:ring-0 w-full"
-                      onClick={stopPropagation}
-                    />
-                  </Button>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="justify-start text-left font-normal bg-white border-gray-300 w-full md:w-[140px]"
+                      >
+                        <Clock className="mr-2 h-4 w-4" />
+                        <span>
+                          {editedTask.dueDate 
+                            ? format(new Date(editedTask.dueDate), "h:mm a") 
+                            : "Select time"}
+                        </span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0" align="start">
+                      <div className="p-3">
+                        <Input
+                          type="time"
+                          value={format(new Date(editedTask.dueDate), "HH:mm")}
+                          onChange={handleTimeChange}
+                          className="w-full"
+                          onClick={stopPropagation}
+                        />
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
             </div>

@@ -114,7 +114,7 @@ button:has(input[type="time"]) {
 }
 
 button input[type="time"] {
-  @apply text-left;
+  @apply text-left pl-0;
 }
 
 button input[type="time"]:focus {
