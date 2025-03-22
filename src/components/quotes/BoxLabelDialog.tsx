@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,6 +6,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Printer } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { PrintStyles } from "../layout/PrintStyles";
@@ -29,6 +30,8 @@ export function BoxLabelDialog({
   orderNickname = "Project Care Quote",
   poNumber = "PO-" + quoteId,
 }: BoxLabelDialogProps) {
+  const [currentBox, setCurrentBox] = useState("1");
+  const [totalBoxes, setTotalBoxes] = useState("1");
   const customerNumber = `CUST-${quoteId}`;
   const orderNumber = `ORD-${quoteId}`;
   const workOrderUrl = `/work-orders/${quoteId}`;
@@ -44,6 +47,26 @@ export function BoxLabelDialog({
           <DialogHeader className="p-6 pb-2">
             <DialogTitle>Box Label</DialogTitle>
           </DialogHeader>
+
+          {/* Box number inputs */}
+          <div className="px-6 pb-2 grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="currentBox">Box Number</Label>
+              <Input
+                id="currentBox"
+                value={currentBox}
+                onChange={(e) => setCurrentBox(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="totalBoxes">Total Boxes</Label>
+              <Input
+                id="totalBoxes"
+                value={totalBoxes}
+                onChange={(e) => setTotalBoxes(e.target.value)}
+              />
+            </div>
+          </div>
           
           {/* Scrollable preview of the label */}
           <ScrollArea className="h-[calc(100vh-250px)] px-6">
@@ -54,6 +77,8 @@ export function BoxLabelDialog({
                   orderNumber={orderNumber}
                   poNumber={poNumber}
                   orderNickname={orderNickname}
+                  currentBox={currentBox}
+                  totalBoxes={totalBoxes}
                   workOrderUrl={workOrderUrl}
                 />
               </div>
@@ -78,12 +103,16 @@ function BoxLabel({
   orderNumber,
   poNumber,
   orderNickname,
+  currentBox,
+  totalBoxes,
   workOrderUrl,
 }: {
   customerNumber: string;
   orderNumber: string;
   poNumber: string;
   orderNickname: string;
+  currentBox: string;
+  totalBoxes: string;
   workOrderUrl: string;
 }) {
   return (
@@ -116,10 +145,8 @@ function BoxLabel({
           
           <div className="mt-auto">
             <div className="text-xs font-semibold">Box:</div>
-            <div className="text-3xl font-bold flex items-center">
-              <div className="border-b-2 border-black w-12 h-8 flex items-center justify-center"></div>
-              <span className="mx-2">of</span>
-              <div className="border-b-2 border-black w-12 h-8 flex items-center justify-center"></div>
+            <div className="text-3xl font-bold">
+              {currentBox} of {totalBoxes}
             </div>
           </div>
         </div>
