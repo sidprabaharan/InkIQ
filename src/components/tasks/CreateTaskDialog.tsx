@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Calendar as CalendarIcon, Clock, Upload, X } from "lucide-react";
 import { format } from "date-fns";
@@ -33,13 +34,12 @@ import { TaskPriority, TaskStatus } from "@/types/task";
 
 interface CreateTaskDialogProps {
   onCreateTask: (task: any) => void;
-  initialOrderNumber?: string;
 }
 
-export function CreateTaskDialog({ onCreateTask, initialOrderNumber }: CreateTaskDialogProps) {
+export function CreateTaskDialog({ onCreateTask }: CreateTaskDialogProps) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
-  const [orderNumber, setOrderNumber] = useState(initialOrderNumber || '');
+  const [orderNumber, setOrderNumber] = useState('');
   const [responsible, setResponsible] = useState('');
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [status, setStatus] = useState<TaskStatus>('pending');
@@ -138,7 +138,7 @@ export function CreateTaskDialog({ onCreateTask, initialOrderNumber }: CreateTas
 
   const resetForm = () => {
     setTitle('');
-    setOrderNumber(initialOrderNumber || '');
+    setOrderNumber('');
     setResponsible('');
     setPriority('medium');
     setStatus('pending');

@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Printer, Copy, ListChecks, MessageCircle, Edit, Link, File, Trash, Download, DollarSign, Truck, Package, ListPlus, Wrench, Box } from "lucide-react";
 import {
@@ -10,22 +11,18 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { StatusDropdown } from "./StatusDropdown";
 import { useState } from "react";
 import { PackingSlip } from "./PackingSlip";
 import { ShippingLabelDialog } from "./ShippingLabelDialog";
 import { BoxLabelDialog } from "./BoxLabelDialog";
-import { TaskPriority, TaskProps, TaskStatus } from "@/types/task";
-import { TasksHeader } from "@/components/tasks/TasksHeader";
-import { TaskSearch } from "@/components/tasks/TaskSearch";
-import { TasksList } from "@/components/tasks/TasksList";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface QuoteDetailHeaderProps {
   quoteId: string;
@@ -46,41 +43,10 @@ export function QuoteDetailHeader({
   const [packingSlipOpen, setPackingSlipOpen] = useState(false);
   const [shippingLabelOpen, setShippingLabelOpen] = useState(false);
   const [boxLabelOpen, setBoxLabelOpen] = useState(false);
-  const [tasksDialogOpen, setTasksDialogOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [tasks, setTasks] = useState<TaskProps[]>([
-    { 
-      id: '101', 
-      title: 'Verify quote details', 
-      dueDate: new Date().toISOString(),
-      status: 'pending', 
-      responsible: 'Emma Coordinator',
-      priority: 'high',
-      notes: 'Ensure all measurements are correct before proceeding',
-      orderNumber: quoteId,
-      orderId: quoteId
-    },
-    { 
-      id: '102', 
-      title: 'Schedule client consultation', 
-      dueDate: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
-      status: 'pending', 
-      responsible: 'Jennifer Specialist',
-      priority: 'medium',
-      orderNumber: quoteId,
-      orderId: quoteId
-    }
-  ]);
-  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   
   const isInvoice = !status.toLowerCase().startsWith('quote');
   const documentType = isInvoice ? "Invoice" : "Quote";
   
-  const filteredTasks = tasks.filter(task => 
-    task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    task.responsible.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   const handleDuplicate = () => {
     toast({
       title: `${documentType} duplicated`,
@@ -175,77 +141,51 @@ export function QuoteDetailHeader({
   const handleStatusChange = (newStatus: string) => {
     setStatus(newStatus);
   };
-
-  const updateTaskStatus = (taskId: string, newStatus: TaskStatus) => {
-    const updatedTasks = tasks.map(task => 
-      task.id === taskId ? { ...task, status: newStatus } : task
-    );
-    setTasks(updatedTasks);
-    toast({
-      description: "Task status updated successfully",
-    });
-  };
-
-  const updateTaskPriority = (taskId: string, newPriority: TaskPriority) => {
-    const updatedTasks = tasks.map(task => 
-      task.id === taskId ? { ...task, priority: newPriority } : task
-    );
-    setTasks(updatedTasks);
-    toast({
-      description: "Task priority updated successfully",
-    });
-  };
-
-  const updateTask = (taskId: string, updatedFields: Partial<TaskProps>) => {
-    const updatedTasks = tasks.map(task => 
-      task.id === taskId ? { ...task, ...updatedFields } : task
-    );
-    setTasks(updatedTasks);
-    toast({
-      description: "Task updated successfully",
-    });
-  };
-
-  const toggleExpandTask = (taskId: string) => {
-    setExpandedTaskId(expandedTaskId === taskId ? null : taskId);
-  };
-
-  const addTask = (newTask: TaskProps) => {
-    const taskWithOrderId = {
-      ...newTask,
-      orderId: quoteId,
-      orderNumber: newTask.orderNumber || quoteId
-    };
-    
-    setTasks([taskWithOrderId, ...tasks]);
-    toast({
-      description: "New task created successfully",
-    });
-  };
-
-  const handleViewAllTasks = () => {
-    navigate(`/work-orders/${quoteId}/tasks`);
-  };
   
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="flex gap-4 items-center">
         <h1 className="text-2xl font-semibold">{documentType} #{quoteId}</h1>
         
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="gap-1"
-          onClick={() => setTasksDialogOpen(true)}
-        >
-          <ListChecks className="h-4 w-4" />
-          Tasks
-        </Button>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1">
+              <ListChecks className="h-4 w-4" />
+              Tasks
+            </Button>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Tasks for {documentType} #{quoteId}</SheetTitle>
+              <SheetDescription>
+                View and manage tasks associated with this {documentType.toLowerCase()}.
+              </SheetDescription>
+            </SheetHeader>
+            <div className="py-6">
+              <p className="text-muted-foreground">Task management interface will be designed later.</p>
+            </div>
+          </SheetContent>
+        </Sheet>
         
-        <Button variant="outline" size="sm" className="gap-1">
-          <MessageCircle className="h-4 w-4" />
-          Messages
-        </Button>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1">
+              <MessageCircle className="h-4 w-4" />
+              Messages
+            </Button>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Messages for {documentType} #{quoteId}</SheetTitle>
+              <SheetDescription>
+                Communicate with your customer about this {documentType.toLowerCase()}.
+              </SheetDescription>
+            </SheetHeader>
+            <div className="py-6">
+              <p className="text-muted-foreground">Messaging interface will be designed later.</p>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
       <div className="flex items-center gap-2">
         <StatusDropdown currentStatus={status} onStatusChange={handleStatusChange} />
@@ -311,103 +251,6 @@ export function QuoteDetailHeader({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      
-      <Dialog open={tasksDialogOpen} onOpenChange={setTasksDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Tasks for {documentType} #{quoteId}</DialogTitle>
-            <DialogDescription>
-              View and manage tasks associated with this {documentType.toLowerCase()}.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="py-4 space-y-6">
-            <div className="flex justify-between items-center">
-              <TasksHeader 
-                title={`${documentType} #${quoteId} Tasks`}
-                onCreateTask={addTask}
-                initialOrderNumber={quoteId}
-              />
-            </div>
-            
-            <TaskSearch 
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              placeholder="Search tasks..."
-            />
-            
-            <Tabs defaultValue="all">
-              <TabsList className="mb-4">
-                <TabsTrigger value="all">All Tasks</TabsTrigger>
-                <TabsTrigger value="pending">Pending</TabsTrigger>
-                <TabsTrigger value="in-progress">In Progress</TabsTrigger>
-                <TabsTrigger value="completed">Completed</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="all">
-                <TasksList
-                  tasks={filteredTasks}
-                  expandedTaskId={expandedTaskId}
-                  toggleExpandTask={toggleExpandTask}
-                  onStatusChange={updateTaskStatus}
-                  onPriorityChange={updateTaskPriority}
-                  onTaskUpdate={updateTask}
-                  searchQuery={searchQuery}
-                  orderId={quoteId}
-                />
-              </TabsContent>
-              
-              <TabsContent value="pending">
-                <TasksList
-                  tasks={filteredTasks}
-                  expandedTaskId={expandedTaskId}
-                  toggleExpandTask={toggleExpandTask}
-                  onStatusChange={updateTaskStatus}
-                  onPriorityChange={updateTaskPriority}
-                  onTaskUpdate={updateTask}
-                  status="pending"
-                  searchQuery={searchQuery}
-                  orderId={quoteId}
-                />
-              </TabsContent>
-              
-              <TabsContent value="in-progress">
-                <TasksList
-                  tasks={filteredTasks}
-                  expandedTaskId={expandedTaskId}
-                  toggleExpandTask={toggleExpandTask}
-                  onStatusChange={updateTaskStatus}
-                  onPriorityChange={updateTaskPriority}
-                  onTaskUpdate={updateTask}
-                  status="in-progress"
-                  searchQuery={searchQuery}
-                  orderId={quoteId}
-                />
-              </TabsContent>
-              
-              <TabsContent value="completed">
-                <TasksList
-                  tasks={filteredTasks}
-                  expandedTaskId={expandedTaskId}
-                  toggleExpandTask={toggleExpandTask}
-                  onStatusChange={updateTaskStatus}
-                  onPriorityChange={updateTaskPriority}
-                  onTaskUpdate={updateTask}
-                  status="completed"
-                  searchQuery={searchQuery}
-                  orderId={quoteId}
-                />
-              </TabsContent>
-            </Tabs>
-            
-            <div className="flex justify-end">
-              <Button onClick={handleViewAllTasks} variant="outline">
-                View All Tasks
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
       
       <PackingSlip
         open={packingSlipOpen}
