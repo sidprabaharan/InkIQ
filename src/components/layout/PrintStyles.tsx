@@ -14,6 +14,10 @@ export const PrintStyles: React.FC = () => (
         background-color: white !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 4in !important;
+        height: 6in !important;
       }
       
       .print\\:hidden {
@@ -21,18 +25,20 @@ export const PrintStyles: React.FC = () => (
       }
       
       /* Hide everything except the box label when printing */
-      body > *:not(#boxLabel) {
+      body > *:not(.box-label-container) {
         display: none !important;
       }
       
-      #boxLabel {
-        position: absolute;
-        top: 0;
-        left: 0;
+      .box-label-container {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
         width: 4in !important;
         height: 6in !important;
         margin: 0 !important;
         padding: 0 !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
       }
     }
   `}} />
