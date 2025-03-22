@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { 
@@ -10,7 +11,9 @@ import {
   Clock,
   Edit,
   Save,
-  X
+  X,
+  Image,
+  Upload
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -35,13 +38,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
-
-type TaskStatus = 'pending' | 'in-progress' | 'completed';
-type TaskPriority = 'low' | 'medium' | 'high';
+import { CreateTaskDialog } from "@/components/tasks/CreateTaskDialog";
+import { TaskImage, TaskPriority, TaskProps, TaskStatus } from "@/types/task";
 
 export const USERS = [
   { id: '1', name: 'John Manager' },
@@ -58,20 +65,6 @@ export const USERS = [
   { id: '12', name: 'Emily Project Manager' },
 ];
 
-type TaskProps = {
-  id: string;
-  title: string;
-  dueDate: string; // ISO format date-time string
-  dueTime?: string; 
-  status: TaskStatus;
-  responsible: string;
-  priority: TaskPriority;
-  notes?: string;
-  assignedDate?: string; // ISO format date-time string
-  assignedBy?: string;
-  orderNumber?: string; // Added order number field
-};
-
 export default function Tasks() {
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -86,7 +79,10 @@ export default function Tasks() {
       priority: 'high',
       notes: 'Need to discuss pricing and timeline for the new project.',
       assignedBy: 'John Manager',
-      orderNumber: '12345'
+      orderNumber: '12345',
+      images: [
+        { id: 'img1', url: '/placeholder.svg', name: 'Sample Document.jpg' }
+      ]
     },
     { 
       id: '2', 
@@ -177,6 +173,13 @@ export default function Tasks() {
     setExpandedTaskId(expandedTaskId === taskId ? null : taskId);
   };
 
+  const addTask = (newTask: TaskProps) => {
+    setTasks([newTask, ...tasks]);
+    toast({
+      description: "New task created successfully",
+    });
+  };
+
   return (
     <div className="container py-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -184,10 +187,7 @@ export default function Tasks() {
           <ListChecks className="h-6 w-6 text-inkiq-primary" />
           <h1 className="text-2xl font-bold">Tasks</h1>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Create Task
-        </Button>
+        <CreateTaskDialog onCreateTask={addTask} />
       </div>
 
       <div className="relative">
@@ -312,6 +312,8 @@ function TaskCard({
   const [date, setDate] = useState<Date | undefined>(
     task.dueDate ? new Date(task.dueDate) : undefined
   );
+  const [viewImageIndex, setViewImageIndex] = useState<number | null>(null);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
   
   const priorityColors: Record<TaskPriority, string> = {
     high: 'bg-red-100 text-red-800',
@@ -414,6 +416,36 @@ function TaskCard({
     
     currentDate.setHours(hours);
     setEditedTask({...editedTask, dueDate: currentDate.toISOString()});
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    const newImages = Array.from(e.target.files).map(file => {
+      const id = crypto.randomUUID();
+      return {
+        id,
+        url: URL.createObjectURL(file),
+        name: file.name
+      };
+    });
+    
+    const currentImages = editedTask.images || [];
+    setEditedTask({
+      ...editedTask, 
+      images: [...currentImages, ...newImages]
+    });
+    
+    setIsUploadingImages(false);
+  };
+
+  const removeImage = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    const currentImages = editedTask.images || [];
+    setEditedTask({
+      ...editedTask,
+      images: currentImages.filter(img => img.id !== id)
+    });
   };
 
   return (
@@ -691,6 +723,92 @@ function TaskCard({
                     </div>
                   )}
                 </>
+              )}
+            </div>
+
+            {/* Image Attachment Section */}
+            <div className="mt-2" onClick={stopPropagation}>
+              <div className="flex items-center justify-between">
+                <Label className="block font-medium mb-2 text-foreground">
+                  <div className="flex items-center gap-1">
+                    <Image className="h-4 w-4" />
+                    <span>Attachments:</span>
+                  </div>
+                </Label>
+                {isEditing && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setIsUploadingImages(true)}
+                    className="mb-2"
+                  >
+                    <Upload className="h-3 w-3 mr-1" />
+                    <span>Upload</span>
+                  </Button>
+                )}
+              </div>
+              
+              {isEditing && isUploadingImages && (
+                <div className="border-2 border-dashed border-gray-300 rounded-md p-4 mb-4">
+                  <div className="flex flex-col items-center">
+                    <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                    <p className="text-sm text-gray-500 mb-2">Drag & drop images or click to browse</p>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      id={`image-upload-${task.id}`}
+                      onChange={handleImageUpload}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => document.getElementById(`image-upload-${task.id}`)?.click()}
+                    >
+                      Choose Files
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              {(!editedTask.images || editedTask.images.length === 0) ? (
+                <p className="text-sm text-gray-500">No attachments</p>
+              ) : (
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-2">
+                  {editedTask.images.map((image, index) => (
+                    <div key={image.id} className="relative group">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <div className="cursor-pointer">
+                            <img
+                              src={image.url}
+                              alt={image.name}
+                              className="h-16 object-cover w-full rounded-md border border-gray-200"
+                            />
+                            <p className="text-xs mt-1 truncate">{image.name}</p>
+                          </div>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[80vw] p-1">
+                          <img 
+                            src={image.url} 
+                            alt={image.name} 
+                            className="w-full h-auto max-h-[80vh] object-contain"
+                          />
+                        </DialogContent>
+                      </Dialog>
+                      {isEditing && (
+                        <button
+                          type="button"
+                          onClick={(e) => removeImage(e, image.id)}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
             
