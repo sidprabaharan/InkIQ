@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Printer, Copy, ListChecks, MessageCircle, Edit, Link, File, Trash, Download, DollarSign, Truck, Package, ListPlus, Wrench, Box } from "lucide-react";
 import {
@@ -21,6 +22,7 @@ import { StatusDropdown } from "./StatusDropdown";
 import { useState } from "react";
 import { PackingSlip } from "./PackingSlip";
 import { ShippingLabelDialog } from "./ShippingLabelDialog";
+import { BoxLabelDialog } from "./BoxLabelDialog";
 
 interface QuoteDetailHeaderProps {
   quoteId: string;
@@ -40,6 +42,7 @@ export function QuoteDetailHeader({
   const [status, setStatus] = useState(initialStatus);
   const [packingSlipOpen, setPackingSlipOpen] = useState(false);
   const [shippingLabelOpen, setShippingLabelOpen] = useState(false);
+  const [boxLabelOpen, setBoxLabelOpen] = useState(false);
   
   const isInvoice = !status.toLowerCase().startsWith('quote');
   const documentType = isInvoice ? "Invoice" : "Quote";
@@ -82,6 +85,10 @@ export function QuoteDetailHeader({
     setShippingLabelOpen(true);
   };
   
+  const handleBoxLabel = () => {
+    setBoxLabelOpen(true);
+  };
+  
   const handleAddLineItemsToPO = () => {
     toast({
       title: "Add to PO",
@@ -99,10 +106,7 @@ export function QuoteDetailHeader({
   };
   
   const handlePrintBoxLabels = () => {
-    toast({
-      title: "Print Box Labels",
-      description: `Printing box labels for ${documentType.toLowerCase()} #${quoteId}`,
-    });
+    setBoxLabelOpen(true);
   };
   
   const handleDownloadPDF = () => {
@@ -211,6 +215,10 @@ export function QuoteDetailHeader({
               <Truck className="h-4 w-4 mr-2" />
               Shipping
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleBoxLabel}>
+              <Box className="h-4 w-4 mr-2" />
+              Box Label
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={handleAddLineItemsToPO}>
               <ListPlus className="h-4 w-4 mr-2" />
               Add Line Items to PO
@@ -218,10 +226,6 @@ export function QuoteDetailHeader({
             <DropdownMenuItem onClick={handleWorkOrder}>
               <Wrench className="h-4 w-4 mr-2" />
               Work Order
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handlePrintBoxLabels}>
-              <Box className="h-4 w-4 mr-2" />
-              Print Box Labels
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handlePrint}>
               <Printer className="h-4 w-4 mr-2" />
@@ -261,6 +265,14 @@ export function QuoteDetailHeader({
         onOpenChange={setShippingLabelOpen}
         quoteId={quoteId}
         customerInfo={customerInfo}
+      />
+      
+      <BoxLabelDialog
+        open={boxLabelOpen}
+        onOpenChange={setBoxLabelOpen}
+        quoteId={quoteId}
+        customerInfo={customerInfo}
+        orderNickname="Project Care Quote"
       />
     </div>
   );
