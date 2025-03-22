@@ -380,29 +380,6 @@ function TaskCard({
     setEditedTask({...editedTask, dueDate: date.toISOString()});
   };
 
-  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const timeString = e.target.value; // Format: HH:MM
-    if (!timeString) return;
-    
-    const [hours, minutes] = timeString.split(':').map(Number);
-    
-    const currentDate = editedTask.dueDate ? new Date(editedTask.dueDate) : new Date();
-    currentDate.setHours(hours);
-    currentDate.setMinutes(minutes);
-    
-    setEditedTask({...editedTask, dueDate: currentDate.toISOString()});
-  };
-
-  const handleTimeSelect = (time: string) => {
-    const [hours, minutes] = time.split(':').map(Number);
-    
-    const currentDate = editedTask.dueDate ? new Date(editedTask.dueDate) : new Date();
-    currentDate.setHours(hours);
-    currentDate.setMinutes(minutes);
-    
-    setEditedTask({...editedTask, dueDate: currentDate.toISOString()});
-  };
-
   const handleHourChange = (hour: number) => {
     const currentDate = editedTask.dueDate ? new Date(editedTask.dueDate) : new Date();
     const isPM = currentDate.getHours() >= 12;
@@ -596,96 +573,63 @@ function TaskCard({
                         </span>
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="p-0 w-[280px]" align="start">
-                      <div className="p-3">
-                        <div className="mb-3">
-                          <div className="flex justify-between items-center mb-2">
-                            <div className="text-sm font-medium">Hour</div>
-                            <div className="text-sm font-medium">Minute</div>
-                            <div className="text-sm font-medium">AM/PM</div>
-                          </div>
-                          <div className="flex justify-between gap-2">
-                            <Select
-                              value={(editedTask.dueDate 
-                                ? new Date(editedTask.dueDate).getHours() % 12 || 12
-                                : 12).toString()}
-                              onValueChange={(value) => handleHourChange(parseInt(value))}
-                            >
-                              <SelectTrigger className="w-20 bg-white border-gray-300">
-                                <SelectValue placeholder="Hour" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
-                                  <SelectItem key={hour} value={hour.toString()}>
-                                    {hour}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            
-                            <Select
-                              value={(editedTask.dueDate 
-                                ? new Date(editedTask.dueDate).getMinutes()
-                                : 0).toString()}
-                              onValueChange={(value) => handleMinuteChange(parseInt(value))}
-                            >
-                              <SelectTrigger className="w-20 bg-white border-gray-300">
-                                <SelectValue placeholder="Min" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {Array.from({ length: 12 }, (_, i) => i * 5).map((minute) => (
-                                  <SelectItem key={minute} value={minute.toString()}>
-                                    {minute.toString().padStart(2, '0')}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            
-                            <Select
-                              value={editedTask.dueDate 
-                                ? new Date(editedTask.dueDate).getHours() >= 12 ? "PM" : "AM"
-                                : "AM"}
-                              onValueChange={(value) => handleAmPmChange(value === "PM")}
-                            >
-                              <SelectTrigger className="w-20 bg-white border-gray-300">
-                                <SelectValue placeholder="AM/PM" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="AM">AM</SelectItem>
-                                <SelectItem value="PM">PM</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-1 pt-2 border-t">
-                          <p className="text-sm font-medium mb-2">Quick select:</p>
-                          <div className="grid grid-cols-2 gap-1">
-                            {['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'].map((time) => (
-                              <Button 
-                                key={time}
-                                variant="ghost" 
-                                className="justify-start font-normal h-8 px-2"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  handleTimeSelect(time);
-                                }}
-                              >
-                                {format(new Date(`2000-01-01T${time}`), 'h:mm a')}
-                              </Button>
+                    <PopoverContent className="p-3 w-[280px]" align="start">
+                      <div className="flex justify-between items-center mb-2">
+                        <div className="text-sm font-medium">Hour</div>
+                        <div className="text-sm font-medium">Minute</div>
+                        <div className="text-sm font-medium">AM/PM</div>
+                      </div>
+                      <div className="flex justify-between gap-2">
+                        <Select
+                          value={(editedTask.dueDate 
+                            ? new Date(editedTask.dueDate).getHours() % 12 || 12
+                            : 12).toString()}
+                          onValueChange={(value) => handleHourChange(parseInt(value))}
+                        >
+                          <SelectTrigger className="w-20 bg-white border-gray-300">
+                            <SelectValue placeholder="Hour" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
+                              <SelectItem key={hour} value={hour.toString()}>
+                                {hour}
+                              </SelectItem>
                             ))}
-                          </div>
-                          <div className="pt-2 pb-1">
-                            <label className="text-sm font-medium">Custom time:</label>
-                            <Input
-                              type="time"
-                              value={editedTask.dueDate ? format(new Date(editedTask.dueDate), "HH:mm") : ""}
-                              onChange={handleTimeChange}
-                              className="w-full mt-1"
-                              onClick={stopPropagation}
-                            />
-                          </div>
-                        </div>
+                          </SelectContent>
+                        </Select>
+                        
+                        <Select
+                          value={(editedTask.dueDate 
+                            ? new Date(editedTask.dueDate).getMinutes()
+                            : 0).toString()}
+                          onValueChange={(value) => handleMinuteChange(parseInt(value))}
+                        >
+                          <SelectTrigger className="w-20 bg-white border-gray-300">
+                            <SelectValue placeholder="Min" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Array.from({ length: 12 }, (_, i) => i * 5).map((minute) => (
+                              <SelectItem key={minute} value={minute.toString()}>
+                                {minute.toString().padStart(2, '0')}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        
+                        <Select
+                          value={editedTask.dueDate 
+                            ? new Date(editedTask.dueDate).getHours() >= 12 ? "PM" : "AM"
+                            : "AM"}
+                          onValueChange={(value) => handleAmPmChange(value === "PM")}
+                        >
+                          <SelectTrigger className="w-20 bg-white border-gray-300">
+                            <SelectValue placeholder="AM/PM" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="AM">AM</SelectItem>
+                            <SelectItem value="PM">PM</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                     </PopoverContent>
                   </Popover>
