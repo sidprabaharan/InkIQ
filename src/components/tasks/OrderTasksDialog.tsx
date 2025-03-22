@@ -17,7 +17,6 @@ import { TaskProps, TaskStatus, TaskPriority } from "@/types/task";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { CreateTaskDialog } from "@/components/tasks/CreateTaskDialog";
-import { TaskCard } from "@/components/tasks/TaskCard";
 
 interface OrderTasksDialogProps {
   open: boolean;
@@ -303,11 +302,29 @@ function TaskRowWithDetails({
         <div className="flex items-center gap-2">
           <Badge 
             className={`${getPriorityBadgeStyles(task.priority)} font-medium text-[11px] h-5`}
+            onClick={(e) => {
+              e.stopPropagation();
+              const nextPriority: Record<TaskPriority, TaskPriority> = {
+                high: 'medium',
+                medium: 'low',
+                low: 'high'
+              };
+              onPriorityChange(nextPriority[task.priority]);
+            }}
           >
             {getPriorityLabel(task.priority)}
           </Badge>
           <Badge 
             className={`${getStatusBadgeStyles(task.status)} font-medium text-[11px] h-5`}
+            onClick={(e) => {
+              e.stopPropagation();
+              const nextStatus: Record<TaskStatus, TaskStatus> = {
+                pending: 'in-progress',
+                'in-progress': 'completed',
+                completed: 'pending'
+              };
+              onStatusChange(nextStatus[task.status]);
+            }}
           >
             {getStatusLabel(task.status)}
           </Badge>
