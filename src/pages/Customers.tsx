@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
   Search, Plus, ArrowLeft, Mail, Phone, FileText, Calendar, MessageSquare, 
   File, Image, Folder, Code, PenTool, ShoppingCart, FileCheck, UserPlus,
-  Edit, MapPin
+  Edit, MapPin, ClipboardList
 } from "lucide-react";
 import { CustomerDialog } from "@/components/quotes/CustomerDialog";
 import { useCustomers } from "@/context/CustomersContext";
@@ -394,6 +394,10 @@ export default function Customers() {
                   <Button variant="outline" size="sm" className="flex items-center gap-2">
                     <MessageSquare className="h-4 w-4" />
                     Message
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <ClipboardList className="h-4 w-4" />
+                    Task
                   </Button>
                 </div>
               </CardContent>
