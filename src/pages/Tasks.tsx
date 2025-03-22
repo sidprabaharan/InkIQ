@@ -433,7 +433,7 @@ function TaskCard({
             ) : (
               <h3 className="font-medium">{task.title}</h3>
             )}
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-foreground">
               {isEditing ? (
                 <div onClick={stopPropagation} className="mt-4">
                   <Label className="block font-medium mb-2 text-foreground">Responsible:</Label>
