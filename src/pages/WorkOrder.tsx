@@ -8,6 +8,7 @@ import { NotesCard } from "@/components/quotes/NotesCard";
 import { quotationData } from "@/components/quotes/QuoteData";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
+import { PrintStyles } from "@/components/layout/PrintStyles";
 
 export default function WorkOrder() {
   const { id } = useParams();
@@ -103,16 +104,7 @@ export default function WorkOrder() {
         </div>
       </div>
       
-      <style jsx global>{`
-        @media print {
-          body {
-            background-color: white;
-          }
-          .print\\:hidden {
-            display: none !important;
-          }
-        }
-      `}</style>
+      <PrintStyles />
     </div>
   );
 }
