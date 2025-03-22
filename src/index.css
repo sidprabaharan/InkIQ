@@ -102,10 +102,10 @@ input[type="time"] {
 }
 
 input[type="time"]::-webkit-calendar-picker-indicator {
-  @apply opacity-100 cursor-pointer;
-  filter: invert(0.5);
-  width: 16px;
-  height: 16px;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
 }
 
 /* Updated time input styling for the button wrapper approach */

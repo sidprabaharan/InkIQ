@@ -539,25 +539,23 @@ function TaskCard({
                     </PopoverContent>
                   </Popover>
                   
-                  <div className="relative w-full md:w-[140px]">
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "justify-start text-left font-normal bg-white border-gray-300 w-full h-10",
-                      )}
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "justify-start text-left font-normal bg-white border-gray-300 w-full md:w-[140px] h-10",
+                    )}
+                    onClick={stopPropagation}
+                    type="button"
+                  >
+                    <Clock className="mr-2 h-4 w-4" />
+                    <Input
+                      type="time"
+                      value={format(new Date(editedTask.dueDate), "HH:mm")}
+                      onChange={handleTimeChange}
+                      className="bg-transparent border-none p-0 m-0 focus:ring-0 w-full"
                       onClick={stopPropagation}
-                      type="button"
-                    >
-                      <Clock className="mr-2 h-4 w-4" />
-                      <Input
-                        type="time"
-                        value={format(new Date(editedTask.dueDate), "HH:mm")}
-                        onChange={handleTimeChange}
-                        className="bg-transparent border-none p-0 m-0 focus:ring-0 w-full"
-                        onClick={stopPropagation}
-                      />
-                    </Button>
-                  </div>
+                    />
+                  </Button>
                 </div>
               </div>
             </div>
