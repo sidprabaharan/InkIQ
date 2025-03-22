@@ -45,8 +45,8 @@ export function BoxLabelDialog({
             <DialogTitle>Box Label</DialogTitle>
           </DialogHeader>
           
-          {/* Preview of the label */}
-          <ScrollArea className="h-[400px] rounded-md border p-4">
+          {/* Preview of the label - increased height from 400px to 500px */}
+          <ScrollArea className="h-[500px] rounded-md border p-4">
             <div id="boxLabel" className="w-full" style={{ width: "4in", height: "6in", margin: "0 auto" }}>
               <BoxLabel
                 customerNumber={customerNumber}
