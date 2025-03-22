@@ -39,7 +39,7 @@ type TaskProps = {
   title: string;
   dueDate: string;
   status: TaskStatus;
-  customer: string;
+  responsible: string;
   priority: TaskPriority;
   notes?: string;
   assignedDate?: string;
@@ -55,7 +55,7 @@ export default function Tasks() {
       dueDate: '2023-09-15', 
       assignedDate: '2023-09-10',
       status: 'pending', 
-      customer: 'ABC Corporation', 
+      responsible: 'ABC Corporation',
       priority: 'high',
       notes: 'Need to discuss pricing and timeline for the new project.' 
     },
@@ -65,7 +65,7 @@ export default function Tasks() {
       dueDate: '2023-09-18', 
       assignedDate: '2023-09-12',
       status: 'pending', 
-      customer: 'XYZ Inc', 
+      responsible: 'XYZ Inc',
       priority: 'medium',
       notes: 'Include the additional services they requested in the meeting.' 
     },
@@ -75,7 +75,7 @@ export default function Tasks() {
       dueDate: '2023-09-20', 
       assignedDate: '2023-09-05',
       status: 'pending', 
-      customer: '123 Industries', 
+      responsible: '123 Industries',
       priority: 'low',
       notes: 'Verify their availability for the installation date.' 
     },
@@ -85,7 +85,7 @@ export default function Tasks() {
       dueDate: '2023-09-10', 
       assignedDate: '2023-08-25',
       status: 'completed', 
-      customer: 'Smith Design', 
+      responsible: 'Smith Design',
       priority: 'high',
       notes: 'Invoice #12345 has been sent.' 
     },
@@ -95,7 +95,7 @@ export default function Tasks() {
       dueDate: '2023-09-12', 
       assignedDate: '2023-09-01',
       status: 'in-progress', 
-      customer: 'Johnson Printing', 
+      responsible: 'Johnson Printing',
       priority: 'medium',
       notes: 'Check inventory before placing the order.' 
     },
@@ -106,7 +106,7 @@ export default function Tasks() {
   
   const filteredTasks = tasks.filter(task => 
     task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    task.customer.toLowerCase().includes(searchQuery.toLowerCase())
+    task.responsible.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const updateTaskStatus = (taskId: string, newStatus: TaskStatus) => {
@@ -337,13 +337,13 @@ function TaskCard({
             <p className="text-sm text-gray-500">
               {isEditing ? (
                 <Input 
-                  value={editedTask.customer}
-                  onChange={(e) => setEditedTask({...editedTask, customer: e.target.value})}
+                  value={editedTask.responsible}
+                  onChange={(e) => setEditedTask({...editedTask, responsible: e.target.value})}
                   onClick={stopPropagation}
                   className="text-sm"
                 />
               ) : (
-                `Responsible: ${task.customer}`
+                `Responsible: ${task.responsible}`
               )}
             </p>
           </div>
