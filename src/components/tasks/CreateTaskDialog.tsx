@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Calendar as CalendarIcon, Clock, Upload, X } from "lucide-react";
 import { format } from "date-fns";
@@ -34,12 +33,14 @@ import { TaskPriority, TaskStatus } from "@/types/task";
 
 interface CreateTaskDialogProps {
   onCreateTask: (task: any) => void;
+  initialOrderNumber?: string;
+  trigger?: React.ReactNode;
 }
 
-export function CreateTaskDialog({ onCreateTask }: CreateTaskDialogProps) {
+export function CreateTaskDialog({ onCreateTask, initialOrderNumber, trigger }: CreateTaskDialogProps) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
-  const [orderNumber, setOrderNumber] = useState('');
+  const [orderNumber, setOrderNumber] = useState(initialOrderNumber || '');
   const [responsible, setResponsible] = useState('');
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [status, setStatus] = useState<TaskStatus>('pending');
@@ -50,7 +51,6 @@ export function CreateTaskDialog({ onCreateTask }: CreateTaskDialogProps) {
   const handleDateSelect = (newDate: Date | undefined) => {
     if (!newDate) return;
     
-    // Preserve the current time when changing the date
     if (date) {
       newDate.setHours(date.getHours());
       newDate.setMinutes(date.getMinutes());
@@ -63,7 +63,6 @@ export function CreateTaskDialog({ onCreateTask }: CreateTaskDialogProps) {
     if (!date) return;
     const newDate = new Date(date);
     
-    // Handle AM/PM conversion
     const isPM = newDate.getHours() >= 12;
     const adjustedHour = isPM && hour < 12 ? hour + 12 : (!isPM && hour === 12 ? 0 : hour);
     
@@ -85,10 +84,8 @@ export function CreateTaskDialog({ onCreateTask }: CreateTaskDialogProps) {
     const isCurrentlyPm = hours >= 12;
     
     if (isPm && !isCurrentlyPm) {
-      // Converting AM to PM
       hours += 12;
     } else if (!isPm && isCurrentlyPm) {
-      // Converting PM to AM
       hours -= 12;
     }
     
@@ -138,7 +135,7 @@ export function CreateTaskDialog({ onCreateTask }: CreateTaskDialogProps) {
 
   const resetForm = () => {
     setTitle('');
-    setOrderNumber('');
+    setOrderNumber(initialOrderNumber || '');
     setResponsible('');
     setPriority('medium');
     setStatus('pending');
@@ -150,10 +147,12 @@ export function CreateTaskDialog({ onCreateTask }: CreateTaskDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2">
-          <Upload className="h-4 w-4" />
-          Create Task
-        </Button>
+        {trigger || (
+          <Button className="gap-2">
+            <Upload className="h-4 w-4" />
+            Create Task
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>

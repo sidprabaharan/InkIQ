@@ -37,7 +37,7 @@ export function OrderTasksDialog({ open, onOpenChange, quoteId }: OrderTasksDial
       priority: "high",
       notes: "Check the dimensions and colors before approving",
       orderNumber: quoteId,
-      orderId: quoteId
+      orderId: quoteId // Now valid since we added it to TaskProps
     },
     {
       id: `${quoteId}-task2`,
@@ -47,7 +47,7 @@ export function OrderTasksDialog({ open, onOpenChange, quoteId }: OrderTasksDial
       responsible: "Jennifer Specialist",
       priority: "medium",
       orderNumber: quoteId,
-      orderId: quoteId
+      orderId: quoteId // Now valid since we added it to TaskProps
     },
   ]);
   const { toast } = useToast();
