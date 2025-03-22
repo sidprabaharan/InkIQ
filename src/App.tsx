@@ -12,6 +12,7 @@ import QuoteDetail from "@/pages/QuoteDetail";
 import WorkOrder from "@/pages/WorkOrder";
 import Invoices from "@/pages/Invoices";
 import Customers from "@/pages/Customers";
+import Tasks from "@/pages/Tasks";
 import NotFound from "@/pages/NotFound";
 import { CustomersProvider } from "./context/CustomersContext";
 
@@ -33,6 +34,7 @@ function App() {
               <Route path="/work-orders/:id" element={<WorkOrder />} />
               <Route path="/invoices" element={<AppLayout><Invoices /></AppLayout>} />
               <Route path="/customers" element={<AppLayout><Customers /></AppLayout>} />
+              <Route path="/tasks" element={<AppLayout><Tasks /></AppLayout>} />
               <Route path="*" element={<AppLayout><NotFound /></AppLayout>} />
             </Routes>
           </CustomersProvider>

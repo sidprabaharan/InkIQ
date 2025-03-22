@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import {
   BarChart2,
@@ -18,6 +17,7 @@ import {
   Store,
   User,
   Users,
+  ClipboardList,
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -66,6 +66,11 @@ export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
       path: '/customers',
     },
     {
+      name: 'Tasks',
+      icon: ClipboardList,
+      path: '/tasks',
+    },
+    {
       name: 'Products',
       icon: ShoppingBag,
       path: '/products',
@@ -79,16 +84,6 @@ export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
       name: 'Messages',
       icon: MessageSquare,
       path: '/messages',
-    },
-    {
-      name: 'Tasks',
-      icon: FileText,
-      path: '/tasks',
-    },
-    {
-      name: 'Payments',
-      icon: CreditCard,
-      path: '/payments',
     },
     {
       name: 'Expenses',
