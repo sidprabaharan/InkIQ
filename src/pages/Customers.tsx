@@ -1,11 +1,10 @@
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { AddContactDialog } from "@/components/customers/AddContactDialog";
-import { ContactsList } from "@/components/customers/ContactsList";
-import { EditAddressDialog } from "@/components/customers/EditAddressDialog";
-import { EditCompanyDialog } from "@/components/customers/EditCompanyDialog";
-import { EditTaxInfoDialog } from "@/components/customers/EditTaxInfoDialog";
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
   Search, Plus, ArrowLeft, Mail, Phone, FileText, Calendar, MessageSquare, 
   File, Image, Folder, Code, PenTool, ShoppingCart, FileCheck, UserPlus,
@@ -13,289 +12,951 @@ import {
 } from "lucide-react";
 import { CustomerDialog } from "@/components/quotes/CustomerDialog";
 import { useCustomers } from "@/context/CustomersContext";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Link } from "react-router-dom";
+import { AddContactDialog, ContactFormValues } from "@/components/customers/AddContactDialog";
+import { ContactsList } from "@/components/customers/ContactsList";
+import { Contact } from "@/types/customer";
+import { EditContactDialog } from "@/components/customers/EditContactDialog";
+import { EditCompanyDialog, CompanyFormValues } from "@/components/customers/EditCompanyDialog";
+import { EditAddressDialog, AddressFormValues } from "@/components/customers/EditAddressDialog";
+import { EditTaxInfoDialog, TaxInfoFormValues } from "@/components/customers/EditTaxInfoDialog";
+import { toast } from "sonner";
 
 export default function Customers() {
-  const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState("");
-  const [activeEditDialog, setActiveEditDialog] = useState<"company" | "address" | "tax" | null>(null);
-  const [addContactDialogOpen, setAddContactDialogOpen] = useState(false);
-  const navigate = useNavigate();
-  const { customers, selectCustomer, selectedCustomer, addCustomer, getCustomerById } = useCustomers();
+  const [openDialog, setOpenDialog] = useState(false);
+  const [openContactDialog, setOpenContactDialog] = useState(false);
+  const { customers, addContactToCustomer, updateCustomer, updateCustomerContact } = useCustomers();
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  
+  // Edit dialog states
+  const [editContactDialog, setEditContactDialog] = useState(false);
+  const [editCompanyDialog, setEditCompanyDialog] = useState(false);
+  const [editBillingAddressDialog, setEditBillingAddressDialog] = useState(false);
+  const [editShippingAddressDialog, setEditShippingAddressDialog] = useState(false);
+  const [editTaxInfoDialog, setEditTaxInfoDialog] = useState(false);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
 
-  useEffect(() => {
-    // This effect will run whenever the 'customers' array changes.
-    // If there are customers available and no customer is currently selected,
-    // it will select the first customer in the list.
-    if (customers.length > 0 && !selectedCustomer) {
-      selectCustomer(customers[0].id);
+  const selectedCustomer = selectedCustomerId 
+    ? customers.find(c => c.id === selectedCustomerId) 
+    : null;
+
+  const filteredCustomers = customers.filter(customer => 
+    customer.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const getInitials = (companyName: string) => {
+    return companyName.charAt(0).toUpperCase();
+  };
+
+  const getIndustryName = (industryId: string) => {
+    const industry = industries.find(i => i.id === industryId);
+    return industry ? industry.name : industryId;
+  };
+
+  const handleAddContact = (data: ContactFormValues) => {
+    if (selectedCustomerId) {
+      // Ensure all required fields are present
+      // The Contact type requires email, firstName, lastName, and phoneNumber to be required
+      const newContact: Omit<Contact, "id"> = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        jobTitle: data.jobTitle,
+        department: data.department,
+        contactOwner: data.contactOwner,
+      };
+      
+      addContactToCustomer(selectedCustomerId, newContact);
+      toast.success("Contact added successfully");
     }
-  }, [customers, selectCustomer, selectedCustomer]);
-
-  const handleOpenChange = () => {
-    setOpen(!open);
   };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
+  const handleEditContact = (contactId: string, data: ContactFormValues) => {
+    if (selectedCustomerId) {
+      updateCustomerContact(selectedCustomerId, contactId, data);
+      toast.success("Contact updated successfully");
+    }
   };
 
-  const filteredCustomers = customers.filter(customer => {
-    const searchTerm = search.toLowerCase();
-    return (
-      customer.companyName.toLowerCase().includes(searchTerm) ||
-      customer.firstName.toLowerCase().includes(searchTerm) ||
-      customer.lastName.toLowerCase().includes(searchTerm) ||
-      customer.email.toLowerCase().includes(searchTerm)
-    );
-  });
-
-  const handleCustomerSelect = (customerId: string) => {
-    selectCustomer(customerId);
+  const handleEditCompany = (data: CompanyFormValues) => {
+    if (selectedCustomerId) {
+      updateCustomer(selectedCustomerId, data);
+      toast.success("Company information updated successfully");
+    }
   };
 
-  const handleAddCustomer = (customerData: any) => {
-    const newCustomer = addCustomer(customerData);
-    selectCustomer(newCustomer.id); // Automatically select the new customer
+  // Update these handler functions to ensure they pass non-optional values
+  const handleEditBillingAddress = (data: AddressFormValues) => {
+    if (selectedCustomerId) {
+      // Ensure all required fields are present
+      const billingAddress = {
+        address1: data.address1,
+        address2: data.address2 || "",
+        city: data.city,
+        stateProvince: data.stateProvince || "",
+        zipCode: data.zipCode,
+        country: data.country,
+      };
+      
+      updateCustomer(selectedCustomerId, { billingAddress });
+      toast.success("Billing address updated successfully");
+    }
   };
 
-  const renderCustomerDetails = () => {
-    if (!selectedCustomer) return null;
+  const handleEditShippingAddress = (data: AddressFormValues) => {
+    if (selectedCustomerId) {
+      // Ensure all required fields are present
+      const shippingAddress = {
+        address1: data.address1,
+        address2: data.address2 || "",
+        city: data.city,
+        stateProvince: data.stateProvince || "",
+        zipCode: data.zipCode,
+        country: data.country,
+      };
+      
+      updateCustomer(selectedCustomerId, { shippingAddress });
+      toast.success("Shipping address updated successfully");
+    }
+  };
 
-    return (
-      <div className="flex flex-col p-4 space-y-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-xl">Company Information</CardTitle>
-              <Button variant="outline" size="sm" onClick={() => setActiveEditDialog("company")}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
+  const handleEditTaxInfo = (data: TaxInfoFormValues) => {
+    if (selectedCustomerId) {
+      // Ensure all required fields are present
+      const taxInfo = {
+        taxId: data.taxId || "",
+        taxRate: data.taxRate || "",
+        taxExemptionNumber: data.taxExemptionNumber || "",
+      };
+      
+      updateCustomer(selectedCustomerId, { taxInfo });
+      toast.success("Tax information updated successfully");
+    }
+  };
+
+  const handleEditPrimaryContact = () => {
+    if (selectedCustomer) {
+      // Create a partial update for the primary contact fields
+      const data = {
+        firstName: selectedCustomer.firstName,
+        lastName: selectedCustomer.lastName,
+        email: selectedCustomer.email,
+        phoneNumber: selectedCustomer.phoneNumber
+      };
+      
+      // We'll reuse the company dialog since it contains these fields
+      setEditCompanyDialog(true);
+    }
+  };
+
+  const customerOrders = [
+    {
+      id: "3032",
+      date: "2023-08-15",
+      total: "$1,245.00",
+      status: "Completed",
+      items: "T-shirts (50), Hoodies (25)"
+    },
+    {
+      id: "2987",
+      date: "2023-06-22",
+      total: "$780.50",
+      status: "Completed",
+      items: "Polos (30), Caps (40)"
+    },
+    {
+      id: "2756",
+      date: "2023-04-10",
+      total: "$2,100.00",
+      status: "Completed",
+      items: "Custom Jackets (20)"
+    }
+  ];
+
+  const customerQuotes = [
+    {
+      id: "Q-5893",
+      date: "2023-09-05",
+      total: "$2,450.00",
+      status: "Pending Approval",
+      items: "Custom T-shirts (100), Embroidered Caps (50)"
+    },
+    {
+      id: "Q-5742",
+      date: "2023-08-28",
+      total: "$980.00",
+      status: "Draft",
+      items: "Polo Shirts (45)"
+    },
+    {
+      id: "Q-5621",
+      date: "2023-08-10",
+      total: "$3,200.00",
+      status: "Approved",
+      items: "Hoodies (80), Tote Bags (100)"
+    }
+  ];
+
+  const artworkFiles = {
+    mockups: [
+      { name: "Tshirt-Front-Design.png", date: "2023-08-01", size: "2.4 MB" },
+      { name: "Hoodie-Back-Logo.png", date: "2023-06-15", size: "1.8 MB" }
+    ],
+    logoFiles: [
+      { name: "Company-Logo-Vector.ai", date: "2023-01-10", size: "4.2 MB" },
+      { name: "Logo-White-Version.png", date: "2023-01-10", size: "1.1 MB" }
+    ],
+    colorSeparations: [
+      { name: "Logo-4Color-Sep.pdf", date: "2023-02-20", size: "5.6 MB" }
+    ],
+    digitizedLogos: [
+      { name: "Logo-Digitized-3Inches.dst", date: "2023-03-05", size: "156 KB" },
+      { name: "Logo-Digitized-5Inches.dst", date: "2023-03-05", size: "220 KB" }
+    ],
+    dtfGangSheets: [
+      { name: "Small-Logos-Gang-Sheet.pdf", date: "2023-07-12", size: "8.2 MB" }
+    ]
+  };
+
+  return (
+    <div className="p-6 bg-gray-50 min-h-full">
+      {!selectedCustomer ? (
+        <>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-semibold">Customers</h1>
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                <Input 
+                  placeholder="Search" 
+                  className="pl-9 w-[250px]"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <Button variant="outline">Delete</Button>
+              <Button variant="outline">Export</Button>
+              <Button 
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => setOpenDialog(true)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Create New
               </Button>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p className="text-sm"><span className="font-medium">Company Name:</span> {selectedCustomer.companyName}</p>
-              <p className="text-sm"><span className="font-medium">Industry:</span> {selectedCustomer.industry}</p>
-              <p className="text-sm"><span className="font-medium">Invoice Owner:</span> {selectedCustomer.invoiceOwner}</p>
+          </div>
+
+          <div className="bg-white rounded-md border">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <input type="checkbox" className="h-4 w-4 rounded" />
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Company
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      City
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Country
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      No. of Orders Placed
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Sales volume
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Industry
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredCustomers.map((customer) => (
+                    <tr 
+                      key={customer.id} 
+                      className="hover:bg-gray-50 cursor-pointer"
+                      onClick={() => setSelectedCustomerId(customer.id)}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <input type="checkbox" className="h-4 w-4 rounded" onClick={(e) => e.stopPropagation()} />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {customer.companyName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {customer.billingAddress.city}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {customer.billingAddress.country}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        0
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        $0
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {getIndustryName(customer.industry)}
+                      </td>
+                    </tr>
+                  ))}
+                  {filteredCustomers.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                        No customers found. Add a new customer to get started.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-xl">Contact</CardTitle>
-              <Button variant="outline" size="sm" onClick={() => setActiveEditDialog("company")}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex items-center text-sm">
-                <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span>{selectedCustomer.email}</span>
+            {filteredCustomers.length > 0 && (
+              <div className="flex items-center justify-between px-6 py-4 border-t">
+                <div>
+                  Showing {filteredCustomers.length} of {customers.length} results
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" disabled={true}>
+                    Previous
+                  </Button>
+                  <Button variant="outline" size="sm" className="bg-blue-50">
+                    1
+                  </Button>
+                  <Button variant="outline" size="sm" disabled={true}>
+                    Next
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center text-sm">
-                <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span>{selectedCustomer.phoneNumber}</span>
-              </div>
-              <div className="flex items-center gap-2 mt-4">
-                <Button variant="outline" size="sm" className="flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  Message
-                </Button>
-                <Link to={`/customers/${selectedCustomer.id}/tasks`}>
+            )}
+          </div>
+        </>
+      ) : (
+        <div className="flex gap-6">
+          <div className="w-1/3">
+            <Button 
+              variant="ghost" 
+              className="mb-4 text-gray-500"
+              onClick={() => setSelectedCustomerId(null)}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Customers
+            </Button>
+            
+            <Card>
+              <CardContent className="p-6 flex flex-col items-center text-center">
+                <div className="flex justify-end w-full">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 w-8 p-0"
+                    onClick={() => setEditCompanyDialog(true)}
+                  >
+                    <Edit className="h-4 w-4" />
+                    <span className="sr-only">Edit company</span>
+                  </Button>
+                </div>
+                
+                <Avatar className="h-24 w-24 my-4 bg-blue-100 text-blue-600">
+                  <AvatarFallback className="text-2xl">
+                    {getInitials(selectedCustomer.companyName)}
+                  </AvatarFallback>
+                </Avatar>
+                
+                <h2 className="text-2xl font-bold mt-2">{selectedCustomer.companyName}</h2>
+                <p className="text-gray-500 mb-6">{getIndustryName(selectedCustomer.industry)}</p>
+                
+                <div className="flex flex-wrap justify-center gap-4 mb-6">
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    Email
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <Phone className="h-4 w-4" />
+                    Call
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Notes
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Meeting
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4" />
+                    Message
+                  </Button>
                   <Button variant="outline" size="sm" className="flex items-center gap-2">
                     <ClipboardList className="h-4 w-4" />
                     Task
                   </Button>
-                </Link>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-xl">Billing Address</CardTitle>
-              <Button variant="outline" size="sm" onClick={() => setActiveEditDialog("address")}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p className="text-sm"><span className="font-medium">Address 1:</span> {selectedCustomer.billingAddress.address1}</p>
-              {selectedCustomer.billingAddress.address2 && <p className="text-sm"><span className="font-medium">Address 2:</span> {selectedCustomer.billingAddress.address2}</p>}
-              <p className="text-sm"><span className="font-medium">City:</span> {selectedCustomer.billingAddress.city}</p>
-              <p className="text-sm"><span className="font-medium">State/Province:</span> {selectedCustomer.billingAddress.stateProvince}</p>
-              <p className="text-sm"><span className="font-medium">Zip Code:</span> {selectedCustomer.billingAddress.zipCode}</p>
-              <p className="text-sm"><span className="font-medium">Country:</span> {selectedCustomer.billingAddress.country}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-xl">Shipping Address</CardTitle>
-              <Button variant="outline" size="sm" onClick={() => setActiveEditDialog("address")}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p className="text-sm"><span className="font-medium">Address 1:</span> {selectedCustomer.shippingAddress.address1}</p>
-              {selectedCustomer.shippingAddress.address2 && <p className="text-sm"><span className="font-medium">Address 2:</span> {selectedCustomer.shippingAddress.address2}</p>}
-              <p className="text-sm"><span className="font-medium">City:</span> {selectedCustomer.shippingAddress.city}</p>
-              <p className="text-sm"><span className="font-medium">State/Province:</span> {selectedCustomer.shippingAddress.stateProvince}</p>
-              <p className="text-sm"><span className="font-medium">Zip Code:</span> {selectedCustomer.shippingAddress.zipCode}</p>
-              <p className="text-sm"><span className="font-medium">Country:</span> {selectedCustomer.shippingAddress.country}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-xl">Tax Information</CardTitle>
-              <Button variant="outline" size="sm" onClick={() => setActiveEditDialog("tax")}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p className="text-sm"><span className="font-medium">Tax ID:</span> {selectedCustomer.taxInfo.taxId}</p>
-              <p className="text-sm"><span className="font-medium">Tax Rate:</span> {selectedCustomer.taxInfo.taxRate}</p>
-              <p className="text-sm"><span className="font-medium">Tax Exemption Number:</span> {selectedCustomer.taxInfo.taxExemptionNumber}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex items-center justify-between">
-            <CardTitle>Contacts</CardTitle>
-            <Button variant="outline" size="sm" onClick={() => setAddContactDialogOpen(true)}>
-              <UserPlus className="h-4 w-4 mr-2" />
-              Add Contact
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <ContactsList 
-              contacts={selectedCustomer.contacts} 
-              primaryContact={{
-                firstName: selectedCustomer.firstName,
-                lastName: selectedCustomer.lastName,
-                email: selectedCustomer.email,
-                phoneNumber: selectedCustomer.phoneNumber
-              }}
-            />
-          </CardContent>
-        </Card>
-      </div>
-    );
-  };
-
-  return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center">
-          <Button variant="ghost" onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          <h1 className="text-2xl font-bold">Customers</h1>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="w-2/3">
+            <h1 className="text-2xl font-semibold mb-6">Customer Detail</h1>
+            
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="mb-4">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="quotes">Quotes</TabsTrigger>
+                <TabsTrigger value="orders">Orders</TabsTrigger>
+                <TabsTrigger value="artwork">Artwork & Files</TabsTrigger>
+                <TabsTrigger value="activities">Activities</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="overview" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Data Highlights</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-3 gap-6">
+                      <div className="bg-blue-50 p-4 rounded-lg">
+                        <p className="text-gray-500 mb-1">Number of Orders</p>
+                        <p className="text-2xl font-bold">3</p>
+                      </div>
+                      <div className="bg-green-50 p-4 rounded-lg">
+                        <p className="text-gray-500 mb-1">Total Sales Volume</p>
+                        <p className="text-2xl font-bold">$4,125.50</p>
+                      </div>
+                      <div className="bg-purple-50 p-4 rounded-lg">
+                        <p className="text-gray-500 mb-1">Current Quotes Volume</p>
+                        <p className="text-2xl font-bold">$6,630.00</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle>Contact Information</CardTitle>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-blue-600"
+                      onClick={() => setOpenContactDialog(true)}
+                    >
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Add Contact
+                    </Button>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <ContactsList 
+                      contacts={selectedCustomer.contacts || []}
+                      primaryContact={{
+                        firstName: selectedCustomer.firstName,
+                        lastName: selectedCustomer.lastName,
+                        email: selectedCustomer.email,
+                        phoneNumber: selectedCustomer.phoneNumber
+                      }}
+                      onEditContact={(contact) => {
+                        setSelectedContact(contact);
+                        setEditContactDialog(true);
+                      }}
+                      onEditPrimaryContact={handleEditPrimaryContact}
+                    />
+                  </CardContent>
+                </Card>
+                
+                <div className="grid grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <CardTitle>Billing Address</CardTitle>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0"
+                        onClick={() => setEditBillingAddressDialog(true)}
+                      >
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Edit billing address</span>
+                      </Button>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="space-y-2">
+                        <p>{selectedCustomer.billingAddress.address1}</p>
+                        {selectedCustomer.billingAddress.address2 && (
+                          <p>{selectedCustomer.billingAddress.address2}</p>
+                        )}
+                        <p>
+                          {selectedCustomer.billingAddress.city}, 
+                          {selectedCustomer.billingAddress.stateProvince && ` ${selectedCustomer.billingAddress.stateProvince},`} 
+                          {selectedCustomer.billingAddress.zipCode}
+                        </p>
+                        <p>{selectedCustomer.billingAddress.country}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <CardTitle>Shipping Address</CardTitle>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0"
+                        onClick={() => setEditShippingAddressDialog(true)}
+                      >
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Edit shipping address</span>
+                      </Button>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="space-y-2">
+                        <p>{selectedCustomer.shippingAddress.address1}</p>
+                        {selectedCustomer.shippingAddress.address2 && (
+                          <p>{selectedCustomer.shippingAddress.address2}</p>
+                        )}
+                        <p>
+                          {selectedCustomer.shippingAddress.city}, 
+                          {selectedCustomer.shippingAddress.stateProvince && ` ${selectedCustomer.shippingAddress.stateProvince},`} 
+                          {selectedCustomer.shippingAddress.zipCode}
+                        </p>
+                        <p>{selectedCustomer.shippingAddress.country}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle>Tax Information</CardTitle>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 w-8 p-0"
+                      onClick={() => setEditTaxInfoDialog(true)}
+                    >
+                      <Edit className="h-4 w-4" />
+                      <span className="sr-only">Edit tax information</span>
+                    </Button>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-3 gap-6">
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Tax ID</p>
+                        <p>{selectedCustomer.taxInfo.taxId || "N/A"}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Tax Rate</p>
+                        <p>{selectedCustomer.taxInfo.taxRate ? `${selectedCustomer.taxInfo.taxRate}%` : "N/A"}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Tax Exemption Number</p>
+                        <p>{selectedCustomer.taxInfo.taxExemptionNumber || "N/A"}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="quotes">
+                <Card>
+                  <CardHeader className="pb-0">
+                    <div className="flex justify-between items-center">
+                      <CardTitle>Customer Quotes</CardTitle>
+                      <Button variant="outline" size="sm" className="text-blue-600">
+                        <Plus className="h-4 w-4 mr-2" />
+                        New Quote
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[100px]">Quote ID</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Items</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Amount</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {customerQuotes.map((quote) => (
+                          <TableRow key={quote.id} className="cursor-pointer hover:bg-gray-50">
+                            <TableCell className="font-medium">#{quote.id}</TableCell>
+                            <TableCell>{quote.date}</TableCell>
+                            <TableCell>{quote.items}</TableCell>
+                            <TableCell>
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                quote.status === 'Approved' 
+                                  ? 'bg-green-100 text-green-800'
+                                  : quote.status === 'Draft'
+                                    ? 'bg-gray-100 text-gray-800'
+                                    : 'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {quote.status}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-right">{quote.total}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                    
+                    <div className="flex justify-center mt-6">
+                      <Button variant="outline" className="text-blue-600">
+                        <FileCheck className="h-4 w-4 mr-2" />
+                        View All Quotes
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="orders">
+                <Card>
+                  <CardHeader className="pb-0">
+                    <div className="flex justify-between items-center">
+                      <CardTitle>Customer Orders</CardTitle>
+                      <Button variant="outline" size="sm" className="text-blue-600">
+                        <Plus className="h-4 w-4 mr-2" />
+                        New Order
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[100px]">Order ID</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Items</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Amount</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {customerOrders.map((order) => (
+                          <TableRow key={order.id} className="cursor-pointer hover:bg-gray-50">
+                            <TableCell className="font-medium">#{order.id}</TableCell>
+                            <TableCell>{order.date}</TableCell>
+                            <TableCell>{order.items}</TableCell>
+                            <TableCell>
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                {order.status}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-right">{order.total}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                    
+                    <div className="flex justify-center mt-6">
+                      <Button variant="outline" className="text-blue-600">
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        View All Orders
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="artwork">
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <Image className="h-5 w-5 mr-2" />
+                        Mockups
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>File Name</TableHead>
+                            <TableHead>Date Added</TableHead>
+                            <TableHead>Size</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {artworkFiles.mockups.map((file, index) => (
+                            <TableRow key={index}>
+                              <TableCell className="font-medium flex items-center">
+                                <Image className="h-4 w-4 mr-2 text-blue-500" />
+                                {file.name}
+                              </TableCell>
+                              <TableCell>{file.date}</TableCell>
+                              <TableCell>{file.size}</TableCell>
+                              <TableCell className="text-right">
+                                <Button variant="ghost" size="sm">
+                                  View
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  Download
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <File className="h-5 w-5 mr-2" />
+                        Logo Files
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>File Name</TableHead>
+                            <TableHead>Date Added</TableHead>
+                            <TableHead>Size</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {artworkFiles.logoFiles.map((file, index) => (
+                            <TableRow key={index}>
+                              <TableCell className="font-medium flex items-center">
+                                <File className="h-4 w-4 mr-2 text-blue-500" />
+                                {file.name}
+                              </TableCell>
+                              <TableCell>{file.date}</TableCell>
+                              <TableCell>{file.size}</TableCell>
+                              <TableCell className="text-right">
+                                <Button variant="ghost" size="sm">
+                                  View
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  Download
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <PenTool className="h-5 w-5 mr-2" />
+                        Colour Separations
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>File Name</TableHead>
+                            <TableHead>Date Added</TableHead>
+                            <TableHead>Size</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {artworkFiles.colorSeparations.map((file, index) => (
+                            <TableRow key={index}>
+                              <TableCell className="font-medium flex items-center">
+                                <FileText className="h-4 w-4 mr-2 text-blue-500" />
+                                {file.name}
+                              </TableCell>
+                              <TableCell>{file.date}</TableCell>
+                              <TableCell>{file.size}</TableCell>
+                              <TableCell className="text-right">
+                                <Button variant="ghost" size="sm">
+                                  View
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  Download
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <Code className="h-5 w-5 mr-2" />
+                        Digitized Logos
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>File Name</TableHead>
+                            <TableHead>Date Added</TableHead>
+                            <TableHead>Size</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {artworkFiles.digitizedLogos.map((file, index) => (
+                            <TableRow key={index}>
+                              <TableCell className="font-medium flex items-center">
+                                <Code className="h-4 w-4 mr-2 text-blue-500" />
+                                {file.name}
+                              </TableCell>
+                              <TableCell>{file.date}</TableCell>
+                              <TableCell>{file.size}</TableCell>
+                              <TableCell className="text-right">
+                                <Button variant="ghost" size="sm">
+                                  View
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  Download
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <Folder className="h-5 w-5 mr-2" />
+                        DTF Gang Sheets
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>File Name</TableHead>
+                            <TableHead>Date Added</TableHead>
+                            <TableHead>Size</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {artworkFiles.dtfGangSheets.map((file, index) => (
+                            <TableRow key={index}>
+                              <TableCell className="font-medium flex items-center">
+                                <Folder className="h-4 w-4 mr-2 text-blue-500" />
+                                {file.name}
+                              </TableCell>
+                              <TableCell>{file.date}</TableCell>
+                              <TableCell>{file.size}</TableCell>
+                              <TableCell className="text-right">
+                                <Button variant="ghost" size="sm">
+                                  View
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  Download
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="activities">
+                <Card>
+                  <CardContent className="p-6 min-h-[200px] flex items-center justify-center">
+                    <div className="text-center text-gray-500">
+                      <Calendar className="h-16 w-16 mx-auto mb-4 opacity-40" />
+                      <p className="text-lg">No activity data to show yet.</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Input
-            type="search"
-            placeholder="Search customers..."
-            value={search}
-            onChange={handleSearchChange}
-          />
-          <Button onClick={handleOpenChange}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Customer
-          </Button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="md:col-span-1">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Company</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredCustomers.map((customer) => (
-                <TableRow
-                  key={customer.id}
-                  onClick={() => handleCustomerSelect(customer.id)}
-                  className="cursor-pointer hover:bg-gray-100"
-                >
-                  <TableCell>{customer.companyName}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-        <div className="md:col-span-3">
-          {renderCustomerDetails()}
-        </div>
-      </div>
+      )}
 
       <CustomerDialog 
-        open={open} 
-        onOpenChange={handleOpenChange} 
+        open={openDialog}
+        onOpenChange={setOpenDialog}
       />
-      
-      {activeEditDialog === "company" && selectedCustomer && (
-        <EditCompanyDialog 
-          open={true} 
-          onOpenChange={() => setActiveEditDialog(null)}
-          customer={selectedCustomer}
-        />
-      )}
-      
-      {activeEditDialog === "address" && selectedCustomer && (
-        <EditAddressDialog
-          open={true}
-          onOpenChange={() => setActiveEditDialog(null)}
-          customer={selectedCustomer}
-        />
-      )}
 
-      {activeEditDialog === "tax" && selectedCustomer && (
-        <EditTaxInfoDialog
-          open={true}
-          onOpenChange={() => setActiveEditDialog(null)}
-          customer={selectedCustomer}
-        />
-      )}
-
-      {selectedCustomer && (
-        <AddContactDialog
-          open={addContactDialogOpen}
-          onOpenChange={setAddContactDialogOpen}
-          customerId={selectedCustomer.id}
-        />
+      {selectedCustomerId && (
+        <>
+          <AddContactDialog 
+            open={openContactDialog}
+            onOpenChange={setOpenContactDialog}
+            onAddContact={handleAddContact}
+            customerId={selectedCustomerId}
+          />
+          
+          {selectedContact && (
+            <EditContactDialog 
+              open={editContactDialog}
+              onOpenChange={setEditContactDialog}
+              onUpdateContact={handleEditContact}
+              contact={selectedContact}
+            />
+          )}
+          
+          {selectedCustomer && (
+            <>
+              <EditCompanyDialog 
+                open={editCompanyDialog}
+                onOpenChange={setEditCompanyDialog}
+                onUpdateCompany={handleEditCompany}
+                customer={selectedCustomer}
+              />
+              
+              <EditAddressDialog 
+                open={editBillingAddressDialog}
+                onOpenChange={setEditBillingAddressDialog}
+                onUpdateAddress={handleEditBillingAddress}
+                address={selectedCustomer.billingAddress}
+                title="Billing Address"
+              />
+              
+              <EditAddressDialog 
+                open={editShippingAddressDialog}
+                onOpenChange={setEditShippingAddressDialog}
+                onUpdateAddress={handleEditShippingAddress}
+                address={selectedCustomer.shippingAddress}
+                title="Shipping Address"
+              />
+              
+              <EditTaxInfoDialog 
+                open={editTaxInfoDialog}
+                onOpenChange={setEditTaxInfoDialog}
+                onUpdateTaxInfo={handleEditTaxInfo}
+                taxInfo={selectedCustomer.taxInfo}
+              />
+            </>
+          )}
+        </>
       )}
     </div>
   );
 }
+
+const industries = [
+  { id: "tech", name: "Technology" },
+  { id: "retail", name: "Retail" },
+  { id: "healthcare", name: "Healthcare" },
+  { id: "education", name: "Education" },
+  { id: "manufacturing", name: "Manufacturing" },
+  { id: "ecommerce", name: "Ecommerce" },
+];

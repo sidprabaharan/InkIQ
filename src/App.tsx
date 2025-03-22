@@ -12,12 +12,8 @@ import QuoteDetail from "@/pages/QuoteDetail";
 import WorkOrder from "@/pages/WorkOrder";
 import Invoices from "@/pages/Invoices";
 import Customers from "@/pages/Customers";
-import Tasks from "@/pages/Tasks";
-import CustomerTasks from "@/pages/CustomerTasks";
-import OrderTasks from "@/pages/OrderTasks";
 import NotFound from "@/pages/NotFound";
 import { CustomersProvider } from "./context/CustomersContext";
-import { TaskProvider } from "./context/TaskContext";
 
 import "./App.css";
 
@@ -29,21 +25,16 @@ function App() {
       <TooltipProvider>
         <BrowserRouter>
           <CustomersProvider>
-            <TaskProvider>
-              <Routes>
-                <Route path="/" element={<AppLayout><Index /></AppLayout>} />
-                <Route path="/quotes" element={<AppLayout><Quotes /></AppLayout>} />
-                <Route path="/quotes/new" element={<AppLayout><NewQuote /></AppLayout>} />
-                <Route path="/quotes/:id" element={<AppLayout><QuoteDetail /></AppLayout>} />
-                <Route path="/work-orders/:id" element={<WorkOrder />} />
-                <Route path="/invoices" element={<AppLayout><Invoices /></AppLayout>} />
-                <Route path="/customers" element={<AppLayout><Customers /></AppLayout>} />
-                <Route path="/tasks" element={<AppLayout><Tasks /></AppLayout>} />
-                <Route path="/customers/:customerId/tasks" element={<AppLayout><CustomerTasks /></AppLayout>} />
-                <Route path="/quotes/:orderId/tasks" element={<AppLayout><OrderTasks /></AppLayout>} />
-                <Route path="*" element={<AppLayout><NotFound /></AppLayout>} />
-              </Routes>
-            </TaskProvider>
+            <Routes>
+              <Route path="/" element={<AppLayout><Index /></AppLayout>} />
+              <Route path="/quotes" element={<AppLayout><Quotes /></AppLayout>} />
+              <Route path="/quotes/new" element={<AppLayout><NewQuote /></AppLayout>} />
+              <Route path="/quotes/:id" element={<AppLayout><QuoteDetail /></AppLayout>} />
+              <Route path="/work-orders/:id" element={<WorkOrder />} />
+              <Route path="/invoices" element={<AppLayout><Invoices /></AppLayout>} />
+              <Route path="/customers" element={<AppLayout><Customers /></AppLayout>} />
+              <Route path="*" element={<AppLayout><NotFound /></AppLayout>} />
+            </Routes>
           </CustomersProvider>
         </BrowserRouter>
         <Toaster />
