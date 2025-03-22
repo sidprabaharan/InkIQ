@@ -32,6 +32,7 @@ export function BoxLabelDialog({
   const customerNumber = `CUST-${quoteId}`;
   const orderNumber = `ORD-${quoteId}`;
   const workOrderUrl = `/work-orders/${quoteId}`;
+  const customerCompany = customerInfo?.billing?.company || "Customer";
 
   const handlePrint = () => {
     window.print();
@@ -54,6 +55,7 @@ export function BoxLabelDialog({
                 poNumber={poNumber}
                 orderNickname={orderNickname}
                 workOrderUrl={workOrderUrl}
+                customerCompany={customerCompany}
               />
             </div>
           </ScrollArea>
@@ -77,21 +79,28 @@ function BoxLabel({
   poNumber,
   orderNickname,
   workOrderUrl,
+  customerCompany,
 }: {
   customerNumber: string;
   orderNumber: string;
   poNumber: string;
   orderNickname: string;
   workOrderUrl: string;
+  customerCompany: string;
 }) {
   return (
     <div className="flex flex-col h-full border border-black p-4" style={{ fontFamily: "Arial, sans-serif" }}>
-      <div className="text-center border-b pb-2 mb-2">
+      <div className="text-center border-b pb-2 mb-2 print:hidden">
         <h1 className="text-xl font-bold">Box Label</h1>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 flex-grow">
-        <div className="space-y-4">
+      <div className="flex flex-col h-full">
+        <div className="space-y-4 flex-grow">
+          <div>
+            <div className="text-xs font-semibold">Customer:</div>
+            <div className="text-lg font-bold">{customerCompany}</div>
+          </div>
+          
           <div>
             <div className="text-xs font-semibold">Customer #:</div>
             <div className="text-lg font-bold">{customerNumber}</div>
@@ -122,7 +131,7 @@ function BoxLabel({
           </div>
         </div>
         
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center mt-4">
           <QRCodeSVG 
             value={window.location.origin + workOrderUrl}
             size={150}
