@@ -393,6 +393,16 @@ function TaskCard({
     setEditedTask({...editedTask, dueDate: currentDate.toISOString()});
   };
 
+  const handleTimeSelect = (time: string) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    
+    const currentDate = editedTask.dueDate ? new Date(editedTask.dueDate) : new Date();
+    currentDate.setHours(hours);
+    currentDate.setMinutes(minutes);
+    
+    setEditedTask({...editedTask, dueDate: currentDate.toISOString()});
+  };
+
   return (
     <Card 
       className={`hover:shadow-md transition-all cursor-pointer ${isExpanded ? 'scale-[1.02]' : ''}`}
@@ -555,13 +565,31 @@ function TaskCard({
                     </PopoverTrigger>
                     <PopoverContent className="p-0" align="start">
                       <div className="p-3">
-                        <Input
-                          type="time"
-                          value={format(new Date(editedTask.dueDate), "HH:mm")}
-                          onChange={handleTimeChange}
-                          className="w-full"
-                          onClick={stopPropagation}
-                        />
+                        <div className="grid gap-2">
+                          {['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'].map((time) => (
+                            <Button 
+                              key={time}
+                              variant="ghost" 
+                              className="justify-start font-normal"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleTimeSelect(time);
+                              }}
+                            >
+                              {format(new Date(`2000-01-01T${time}`), 'h:mm a')}
+                            </Button>
+                          ))}
+                          <div className="pt-2 pb-1">
+                            <label className="text-sm font-medium">Custom time:</label>
+                            <Input
+                              type="time"
+                              value={editedTask.dueDate ? format(new Date(editedTask.dueDate), "HH:mm") : ""}
+                              onChange={handleTimeChange}
+                              className="w-full mt-1"
+                              onClick={stopPropagation}
+                            />
+                          </div>
+                        </div>
                       </div>
                     </PopoverContent>
                   </Popover>
