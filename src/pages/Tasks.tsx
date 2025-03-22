@@ -4,11 +4,20 @@ import { Button } from "@/components/ui/button";
 import { 
   ListChecks, 
   Plus,
-  Search
+  Search,
+  Check,
+  ChevronDown
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "@/hooks/use-toast";
 
 export default function Tasks() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -27,6 +36,31 @@ export default function Tasks() {
     task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     task.customer.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // State for tasks (in a real app, this would be stored in a context or fetched from an API)
+  const [tasks, setTasks] = useState(mockTasks);
+
+  // Function to update task status
+  const updateTaskStatus = (taskId: string, newStatus: TaskProps['status']) => {
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, status: newStatus } : task
+    );
+    setTasks(updatedTasks);
+    toast({
+      description: "Task status updated successfully",
+    });
+  };
+
+  // Function to update task priority
+  const updateTaskPriority = (taskId: string, newPriority: TaskProps['priority']) => {
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, priority: newPriority } : task
+    );
+    setTasks(updatedTasks);
+    toast({
+      description: "Task priority updated successfully",
+    });
+  };
 
   return (
     <div className="container py-6 space-y-6">
@@ -62,7 +96,12 @@ export default function Tasks() {
         <TabsContent value="all" className="space-y-4">
           {filteredTasks.length > 0 ? (
             filteredTasks.map(task => (
-              <TaskCard key={task.id} task={task} />
+              <TaskCard 
+                key={task.id} 
+                task={task} 
+                onStatusChange={(status) => updateTaskStatus(task.id, status)}
+                onPriorityChange={(priority) => updateTaskPriority(task.id, priority)}
+              />
             ))
           ) : (
             <EmptyState query={searchQuery} />
@@ -73,7 +112,14 @@ export default function Tasks() {
           {filteredTasks.filter(t => t.status === 'pending').length > 0 ? (
             filteredTasks
               .filter(t => t.status === 'pending')
-              .map(task => <TaskCard key={task.id} task={task} />)
+              .map(task => (
+                <TaskCard 
+                  key={task.id} 
+                  task={task} 
+                  onStatusChange={(status) => updateTaskStatus(task.id, status)}
+                  onPriorityChange={(priority) => updateTaskPriority(task.id, priority)}
+                />
+              ))
           ) : (
             <EmptyState query={searchQuery} status="pending" />
           )}
@@ -83,7 +129,14 @@ export default function Tasks() {
           {filteredTasks.filter(t => t.status === 'in-progress').length > 0 ? (
             filteredTasks
               .filter(t => t.status === 'in-progress')
-              .map(task => <TaskCard key={task.id} task={task} />)
+              .map(task => (
+                <TaskCard 
+                  key={task.id} 
+                  task={task} 
+                  onStatusChange={(status) => updateTaskStatus(task.id, status)}
+                  onPriorityChange={(priority) => updateTaskPriority(task.id, priority)}
+                />
+              ))
           ) : (
             <EmptyState query={searchQuery} status="in-progress" />
           )}
@@ -93,7 +146,14 @@ export default function Tasks() {
           {filteredTasks.filter(t => t.status === 'completed').length > 0 ? (
             filteredTasks
               .filter(t => t.status === 'completed')
-              .map(task => <TaskCard key={task.id} task={task} />)
+              .map(task => (
+                <TaskCard 
+                  key={task.id} 
+                  task={task} 
+                  onStatusChange={(status) => updateTaskStatus(task.id, status)}
+                  onPriorityChange={(priority) => updateTaskPriority(task.id, priority)}
+                />
+              ))
           ) : (
             <EmptyState query={searchQuery} status="completed" />
           )}
@@ -112,7 +172,13 @@ type TaskProps = {
   priority: 'low' | 'medium' | 'high';
 };
 
-function TaskCard({ task }: { task: TaskProps }) {
+interface TaskCardProps {
+  task: TaskProps;
+  onStatusChange: (status: TaskProps['status']) => void;
+  onPriorityChange: (priority: TaskProps['priority']) => void;
+}
+
+function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
   const priorityColors = {
     low: 'bg-blue-100 text-blue-800',
     medium: 'bg-yellow-100 text-yellow-800',
@@ -131,23 +197,82 @@ function TaskCard({ task }: { task: TaskProps }) {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
+  // Format status for display
+  const formatStatus = (status: TaskProps['status']) => {
+    return status === 'in-progress' 
+      ? 'In Progress' 
+      : status.charAt(0).toUpperCase() + status.slice(1);
+  };
+
+  // Format priority for display
+  const formatPriority = (priority: TaskProps['priority']) => {
+    return priority.charAt(0).toUpperCase() + priority.slice(1);
+  };
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-4">
         <div className="flex justify-between items-start">
           <div className="space-y-1">
             <h3 className="font-medium">{task.title}</h3>
-            <p className="text-sm text-gray-500">Customer: {task.customer}</p>
+            <p className="text-sm text-gray-500">Responsible: {task.customer}</p>
           </div>
           <div className="flex gap-2">
-            <span className={`px-2 py-1 rounded text-xs ${priorityColors[task.priority]}`}>
-              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-            </span>
-            <span className={`px-2 py-1 rounded text-xs ${statusColors[task.status]}`}>
-              {task.status === 'in-progress' 
-                ? 'In Progress' 
-                : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
-            </span>
+            {/* Priority Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className={`px-2 py-1 rounded text-xs flex items-center gap-1 ${priorityColors[task.priority]}`}>
+                {formatPriority(task.priority)}
+                <ChevronDown className="h-3 w-3" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onPriorityChange('low')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    {task.priority === 'low' && <Check className="mr-2 h-4 w-4" />}
+                    <span className={task.priority === 'low' ? 'font-medium' : ''}>Low</span>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onPriorityChange('medium')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    {task.priority === 'medium' && <Check className="mr-2 h-4 w-4" />}
+                    <span className={task.priority === 'medium' ? 'font-medium' : ''}>Medium</span>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onPriorityChange('high')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    {task.priority === 'high' && <Check className="mr-2 h-4 w-4" />}
+                    <span className={task.priority === 'high' ? 'font-medium' : ''}>High</span>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
+            {/* Status Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className={`px-2 py-1 rounded text-xs flex items-center gap-1 ${statusColors[task.status]}`}>
+                {formatStatus(task.status)}
+                <ChevronDown className="h-3 w-3" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onStatusChange('pending')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    {task.status === 'pending' && <Check className="mr-2 h-4 w-4" />}
+                    <span className={task.status === 'pending' ? 'font-medium' : ''}>Pending</span>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onStatusChange('in-progress')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    {task.status === 'in-progress' && <Check className="mr-2 h-4 w-4" />}
+                    <span className={task.status === 'in-progress' ? 'font-medium' : ''}>In Progress</span>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onStatusChange('completed')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    {task.status === 'completed' && <Check className="mr-2 h-4 w-4" />}
+                    <span className={task.status === 'completed' ? 'font-medium' : ''}>Completed</span>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
         <div className="mt-2">
