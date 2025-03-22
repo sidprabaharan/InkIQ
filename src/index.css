@@ -95,6 +95,23 @@
   }
 }
 
+/* Custom time input styling */
+input[type="time"] {
+  @apply py-2 px-3;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  @apply opacity-100 cursor-pointer;
+  filter: invert(0.5);
+  margin-left: 8px;
+}
+
+.time-input {
+  @apply text-base py-2;
+  min-width: 180px;
+}
+
 /* Keep the rest of the CSS classes the same */
 .status-badge {
   @apply px-3 py-1 text-white text-sm font-medium rounded-md;
