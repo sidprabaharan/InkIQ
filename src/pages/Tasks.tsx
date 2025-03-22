@@ -425,25 +425,28 @@ function TaskCard({
         <div className="flex justify-between items-start">
           <div className="space-y-1 w-full max-w-lg">
             {isEditing ? (
-              <>
-                <Label className="block font-medium mb-2 text-foreground">Task Name:</Label>
-                <Input 
-                  value={editedTask.title}
-                  onChange={(e) => setEditedTask({...editedTask, title: e.target.value})}
-                  onClick={stopPropagation}
-                  className="font-medium text-base mb-4 border-gray-300 focus:border-primary"
-                  placeholder="Task title"
-                />
-                <div onClick={stopPropagation} className="mb-4 mt-2">
+              <div className="space-y-5">
+                <div>
+                  <Label className="block font-medium mb-2 text-foreground">Task Name:</Label>
+                  <Input 
+                    value={editedTask.title}
+                    onChange={(e) => setEditedTask({...editedTask, title: e.target.value})}
+                    onClick={stopPropagation}
+                    className="font-medium text-base border-gray-300 focus:border-primary"
+                    placeholder="Task title"
+                  />
+                </div>
+                
+                <div onClick={stopPropagation}>
                   <Label className="block font-medium mb-2 text-foreground">Order Number:</Label>
                   <Input 
                     value={editedTask.orderNumber || ''}
                     onChange={(e) => setEditedTask({...editedTask, orderNumber: e.target.value})}
-                    className="mb-4 border-gray-300 focus:border-primary text-foreground"
+                    className="border-gray-300 focus:border-primary text-foreground"
                     placeholder="Associated order number"
                   />
                 </div>
-              </>
+              </div>
             ) : (
               <>
                 <h3 className="font-medium">{task.title}</h3>
@@ -454,7 +457,7 @@ function TaskCard({
             )}
             <p className="text-sm text-foreground">
               {isEditing ? (
-                <div onClick={stopPropagation} className="mt-6">
+                <div onClick={stopPropagation} className="mt-5">
                   <Label className="block font-medium mb-2 text-foreground">Responsible:</Label>
                   <Select
                     value={editedTask.responsible}
