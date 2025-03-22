@@ -608,7 +608,7 @@ function TaskCard({
                             <SelectValue placeholder="Min" />
                           </SelectTrigger>
                           <SelectContent>
-                            {Array.from({ length: 12 }, (_, i) => i * 5).map((minute) => (
+                            {Array.from({ length: 60 }, (_, i) => i).map((minute) => (
                               <SelectItem key={minute} value={minute.toString()}>
                                 {minute.toString().padStart(2, '0')}
                               </SelectItem>
