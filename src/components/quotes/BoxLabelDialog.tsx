@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Dialog,
@@ -12,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Printer } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { PrintStyles } from "../layout/PrintStyles";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface BoxLabelDialogProps {
   open: boolean;
@@ -43,13 +43,13 @@ export function BoxLabelDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] p-0">
+          <DialogHeader className="p-6 pb-2">
             <DialogTitle>Box Label</DialogTitle>
           </DialogHeader>
 
           {/* Box number inputs */}
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="px-6 pb-2 grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="currentBox">Box Number</Label>
               <Input
@@ -68,22 +68,24 @@ export function BoxLabelDialog({
             </div>
           </div>
           
-          {/* Preview of the label */}
-          <div className="border rounded p-4 mb-4">
-            <div id="boxLabel" className="w-full" style={{ width: "4in", height: "6in", margin: "0 auto" }}>
-              <BoxLabel
-                customerNumber={customerNumber}
-                orderNumber={orderNumber}
-                poNumber={poNumber}
-                orderNickname={orderNickname}
-                currentBox={currentBox}
-                totalBoxes={totalBoxes}
-                workOrderUrl={workOrderUrl}
-              />
+          {/* Scrollable preview of the label */}
+          <ScrollArea className="h-[calc(100vh-250px)] px-6">
+            <div className="border rounded p-4 mb-4">
+              <div id="boxLabel" className="w-full" style={{ width: "4in", height: "6in", margin: "0 auto" }}>
+                <BoxLabel
+                  customerNumber={customerNumber}
+                  orderNumber={orderNumber}
+                  poNumber={poNumber}
+                  orderNickname={orderNickname}
+                  currentBox={currentBox}
+                  totalBoxes={totalBoxes}
+                  workOrderUrl={workOrderUrl}
+                />
+              </div>
             </div>
-          </div>
+          </ScrollArea>
 
-          <div className="flex justify-end">
+          <div className="p-6 pt-2 flex justify-end">
             <Button onClick={handlePrint} className="print:hidden">
               <Printer className="h-4 w-4 mr-2" />
               Print Box Label
