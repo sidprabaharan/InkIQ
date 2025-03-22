@@ -434,7 +434,7 @@ function TaskCard({
                   className="font-medium text-base mb-4 border-gray-300 focus:border-primary"
                   placeholder="Task title"
                 />
-                <div onClick={stopPropagation} className="mt-6">
+                <div onClick={stopPropagation} className="mb-4 mt-2">
                   <Label className="block font-medium mb-2 text-foreground">Order Number:</Label>
                   <Input 
                     value={editedTask.orderNumber || ''}
