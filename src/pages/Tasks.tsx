@@ -69,6 +69,7 @@ type TaskProps = {
   notes?: string;
   assignedDate?: string; // ISO format date-time string
   assignedBy?: string;
+  orderNumber?: string; // Added order number field
 };
 
 export default function Tasks() {
@@ -84,7 +85,8 @@ export default function Tasks() {
       responsible: 'Emma Coordinator',
       priority: 'high',
       notes: 'Need to discuss pricing and timeline for the new project.',
-      assignedBy: 'John Manager'
+      assignedBy: 'John Manager',
+      orderNumber: '12345'
     },
     { 
       id: '2', 
@@ -423,15 +425,32 @@ function TaskCard({
         <div className="flex justify-between items-start">
           <div className="space-y-1 w-full max-w-lg">
             {isEditing ? (
-              <Input 
-                value={editedTask.title}
-                onChange={(e) => setEditedTask({...editedTask, title: e.target.value})}
-                onClick={stopPropagation}
-                className="font-medium text-base mb-4 border-gray-300 focus:border-primary"
-                placeholder="Task title"
-              />
+              <>
+                <Label className="block font-medium mb-2 text-foreground">Task Name:</Label>
+                <Input 
+                  value={editedTask.title}
+                  onChange={(e) => setEditedTask({...editedTask, title: e.target.value})}
+                  onClick={stopPropagation}
+                  className="font-medium text-base mb-4 border-gray-300 focus:border-primary"
+                  placeholder="Task title"
+                />
+                <div onClick={stopPropagation} className="mt-4">
+                  <Label className="block font-medium mb-2 text-foreground">Order Number:</Label>
+                  <Input 
+                    value={editedTask.orderNumber || ''}
+                    onChange={(e) => setEditedTask({...editedTask, orderNumber: e.target.value})}
+                    className="mb-4 border-gray-300 focus:border-primary text-foreground"
+                    placeholder="Associated order number"
+                  />
+                </div>
+              </>
             ) : (
-              <h3 className="font-medium">{task.title}</h3>
+              <>
+                <h3 className="font-medium">{task.title}</h3>
+                {task.orderNumber && (
+                  <p className="text-sm text-foreground">Order: #{task.orderNumber}</p>
+                )}
+              </>
             )}
             <p className="text-sm text-foreground">
               {isEditing ? (
@@ -441,7 +460,7 @@ function TaskCard({
                     value={editedTask.responsible}
                     onValueChange={(value: string) => setEditedTask({...editedTask, responsible: value})}
                   >
-                    <SelectTrigger className="w-full bg-white border-gray-300">
+                    <SelectTrigger className="w-full bg-white border-gray-300 text-foreground">
                       <SelectValue placeholder="Select responsible person" />
                     </SelectTrigger>
                     <SelectContent>
