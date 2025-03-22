@@ -41,7 +41,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronDown as ChevronDownIcon } from "lucide-react";
 
 interface TaskCardProps {
   task: TaskProps;
@@ -164,33 +163,37 @@ export function TaskCard({
         </div>
         
         <div className="flex flex-wrap gap-2 mt-2">
-          <Select
-            value={task.priority}
-            onValueChange={(value) => onPriorityChange(value as TaskPriority)}
-          >
-            <SelectTrigger className={`w-auto h-9 px-3 py-1 rounded-md border-none ${priorityColors[task.priority as TaskPriority]}`}>
-              <SelectValue placeholder="Priority" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="high">High</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="low">Low</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="relative">
+            <Select
+              value={task.priority}
+              onValueChange={(value) => onPriorityChange(value as TaskPriority)}
+            >
+              <SelectTrigger className={`h-9 px-3 py-1 rounded-sm border-none ${priorityColors[task.priority as TaskPriority]}`}>
+                <SelectValue placeholder="Priority" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="low">Low</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           
-          <Select
-            value={task.status}
-            onValueChange={(value) => onStatusChange(value as TaskStatus)}
-          >
-            <SelectTrigger className={`w-auto h-9 px-3 py-1 rounded-md border-none ${statusColors[task.status as TaskStatus]}`}>
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="in-progress">In Progress</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="relative">
+            <Select
+              value={task.status}
+              onValueChange={(value) => onStatusChange(value as TaskStatus)}
+            >
+              <SelectTrigger className={`h-9 px-3 py-1 rounded-sm border-none ${statusColors[task.status as TaskStatus]}`}>
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="in-progress">In Progress</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </CardHeader>
       
