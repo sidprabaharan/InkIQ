@@ -114,8 +114,10 @@ function BoxLabel({
           
           <div className="mt-auto">
             <div className="text-xs font-semibold">Box:</div>
-            <div className="text-3xl font-bold">
-              {customerNumber} of {orderNumber}
+            <div className="text-3xl font-bold flex items-center">
+              <div className="border-b-2 border-black w-12 inline-block"></div>
+              <span className="px-2">of</span>
+              <div className="border-b-2 border-black w-12 inline-block"></div>
             </div>
           </div>
         </div>
