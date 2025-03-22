@@ -400,26 +400,27 @@ function TaskCard({
     >
       <CardContent className="p-4">
         <div className="flex justify-between items-start">
-          <div className="space-y-1">
+          <div className="space-y-1 w-full max-w-lg">
             {isEditing ? (
               <Input 
                 value={editedTask.title}
                 onChange={(e) => setEditedTask({...editedTask, title: e.target.value})}
                 onClick={stopPropagation}
-                className="font-medium"
+                className="font-medium text-base mb-4 border-gray-300 focus:border-primary"
+                placeholder="Task title"
               />
             ) : (
               <h3 className="font-medium">{task.title}</h3>
             )}
             <p className="text-sm text-gray-500">
               {isEditing ? (
-                <div onClick={stopPropagation} className="mt-2">
-                  <label className="text-sm font-medium block mb-1">Responsible:</label>
+                <div onClick={stopPropagation} className="mt-4">
+                  <label className="text-sm font-medium block mb-2">Responsible:</label>
                   <Select
                     value={editedTask.responsible}
                     onValueChange={(value: string) => setEditedTask({...editedTask, responsible: value})}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full bg-white border-gray-300">
                       <SelectValue placeholder="Select responsible person" />
                     </SelectTrigger>
                     <SelectContent>
@@ -508,59 +509,67 @@ function TaskCard({
             )}
           </div>
         </div>
-        <div className="mt-2">
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-gray-400" />
-            {isEditing ? (
-              <div className="flex gap-2 items-center" onClick={stopPropagation}>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-[180px] justify-start text-left font-normal",
-                        !date && "text-muted-foreground"
-                      )}
-                    >
-                      <Calendar className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <CalendarComponent
-                      mode="single"
-                      selected={date}
-                      onSelect={handleDateSelect}
-                      initialFocus
-                      className="p-3 pointer-events-auto"
+        <div className="mt-3">
+          {isEditing ? (
+            <div className="flex flex-col space-y-4 mt-2" onClick={stopPropagation}>
+              <div>
+                <label className="text-sm font-medium block mb-2">Due Date & Time:</label>
+                <div className="flex flex-col md:flex-row gap-3">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "justify-start text-left font-normal bg-white border-gray-300 w-full md:w-[240px]",
+                          !date && "text-muted-foreground"
+                        )}
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {date ? format(date, "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={date}
+                        onSelect={handleDateSelect}
+                        initialFocus
+                        className="p-3"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  
+                  <div className="relative w-full md:w-[140px]">
+                    <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      type="time"
+                      value={format(new Date(editedTask.dueDate), "HH:mm")}
+                      onChange={handleTimeChange}
+                      className="pl-10 bg-white border-gray-300"
                     />
-                  </PopoverContent>
-                </Popover>
-                
-                <Input
-                  type="time"
-                  value={format(new Date(editedTask.dueDate), "HH:mm")}
-                  onChange={handleTimeChange}
-                  className="w-[120px]"
-                />
+                  </div>
+                </div>
               </div>
-            ) : (
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-gray-400" />
               <p className="text-sm">Due: {formatDateTime(task.dueDate)}</p>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {isExpanded && (
-          <div className="mt-4 space-y-3 animate-fade-in">
+          <div className="mt-4 space-y-4 animate-fade-in">
             <div>
               {isEditing ? (
                 <div className="mt-2" onClick={stopPropagation}>
-                  <label className="text-sm font-medium">Notes:</label>
+                  <label className="text-sm font-medium block mb-2">Notes:</label>
                   <Textarea 
                     value={editedTask.notes || ''}
                     onChange={(e) => setEditedTask({...editedTask, notes: e.target.value})}
                     placeholder="Add notes here..."
-                    className="mt-1"
+                    className="min-h-[100px] border-gray-300 bg-white"
                   />
                 </div>
               ) : (
@@ -568,7 +577,7 @@ function TaskCard({
                   {task.notes && (
                     <div className="mt-2">
                       <p className="text-sm font-medium">Notes:</p>
-                      <p className="text-sm mt-1 bg-gray-50 p-2 rounded">{task.notes}</p>
+                      <p className="text-sm mt-1 bg-gray-50 p-3 rounded border border-gray-100">{task.notes}</p>
                     </div>
                   )}
                 </>
@@ -589,12 +598,12 @@ function TaskCard({
 
             {isEditing && (
               <div onClick={stopPropagation} className="mt-2">
-                <label className="text-sm font-medium block mb-1">Assigned By:</label>
+                <label className="text-sm font-medium block mb-2">Assigned By:</label>
                 <Select
                   value={editedTask.assignedBy || ''}
                   onValueChange={(value: string) => setEditedTask({...editedTask, assignedBy: value})}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full bg-white border-gray-300">
                     <SelectValue placeholder="Select who assigned this task" />
                   </SelectTrigger>
                   <SelectContent>
@@ -633,3 +642,4 @@ function EmptyState({ query, status }: { query: string, status?: string }) {
     </div>
   );
 }
+

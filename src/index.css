@@ -93,32 +93,6 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-  
-  /* Remove all focus outlines and rings */
-  *:focus {
-    outline: none !important;
-    box-shadow: none !important;
-  }
-  
-  /* Override default focus styles in all browsers */
-  *:focus-visible {
-    outline: none !important;
-    box-shadow: none !important;
-    ring-width: 0 !important;
-  }
-  
-  /* Remove ring for all form elements */
-  input:focus,
-  textarea:focus,
-  select:focus,
-  button:focus {
-    --tw-ring-offset-width: 0 !important;
-    --tw-ring-offset-color: transparent !important;
-    --tw-ring-color: transparent !important;
-    --tw-ring-offset-shadow: none !important;
-    --tw-ring-shadow: none !important;
-    box-shadow: none !important;
-  }
 }
 
 /* Keep the rest of the CSS classes the same */
@@ -139,4 +113,28 @@
   margin: 0;
   padding: 0;
   text-align: left;
+}
+
+/* Add animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Fix calendar pointer events for proper interaction */
+.rdp {
+  pointer-events: auto !important;
+}
+.rdp-button {
+  pointer-events: auto !important;
+}
+.rdp-day {
+  pointer-events: auto !important;
+}
+.rdp-nav_button {
+  pointer-events: auto !important;
 }
