@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { 
@@ -435,7 +434,7 @@ function TaskCard({
                   className="font-medium text-base mb-4 border-gray-300 focus:border-primary"
                   placeholder="Task title"
                 />
-                <div onClick={stopPropagation} className="mt-4">
+                <div onClick={stopPropagation} className="mt-6">
                   <Label className="block font-medium mb-2 text-foreground">Order Number:</Label>
                   <Input 
                     value={editedTask.orderNumber || ''}
@@ -455,7 +454,7 @@ function TaskCard({
             )}
             <p className="text-sm text-foreground">
               {isEditing ? (
-                <div onClick={stopPropagation} className="mt-4">
+                <div onClick={stopPropagation} className="mt-6">
                   <Label className="block font-medium mb-2 text-foreground">Responsible:</Label>
                   <Select
                     value={editedTask.responsible}
