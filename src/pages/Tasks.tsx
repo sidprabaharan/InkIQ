@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { 
@@ -233,7 +232,7 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
                 onPriorityChange(value);
               }}
             >
-              <SelectTrigger className={`h-8 text-xs ${priorityColors[task.priority]}`}>
+              <SelectTrigger className={`h-8 text-xs min-w-16 ${priorityColors[task.priority]}`}>
                 <SelectValue placeholder="Priority" />
               </SelectTrigger>
               <SelectContent>
@@ -243,7 +242,7 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
               </SelectContent>
             </Select>
             
-            {/* Status Select - Increased width for 'in-progress' status */}
+            {/* Status Select - Further increased width for 'in-progress' status */}
             <Select
               value={task.status}
               onValueChange={(value: TaskStatus) => {
@@ -252,7 +251,7 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
               }}
             >
               <SelectTrigger 
-                className={`h-8 text-xs ${statusColors[task.status]} ${task.status === 'in-progress' ? 'min-w-24' : ''}`}
+                className={`h-8 text-xs ${statusColors[task.status]} ${task.status === 'in-progress' ? 'min-w-28' : 'min-w-24'}`}
               >
                 <SelectValue placeholder="Status">
                   {formatStatus(task.status)}
@@ -293,4 +292,3 @@ function EmptyState({ query, status }: { query: string, status?: string }) {
     </div>
   );
 }
-
