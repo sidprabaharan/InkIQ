@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Search, PlusCircle, ListChecks } from "lucide-react";
+import { Search, PlusCircle, ListChecks, ClipboardList } from "lucide-react";
 import { TaskCard } from "@/components/tasks/TaskCard";
 import { CreateTaskDialog } from "@/components/tasks/CreateTaskDialog";
 import { TaskProps, TaskStatus, TaskPriority } from "@/types/task";
@@ -116,7 +116,7 @@ export function OrderTasksDialog({ open, onOpenChange, quoteId }: OrderTasksDial
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <ListChecks className="h-5 w-5" />
+            <ClipboardList className="h-5 w-5" />
             Tasks for Order #{quoteId}
           </DialogTitle>
           <DialogDescription>
@@ -147,8 +147,8 @@ export function OrderTasksDialog({ open, onOpenChange, quoteId }: OrderTasksDial
             />
           </div>
 
-          <Tabs defaultValue="all">
-            <TabsList className="mb-4">
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="mb-4 w-full grid grid-cols-4">
               <TabsTrigger value="all">All Tasks</TabsTrigger>
               <TabsTrigger value="pending">Pending</TabsTrigger>
               <TabsTrigger value="in-progress">In Progress</TabsTrigger>
@@ -169,7 +169,7 @@ export function OrderTasksDialog({ open, onOpenChange, quoteId }: OrderTasksDial
                   />
                 ))
               ) : (
-                <div className="text-center py-10">
+                <div className="text-center py-10 border rounded-lg">
                   <ListChecks className="mx-auto h-12 w-12 text-gray-300" />
                   <h3 className="mt-2 text-sm font-semibold text-gray-900">No tasks found</h3>
                   <p className="mt-1 text-sm text-gray-500">
@@ -195,7 +195,7 @@ export function OrderTasksDialog({ open, onOpenChange, quoteId }: OrderTasksDial
                     />
                   ))
               ) : (
-                <div className="text-center py-10">
+                <div className="text-center py-10 border rounded-lg">
                   <ListChecks className="mx-auto h-12 w-12 text-gray-300" />
                   <h3 className="mt-2 text-sm font-semibold text-gray-900">No pending tasks</h3>
                   <p className="mt-1 text-sm text-gray-500">
@@ -221,7 +221,7 @@ export function OrderTasksDialog({ open, onOpenChange, quoteId }: OrderTasksDial
                     />
                   ))
               ) : (
-                <div className="text-center py-10">
+                <div className="text-center py-10 border rounded-lg">
                   <ListChecks className="mx-auto h-12 w-12 text-gray-300" />
                   <h3 className="mt-2 text-sm font-semibold text-gray-900">No in-progress tasks</h3>
                   <p className="mt-1 text-sm text-gray-500">
@@ -247,7 +247,7 @@ export function OrderTasksDialog({ open, onOpenChange, quoteId }: OrderTasksDial
                     />
                   ))
               ) : (
-                <div className="text-center py-10">
+                <div className="text-center py-10 border rounded-lg">
                   <ListChecks className="mx-auto h-12 w-12 text-gray-300" />
                   <h3 className="mt-2 text-sm font-semibold text-gray-900">No completed tasks</h3>
                   <p className="mt-1 text-sm text-gray-500">
