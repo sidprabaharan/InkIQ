@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import {
   Sheet,
@@ -23,6 +23,7 @@ import { useState } from "react";
 import { PackingSlip } from "./PackingSlip";
 import { ShippingLabelDialog } from "./ShippingLabelDialog";
 import { BoxLabelDialog } from "./BoxLabelDialog";
+import { OrderTasksDialog } from "@/components/tasks/OrderTasksDialog";
 
 interface QuoteDetailHeaderProps {
   quoteId: string;
@@ -43,6 +44,7 @@ export function QuoteDetailHeader({
   const [packingSlipOpen, setPackingSlipOpen] = useState(false);
   const [shippingLabelOpen, setShippingLabelOpen] = useState(false);
   const [boxLabelOpen, setBoxLabelOpen] = useState(false);
+  const [tasksDialogOpen, setTasksDialogOpen] = useState(false);
   
   const isInvoice = !status.toLowerCase().startsWith('quote');
   const documentType = isInvoice ? "Invoice" : "Quote";
@@ -147,25 +149,15 @@ export function QuoteDetailHeader({
       <div className="flex gap-4 items-center">
         <h1 className="text-2xl font-semibold">{documentType} #{quoteId}</h1>
         
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1">
-              <ListChecks className="h-4 w-4" />
-              Tasks
-            </Button>
-          </SheetTrigger>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>Tasks for {documentType} #{quoteId}</SheetTitle>
-              <SheetDescription>
-                View and manage tasks associated with this {documentType.toLowerCase()}.
-              </SheetDescription>
-            </SheetHeader>
-            <div className="py-6">
-              <p className="text-muted-foreground">Task management interface will be designed later.</p>
-            </div>
-          </SheetContent>
-        </Sheet>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="gap-1"
+          onClick={() => setTasksDialogOpen(true)}
+        >
+          <ListChecks className="h-4 w-4" />
+          Tasks
+        </Button>
         
         <Sheet>
           <SheetTrigger asChild>
@@ -251,6 +243,12 @@ export function QuoteDetailHeader({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      
+      <OrderTasksDialog
+        open={tasksDialogOpen}
+        onOpenChange={setTasksDialogOpen}
+        quoteId={quoteId}
+      />
       
       <PackingSlip
         open={packingSlipOpen}
