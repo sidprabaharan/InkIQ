@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -96,7 +97,7 @@
 
 /* Custom time input styling */
 input[type="time"] {
-  @apply py-2 px-3 rounded-md;
+  @apply py-2 px-2 rounded-md;
   font-family: system-ui, -apple-system, sans-serif;
 }
 
@@ -107,9 +108,17 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   height: 16px;
 }
 
-.time-input {
-  @apply text-base py-2;
-  width: 140px;
+/* Updated time input styling for the button wrapper approach */
+button:has(input[type="time"]) {
+  @apply pr-1;
+}
+
+button input[type="time"] {
+  @apply text-left;
+}
+
+button input[type="time"]:focus {
+  @apply outline-none ring-0;
 }
 
 /* Keep the rest of the CSS classes the same */
@@ -155,4 +164,3 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .rdp-nav_button {
   pointer-events: auto !important;
 }
-
