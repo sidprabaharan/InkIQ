@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,11 +7,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Printer } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { PrintStyles } from "../layout/PrintStyles";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface BoxLabelDialogProps {
   open: boolean;
@@ -30,8 +29,6 @@ export function BoxLabelDialog({
   orderNickname = "Project Care Quote",
   poNumber = "PO-" + quoteId,
 }: BoxLabelDialogProps) {
-  const [currentBox, setCurrentBox] = useState("1");
-  const [totalBoxes, setTotalBoxes] = useState("1");
   const customerNumber = `CUST-${quoteId}`;
   const orderNumber = `ORD-${quoteId}`;
   const workOrderUrl = `/work-orders/${quoteId}`;
@@ -47,41 +44,19 @@ export function BoxLabelDialog({
           <DialogHeader>
             <DialogTitle>Box Label</DialogTitle>
           </DialogHeader>
-
-          {/* Box number inputs */}
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div className="space-y-2">
-              <Label htmlFor="currentBox">Box Number</Label>
-              <Input
-                id="currentBox"
-                value={currentBox}
-                onChange={(e) => setCurrentBox(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="totalBoxes">Total Boxes</Label>
-              <Input
-                id="totalBoxes"
-                value={totalBoxes}
-                onChange={(e) => setTotalBoxes(e.target.value)}
-              />
-            </div>
-          </div>
           
           {/* Preview of the label */}
-          <div className="border rounded p-4 mb-4">
+          <ScrollArea className="h-[400px] rounded-md border p-4">
             <div id="boxLabel" className="w-full" style={{ width: "4in", height: "6in", margin: "0 auto" }}>
               <BoxLabel
                 customerNumber={customerNumber}
                 orderNumber={orderNumber}
                 poNumber={poNumber}
                 orderNickname={orderNickname}
-                currentBox={currentBox}
-                totalBoxes={totalBoxes}
                 workOrderUrl={workOrderUrl}
               />
             </div>
-          </div>
+          </ScrollArea>
 
           <div className="flex justify-end">
             <Button onClick={handlePrint} className="print:hidden">
@@ -101,16 +76,12 @@ function BoxLabel({
   orderNumber,
   poNumber,
   orderNickname,
-  currentBox,
-  totalBoxes,
   workOrderUrl,
 }: {
   customerNumber: string;
   orderNumber: string;
   poNumber: string;
   orderNickname: string;
-  currentBox: string;
-  totalBoxes: string;
   workOrderUrl: string;
 }) {
   return (
@@ -144,7 +115,7 @@ function BoxLabel({
           <div className="mt-auto">
             <div className="text-xs font-semibold">Box:</div>
             <div className="text-3xl font-bold">
-              {currentBox} of {totalBoxes}
+              {customerNumber} of {orderNumber}
             </div>
           </div>
         </div>
