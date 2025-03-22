@@ -30,9 +30,32 @@ import {
   SelectContent, 
   SelectItem 
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 type TaskStatus = 'pending' | 'in-progress' | 'completed';
 type TaskPriority = 'low' | 'medium' | 'high';
+
+export const USERS = [
+  { id: '1', name: 'John Manager' },
+  { id: '2', name: 'Sarah Director' },
+  { id: '3', name: 'Mike Supervisor' },
+  { id: '4', name: 'Emma Coordinator' },
+  { id: '5', name: 'David Team Lead' },
+  { id: '6', name: 'Jennifer Specialist' },
+  { id: '7', name: 'Michael Executive' },
+  { id: '8', name: 'Olivia Associate' },
+  { id: '9', name: 'Daniel Administrator' },
+  { id: '10', name: 'Sophia Analyst' },
+  { id: '11', name: 'James Consultant' },
+  { id: '12', name: 'Emily Project Manager' },
+];
 
 type TaskProps = {
   id: string;
@@ -57,7 +80,7 @@ export default function Tasks() {
       dueDate: '2023-09-15T15:30:00', 
       assignedDate: '2023-09-10T09:15:00',
       status: 'pending', 
-      responsible: 'ABC Corporation',
+      responsible: 'Emma Coordinator',
       priority: 'high',
       notes: 'Need to discuss pricing and timeline for the new project.',
       assignedBy: 'John Manager'
@@ -68,7 +91,7 @@ export default function Tasks() {
       dueDate: '2023-09-18T17:00:00', 
       assignedDate: '2023-09-12T11:30:00',
       status: 'pending', 
-      responsible: 'XYZ Inc',
+      responsible: 'David Team Lead',
       priority: 'medium',
       notes: 'Include the additional services they requested in the meeting.',
       assignedBy: 'Sarah Director'
@@ -79,7 +102,7 @@ export default function Tasks() {
       dueDate: '2023-09-20T10:00:00', 
       assignedDate: '2023-09-05T14:45:00',
       status: 'pending', 
-      responsible: '123 Industries',
+      responsible: 'Jennifer Specialist',
       priority: 'low',
       notes: 'Verify their availability for the installation date.',
       assignedBy: 'Mike Supervisor'
@@ -90,10 +113,10 @@ export default function Tasks() {
       dueDate: '2023-09-10T12:00:00', 
       assignedDate: '2023-08-25T13:20:00',
       status: 'completed', 
-      responsible: 'Smith Design',
+      responsible: 'Michael Executive',
       priority: 'high',
       notes: 'Invoice #12345 has been sent.',
-      assignedBy: 'Financial Department'
+      assignedBy: 'Daniel Administrator'
     },
     { 
       id: '5', 
@@ -101,10 +124,10 @@ export default function Tasks() {
       dueDate: '2023-09-12T16:30:00', 
       assignedDate: '2023-09-01T08:45:00',
       status: 'in-progress', 
-      responsible: 'Johnson Printing',
+      responsible: 'Olivia Associate',
       priority: 'medium',
       notes: 'Check inventory before placing the order.',
-      assignedBy: 'Procurement Team'
+      assignedBy: 'James Consultant'
     },
   ];
 
@@ -283,7 +306,10 @@ function TaskCard({
 }: TaskCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
-
+  const [date, setDate] = useState<Date | undefined>(
+    task.dueDate ? new Date(task.dueDate) : undefined
+  );
+  
   const priorityColors: Record<TaskPriority, string> = {
     high: 'bg-red-100 text-red-800',
     medium: 'bg-yellow-100 text-yellow-800',
@@ -340,6 +366,33 @@ function TaskCard({
     e.stopPropagation();
   };
 
+  const handleDateSelect = (date: Date | undefined) => {
+    if (!date) return;
+    
+    const currentDate = editedTask.dueDate ? new Date(editedTask.dueDate) : new Date();
+    const hours = currentDate.getHours();
+    const minutes = currentDate.getMinutes();
+    
+    date.setHours(hours);
+    date.setMinutes(minutes);
+    
+    setDate(date);
+    setEditedTask({...editedTask, dueDate: date.toISOString()});
+  };
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const timeString = e.target.value; // Format: HH:MM
+    if (!timeString) return;
+    
+    const [hours, minutes] = timeString.split(':').map(Number);
+    
+    const currentDate = editedTask.dueDate ? new Date(editedTask.dueDate) : new Date();
+    currentDate.setHours(hours);
+    currentDate.setMinutes(minutes);
+    
+    setEditedTask({...editedTask, dueDate: currentDate.toISOString()});
+  };
+
   return (
     <Card 
       className={`hover:shadow-md transition-all cursor-pointer ${isExpanded ? 'scale-[1.02]' : ''}`}
@@ -360,12 +413,24 @@ function TaskCard({
             )}
             <p className="text-sm text-gray-500">
               {isEditing ? (
-                <Input 
-                  value={editedTask.responsible}
-                  onChange={(e) => setEditedTask({...editedTask, responsible: e.target.value})}
-                  onClick={stopPropagation}
-                  className="text-sm"
-                />
+                <div onClick={stopPropagation} className="mt-2">
+                  <label className="text-sm font-medium block mb-1">Responsible:</label>
+                  <Select
+                    value={editedTask.responsible}
+                    onValueChange={(value: string) => setEditedTask({...editedTask, responsible: value})}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select responsible person" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {USERS.map((user) => (
+                        <SelectItem key={user.id} value={user.name}>
+                          {user.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               ) : (
                 `Responsible: ${task.responsible}`
               )}
@@ -447,24 +512,36 @@ function TaskCard({
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-gray-400" />
             {isEditing ? (
-              <div className="flex gap-2" onClick={stopPropagation}>
-                <Input 
-                  type="date"
-                  value={editedTask.dueDate.split('T')[0]}
-                  onChange={(e) => {
-                    const [, time] = editedTask.dueDate.split('T');
-                    setEditedTask({...editedTask, dueDate: `${e.target.value}T${time || '00:00:00'}`});
-                  }}
-                  className="text-sm h-8 w-32"
-                />
-                <Input 
+              <div className="flex gap-2 items-center" onClick={stopPropagation}>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-[180px] justify-start text-left font-normal",
+                        !date && "text-muted-foreground"
+                      )}
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {date ? format(date, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={date}
+                      onSelect={handleDateSelect}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+                
+                <Input
                   type="time"
-                  value={editedTask.dueDate.split('T')[1]?.substring(0, 5) || '00:00'}
-                  onChange={(e) => {
-                    const [date] = editedTask.dueDate.split('T');
-                    setEditedTask({...editedTask, dueDate: `${date}T${e.target.value}:00`});
-                  }}
-                  className="text-sm h-8 w-24"
+                  value={format(new Date(editedTask.dueDate), "HH:mm")}
+                  onChange={handleTimeChange}
+                  className="w-[120px]"
                 />
               </div>
             ) : (
@@ -511,13 +588,23 @@ function TaskCard({
             </div>
 
             {isEditing && (
-              <div className="flex items-center gap-2" onClick={stopPropagation}>
-                <label className="text-sm">Assigned By:</label>
-                <Input 
+              <div onClick={stopPropagation} className="mt-2">
+                <label className="text-sm font-medium block mb-1">Assigned By:</label>
+                <Select
                   value={editedTask.assignedBy || ''}
-                  onChange={(e) => setEditedTask({...editedTask, assignedBy: e.target.value})}
-                  className="text-sm h-8"
-                />
+                  onValueChange={(value: string) => setEditedTask({...editedTask, assignedBy: value})}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select who assigned this task" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {USERS.map((user) => (
+                      <SelectItem key={user.id} value={user.name}>
+                        {user.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
           </div>
