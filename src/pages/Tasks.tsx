@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { 
@@ -522,17 +523,19 @@ function TaskCard({
               </SelectContent>
             </Select>
             
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={(e) => {
-                e.stopPropagation();
-                handleEditSave();
-              }}
-              className="h-8"
-            >
-              {isEditing ? <Save className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
-            </Button>
+            {isExpanded && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEditSave();
+                }}
+                className="h-8"
+              >
+                {isEditing ? <Save className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
+              </Button>
+            )}
             
             {isEditing && (
               <Button 
