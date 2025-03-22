@@ -2,8 +2,7 @@
 import React from 'react';
 
 export const PrintStyles: React.FC = () => (
-  <style>
-    {`
+  <style jsx global>{`
     @media print {
       @page {
         size: auto;
@@ -20,6 +19,5 @@ export const PrintStyles: React.FC = () => (
         display: none !important;
       }
     }
-    `}
-  </style>
+  `}</style>
 );

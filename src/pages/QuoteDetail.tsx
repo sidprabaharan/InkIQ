@@ -37,15 +37,6 @@ export default function QuoteDetail() {
     email: quote.customer.billing.email
   };
   
-  // Format details properly for QuoteDetailsCard component
-  const formattedDetails = {
-    number: quoteId,
-    date: quote.details.invoiceDate,
-    expiryDate: quote.details.paymentDueDate,
-    salesRep: quote.details.owner,
-    terms: quote.details.deliveryMethod
-  };
-  
   return (
     <div className="p-0 bg-gray-50 min-h-full">
       <QuoteHeader
@@ -70,7 +61,7 @@ export default function QuoteDetail() {
             
             {/* Quote Details - top right */}
             <QuoteDetailsCard 
-              details={formattedDetails} 
+              details={quote.details} 
               totalAmount={totalAmount}
               amountOutstanding={amountOutstanding}
             />
