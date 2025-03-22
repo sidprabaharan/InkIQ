@@ -243,7 +243,7 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
               </SelectContent>
             </Select>
             
-            {/* Status Select */}
+            {/* Status Select - Increased width for 'in-progress' status */}
             <Select
               value={task.status}
               onValueChange={(value: TaskStatus) => {
@@ -251,7 +251,9 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
                 onStatusChange(value);
               }}
             >
-              <SelectTrigger className={`h-8 text-xs ${statusColors[task.status]}`}>
+              <SelectTrigger 
+                className={`h-8 text-xs ${statusColors[task.status]} ${task.status === 'in-progress' ? 'min-w-24' : ''}`}
+              >
                 <SelectValue placeholder="Status">
                   {formatStatus(task.status)}
                 </SelectValue>
