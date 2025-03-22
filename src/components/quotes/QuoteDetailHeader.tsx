@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Printer, Copy, ListChecks, MessageCircle, Edit, Link, File, Trash, Download, DollarSign, Truck, Package, ListPlus, Wrench, Box } from "lucide-react";
 import {
@@ -91,9 +90,11 @@ export function QuoteDetailHeader({
   };
   
   const handleWorkOrder = () => {
+    const workOrderUrl = `/work-orders/${quoteId}`;
+    window.open(workOrderUrl, '_blank');
     toast({
       title: "Work Order",
-      description: `Creating work order for ${documentType.toLowerCase()} #${quoteId}`,
+      description: `Work order for ${documentType.toLowerCase()} #${quoteId} opened in new tab`,
     });
   };
   

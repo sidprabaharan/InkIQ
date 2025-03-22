@@ -9,6 +9,7 @@ import Index from "@/pages/Index";
 import Quotes from "@/pages/Quotes";
 import NewQuote from "@/pages/NewQuote";
 import QuoteDetail from "@/pages/QuoteDetail";
+import WorkOrder from "@/pages/WorkOrder";
 import Invoices from "@/pages/Invoices";
 import Customers from "@/pages/Customers";
 import NotFound from "@/pages/NotFound";
@@ -30,6 +31,7 @@ function App() {
                 <Route path="/quotes" element={<Quotes />} />
                 <Route path="/quotes/new" element={<NewQuote />} />
                 <Route path="/quotes/:id" element={<QuoteDetail />} />
+                <Route path="/work-orders/:id" element={<WorkOrder />} />
                 <Route path="/invoices" element={<Invoices />} />
                 <Route path="/customers" element={<Customers />} />
                 <Route path="*" element={<NotFound />} />

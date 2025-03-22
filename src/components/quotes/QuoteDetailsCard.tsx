@@ -1,57 +1,66 @@
 
 import React from 'react';
 
-interface QuoteDetails {
-  owner: string;
-  deliveryMethod: string;
-  productionDueDate: string;
-  paymentDueDate: string;
-  invoiceDate: string;
+interface DetailItem {
+  label: string;
+  value: string;
 }
 
 interface QuoteDetailsCardProps {
-  details: QuoteDetails;
+  details: {
+    number: string;
+    date: string;
+    expiryDate: string;
+    salesRep: string;
+    terms: string;
+  };
   totalAmount?: string;
   amountOutstanding?: string;
+  hideFinancials?: boolean;
 }
 
-export function QuoteDetailsCard({ details, totalAmount, amountOutstanding }: QuoteDetailsCardProps) {
+export function QuoteDetailsCard({ 
+  details, 
+  totalAmount, 
+  amountOutstanding,
+  hideFinancials = false
+}: QuoteDetailsCardProps) {
   return (
     <div className="bg-white p-6 rounded-lg border">
-      <h3 className="font-medium mb-4">Quotation Details</h3>
-      <div className="space-y-3">
+      <h3 className="font-medium mb-4">Quote Details</h3>
+      <div className="space-y-2">
         <div className="flex justify-between">
-          <span className="text-gray-600">Owner</span>
-          <span>{details.owner}</span>
+          <span className="text-gray-500">Quote Number:</span>
+          <span className="font-medium">{details.number}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600">Delivery Method</span>
-          <span>{details.deliveryMethod}</span>
+          <span className="text-gray-500">Date:</span>
+          <span>{details.date}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600">Production Due Date</span>
-          <span>{details.productionDueDate}</span>
+          <span className="text-gray-500">Expiry Date:</span>
+          <span>{details.expiryDate}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600">Payment Due Date</span>
-          <span>{details.paymentDueDate}</span>
+          <span className="text-gray-500">Sales Rep:</span>
+          <span>{details.salesRep}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600">Invoice Date</span>
-          <span>{details.invoiceDate}</span>
+          <span className="text-gray-500">Terms:</span>
+          <span>{details.terms}</span>
         </div>
         
-        {totalAmount && (
-          <div className="flex justify-between font-medium">
-            <span className="text-gray-600">Total Amount</span>
-            <span>{totalAmount}</span>
+        {!hideFinancials && totalAmount && (
+          <div className="flex justify-between pt-2 border-t mt-2">
+            <span className="text-gray-500">Total Amount:</span>
+            <span className="font-bold">{totalAmount}</span>
           </div>
         )}
         
-        {amountOutstanding && (
-          <div className="flex justify-between font-medium">
-            <span className="text-gray-600">Amount Outstanding</span>
-            <span className="text-amber-600">{amountOutstanding}</span>
+        {!hideFinancials && amountOutstanding && (
+          <div className="flex justify-between">
+            <span className="text-gray-500">Amount Outstanding:</span>
+            <span className="font-medium">{amountOutstanding}</span>
           </div>
         )}
       </div>
