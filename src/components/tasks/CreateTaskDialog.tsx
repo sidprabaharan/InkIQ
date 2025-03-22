@@ -47,6 +47,18 @@ export function CreateTaskDialog({ onCreateTask }: CreateTaskDialogProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [images, setImages] = useState<{ id: string, url: string, name: string }[]>([]);
   
+  const handleDateSelect = (newDate: Date | undefined) => {
+    if (!newDate) return;
+    
+    // Preserve the current time when changing the date
+    if (date) {
+      newDate.setHours(date.getHours());
+      newDate.setMinutes(date.getMinutes());
+    }
+    
+    setDate(newDate);
+  };
+  
   const handleHourChange = (hour: number) => {
     if (!date) return;
     const newDate = new Date(date);
@@ -237,8 +249,9 @@ export function CreateTaskDialog({ onCreateTask }: CreateTaskDialogProps) {
                   <Calendar
                     mode="single"
                     selected={date}
-                    onSelect={setDate}
+                    onSelect={handleDateSelect}
                     initialFocus
+                    className="pointer-events-auto"
                   />
                 </PopoverContent>
               </Popover>
@@ -255,7 +268,7 @@ export function CreateTaskDialog({ onCreateTask }: CreateTaskDialogProps) {
                     </span>
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="p-3 w-[280px]" align="start">
+                <PopoverContent className="p-3 w-[280px] pointer-events-auto" align="start">
                   <div className="flex justify-between items-center mb-2">
                     <div className="text-sm font-medium">Hour</div>
                     <div className="text-sm font-medium">Minute</div>
