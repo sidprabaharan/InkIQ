@@ -34,13 +34,6 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { TaskProps, TaskStatus, TaskPriority } from "@/types/task";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface TaskCardProps {
   task: TaskProps;
@@ -64,15 +57,15 @@ export function TaskCard({
   const [notes, setNotes] = useState(task.notes || "");
   
   const priorityColors = {
-    high: "bg-red-100 text-red-800 hover:bg-red-200",
-    medium: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-    low: "bg-blue-100 text-blue-800 hover:bg-blue-200"
+    high: "text-red-600 bg-red-50",
+    medium: "text-amber-600 bg-amber-50",
+    low: "text-green-600 bg-green-50"
   };
   
   const statusColors = {
-    pending: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-    "in-progress": "bg-purple-100 text-purple-800 hover:bg-purple-200",
-    completed: "bg-green-100 text-green-800 hover:bg-green-200"
+    pending: "text-blue-600 bg-blue-50",
+    "in-progress": "text-amber-600 bg-amber-50",
+    completed: "text-green-600 bg-green-50"
   };
   
   const getInitials = (name: string) => {
@@ -112,15 +105,6 @@ export function TaskCard({
       description: "The task has been removed"
     });
     // In a real app, you would add delete functionality here
-  };
-
-  const getStatusLabel = (status: TaskStatus) => {
-    if (status === 'in-progress') return 'In Progress';
-    return status.charAt(0).toUpperCase() + status.slice(1);
-  };
-
-  const getPriorityLabel = (priority: TaskPriority) => {
-    return priority.charAt(0).toUpperCase() + priority.slice(1);
   };
   
   return (
@@ -163,37 +147,29 @@ export function TaskCard({
         </div>
         
         <div className="flex flex-wrap gap-2 mt-2">
-          <div className="relative">
-            <Select
-              value={task.priority}
-              onValueChange={(value) => onPriorityChange(value as TaskPriority)}
-            >
-              <SelectTrigger className={`h-9 px-3 py-1 rounded-sm border-none ${priorityColors[task.priority as TaskPriority]}`}>
-                <SelectValue placeholder="Priority" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <Badge 
+            variant="secondary" 
+            className={priorityColors[task.priority as TaskPriority]}
+          >
+            {task.priority?.charAt(0).toUpperCase() + task.priority?.slice(1)} Priority
+          </Badge>
           
-          <div className="relative">
-            <Select
-              value={task.status}
-              onValueChange={(value) => onStatusChange(value as TaskStatus)}
-            >
-              <SelectTrigger className={`h-9 px-3 py-1 rounded-sm border-none ${statusColors[task.status as TaskStatus]}`}>
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="in-progress">In Progress</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <Badge 
+            variant="secondary" 
+            className={statusColors[task.status as TaskStatus]}
+            onClick={() => {
+              const nextStatus: Record<TaskStatus, TaskStatus> = {
+                pending: "in-progress",
+                "in-progress": "completed",
+                completed: "pending"
+              };
+              onStatusChange(nextStatus[task.status as TaskStatus]);
+            }}
+          >
+            {task.status?.split('-').map(word => 
+              word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ')}
+          </Badge>
         </div>
       </CardHeader>
       
