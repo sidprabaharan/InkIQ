@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { 
@@ -190,10 +189,10 @@ interface TaskCardProps {
 }
 
 function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
-  const priorityColors = {
-    low: 'bg-blue-100 text-blue-800',
+  const priorityColors: Record<TaskPriority, string> = {
+    high: 'bg-red-100 text-red-800',
     medium: 'bg-yellow-100 text-yellow-800',
-    high: 'bg-red-100 text-red-800'
+    low: 'bg-blue-100 text-blue-800'
   };
 
   const statusColors = {
@@ -226,7 +225,7 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
           <div className="flex gap-2">
             {/* Priority Select */}
             <Select
-              defaultValue={task.priority}
+              value={task.priority}
               onValueChange={(value: TaskPriority) => onPriorityChange(value)}
             >
               <SelectTrigger className={`h-8 text-xs ${priorityColors[task.priority]}`}>
@@ -241,7 +240,7 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
             
             {/* Status Select */}
             <Select
-              defaultValue={task.status}
+              value={task.status}
               onValueChange={(value: TaskStatus) => onStatusChange(value)}
             >
               <SelectTrigger className={`h-8 text-xs ${statusColors[task.status]}`}>
