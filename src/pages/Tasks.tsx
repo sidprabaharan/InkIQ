@@ -37,12 +37,14 @@ type TaskPriority = 'low' | 'medium' | 'high';
 type TaskProps = {
   id: string;
   title: string;
-  dueDate: string;
+  dueDate: string; // ISO format date-time string
+  dueTime?: string; 
   status: TaskStatus;
   responsible: string;
   priority: TaskPriority;
   notes?: string;
-  assignedDate?: string;
+  assignedDate?: string; // ISO format date-time string
+  assignedBy?: string;
 };
 
 export default function Tasks() {
@@ -52,52 +54,57 @@ export default function Tasks() {
     { 
       id: '1', 
       title: 'Follow up with ABC Corp', 
-      dueDate: '2023-09-15', 
-      assignedDate: '2023-09-10',
+      dueDate: '2023-09-15T15:30:00', 
+      assignedDate: '2023-09-10T09:15:00',
       status: 'pending', 
       responsible: 'ABC Corporation',
       priority: 'high',
-      notes: 'Need to discuss pricing and timeline for the new project.' 
+      notes: 'Need to discuss pricing and timeline for the new project.',
+      assignedBy: 'John Manager'
     },
     { 
       id: '2', 
       title: 'Send revised quote', 
-      dueDate: '2023-09-18', 
-      assignedDate: '2023-09-12',
+      dueDate: '2023-09-18T17:00:00', 
+      assignedDate: '2023-09-12T11:30:00',
       status: 'pending', 
       responsible: 'XYZ Inc',
       priority: 'medium',
-      notes: 'Include the additional services they requested in the meeting.' 
+      notes: 'Include the additional services they requested in the meeting.',
+      assignedBy: 'Sarah Director'
     },
     { 
       id: '3', 
       title: 'Schedule installation', 
-      dueDate: '2023-09-20', 
-      assignedDate: '2023-09-05',
+      dueDate: '2023-09-20T10:00:00', 
+      assignedDate: '2023-09-05T14:45:00',
       status: 'pending', 
       responsible: '123 Industries',
       priority: 'low',
-      notes: 'Verify their availability for the installation date.' 
+      notes: 'Verify their availability for the installation date.',
+      assignedBy: 'Mike Supervisor'
     },
     { 
       id: '4', 
       title: 'Collect payment', 
-      dueDate: '2023-09-10', 
-      assignedDate: '2023-08-25',
+      dueDate: '2023-09-10T12:00:00', 
+      assignedDate: '2023-08-25T13:20:00',
       status: 'completed', 
       responsible: 'Smith Design',
       priority: 'high',
-      notes: 'Invoice #12345 has been sent.' 
+      notes: 'Invoice #12345 has been sent.',
+      assignedBy: 'Financial Department'
     },
     { 
       id: '5', 
       title: 'Order materials', 
-      dueDate: '2023-09-12', 
-      assignedDate: '2023-09-01',
+      dueDate: '2023-09-12T16:30:00', 
+      assignedDate: '2023-09-01T08:45:00',
       status: 'in-progress', 
       responsible: 'Johnson Printing',
       priority: 'medium',
-      notes: 'Check inventory before placing the order.' 
+      notes: 'Check inventory before placing the order.',
+      assignedBy: 'Procurement Team'
     },
   ];
 
@@ -291,7 +298,24 @@ function TaskCard({
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+  };
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
+  const formatDateTime = (dateString: string) => {
+    return `${formatDate(dateString)} at ${formatTime(dateString)}`;
   };
 
   const formatStatus = (status: TaskStatus) => {
@@ -423,15 +447,28 @@ function TaskCard({
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-gray-400" />
             {isEditing ? (
-              <Input 
-                type="date"
-                value={editedTask.dueDate}
-                onChange={(e) => setEditedTask({...editedTask, dueDate: e.target.value})}
-                onClick={stopPropagation}
-                className="text-sm h-8"
-              />
+              <div className="flex gap-2" onClick={stopPropagation}>
+                <Input 
+                  type="date"
+                  value={editedTask.dueDate.split('T')[0]}
+                  onChange={(e) => {
+                    const [, time] = editedTask.dueDate.split('T');
+                    setEditedTask({...editedTask, dueDate: `${e.target.value}T${time || '00:00:00'}`});
+                  }}
+                  className="text-sm h-8 w-32"
+                />
+                <Input 
+                  type="time"
+                  value={editedTask.dueDate.split('T')[1]?.substring(0, 5) || '00:00'}
+                  onChange={(e) => {
+                    const [date] = editedTask.dueDate.split('T');
+                    setEditedTask({...editedTask, dueDate: `${date}T${e.target.value}:00`});
+                  }}
+                  className="text-sm h-8 w-24"
+                />
+              </div>
             ) : (
-              <p className="text-sm">Due: {formatDate(task.dueDate)}</p>
+              <p className="text-sm">Due: {formatDateTime(task.dueDate)}</p>
             )}
           </div>
         </div>
@@ -463,8 +500,26 @@ function TaskCard({
             
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-gray-400" />
-              <p className="text-sm">Assigned: {task.assignedDate ? formatDate(task.assignedDate) : 'Not assigned'}</p>
+              <p className="text-sm">
+                {task.assignedDate 
+                  ? <>
+                      Assigned: {formatDateTime(task.assignedDate)} 
+                      {task.assignedBy && <span> by {task.assignedBy}</span>}
+                    </> 
+                  : 'Not assigned'}
+              </p>
             </div>
+
+            {isEditing && (
+              <div className="flex items-center gap-2" onClick={stopPropagation}>
+                <label className="text-sm">Assigned By:</label>
+                <Input 
+                  value={editedTask.assignedBy || ''}
+                  onChange={(e) => setEditedTask({...editedTask, assignedBy: e.target.value})}
+                  className="text-sm h-8"
+                />
+              </div>
+            )}
           </div>
         )}
       </CardContent>
