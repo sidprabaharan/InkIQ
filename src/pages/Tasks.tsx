@@ -15,11 +15,11 @@ export default function Tasks() {
   
   // Mock tasks data (in a real app, this would come from an API or context)
   const mockTasks = [
-    { id: '1', title: 'Follow up with ABC Corp', dueDate: '2023-09-15', status: 'pending', customer: 'ABC Corporation', priority: 'high' },
-    { id: '2', title: 'Send revised quote', dueDate: '2023-09-18', status: 'pending', customer: 'XYZ Inc', priority: 'medium' },
-    { id: '3', title: 'Schedule installation', dueDate: '2023-09-20', status: 'pending', customer: '123 Industries', priority: 'low' },
-    { id: '4', title: 'Collect payment', dueDate: '2023-09-10', status: 'completed', customer: 'Smith Design', priority: 'high' },
-    { id: '5', title: 'Order materials', dueDate: '2023-09-12', status: 'in-progress', customer: 'Johnson Printing', priority: 'medium' },
+    { id: '1', title: 'Follow up with ABC Corp', dueDate: '2023-09-15', status: 'pending' as const, customer: 'ABC Corporation', priority: 'high' as const },
+    { id: '2', title: 'Send revised quote', dueDate: '2023-09-18', status: 'pending' as const, customer: 'XYZ Inc', priority: 'medium' as const },
+    { id: '3', title: 'Schedule installation', dueDate: '2023-09-20', status: 'pending' as const, customer: '123 Industries', priority: 'low' as const },
+    { id: '4', title: 'Collect payment', dueDate: '2023-09-10', status: 'completed' as const, customer: 'Smith Design', priority: 'high' as const },
+    { id: '5', title: 'Order materials', dueDate: '2023-09-12', status: 'in-progress' as const, customer: 'Johnson Printing', priority: 'medium' as const },
   ];
 
   // Filter tasks based on search query
