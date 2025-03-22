@@ -60,7 +60,7 @@ export const QuoteDetailHeader: React.FC<QuoteDetailHeaderProps> = ({
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
       <div>
         <div className="flex items-center gap-4 mb-2">
-          <StatusDropdown current={status} />
+          <StatusDropdown currentStatus={status} />
           <span className="text-gray-500">PO# {poNumber}</span>
         </div>
         {nickName && <div className="text-lg">{nickName}</div>}
