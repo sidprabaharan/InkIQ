@@ -1,12 +1,13 @@
 
 import { useParams, useSearchParams } from "react-router-dom";
-import { QuoteDetailHeader } from "@/components/quotes/QuoteDetailHeader";
 import { CompanyInfoCard } from "@/components/quotes/CompanyInfoCard";
 import { QuoteDetailsCard } from "@/components/quotes/QuoteDetailsCard";
 import { CustomerInfoCard } from "@/components/quotes/CustomerInfoCard";
 import { WorkOrderItemsTable } from "@/components/quotes/WorkOrderItemsTable";
 import { NotesCard } from "@/components/quotes/NotesCard";
 import { quotationData } from "@/components/quotes/QuoteData";
+import { Button } from "@/components/ui/button";
+import { Printer } from "lucide-react";
 
 export default function WorkOrder() {
   const { id } = useParams();
@@ -15,27 +16,42 @@ export default function WorkOrder() {
   const quoteId = id || "3032";
   const quote = quotationData;
   
-  // Set status to "Work Order"
-  const status = "Work Order";
+  // Format the quote details in the structure expected by QuoteDetailsCard
+  const formattedDetails = {
+    number: quoteId,
+    date: quote.details.invoiceDate,
+    expiryDate: quote.details.paymentDueDate,
+    salesRep: quote.details.owner,
+    terms: quote.details.deliveryMethod
+  };
   
-  // Create properly formatted customer shipping info for the work order
-  const customerShipping = {
-    name: quote.customer.billing.contact || "Customer",
-    companyName: quote.customer.shipping.company,
-    address1: quote.customer.shipping.address,
-    address2: quote.customer.shipping.unit,
-    city: quote.customer.shipping.city,
-    stateProvince: quote.customer.shipping.region,
-    zipCode: quote.customer.billing.postalCode || "",
-    country: "Canada",
-    phone: quote.customer.billing.phone,
-    email: quote.customer.billing.email
+  // Map quote items to the structure expected by WorkOrderItemsTable
+  const formattedItems = quote.items.map((item, index) => ({
+    id: index.toString(),
+    name: item.category,
+    description: item.description,
+    quantity: parseInt(item.quantity) || 0,
+    price: parseFloat(item.price.replace('$', '')) || 0,
+    total: parseFloat(item.total.replace('$', '')) || 0,
+    sku: item.itemNumber,
+    imprintDetails: {
+      locations: ['Front', 'Back'],
+      colors: [item.color],
+    }
+  }));
+  
+  const handlePrint = () => {
+    window.print();
   };
   
   return (
-    <div className="p-0 bg-gray-50 min-h-full">
+    <div className="p-0 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center p-4 border-b bg-white">
         <div className="text-xl font-bold">Work Order #{quoteId}</div>
+        <Button onClick={handlePrint} size="sm" className="print:hidden">
+          <Printer className="h-4 w-4 mr-2" />
+          Print
+        </Button>
       </div>
       
       <div className="p-6">
@@ -51,7 +67,7 @@ export default function WorkOrder() {
             
             {/* Work Order Details - top right */}
             <QuoteDetailsCard 
-              details={quote.details} 
+              details={formattedDetails} 
               hideFinancials={true}
             />
           </div>
@@ -74,7 +90,7 @@ export default function WorkOrder() {
           )}
           
           {/* Work Order Items - full width */}
-          <WorkOrderItemsTable items={quote.items} />
+          <WorkOrderItemsTable items={formattedItems} />
           
           {/* Notes and Production Notes - bottom row */}
           <div className="grid grid-cols-2 gap-6">
@@ -86,6 +102,17 @@ export default function WorkOrder() {
           </div>
         </div>
       </div>
+      
+      <style jsx global>{`
+        @media print {
+          body {
+            background-color: white;
+          }
+          .print\\:hidden {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

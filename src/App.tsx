@@ -25,18 +25,16 @@ function App() {
       <TooltipProvider>
         <BrowserRouter>
           <CustomersProvider>
-            <AppLayout>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/quotes" element={<Quotes />} />
-                <Route path="/quotes/new" element={<NewQuote />} />
-                <Route path="/quotes/:id" element={<QuoteDetail />} />
-                <Route path="/work-orders/:id" element={<WorkOrder />} />
-                <Route path="/invoices" element={<Invoices />} />
-                <Route path="/customers" element={<Customers />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </AppLayout>
+            <Routes>
+              <Route path="/" element={<AppLayout><Index /></AppLayout>} />
+              <Route path="/quotes" element={<AppLayout><Quotes /></AppLayout>} />
+              <Route path="/quotes/new" element={<AppLayout><NewQuote /></AppLayout>} />
+              <Route path="/quotes/:id" element={<AppLayout><QuoteDetail /></AppLayout>} />
+              <Route path="/work-orders/:id" element={<WorkOrder />} />
+              <Route path="/invoices" element={<AppLayout><Invoices /></AppLayout>} />
+              <Route path="/customers" element={<AppLayout><Customers /></AppLayout>} />
+              <Route path="*" element={<AppLayout><NotFound /></AppLayout>} />
+            </Routes>
           </CustomersProvider>
         </BrowserRouter>
         <Toaster />
