@@ -7,7 +7,7 @@ import { Mail, Phone, Briefcase, Building, UserCog, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ContactsListProps {
-  contacts: Contact[];
+  contacts?: Contact[];
   primaryContact?: {
     firstName: string;
     lastName: string;
@@ -19,7 +19,7 @@ interface ContactsListProps {
 }
 
 export function ContactsList({ 
-  contacts, 
+  contacts = [], // Set default empty array to prevent undefined errors
   primaryContact, 
   onEditContact,
   onEditPrimaryContact

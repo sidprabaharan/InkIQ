@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AddContactDialog } from "@/components/customers/AddContactDialog";
@@ -57,7 +58,7 @@ export default function Customers() {
     selectCustomer(customerId);
   };
 
-  const handleAddCustomer = (customerData: Omit<any, "id">) => {
+  const handleAddCustomer = (customerData: any) => {
     const newCustomer = addCustomer(customerData);
     selectCustomer(newCustomer.id); // Automatically select the new customer
   };
@@ -194,7 +195,15 @@ export default function Customers() {
             </Button>
           </CardHeader>
           <CardContent>
-            <ContactsList customer={selectedCustomer} />
+            <ContactsList 
+              contacts={selectedCustomer.contacts} 
+              primaryContact={{
+                firstName: selectedCustomer.firstName,
+                lastName: selectedCustomer.lastName,
+                email: selectedCustomer.email,
+                phoneNumber: selectedCustomer.phoneNumber
+              }}
+            />
           </CardContent>
         </Card>
       </div>
@@ -251,12 +260,15 @@ export default function Customers() {
         </div>
       </div>
 
-      <CustomerDialog open={open} onOpenChange={handleOpenChange} onSubmit={handleAddCustomer} />
+      <CustomerDialog 
+        open={open} 
+        onOpenChange={handleOpenChange} 
+      />
       
       {activeEditDialog === "company" && selectedCustomer && (
         <EditCompanyDialog 
           open={true} 
-          onOpenChange={setActiveEditDialog}
+          onOpenChange={() => setActiveEditDialog(null)}
           customer={selectedCustomer}
         />
       )}
@@ -264,7 +276,7 @@ export default function Customers() {
       {activeEditDialog === "address" && selectedCustomer && (
         <EditAddressDialog
           open={true}
-          onOpenChange={setActiveEditDialog}
+          onOpenChange={() => setActiveEditDialog(null)}
           customer={selectedCustomer}
         />
       )}
@@ -272,7 +284,7 @@ export default function Customers() {
       {activeEditDialog === "tax" && selectedCustomer && (
         <EditTaxInfoDialog
           open={true}
-          onOpenChange={setActiveEditDialog}
+          onOpenChange={() => setActiveEditDialog(null)}
           customer={selectedCustomer}
         />
       )}
