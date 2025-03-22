@@ -11,8 +11,7 @@ import {
   MessageCircle,
   Users,
   PlusCircle,
-  Image,
-  Calendar
+  Image
 } from "lucide-react";
 import { 
   Card, 
@@ -35,10 +34,6 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { TaskProps, TaskStatus, TaskPriority } from "@/types/task";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
 
 interface TaskCardProps {
   task: TaskProps;
@@ -60,18 +55,25 @@ export function TaskCard({
   const { toast } = useToast();
   const [editingNotes, setEditingNotes] = useState(false);
   const [notes, setNotes] = useState(task.notes || "");
-  const [viewImageIndex, setViewImageIndex] = useState<number | null>(null);
   
   const priorityColors = {
-    high: "bg-red-50 text-red-600 hover:bg-red-100",
-    medium: "bg-amber-50 text-amber-600 hover:bg-amber-100",
-    low: "bg-blue-50 text-blue-600 hover:bg-blue-100"
+    high: "text-red-600 bg-red-50",
+    medium: "text-amber-600 bg-amber-50",
+    low: "text-green-600 bg-green-50"
   };
   
   const statusColors = {
-    pending: "bg-gray-50 text-gray-600 hover:bg-gray-100",
-    "in-progress": "bg-purple-50 text-purple-800 hover:bg-purple-100",
-    completed: "bg-green-50 text-green-600 hover:bg-green-100"
+    pending: "text-blue-600 bg-blue-50",
+    "in-progress": "text-amber-600 bg-amber-50",
+    completed: "text-green-600 bg-green-50"
+  };
+  
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part.charAt(0))
+      .join('')
+      .toUpperCase();
   };
   
   const formatDate = (dateString: string) => {
@@ -92,15 +94,6 @@ export function TaskCard({
     }
   };
   
-  const formatDateTime = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      return `${format(date, "MMM d, yyyy")} at ${format(date, "h:mm a")}`;
-    } catch (error) {
-      return "Invalid date";
-    }
-  };
-  
   const handleNotesUpdate = () => {
     setEditingNotes(false);
     onTaskUpdate({ notes });
@@ -114,174 +107,198 @@ export function TaskCard({
     // In a real app, you would add delete functionality here
   };
   
-  const getStatusLabel = (status: TaskStatus) => {
-    return status === 'in-progress' 
-      ? 'In Progress' 
-      : status.charAt(0).toUpperCase() + status.slice(1);
-  };
-  
   return (
     <Card className="overflow-hidden">
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start">
-          <div className="space-y-3 w-full">
-            <div className="flex flex-col">
-              <h3 className="text-xl font-semibold">{task.title}</h3>
-              {task.orderNumber && (
-                <p className="text-sm text-foreground">Order: #{task.orderNumber}</p>
-              )}
-              <p className="text-sm text-foreground mt-1">
-                Responsible: {task.responsible}
-              </p>
-              <div className="flex items-center text-sm text-gray-600 mt-1">
-                <Clock className="h-4 w-4 mr-2 text-gray-400" />
-                <span>Due: {formatDateTime(task.dueDate)}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex flex-col gap-2 ml-4">
-            <Badge
-              className={`cursor-pointer px-4 py-1.5 ${priorityColors[task.priority]}`}
-              onClick={() => {
-                const nextPriority: Record<TaskPriority, TaskPriority> = {
-                  high: 'medium',
-                  medium: 'low',
-                  low: 'high'
-                };
-                onPriorityChange(nextPriority[task.priority]);
-              }}
-            >
-              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} {task.priority === 'high' ? '↓' : task.priority === 'low' ? '↑' : '↕'}
-            </Badge>
-            
-            <Badge
-              className={`cursor-pointer px-4 py-1.5 ${statusColors[task.status]}`}
-              onClick={() => {
-                const nextStatus: Record<TaskStatus, TaskStatus> = {
-                  pending: 'in-progress',
-                  'in-progress': 'completed',
-                  completed: 'pending'
-                };
-                onStatusChange(nextStatus[task.status]);
-              }}
-            >
-              {getStatusLabel(task.status)} {task.status !== 'completed' ? '↓' : '↑'}
-            </Badge>
-            
-            {isExpanded && (
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-9 w-9"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  // Add edit functionality
-                }}
-              >
-                <Edit2 className="h-4 w-4" />
-              </Button>
+      <CardHeader className="pb-2">
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <CardTitle className="text-xl">{task.title}</CardTitle>
+            {task.orderNumber && (
+              <CardDescription>
+                Order #{task.orderNumber}
+              </CardDescription>
             )}
           </div>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Edit2 className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem 
+                onClick={() => setEditingNotes(true)}
+              >
+                Edit Notes
+              </DropdownMenuItem>
+              
+              <DropdownMenuSeparator />
+              
+              <DropdownMenuItem 
+                className="text-red-600" 
+                onClick={handleDeleteTask}
+              >
+                <Trash className="h-4 w-4 mr-2" />
+                Delete Task
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         
-        {isExpanded && (
-          <div className="mt-6 space-y-4 animate-in">
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium">Notes:</h4>
-              {editingNotes ? (
-                <div className="space-y-2">
-                  <Textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Add notes..."
-                    className="min-h-[100px]"
-                  />
-                  <div className="flex justify-end space-x-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => {
-                        setNotes(task.notes || "");
-                        setEditingNotes(false);
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                    <Button 
-                      size="sm"
-                      onClick={handleNotesUpdate}
-                    >
-                      Save Notes
-                    </Button>
-                  </div>
+        <div className="flex flex-wrap gap-2 mt-2">
+          <Badge 
+            variant="secondary" 
+            className={priorityColors[task.priority as TaskPriority]}
+          >
+            {task.priority?.charAt(0).toUpperCase() + task.priority?.slice(1)} Priority
+          </Badge>
+          
+          <Badge 
+            variant="secondary" 
+            className={statusColors[task.status as TaskStatus]}
+            onClick={() => {
+              const nextStatus: Record<TaskStatus, TaskStatus> = {
+                pending: "in-progress",
+                "in-progress": "completed",
+                completed: "pending"
+              };
+              onStatusChange(nextStatus[task.status as TaskStatus]);
+            }}
+          >
+            {task.status?.split('-').map(word => 
+              word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ')}
+          </Badge>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="pb-2">
+        <div className="flex flex-col space-y-2">
+          <div className="flex items-center text-sm text-gray-600">
+            <CalendarIcon className="h-4 w-4 mr-2" />
+            <span>Due: {formatDate(task.dueDate)}</span>
+            {task.dueTime && (
+              <>
+                <Clock className="h-4 w-4 ml-3 mr-2" />
+                <span>{task.dueTime}</span>
+              </>
+            )}
+          </div>
+          
+          <div className="flex items-center text-sm text-gray-600">
+            <Users className="h-4 w-4 mr-2" />
+            <span>
+              Assigned to: {task.responsible}
+              {task.assignedBy && ` by ${task.assignedBy}`}
+            </span>
+          </div>
+        </div>
+      </CardContent>
+      
+      {isExpanded && (
+        <CardContent className="pt-0">
+          <div className="space-y-4">
+            {editingNotes ? (
+              <div className="space-y-2">
+                <Textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Add notes..."
+                  className="min-h-[100px]"
+                />
+                <div className="flex justify-end space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      setNotes(task.notes || "");
+                      setEditingNotes(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    size="sm"
+                    onClick={handleNotesUpdate}
+                  >
+                    Save Notes
+                  </Button>
                 </div>
-              ) : (
-                <div className="bg-gray-50 p-3 rounded border border-gray-100">
-                  <p className="text-sm text-gray-600">{task.notes || "No notes added."}</p>
-                </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="text-sm font-medium">Notes:</div>
+                <p className="text-sm text-gray-600 min-h-[40px]">
+                  {task.notes || "No notes added."}
+                </p>
+              </div>
+            )}
             
             {task.images && task.images.length > 0 && (
               <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Image className="h-4 w-4" />
-                  <h4 className="text-sm font-medium">Attachments:</h4>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {task.images.map((image, index) => (
-                    <div key={image.id} className="relative">
-                      <Dialog open={viewImageIndex === index} onOpenChange={() => setViewImageIndex(null)}>
-                        <DialogContent className="sm:max-w-[80vw] p-1">
-                          <img 
-                            src={image.url} 
-                            alt={image.name} 
-                            className="w-full h-auto max-h-[80vh] object-contain"
-                          />
-                        </DialogContent>
-                      </Dialog>
-                      <div 
-                        className="cursor-pointer"
-                        onClick={() => setViewImageIndex(index)}
-                      >
-                        <img
-                          src={image.url}
-                          alt={image.name}
-                          className="h-16 w-full object-cover rounded-md border border-gray-200"
-                        />
-                        <p className="text-xs mt-1 truncate">{image.name}</p>
-                      </div>
+                <div className="text-sm font-medium">Attachments:</div>
+                <div className="flex flex-wrap gap-2">
+                  {task.images.map((image) => (
+                    <div key={image.id} className="border rounded p-2 flex items-center gap-2">
+                      <Image className="h-4 w-4" />
+                      <span className="text-sm">{image.name}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
             
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Calendar className="h-4 w-4 text-gray-400" />
-              <p>
-                Assigned: {task.assignedDate ? formatDateTime(task.assignedDate) : "Not assigned"} 
-                {task.assignedBy && <span> by {task.assignedBy}</span>}
-              </p>
-            </div>
+            {task.assignedDate && (
+              <div className="text-xs text-gray-500">
+                Created on {formatDate(task.assignedDate)}
+              </div>
+            )}
           </div>
-        )}
-      </CardContent>
+        </CardContent>
+      )}
       
-      <CardFooter className="flex justify-end bg-gray-50 p-2">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={onToggleExpand}
-          className="h-8"
-        >
-          {isExpanded ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-        </Button>
+      <CardFooter className="border-t bg-gray-50 p-2">
+        <div className="flex justify-between items-center w-full">
+          <div className="flex items-center">
+            <Avatar className="h-6 w-6 mr-2">
+              <AvatarFallback>
+                {getInitials(task.responsible)}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-xs text-gray-600">
+              {task.responsible}
+            </span>
+          </div>
+          
+          <div className="flex space-x-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-xs" 
+              onClick={() => {
+                toast({
+                  description: "Comments feature coming soon"
+                });
+              }}
+            >
+              <MessageCircle className="h-3.5 w-3.5 mr-1" />
+              Comment
+            </Button>
+            
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onToggleExpand}
+            >
+              {isExpanded ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+        </div>
       </CardFooter>
     </Card>
   );
