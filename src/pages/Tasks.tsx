@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { 
@@ -313,6 +312,10 @@ function TaskCard({
     setIsEditing(false);
   };
 
+  const stopPropagation = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
     <Card 
       className={`hover:shadow-md transition-all cursor-pointer ${isExpanded ? 'scale-[1.02]' : ''}`}
@@ -325,7 +328,7 @@ function TaskCard({
               <Input 
                 value={editedTask.title}
                 onChange={(e) => setEditedTask({...editedTask, title: e.target.value})}
-                onClick={(e) => e.stopPropagation()}
+                onClick={stopPropagation}
                 className="font-medium"
               />
             ) : (
@@ -336,7 +339,7 @@ function TaskCard({
                 <Input 
                   value={editedTask.customer}
                   onChange={(e) => setEditedTask({...editedTask, customer: e.target.value})}
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={stopPropagation}
                   className="text-sm"
                 />
               ) : (
@@ -344,14 +347,13 @@ function TaskCard({
               )}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2" onClick={stopPropagation}>
             <Select
               value={task.priority}
               onValueChange={(value: TaskPriority) => {
                 console.log(`Select changing priority to: ${value}`);
                 onPriorityChange(value);
               }}
-              onClick={(e) => e.stopPropagation()}
             >
               <SelectTrigger className={`h-8 text-xs min-w-16 ${priorityColors[task.priority]}`}>
                 <SelectValue placeholder="Priority" />
@@ -369,7 +371,6 @@ function TaskCard({
                 console.log(`Select changing status to: ${value}`);
                 onStatusChange(value);
               }}
-              onClick={(e) => e.stopPropagation()}
             >
               <SelectTrigger 
                 className={`h-8 text-xs ${statusColors[task.status]} ${
@@ -426,7 +427,7 @@ function TaskCard({
                 type="date"
                 value={editedTask.dueDate}
                 onChange={(e) => setEditedTask({...editedTask, dueDate: e.target.value})}
-                onClick={(e) => e.stopPropagation()}
+                onClick={stopPropagation}
                 className="text-sm h-8"
               />
             ) : (
@@ -439,7 +440,7 @@ function TaskCard({
           <div className="mt-4 space-y-3 animate-fade-in">
             <div>
               {isEditing ? (
-                <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+                <div className="mt-2" onClick={stopPropagation}>
                   <label className="text-sm font-medium">Notes:</label>
                   <Textarea 
                     value={editedTask.notes || ''}
