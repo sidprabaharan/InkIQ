@@ -90,9 +90,7 @@ function BoxLabel({
 }) {
   return (
     <div className="flex flex-col h-full border border-black p-4" style={{ fontFamily: "Arial, sans-serif" }}>
-      <div className="text-center border-b pb-2 mb-2 print:hidden">
-        <h1 className="text-xl font-bold">Box Label</h1>
-      </div>
+      {/* Removed the Box Label title that was circled in red */}
 
       <div className="flex flex-col h-full">
         <div className="space-y-4 flex-grow">
