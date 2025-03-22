@@ -25,7 +25,6 @@ import {
   SelectItem 
 } from "@/components/ui/select";
 
-// Define types consistently at the top of the file
 type TaskStatus = 'pending' | 'in-progress' | 'completed';
 type TaskPriority = 'low' | 'medium' | 'high';
 
@@ -41,7 +40,6 @@ type TaskProps = {
 export default function Tasks() {
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Mock tasks data with consistent typings
   const mockTasks: TaskProps[] = [
     { id: '1', title: 'Follow up with ABC Corp', dueDate: '2023-09-15', status: 'pending', customer: 'ABC Corporation', priority: 'high' },
     { id: '2', title: 'Send revised quote', dueDate: '2023-09-18', status: 'pending', customer: 'XYZ Inc', priority: 'medium' },
@@ -50,16 +48,13 @@ export default function Tasks() {
     { id: '5', title: 'Order materials', dueDate: '2023-09-12', status: 'in-progress', customer: 'Johnson Printing', priority: 'medium' },
   ];
 
-  // State for tasks with the proper type annotation
   const [tasks, setTasks] = useState<TaskProps[]>(mockTasks);
   
-  // Filter tasks based on search query
   const filteredTasks = tasks.filter(task => 
     task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     task.customer.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Function to update task status with proper typing
   const updateTaskStatus = (taskId: string, newStatus: TaskStatus) => {
     const updatedTasks = tasks.map(task => 
       task.id === taskId ? { ...task, status: newStatus } : task
@@ -70,7 +65,6 @@ export default function Tasks() {
     });
   };
 
-  // Function to update task priority with proper typing
   const updateTaskPriority = (taskId: string, newPriority: TaskPriority) => {
     console.log(`Updating task ${taskId} priority to ${newPriority}`);
     const updatedTasks = tasks.map(task => 
@@ -202,13 +196,11 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
     'completed': 'bg-green-100 text-green-800'
   };
 
-  // Format date to be more readable
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
-  // Format status for display
   const formatStatus = (status: TaskStatus) => {
     return status === 'in-progress' 
       ? 'In Progress' 
@@ -224,7 +216,6 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
             <p className="text-sm text-gray-500">Responsible: {task.customer}</p>
           </div>
           <div className="flex gap-2">
-            {/* Priority Select */}
             <Select
               value={task.priority}
               onValueChange={(value: TaskPriority) => {
@@ -242,7 +233,6 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
               </SelectContent>
             </Select>
             
-            {/* Status Select - Further increased width for 'in-progress' status */}
             <Select
               value={task.status}
               onValueChange={(value: TaskStatus) => {
@@ -251,7 +241,13 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
               }}
             >
               <SelectTrigger 
-                className={`h-8 text-xs ${statusColors[task.status]} ${task.status === 'in-progress' ? 'min-w-28' : 'min-w-24'}`}
+                className={`h-8 text-xs ${statusColors[task.status]} ${
+                  task.status === 'in-progress' 
+                    ? 'min-w-28' 
+                    : task.status === 'completed' 
+                      ? 'min-w-28' 
+                      : 'min-w-24'
+                }`}
               >
                 <SelectValue placeholder="Status">
                   {formatStatus(task.status)}
