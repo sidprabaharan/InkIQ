@@ -10,12 +10,13 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogClose,
 } from "@/components/ui/dialog";
-import { Search, PlusCircle, ListChecks, ClipboardList } from "lucide-react";
-import { TaskCard } from "@/components/tasks/TaskCard";
-import { CreateTaskDialog } from "@/components/tasks/CreateTaskDialog";
+import { Search, Clock, ListChecks, ArrowUpFromLine, Pencil, User } from "lucide-react";
 import { TaskProps, TaskStatus, TaskPriority } from "@/types/task";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+import { CreateTaskDialog } from "@/components/tasks/CreateTaskDialog";
 
 interface OrderTasksDialogProps {
   open: boolean;
@@ -25,7 +26,6 @@ interface OrderTasksDialogProps {
 
 export function OrderTasksDialog({ open, onOpenChange, quoteId }: OrderTasksDialogProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [tasks, setTasks] = useState<TaskProps[]>([
     {
       id: `${quoteId}-task1`,
@@ -37,7 +37,7 @@ export function OrderTasksDialog({ open, onOpenChange, quoteId }: OrderTasksDial
       priority: "high",
       notes: "Check the dimensions and colors before approving",
       orderNumber: quoteId,
-      orderId: quoteId // Now valid since we added it to TaskProps
+      orderId: quoteId
     },
     {
       id: `${quoteId}-task2`,
@@ -47,7 +47,7 @@ export function OrderTasksDialog({ open, onOpenChange, quoteId }: OrderTasksDial
       responsible: "Jennifer Specialist",
       priority: "medium",
       orderNumber: quoteId,
-      orderId: quoteId // Now valid since we added it to TaskProps
+      orderId: quoteId
     },
   ]);
   const { toast } = useToast();
@@ -57,11 +57,6 @@ export function OrderTasksDialog({ open, onOpenChange, quoteId }: OrderTasksDial
     task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     task.responsible.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  // Toggle expanded task view
-  const toggleExpandTask = (taskId: string) => {
-    setExpandedTaskId(expandedTaskId === taskId ? null : taskId);
-  };
 
   // Handle task status updates
   const updateTaskStatus = (taskId: string, newStatus: TaskStatus) => {
@@ -111,14 +106,27 @@ export function OrderTasksDialog({ open, onOpenChange, quoteId }: OrderTasksDial
     });
   };
 
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      
+      // Format: Sep 15, 2023 at 3:30 PM
+      return `${format(date, "MMM d, yyyy")} at ${
+        format(date, "h:mm a").replace("AM", "am").replace("PM", "pm")
+      }`;
+    } catch (error) {
+      return "Invalid date";
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <ClipboardList className="h-5 w-5" />
-            Tasks for Order #{quoteId}
-          </DialogTitle>
+          <div className="flex items-center gap-2">
+            <ListChecks className="h-5 w-5" />
+            <DialogTitle>Tasks for Order #{quoteId}</DialogTitle>
+          </div>
           <DialogDescription>
             Manage tasks associated with this order
           </DialogDescription>
@@ -130,7 +138,7 @@ export function OrderTasksDialog({ open, onOpenChange, quoteId }: OrderTasksDial
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Search tasks..."
-                className="pl-10"
+                className="pl-10 bg-white border-gray-200"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -139,126 +147,269 @@ export function OrderTasksDialog({ open, onOpenChange, quoteId }: OrderTasksDial
               onCreateTask={addTask}
               initialOrderNumber={quoteId}
               trigger={
-                <Button className="whitespace-nowrap">
-                  <PlusCircle className="h-4 w-4 mr-2" />
+                <Button className="whitespace-nowrap bg-blue-600 hover:bg-blue-700">
+                  <ArrowUpFromLine className="h-4 w-4 mr-2" />
                   Add Task
                 </Button>
               }
             />
           </div>
 
-          <Tabs defaultValue="all" className="w-full">
-            <TabsList className="mb-4 w-full grid grid-cols-4">
-              <TabsTrigger value="all">All Tasks</TabsTrigger>
-              <TabsTrigger value="pending">Pending</TabsTrigger>
-              <TabsTrigger value="in-progress">In Progress</TabsTrigger>
-              <TabsTrigger value="completed">Completed</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="all" className="space-y-4">
-              {filteredTasks.length > 0 ? (
-                filteredTasks.map(task => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    isExpanded={expandedTaskId === task.id}
-                    onToggleExpand={() => toggleExpandTask(task.id)}
-                    onStatusChange={(status) => updateTaskStatus(task.id, status)}
-                    onPriorityChange={(priority) => updateTaskPriority(task.id, priority)}
-                    onTaskUpdate={(fields) => updateTask(task.id, fields)}
-                  />
-                ))
-              ) : (
-                <div className="text-center py-10 border rounded-lg">
-                  <ListChecks className="mx-auto h-12 w-12 text-gray-300" />
-                  <h3 className="mt-2 text-sm font-semibold text-gray-900">No tasks found</h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    {searchQuery ? "Try modifying your search" : "Create a task to get started"}
-                  </p>
-                </div>
-              )}
-            </TabsContent>
-            
-            <TabsContent value="pending" className="space-y-4">
-              {filteredTasks.filter(t => t.status === "pending").length > 0 ? (
-                filteredTasks
-                  .filter(t => t.status === "pending")
-                  .map(task => (
-                    <TaskCard
+          <div className="bg-gray-50 p-1 rounded-lg">
+            <Tabs defaultValue="all" className="w-full">
+              <TabsList className="w-full grid grid-cols-4 bg-transparent h-10 mb-0">
+                <TabsTrigger 
+                  value="all" 
+                  className="data-[state=active]:bg-white rounded-md data-[state=active]:shadow-none"
+                >
+                  All Tasks
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="pending" 
+                  className="data-[state=active]:bg-white rounded-md data-[state=active]:shadow-none"
+                >
+                  Pending
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="in-progress" 
+                  className="data-[state=active]:bg-white rounded-md data-[state=active]:shadow-none"
+                >
+                  In Progress
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="completed" 
+                  className="data-[state=active]:bg-white rounded-md data-[state=active]:shadow-none"
+                >
+                  Completed
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="all" className="space-y-4 mt-4">
+                {filteredTasks.length > 0 ? (
+                  filteredTasks.map(task => (
+                    <TaskRow
                       key={task.id}
                       task={task}
-                      isExpanded={expandedTaskId === task.id}
-                      onToggleExpand={() => toggleExpandTask(task.id)}
                       onStatusChange={(status) => updateTaskStatus(task.id, status)}
                       onPriorityChange={(priority) => updateTaskPriority(task.id, priority)}
                       onTaskUpdate={(fields) => updateTask(task.id, fields)}
                     />
                   ))
-              ) : (
-                <div className="text-center py-10 border rounded-lg">
-                  <ListChecks className="mx-auto h-12 w-12 text-gray-300" />
-                  <h3 className="mt-2 text-sm font-semibold text-gray-900">No pending tasks</h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    {searchQuery ? "Try modifying your search" : "Create a task to get started"}
-                  </p>
-                </div>
-              )}
-            </TabsContent>
-            
-            <TabsContent value="in-progress" className="space-y-4">
-              {filteredTasks.filter(t => t.status === "in-progress").length > 0 ? (
-                filteredTasks
-                  .filter(t => t.status === "in-progress")
-                  .map(task => (
-                    <TaskCard
-                      key={task.id}
-                      task={task}
-                      isExpanded={expandedTaskId === task.id}
-                      onToggleExpand={() => toggleExpandTask(task.id)}
-                      onStatusChange={(status) => updateTaskStatus(task.id, status)}
-                      onPriorityChange={(priority) => updateTaskPriority(task.id, priority)}
-                      onTaskUpdate={(fields) => updateTask(task.id, fields)}
-                    />
-                  ))
-              ) : (
-                <div className="text-center py-10 border rounded-lg">
-                  <ListChecks className="mx-auto h-12 w-12 text-gray-300" />
-                  <h3 className="mt-2 text-sm font-semibold text-gray-900">No in-progress tasks</h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    {searchQuery ? "Try modifying your search" : "Create a task to get started"}
-                  </p>
-                </div>
-              )}
-            </TabsContent>
-            
-            <TabsContent value="completed" className="space-y-4">
-              {filteredTasks.filter(t => t.status === "completed").length > 0 ? (
-                filteredTasks
-                  .filter(t => t.status === "completed")
-                  .map(task => (
-                    <TaskCard
-                      key={task.id}
-                      task={task}
-                      isExpanded={expandedTaskId === task.id}
-                      onToggleExpand={() => toggleExpandTask(task.id)}
-                      onStatusChange={(status) => updateTaskStatus(task.id, status)}
-                      onPriorityChange={(priority) => updateTaskPriority(task.id, priority)}
-                      onTaskUpdate={(fields) => updateTask(task.id, fields)}
-                    />
-                  ))
-              ) : (
-                <div className="text-center py-10 border rounded-lg">
-                  <ListChecks className="mx-auto h-12 w-12 text-gray-300" />
-                  <h3 className="mt-2 text-sm font-semibold text-gray-900">No completed tasks</h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    {searchQuery ? "Try modifying your search" : "Create a task to get started"}
-                  </p>
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
+                ) : (
+                  <EmptyTaskList query={searchQuery} />
+                )}
+              </TabsContent>
+              
+              <TabsContent value="pending" className="space-y-4 mt-4">
+                {filteredTasks.filter(t => t.status === "pending").length > 0 ? (
+                  filteredTasks
+                    .filter(t => t.status === "pending")
+                    .map(task => (
+                      <TaskRow
+                        key={task.id}
+                        task={task}
+                        onStatusChange={(status) => updateTaskStatus(task.id, status)}
+                        onPriorityChange={(priority) => updateTaskPriority(task.id, priority)}
+                        onTaskUpdate={(fields) => updateTask(task.id, fields)}
+                      />
+                    ))
+                ) : (
+                  <EmptyTaskList query={searchQuery} status="pending" />
+                )}
+              </TabsContent>
+              
+              <TabsContent value="in-progress" className="space-y-4 mt-4">
+                {filteredTasks.filter(t => t.status === "in-progress").length > 0 ? (
+                  filteredTasks
+                    .filter(t => t.status === "in-progress")
+                    .map(task => (
+                      <TaskRow
+                        key={task.id}
+                        task={task}
+                        onStatusChange={(status) => updateTaskStatus(task.id, status)}
+                        onPriorityChange={(priority) => updateTaskPriority(task.id, priority)}
+                        onTaskUpdate={(fields) => updateTask(task.id, fields)}
+                      />
+                    ))
+                ) : (
+                  <EmptyTaskList query={searchQuery} status="in-progress" />
+                )}
+              </TabsContent>
+              
+              <TabsContent value="completed" className="space-y-4 mt-4">
+                {filteredTasks.filter(t => t.status === "completed").length > 0 ? (
+                  filteredTasks
+                    .filter(t => t.status === "completed")
+                    .map(task => (
+                      <TaskRow
+                        key={task.id}
+                        task={task}
+                        onStatusChange={(status) => updateTaskStatus(task.id, status)}
+                        onPriorityChange={(priority) => updateTaskPriority(task.id, priority)}
+                        onTaskUpdate={(fields) => updateTask(task.id, fields)}
+                      />
+                    ))
+                ) : (
+                  <EmptyTaskList query={searchQuery} status="completed" />
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+interface TaskRowProps {
+  task: TaskProps;
+  onStatusChange: (status: TaskStatus) => void;
+  onPriorityChange: (priority: TaskPriority) => void;
+  onTaskUpdate: (fields: Partial<TaskProps>) => void;
+}
+
+function TaskRow({ task, onStatusChange, onPriorityChange, onTaskUpdate }: TaskRowProps) {
+  return (
+    <div className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow">
+      <div className="flex flex-col space-y-3">
+        <div className="flex justify-between">
+          <h3 className="text-lg font-medium">{task.title}</h3>
+          <div className="flex gap-2">
+            <PriorityBadge priority={task.priority} onChange={(p) => onPriorityChange(p)} />
+            <StatusBadge status={task.status} onChange={(s) => onStatusChange(s)} />
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Pencil className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        <p className="text-sm text-gray-600">Order: #{task.orderNumber}</p>
+        <p className="text-sm text-gray-600">Responsible: {task.responsible}</p>
+        <div className="flex items-center text-sm text-gray-600 mt-1">
+          <Clock className="h-4 w-4 mr-2 text-gray-400" />
+          <span>Due: {formatDueDate(task.dueDate, task.dueTime)}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function formatDueDate(dueDate: string, dueTime?: string) {
+  try {
+    const date = new Date(dueDate);
+    const formattedDate = format(date, "MMM d, yyyy");
+    
+    if (dueTime) {
+      return `${formattedDate} at ${dueTime}`;
+    }
+    
+    return formattedDate;
+  } catch (error) {
+    return "Invalid date";
+  }
+}
+
+interface PriorityBadgeProps {
+  priority: TaskPriority;
+  onChange: (priority: TaskPriority) => void;
+}
+
+function PriorityBadge({ priority, onChange }: PriorityBadgeProps) {
+  const getBadgeStyles = () => {
+    switch (priority) {
+      case 'high':
+        return 'bg-red-100 text-red-800 hover:bg-red-200';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200';
+      case 'low':
+        return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getLabel = () => {
+    return priority.charAt(0).toUpperCase() + priority.slice(1);
+  };
+
+  return (
+    <Badge 
+      className={`cursor-pointer ${getBadgeStyles()}`}
+      onClick={() => {
+        const nextPriority: Record<TaskPriority, TaskPriority> = {
+          high: 'medium',
+          medium: 'low',
+          low: 'high'
+        };
+        onChange(nextPriority[priority]);
+      }}
+    >
+      {getLabel()}
+    </Badge>
+  );
+}
+
+interface StatusBadgeProps {
+  status: TaskStatus;
+  onChange: (status: TaskStatus) => void;
+}
+
+function StatusBadge({ status, onChange }: StatusBadgeProps) {
+  const getBadgeStyles = () => {
+    switch (status) {
+      case 'pending':
+        return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
+      case 'in-progress':
+        return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
+      case 'completed':
+        return 'bg-green-100 text-green-800 hover:bg-green-200';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getLabel = () => {
+    if (status === 'in-progress') return 'In Progress';
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  };
+
+  return (
+    <Badge 
+      className={`cursor-pointer ${getBadgeStyles()}`}
+      onClick={() => {
+        const nextStatus: Record<TaskStatus, TaskStatus> = {
+          pending: 'in-progress',
+          'in-progress': 'completed',
+          completed: 'pending'
+        };
+        onChange(nextStatus[status]);
+      }}
+    >
+      {getLabel()}
+    </Badge>
+  );
+}
+
+interface EmptyTaskListProps {
+  query: string;
+  status?: TaskStatus;
+}
+
+function EmptyTaskList({ query, status }: EmptyTaskListProps) {
+  let message = "No tasks found";
+  
+  if (query) {
+    message = `No tasks found matching "${query}"`;
+  } else if (status) {
+    message = `No ${status === 'in-progress' ? 'in-progress' : status} tasks`;
+  }
+  
+  return (
+    <div className="text-center py-10 border border-gray-200 rounded-lg bg-white">
+      <ListChecks className="mx-auto h-12 w-12 text-gray-300" />
+      <h3 className="mt-2 text-sm font-semibold text-gray-900">{message}</h3>
+      <p className="mt-1 text-sm text-gray-500">
+        {!query ? "Create a task to get started." : "Try modifying your search."}
+      </p>
+    </div>
   );
 }
