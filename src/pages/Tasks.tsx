@@ -16,19 +16,39 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
+import { 
+  Select, 
+  SelectTrigger, 
+  SelectValue, 
+  SelectContent, 
+  SelectItem 
+} from "@/components/ui/select";
+
+// Define types consistently at the top of the file
+type TaskStatus = 'pending' | 'in-progress' | 'completed';
+type TaskPriority = 'low' | 'medium' | 'high';
+
+type TaskProps = {
+  id: string;
+  title: string;
+  dueDate: string;
+  status: TaskStatus;
+  customer: string;
+  priority: TaskPriority;
+};
 
 export default function Tasks() {
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Mock tasks data (in a real app, this would come from an API or context)
-  const mockTasks = [
-    { id: '1', title: 'Follow up with ABC Corp', dueDate: '2023-09-15', status: 'pending' as const, customer: 'ABC Corporation', priority: 'high' as const },
-    { id: '2', title: 'Send revised quote', dueDate: '2023-09-18', status: 'pending' as const, customer: 'XYZ Inc', priority: 'medium' as const },
-    { id: '3', title: 'Schedule installation', dueDate: '2023-09-20', status: 'pending' as const, customer: '123 Industries', priority: 'low' as const },
-    { id: '4', title: 'Collect payment', dueDate: '2023-09-10', status: 'completed' as const, customer: 'Smith Design', priority: 'high' as const },
-    { id: '5', title: 'Order materials', dueDate: '2023-09-12', status: 'in-progress' as const, customer: 'Johnson Printing', priority: 'medium' as const },
+  // Mock tasks data with consistent typings
+  const mockTasks: TaskProps[] = [
+    { id: '1', title: 'Follow up with ABC Corp', dueDate: '2023-09-15', status: 'pending', customer: 'ABC Corporation', priority: 'high' },
+    { id: '2', title: 'Send revised quote', dueDate: '2023-09-18', status: 'pending', customer: 'XYZ Inc', priority: 'medium' },
+    { id: '3', title: 'Schedule installation', dueDate: '2023-09-20', status: 'pending', customer: '123 Industries', priority: 'low' },
+    { id: '4', title: 'Collect payment', dueDate: '2023-09-10', status: 'completed', customer: 'Smith Design', priority: 'high' },
+    { id: '5', title: 'Order materials', dueDate: '2023-09-12', status: 'in-progress', customer: 'Johnson Printing', priority: 'medium' },
   ];
 
   // Filter tasks based on search query
@@ -37,11 +57,11 @@ export default function Tasks() {
     task.customer.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // State for tasks (in a real app, this would be stored in a context or fetched from an API)
-  const [tasks, setTasks] = useState(mockTasks);
+  // State for tasks with the proper type annotation
+  const [tasks, setTasks] = useState<TaskProps[]>(mockTasks);
 
-  // Function to update task status
-  const updateTaskStatus = (taskId: string, newStatus: TaskProps['status']) => {
+  // Function to update task status with proper typing
+  const updateTaskStatus = (taskId: string, newStatus: TaskStatus) => {
     const updatedTasks = tasks.map(task => 
       task.id === taskId ? { ...task, status: newStatus } : task
     );
@@ -51,8 +71,8 @@ export default function Tasks() {
     });
   };
 
-  // Function to update task priority
-  const updateTaskPriority = (taskId: string, newPriority: TaskProps['priority']) => {
+  // Function to update task priority with proper typing
+  const updateTaskPriority = (taskId: string, newPriority: TaskPriority) => {
     const updatedTasks = tasks.map(task => 
       task.id === taskId ? { ...task, priority: newPriority } : task
     );
@@ -163,19 +183,10 @@ export default function Tasks() {
   );
 }
 
-type TaskProps = {
-  id: string;
-  title: string;
-  dueDate: string;
-  status: 'pending' | 'in-progress' | 'completed';
-  customer: string;
-  priority: 'low' | 'medium' | 'high';
-};
-
 interface TaskCardProps {
   task: TaskProps;
-  onStatusChange: (status: TaskProps['status']) => void;
-  onPriorityChange: (priority: TaskProps['priority']) => void;
+  onStatusChange: (status: TaskStatus) => void;
+  onPriorityChange: (priority: TaskPriority) => void;
 }
 
 function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
@@ -198,15 +209,10 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
   };
 
   // Format status for display
-  const formatStatus = (status: TaskProps['status']) => {
+  const formatStatus = (status: TaskStatus) => {
     return status === 'in-progress' 
       ? 'In Progress' 
       : status.charAt(0).toUpperCase() + status.slice(1);
-  };
-
-  // Format priority for display
-  const formatPriority = (priority: TaskProps['priority']) => {
-    return priority.charAt(0).toUpperCase() + priority.slice(1);
   };
 
   return (
@@ -218,61 +224,37 @@ function TaskCard({ task, onStatusChange, onPriorityChange }: TaskCardProps) {
             <p className="text-sm text-gray-500">Responsible: {task.customer}</p>
           </div>
           <div className="flex gap-2">
-            {/* Priority Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger className={`px-2 py-1 rounded text-xs flex items-center gap-1 ${priorityColors[task.priority]}`}>
-                {formatPriority(task.priority)}
-                <ChevronDown className="h-3 w-3" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onPriorityChange('low')} className="cursor-pointer">
-                  <div className="flex items-center">
-                    {task.priority === 'low' && <Check className="mr-2 h-4 w-4" />}
-                    <span className={task.priority === 'low' ? 'font-medium' : ''}>Low</span>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onPriorityChange('medium')} className="cursor-pointer">
-                  <div className="flex items-center">
-                    {task.priority === 'medium' && <Check className="mr-2 h-4 w-4" />}
-                    <span className={task.priority === 'medium' ? 'font-medium' : ''}>Medium</span>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onPriorityChange('high')} className="cursor-pointer">
-                  <div className="flex items-center">
-                    {task.priority === 'high' && <Check className="mr-2 h-4 w-4" />}
-                    <span className={task.priority === 'high' ? 'font-medium' : ''}>High</span>
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Priority Select */}
+            <Select
+              defaultValue={task.priority}
+              onValueChange={(value: TaskPriority) => onPriorityChange(value)}
+            >
+              <SelectTrigger className={`h-8 text-xs ${priorityColors[task.priority]}`}>
+                <SelectValue placeholder="Priority" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+              </SelectContent>
+            </Select>
             
-            {/* Status Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger className={`px-2 py-1 rounded text-xs flex items-center gap-1 ${statusColors[task.status]}`}>
-                {formatStatus(task.status)}
-                <ChevronDown className="h-3 w-3" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onStatusChange('pending')} className="cursor-pointer">
-                  <div className="flex items-center">
-                    {task.status === 'pending' && <Check className="mr-2 h-4 w-4" />}
-                    <span className={task.status === 'pending' ? 'font-medium' : ''}>Pending</span>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onStatusChange('in-progress')} className="cursor-pointer">
-                  <div className="flex items-center">
-                    {task.status === 'in-progress' && <Check className="mr-2 h-4 w-4" />}
-                    <span className={task.status === 'in-progress' ? 'font-medium' : ''}>In Progress</span>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onStatusChange('completed')} className="cursor-pointer">
-                  <div className="flex items-center">
-                    {task.status === 'completed' && <Check className="mr-2 h-4 w-4" />}
-                    <span className={task.status === 'completed' ? 'font-medium' : ''}>Completed</span>
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Status Select */}
+            <Select
+              defaultValue={task.status}
+              onValueChange={(value: TaskStatus) => onStatusChange(value)}
+            >
+              <SelectTrigger className={`h-8 text-xs ${statusColors[task.status]}`}>
+                <SelectValue placeholder="Status">
+                  {formatStatus(task.status)}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="in-progress">In Progress</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <div className="mt-2">
