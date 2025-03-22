@@ -74,14 +74,6 @@ export function TaskCard({
     completed: "bg-green-50 text-green-600 hover:bg-green-100"
   };
   
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(part => part.charAt(0))
-      .join('')
-      .toUpperCase();
-  };
-  
   const formatDate = (dateString: string) => {
     try {
       if (!dateString) return "";
