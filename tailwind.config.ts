@@ -93,11 +93,22 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'in': {
+					from: {
+						opacity: '0',
+						transform: 'translateY(5px)'
+					},
+					to: {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'in': 'in 0.2s ease-out'
 			}
 		}
 	},
