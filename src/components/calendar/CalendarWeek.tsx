@@ -11,6 +11,7 @@ import {
   getHours,
   getMinutes,
   isWithinInterval,
+  isToday,
   parseISO,
   addMinutes
 } from 'date-fns';
@@ -132,28 +133,43 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
     };
   };
   
+  const getCategoryColor = (category: string): string => {
+    switch (category) {
+      case 'task':
+        return '#4285F4'; // Blue
+      case 'order':
+        return '#F4B400'; // Yellow/Gold
+      case 'work':
+        return '#0F9D58'; // Green
+      case 'personal':
+        return '#DB4437'; // Red
+      default:
+        return '#4285F4';
+    }
+  };
+
   return (
     <div className="flex flex-col h-full overflow-auto">
       {/* Week header */}
-      <div className="grid grid-cols-8 border-b sticky top-0 bg-white z-10">
+      <div className="grid grid-cols-8 border-b sticky top-0 bg-white z-10 select-none">
         <div className="p-2 border-r text-center text-xs font-medium text-gray-500">
-          GMT-5
+          GMT-04
         </div>
         {days.map((day, i) => {
-          const isToday = isSameDay(day, new Date());
+          const isCurrentDay = isToday(day);
           
           return (
             <div 
               key={i} 
               className={cn(
                 "p-2 text-center",
-                isToday && "bg-blue-50"
+                isCurrentDay && "bg-blue-50"
               )}
             >
-              <div className="text-xs font-medium">{format(day, 'EEE')}</div>
+              <div className="text-xs font-medium">{format(day, 'EEE').toUpperCase()}</div>
               <div className={cn(
-                "text-lg inline-flex h-10 w-10 items-center justify-center rounded-full",
-                isToday && "bg-blue-600 text-white font-medium"
+                "text-xl inline-flex h-10 w-10 items-center justify-center rounded-full font-normal",
+                isCurrentDay && "bg-blue-600 text-white font-medium"
               )}>
                 {format(day, 'd')}
               </div>
@@ -170,7 +186,7 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
             <div key={hour} className="h-[60px] relative border-b text-xs text-gray-500 pr-2 -mt-2.5">
               {hour === 0 ? null : (
                 <div className="absolute right-2">
-                  {hour % 12 === 0 ? '12' : hour % 12}:00 {hour >= 12 ? 'PM' : 'AM'}
+                  {hour % 12 === 0 ? '12' : hour % 12} {hour >= 12 ? 'PM' : 'AM'}
                 </div>
               )}
             </div>
@@ -199,16 +215,16 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
                   
                   const { width, left } = getEventWidthAndLeft(event, day, dayEvents);
                   const isAllDay = event.allDay;
+                  const eventColor = event.color || getCategoryColor(event.category);
                   
                   if (isAllDay) {
                     return (
                       <div
                         key={event.id}
-                        className="absolute top-0 left-0 right-0 h-6 px-1 text-xs truncate z-10"
+                        className="absolute top-0 left-0 right-0 h-6 px-2 text-xs truncate z-10 font-medium"
                         style={{
-                          backgroundColor: `${event.color}33`,
-                          color: event.color,
-                          borderLeft: `3px solid ${event.color}`
+                          backgroundColor: eventColor,
+                          color: 'white',
                         }}
                       >
                         {event.title}
@@ -219,22 +235,24 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
                   return (
                     <div
                       key={event.id}
-                      className="absolute px-1 rounded-sm truncate text-xs hover:z-20"
+                      className="absolute px-2 truncate text-xs hover:z-20 rounded-sm"
                       style={{
                         top: `${position.top}px`,
                         height: `${position.height}px`,
                         width,
                         left,
-                        backgroundColor: `${event.color}33`,
-                        color: event.color,
-                        borderLeft: `3px solid ${event.color}`,
+                        backgroundColor: eventColor,
+                        color: 'white',
                         overflow: 'hidden'
                       }}
                     >
-                      <div className="text-xs font-medium">
-                        {format(new Date(event.start), 'h:mm')}
+                      <div className="font-medium">
+                        {format(new Date(event.start), 'h:mm a')} - {format(new Date(event.end), 'h:mm a')}
                       </div>
                       <div className="truncate">{event.title}</div>
+                      {event.location && (
+                        <div className="truncate text-white/80 text-[10px]">{event.location}</div>
+                      )}
                     </div>
                   );
                 })}
