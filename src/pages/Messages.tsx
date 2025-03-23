@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Mail, Inbox, Send, Archive, Trash, Star, Tag, Clock, UserPlus, MailPlus, Search, Filter, Pencil, Checkbox } from "lucide-react";
+import { Mail, Inbox, Send, Archive, Trash, Star, Tag, Clock, UserPlus, MailPlus, Search, Filter, Pencil } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Checkbox } from "@/components/ui/checkbox";
 import { mockEmails } from "@/data/mockEmails";
 import { EmailList } from "@/components/email/EmailList";
 import { EmailDetail } from "@/components/email/EmailDetail";
