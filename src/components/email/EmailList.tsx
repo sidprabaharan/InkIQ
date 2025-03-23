@@ -53,8 +53,8 @@ export function EmailList({ emails, selectedEmailId, onSelectEmail }: EmailListP
         emails.map((email) => (
           <div
             key={email.id}
-            className={`flex py-2 px-4 border-b hover:shadow-sm cursor-pointer ${
-              selectedEmailId === email.id ? "bg-blue-50" : email.read ? "" : "font-medium"
+            className={`flex py-2 px-4 border-b hover:bg-gray-100 cursor-pointer ${
+              email.read ? "" : "font-medium bg-gray-50"
             }`}
             onClick={() => onSelectEmail(email.id)}
             onMouseEnter={() => setHoveredEmail(email.id)}
@@ -75,45 +75,44 @@ export function EmailList({ emails, selectedEmailId, onSelectEmail }: EmailListP
                 </button>
               </div>
               
-              <div className="flex-1 min-w-0 ml-2">
-                <div className="flex items-center">
-                  <span className={`mr-2 truncate font-medium w-40 ${!email.read ? "text-black" : "text-gray-600"}`}>
-                    {email.from.name}
-                  </span>
-                  <div className="flex-1 flex">
-                    <p className={`truncate mr-2 ${!email.read ? "font-medium text-black" : "text-gray-600"}`}>
-                      {email.subject}
-                      <span className="text-gray-500 mx-1">-</span>
-                      <span className="text-gray-500 truncate">{email.content.replace(/<[^>]*>/g, " ").slice(0, 60)}</span>
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {email.labels?.map(label => (
-                      <Badge 
-                        key={label} 
-                        variant="outline" 
-                        className={`text-xs px-1.5 py-0 h-5 ${
-                          label === 'work' ? 'border-green-500 text-green-700 bg-green-50' :
-                          label === 'personal' ? 'border-blue-500 text-blue-700 bg-blue-50' :
-                          label === 'important' ? 'border-red-500 text-red-700 bg-red-50' : ''
-                        }`}
-                      >
-                        {label}
-                      </Badge>
-                    ))}
-                    
-                    {email.attachments.length > 0 && (
-                      <span className="text-gray-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                        </svg>
-                      </span>
-                    )}
-                    
-                    <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
-                      {getRelativeTime(email.date)}
+              <div className="flex-1 min-w-0 ml-2 flex items-center">
+                <span className={`mr-4 truncate w-44 ${!email.read ? "text-black" : "text-gray-600"}`}>
+                  {email.from.name}
+                </span>
+                <div className="flex-1 flex items-center">
+                  <p className={`truncate ${!email.read ? "font-medium text-black" : "text-gray-600"}`}>
+                    <span className="font-medium mr-1">{email.subject}</span>
+                    <span className="text-gray-500 mx-1">-</span>
+                    <span className="text-gray-500 truncate">{email.content.replace(/<[^>]*>/g, " ").slice(0, 60)}</span>
+                  </p>
+                </div>
+                
+                <div className="flex items-center ml-4 space-x-2 min-w-[100px] justify-end">
+                  {email.labels?.map(label => (
+                    <Badge 
+                      key={label} 
+                      variant="outline" 
+                      className={`text-xs px-1.5 py-0 h-5 ${
+                        label === 'work' ? 'border-green-500 text-green-700 bg-green-50' :
+                        label === 'personal' ? 'border-blue-500 text-blue-700 bg-blue-50' :
+                        label === 'important' ? 'border-red-500 text-red-700 bg-red-50' : ''
+                      }`}
+                    >
+                      {label}
+                    </Badge>
+                  ))}
+                  
+                  {email.attachments.length > 0 && (
+                    <span className="text-gray-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                      </svg>
                     </span>
-                  </div>
+                  )}
+                  
+                  <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
+                    {getRelativeTime(email.date)}
+                  </span>
                 </div>
               </div>
             </div>
