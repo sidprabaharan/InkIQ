@@ -165,14 +165,16 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
       {/* Week grid */}
       <div className="flex flex-1 overflow-auto">
         {/* Time column */}
-        <div className="w-16 flex-shrink-0 border-r">
+        <div className="w-16 flex-shrink-0 border-r text-right">
           {hours.map(hour => (
-            <div key={hour} className="h-[60px] relative border-b text-xs text-gray-500 pr-2 -mt-2.5">
-              {hour === 0 ? null : (
-                <div className="absolute right-2">
-                  {hour % 12 === 0 ? '12' : hour % 12}:00 {hour >= 12 ? 'PM' : 'AM'}
-                </div>
-              )}
+            <div key={hour} className="h-[60px] relative">
+              <div className="absolute -top-[9px] right-2 text-xs text-gray-500">
+                {hour === 0 ? null : (
+                  <div>
+                    {hour % 12 === 0 ? '12' : hour % 12}:00 {hour >= 12 ? 'PM' : 'AM'}
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -186,9 +188,8 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
               <div key={dayIndex} className="relative border-r">
                 {/* Hour divisions */}
                 {hours.map(hour => (
-                  <div key={hour} className="h-[60px] border-b border-gray-200 relative">
-                    <div className="absolute top-0 left-0 w-full h-[1px] bg-gray-100"></div>
-                    <div className="absolute top-[30px] left-0 w-full h-[1px] bg-gray-50"></div>
+                  <div key={hour} className="h-[60px] border-t border-gray-200 relative">
+                    {/* No additional inner divider needed as we're using border-t */}
                   </div>
                 ))}
                 
@@ -235,6 +236,9 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
                         {format(new Date(event.start), 'h:mm')}
                       </div>
                       <div className="truncate">{event.title}</div>
+                      {event.location && (
+                        <div className="text-xs opacity-75 truncate">{event.location}</div>
+                      )}
                     </div>
                   );
                 })}
