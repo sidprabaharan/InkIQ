@@ -1,20 +1,21 @@
 
+import React from 'react';
 import { 
   startOfWeek, 
   endOfWeek, 
   eachDayOfInterval, 
-  eachHourOfInterval, 
   format, 
-  isSameDay, 
-  isToday,
+  isSameDay,
   addHours,
+  startOfDay,
   getHours,
   getMinutes,
-  differenceInMinutes,
-  isWithinInterval
-} from "date-fns";
-import { CalendarEvent } from "@/pages/Calendar";
-import { cn } from "@/lib/utils";
+  isWithinInterval,
+  parseISO,
+  addMinutes
+} from 'date-fns';
+import { CalendarEvent } from '@/pages/Calendar';
+import { cn } from '@/lib/utils';
 
 interface CalendarWeekProps {
   currentDate: Date;
@@ -22,177 +23,224 @@ interface CalendarWeekProps {
 }
 
 export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
-  const weekStart = startOfWeek(currentDate);
-  const weekEnd = endOfWeek(weekStart);
+  const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
+  const weekEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
   
-  const weekDays = eachDayOfInterval({
-    start: weekStart,
-    end: weekEnd
-  });
-  
+  const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
   const hours = Array.from({ length: 24 }, (_, i) => i);
   
-  const getEventsForDayAndHour = (day: Date, hour: number) => {
-    const hourStart = new Date(day);
-    hourStart.setHours(hour, 0, 0, 0);
+  // Calculate event position and height
+  const getEventPositionForDay = (event: CalendarEvent, day: Date) => {
+    const eventStart = new Date(event.start);
+    const eventEnd = new Date(event.end);
     
-    const hourEnd = new Date(hourStart);
-    hourEnd.setHours(hour + 1, 0, 0, 0);
+    // Check if event starts or ends on this day
+    if (!isSameDay(eventStart, day) && !isSameDay(eventEnd, day)) {
+      // Check if day is between start and end of multi-day event
+      const dayStart = startOfDay(day);
+      const dayEnd = addHours(dayStart, 24);
+      
+      if (eventStart < dayStart && eventEnd > dayEnd) {
+        // Day is in the middle of a multi-day event
+        return {
+          top: 0,
+          height: 24 * 60 // Full day height
+        };
+      }
+      
+      return null; // Event not on this day
+    }
     
+    let start = eventStart;
+    let end = eventEnd;
+    
+    // If event starts on a different day, set start to beginning of this day
+    if (!isSameDay(eventStart, day)) {
+      start = startOfDay(day);
+    }
+    
+    // If event ends on a different day, set end to end of this day
+    if (!isSameDay(eventEnd, day)) {
+      end = addHours(startOfDay(day), 24);
+    }
+    
+    const startHour = getHours(start) + getMinutes(start) / 60;
+    const endHour = getHours(end) + getMinutes(end) / 60;
+    const duration = endHour - startHour;
+    
+    return {
+      top: startHour * 60,
+      height: duration * 60
+    };
+  };
+  
+  // Get events for a specific day
+  const getEventsForDay = (day: Date) => {
     return events.filter(event => {
       const eventStart = new Date(event.start);
       const eventEnd = new Date(event.end);
       
-      // Skip all-day events (handled separately)
-      if (event.allDay) return false;
+      // Check if the event is on this day
+      if (isSameDay(eventStart, day) || isSameDay(eventEnd, day)) {
+        return true;
+      }
       
-      // Check if event overlaps with this hour
-      return isWithinInterval(hourStart, { start: eventStart, end: eventEnd }) ||
-             isWithinInterval(eventEnd, { start: hourStart, end: hourEnd }) ||
-             (eventStart <= hourStart && eventEnd >= hourEnd);
+      // Check if this day is within a multi-day event
+      const dayStart = startOfDay(day);
+      const dayEnd = addHours(dayStart, 24);
+      
+      return eventStart < dayEnd && eventEnd > dayStart;
     });
   };
   
-  const getAllDayEvents = (day: Date) => {
-    return events.filter(event => 
-      event.allDay && isSameDay(new Date(event.start), day)
-    );
-  };
-  
-  const calculateEventPosition = (event: CalendarEvent, hour: number) => {
-    const eventStart = new Date(event.start);
-    const hourStart = new Date(eventStart);
-    hourStart.setHours(hour, 0, 0, 0);
+  // Calculate width and left position for overlapping events
+  const getEventWidthAndLeft = (event: CalendarEvent, day: Date, events: CalendarEvent[]) => {
+    const eventsOnSameDay = events.filter(e => {
+      if (e.id === event.id) return false;
+      
+      const eventStart = new Date(event.start);
+      const eventEnd = new Date(event.end);
+      const eStart = new Date(e.start);
+      const eEnd = new Date(e.end);
+      
+      // Check for time overlap
+      return (
+        isWithinInterval(eStart, { start: eventStart, end: eventEnd }) ||
+        isWithinInterval(eEnd, { start: eventStart, end: eventEnd }) ||
+        isWithinInterval(eventStart, { start: eStart, end: eEnd })
+      );
+    });
     
-    const minutesOffset = differenceInMinutes(eventStart, hourStart);
-    const eventDuration = differenceInMinutes(new Date(event.end), eventStart);
+    if (eventsOnSameDay.length === 0) {
+      return { width: '95%', left: '2%' };
+    }
     
-    // Calculate top position based on minutes offset
-    const top = (minutesOffset / 60) * 100;
+    // Find position in overlapping group
+    const totalEvents = eventsOnSameDay.length + 1;
+    let position = 0;
     
-    // Calculate height based on event duration (max 60 minutes per cell)
-    const height = Math.min((eventDuration / 60) * 100, 100);
+    eventsOnSameDay.forEach(e => {
+      if (new Date(e.start) < new Date(event.start)) position++;
+    });
     
-    return {
-      top: `${top}%`,
-      height: `${height}%`,
-      maxHeight: hour === 23 ? '100%' : 'none'
+    const width = 95 / totalEvents;
+    const left = 2 + position * width;
+    
+    return { 
+      width: `${width}%`, 
+      left: `${left}%` 
     };
   };
   
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <div className="grid grid-cols-[50px_repeat(7,1fr)] border-b">
-        <div />
-        {weekDays.map((day, i) => (
-          <div 
-            key={i} 
-            className={cn(
-              "py-2 text-center",
-              isToday(day) && "bg-blue-50"
-            )}
-          >
-            <div className="text-sm font-medium">
-              {format(day, 'EEE')}
-            </div>
-            <div className={cn(
-              "h-7 w-7 mx-auto flex items-center justify-center text-sm rounded-full",
-              isToday(day) && "bg-blue-600 text-white font-medium"
-            )}>
-              {format(day, 'd')}
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      {/* All-day events row */}
-      <div className="grid grid-cols-[50px_repeat(7,1fr)] border-b">
-        <div className="text-xs py-1 px-2 flex items-center justify-center font-medium">
-          All Day
+    <div className="flex flex-col h-full overflow-auto">
+      {/* Week header */}
+      <div className="grid grid-cols-8 border-b sticky top-0 bg-white z-10">
+        <div className="p-2 border-r text-center text-xs font-medium text-gray-500">
+          GMT-5
         </div>
-        {weekDays.map((day, i) => {
-          const allDayEvents = getAllDayEvents(day);
+        {days.map((day, i) => {
+          const isToday = isSameDay(day, new Date());
           
           return (
             <div 
               key={i} 
               className={cn(
-                "p-1 relative min-h-[30px]",
-                isToday(day) && "bg-blue-50"
+                "p-2 text-center",
+                isToday && "bg-blue-50"
               )}
             >
-              {allDayEvents.map(event => (
-                <div 
-                  key={event.id}
-                  className="text-xs p-1 mb-1 rounded truncate"
-                  style={{ 
-                    backgroundColor: `${event.color}33`, // Add transparency
-                    color: event.color,
-                    borderLeft: `3px solid ${event.color}`
-                  }}
-                >
-                  {event.title}
-                </div>
-              ))}
+              <div className="text-xs font-medium">{format(day, 'EEE')}</div>
+              <div className={cn(
+                "text-lg inline-flex h-10 w-10 items-center justify-center rounded-full",
+                isToday && "bg-blue-600 text-white font-medium"
+              )}>
+                {format(day, 'd')}
+              </div>
             </div>
           );
         })}
       </div>
       
-      <div className="flex-1 overflow-y-auto">
-        <div className="grid grid-cols-[50px_repeat(7,1fr)] divide-x h-full">
+      {/* Week grid */}
+      <div className="flex flex-1 overflow-auto">
+        {/* Time column */}
+        <div className="w-16 flex-shrink-0 border-r">
           {hours.map(hour => (
-            <React.Fragment key={hour}>
-              <div className="text-xs text-right pr-2 py-2 border-b border-r">
-                {format(new Date().setHours(hour), 'h a')}
-              </div>
-              
-              {weekDays.map((day, dayIndex) => {
-                const hourEvents = getEventsForDayAndHour(day, hour);
-                
-                return (
-                  <div 
-                    key={`${hour}-${dayIndex}`} 
-                    className={cn(
-                      "border-b relative h-12",
-                      isToday(day) && "bg-blue-50/50"
-                    )}
-                  >
-                    {hourEvents.map(event => {
-                      const eventHour = getHours(new Date(event.start));
-                      
-                      // Only position events that start in this hour cell
-                      if (eventHour === hour) {
-                        const style = calculateEventPosition(event, hour);
-                        
-                        return (
-                          <div 
-                            key={event.id}
-                            className="absolute left-0 right-1 z-10 rounded px-1 overflow-hidden text-xs"
-                            style={{
-                              ...style,
-                              backgroundColor: event.color || '#4285F4',
-                              color: 'white'
-                            }}
-                          >
-                            <div className="font-medium truncate">
-                              {event.title}
-                            </div>
-                            {parseInt(style.height) > 25 && (
-                              <div className="truncate">
-                                {format(new Date(event.start), 'h:mm a')} - {format(new Date(event.end), 'h:mm a')}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      }
-                      return null;
-                    })}
-                  </div>
-                );
-              })}
-            </React.Fragment>
+            <div key={hour} className="h-[60px] relative border-b text-xs text-gray-500 pr-2 -mt-2.5">
+              {hour === 0 ? null : (
+                <div className="absolute right-2">
+                  {hour % 12 === 0 ? '12' : hour % 12}:00 {hour >= 12 ? 'PM' : 'AM'}
+                </div>
+              )}
+            </div>
           ))}
+        </div>
+        
+        {/* Days columns with events */}
+        <div className="flex-1 grid grid-cols-7">
+          {days.map((day, dayIndex) => {
+            const dayEvents = getEventsForDay(day);
+            
+            return (
+              <div key={dayIndex} className="relative border-r">
+                {/* Hour divisions */}
+                {hours.map(hour => (
+                  <div key={hour} className="h-[60px] border-b border-gray-200 relative">
+                    <div className="absolute top-0 left-0 w-full h-[1px] bg-gray-100"></div>
+                    <div className="absolute top-[30px] left-0 w-full h-[1px] bg-gray-50"></div>
+                  </div>
+                ))}
+                
+                {/* Events */}
+                {dayEvents.map((event, eventIndex) => {
+                  const position = getEventPositionForDay(event, day);
+                  if (!position) return null;
+                  
+                  const { width, left } = getEventWidthAndLeft(event, day, dayEvents);
+                  const isAllDay = event.allDay;
+                  
+                  if (isAllDay) {
+                    return (
+                      <div
+                        key={event.id}
+                        className="absolute top-0 left-0 right-0 h-6 px-1 text-xs truncate z-10"
+                        style={{
+                          backgroundColor: `${event.color}33`,
+                          color: event.color,
+                          borderLeft: `3px solid ${event.color}`
+                        }}
+                      >
+                        {event.title}
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <div
+                      key={event.id}
+                      className="absolute px-1 rounded-sm truncate text-xs hover:z-20"
+                      style={{
+                        top: `${position.top}px`,
+                        height: `${position.height}px`,
+                        width,
+                        left,
+                        backgroundColor: `${event.color}33`,
+                        color: event.color,
+                        borderLeft: `3px solid ${event.color}`,
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <div className="text-xs font-medium">
+                        {format(new Date(event.start), 'h:mm')}
+                      </div>
+                      <div className="truncate">{event.title}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
