@@ -4,7 +4,6 @@ import { CalendarHeader } from "@/components/calendar/CalendarHeader";
 import { CalendarMonth } from "@/components/calendar/CalendarMonth";
 import { CalendarWeek } from "@/components/calendar/CalendarWeek";
 import { CalendarDay } from "@/components/calendar/CalendarDay";
-import { CalendarSidebar } from "@/components/calendar/CalendarSidebar";
 import { CreateEventDialog } from "@/components/calendar/CreateEventDialog";
 import { useToast } from "@/hooks/use-toast";
 
@@ -31,7 +30,8 @@ const mockEvents: CalendarEvent[] = [
     end: new Date(new Date().setHours(11, 30, 0, 0)),
     allDay: false,
     category: "order",
-    color: "#4285F4" // Google blue
+    color: "#4285F4", // Google blue
+    location: "Main Office"
   },
   {
     id: "2",
@@ -51,7 +51,8 @@ const mockEvents: CalendarEvent[] = [
     end: new Date(new Date().setHours(15, 0, 0, 0)),
     allDay: false,
     category: "task",
-    color: "#DB4437" // Google red
+    color: "#DB4437", // Google red
+    location: "Conference Room B"
   }
 ];
 
@@ -76,39 +77,33 @@ export default function Calendar() {
   };
 
   return (
-    <div className="flex h-screen">
-      <CalendarSidebar 
-        events={events}
+    <div className="flex h-screen flex-col overflow-hidden">
+      <CalendarHeader 
+        view={view}
+        onViewChange={setView}
+        currentDate={currentDate}
+        onDateChange={setCurrentDate}
         onCreateEvent={() => setShowCreateEventDialog(true)}
       />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <CalendarHeader 
-          view={view}
-          onViewChange={setView}
-          currentDate={currentDate}
-          onDateChange={setCurrentDate}
-          onCreateEvent={() => setShowCreateEventDialog(true)}
-        />
-        <div className="flex-1 overflow-auto">
-          {view === "month" && (
-            <CalendarMonth 
-              currentDate={currentDate} 
-              events={events} 
-            />
-          )}
-          {view === "week" && (
-            <CalendarWeek 
-              currentDate={currentDate} 
-              events={events} 
-            />
-          )}
-          {view === "day" && (
-            <CalendarDay 
-              currentDate={currentDate} 
-              events={events} 
-            />
-          )}
-        </div>
+      <div className="flex-1 overflow-auto">
+        {view === "month" && (
+          <CalendarMonth 
+            currentDate={currentDate} 
+            events={events} 
+          />
+        )}
+        {view === "week" && (
+          <CalendarWeek 
+            currentDate={currentDate} 
+            events={events} 
+          />
+        )}
+        {view === "day" && (
+          <CalendarDay 
+            currentDate={currentDate} 
+            events={events} 
+          />
+        )}
       </div>
 
       <CreateEventDialog 
