@@ -14,6 +14,7 @@ import Invoices from "@/pages/Invoices";
 import Customers from "@/pages/Customers";
 import Tasks from "@/pages/Tasks";
 import Messages from "@/pages/Messages";
+import Calendar from "@/pages/Calendar";
 import NotFound from "@/pages/NotFound";
 import { CustomersProvider } from "./context/CustomersContext";
 
@@ -37,6 +38,7 @@ function App() {
               <Route path="/customers" element={<AppLayout><Customers /></AppLayout>} />
               <Route path="/tasks" element={<AppLayout><Tasks /></AppLayout>} />
               <Route path="/messages" element={<AppLayout><Messages /></AppLayout>} />
+              <Route path="/calendar" element={<AppLayout><Calendar /></AppLayout>} />
               <Route path="*" element={<AppLayout><NotFound /></AppLayout>} />
             </Routes>
           </CustomersProvider>
