@@ -7,7 +7,6 @@ import { CalendarDay } from "@/components/calendar/CalendarDay";
 import { CalendarSidebar } from "@/components/calendar/CalendarSidebar";
 import { CreateEventDialog } from "@/components/calendar/CreateEventDialog";
 import { useToast } from "@/hooks/use-toast";
-import { addDays, addHours, addMinutes, setHours, startOfDay } from "date-fns";
 
 export type CalendarView = "month" | "week" | "day";
 export type CalendarEvent = {
@@ -22,113 +21,37 @@ export type CalendarEvent = {
   location?: string;
 };
 
-// Current date/time for relative event scheduling
-const now = new Date();
-const today = startOfDay(now);
-
-// Mock events data with realistic business-focused events
+// Mock events data
 const mockEvents: CalendarEvent[] = [
   {
     id: "1",
     title: "Order #123 Due",
     description: "Complete screen printing order for ABC Corp",
-    start: setHours(today, 10),
-    end: setHours(today, 11),
+    start: new Date(new Date().setHours(10, 0, 0, 0)),
+    end: new Date(new Date().setHours(11, 30, 0, 0)),
     allDay: false,
     category: "order",
-    color: "#F4B400" // Gold
+    color: "#4285F4" // Google blue
   },
   {
     id: "2",
-    title: "Design Review Meeting",
+    title: "Design Review",
     description: "Review mockups with design team",
-    start: addDays(today, 1),
-    end: addDays(today, 1),
+    start: new Date(new Date().setDate(new Date().getDate() + 1)),
+    end: new Date(new Date().setDate(new Date().getDate() + 1)),
     allDay: true,
     category: "work",
-    color: "#0F9D58" // Green
+    color: "#0F9D58" // Google green
   },
   {
     id: "3",
     title: "Call with Client",
     description: "Discuss revisions for Order #145",
-    start: addHours(today, 14),
-    end: addHours(today, 15),
+    start: new Date(new Date().setHours(14, 0, 0, 0)),
+    end: new Date(new Date().setHours(15, 0, 0, 0)),
     allDay: false,
     category: "task",
-    color: "#4285F4", // Blue
-    location: "Zoom Conference"
-  },
-  {
-    id: "4",
-    title: "Gym",
-    description: "Weekly workout session",
-    start: addHours(today, 18),
-    end: addHours(today, 19),
-    allDay: false,
-    category: "personal",
-    color: "#DB4437", // Red
-    location: "Downtown Fitness Center"
-  },
-  {
-    id: "5",
-    title: "Print Shop Maintenance",
-    description: "Regular equipment maintenance",
-    start: addDays(today, 2),
-    end: addDays(today, 2),
-    allDay: true,
-    category: "work",
-    color: "#0F9D58" // Green
-  },
-  {
-    id: "6",
-    title: "Customer Pickup - Order #156",
-    description: "Client coming to collect their order",
-    start: addDays(addHours(today, 15), 2),
-    end: addDays(addHours(today, 16), 2),
-    allDay: false,
-    category: "order",
-    color: "#F4B400" // Gold
-  },
-  {
-    id: "7",
-    title: "Staff Meeting",
-    description: "Weekly team check-in",
-    start: addDays(addHours(today, 9), 3),
-    end: addDays(addHours(today, 10), 3),
-    allDay: false,
-    category: "work",
-    color: "#0F9D58" // Green
-  },
-  {
-    id: "8",
-    title: "Inventory Restock",
-    description: "Restock ink and materials",
-    start: addDays(today, 4),
-    end: addDays(today, 4),
-    allDay: true,
-    category: "task",
-    color: "#4285F4" // Blue
-  },
-  {
-    id: "9",
-    title: "Marketing Campaign Review",
-    description: "Review Q2 marketing performance",
-    start: addDays(addHours(today, 13), 5),
-    end: addDays(addHours(today, 14), 5),
-    allDay: false,
-    category: "work",
-    color: "#0F9D58" // Green
-  },
-  {
-    id: "10",
-    title: "Website Update",
-    description: "Publish new product catalog",
-    start: addDays(addHours(today, 10), 6),
-    end: addDays(addHours(today, 11), 6),
-    allDay: false,
-    category: "task",
-    color: "#4285F4" // Blue
+    color: "#DB4437" // Google red
   }
 ];
 
@@ -153,7 +76,7 @@ export default function Calendar() {
   };
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen">
       <CalendarSidebar 
         events={events}
         onCreateEvent={() => setShowCreateEventDialog(true)}
