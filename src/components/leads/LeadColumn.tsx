@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LeadColumn } from '@/types/lead';
+import { Lead, LeadColumn } from '@/types/lead';
 import { useDraggable } from '@dnd-kit/core';
 import LeadCard from './LeadCard';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
