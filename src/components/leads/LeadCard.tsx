@@ -8,18 +8,27 @@ import { User, DollarSign } from 'lucide-react';
 interface LeadCardProps {
   lead: Lead;
   isDragging?: boolean;
+  onClick: (lead: Lead) => void;
 }
 
-export default function LeadCard({ lead, isDragging = false }: LeadCardProps) {
+export default function LeadCard({ lead, isDragging = false, onClick }: LeadCardProps) {
   const timeAgo = lead.lastContactedAt 
     ? formatDistanceToNow(new Date(lead.lastContactedAt), { addSuffix: true })
     : formatDistanceToNow(new Date(lead.createdAt), { addSuffix: true });
+
+  const handleClick = (e: React.MouseEvent) => {
+    // Prevent click from triggering drag
+    e.stopPropagation();
+    onClick(lead);
+  };
 
   return (
     <Card className={`
       ${isDragging ? 'opacity-50' : 'opacity-100'}
       bg-white shadow-sm hover:shadow cursor-pointer transition-shadow duration-200
-    `}>
+    `}
+    onClick={handleClick}
+    >
       <CardContent className="p-3">
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-medium line-clamp-1">{lead.name}</h3>

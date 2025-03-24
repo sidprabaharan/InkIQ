@@ -7,9 +7,10 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 interface LeadColumnProps {
   column: LeadColumn;
+  onLeadClick: (lead: Lead) => void;
 }
 
-export default function LeadColumnComponent({ column }: LeadColumnProps) {
+export default function LeadColumnComponent({ column, onLeadClick }: LeadColumnProps) {
   const totalValue = column.leads.reduce((sum, lead) => sum + lead.value, 0);
   
   return (
@@ -27,7 +28,7 @@ export default function LeadColumnComponent({ column }: LeadColumnProps) {
       <CardContent className="flex-1 overflow-y-auto p-2">
         <div className="space-y-2">
           {column.leads.map(lead => (
-            <DraggableLead key={lead.id} lead={lead} />
+            <DraggableLead key={lead.id} lead={lead} onLeadClick={onLeadClick} />
           ))}
         </div>
       </CardContent>
@@ -35,7 +36,7 @@ export default function LeadColumnComponent({ column }: LeadColumnProps) {
   );
 }
 
-function DraggableLead({ lead }: { lead: Lead }) {
+function DraggableLead({ lead, onLeadClick }: { lead: Lead; onLeadClick: (lead: Lead) => void }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: lead.id,
   });
@@ -52,7 +53,7 @@ function DraggableLead({ lead }: { lead: Lead }) {
       {...listeners}
       {...attributes}
     >
-      <LeadCard lead={lead} isDragging={isDragging} />
+      <LeadCard lead={lead} isDragging={isDragging} onClick={onLeadClick} />
     </div>
   );
 }

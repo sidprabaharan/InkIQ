@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import LeadBoard from '@/components/leads/LeadBoard';
 import LeadCard from '@/components/leads/LeadCard';
+import LeadDetails from '@/components/leads/LeadDetails';
 import CreateLeadDialog from '@/components/leads/CreateLeadDialog';
 import { Lead, LeadColumn, LeadStatus } from '@/types/lead';
 
@@ -74,7 +74,6 @@ const columns: LeadColumn[] = [
 export default function Leads() {
   const [leads, setLeads] = useState<Lead[]>(initialLeads);
   const [boardColumns, setBoardColumns] = useState<LeadColumn[]>(() => {
-    // Distribute the leads to their respective columns
     const updatedColumns = [...columns];
     leads.forEach(lead => {
       const columnIndex = updatedColumns.findIndex(col => col.id === lead.status);
@@ -88,6 +87,8 @@ export default function Leads() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeLead, setActiveLead] = useState<Lead | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [showLeadDetails, setShowLeadDetails] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -101,7 +102,6 @@ export default function Leads() {
     const { active } = event;
     setActiveId(active.id as string);
     
-    // Find the lead being dragged
     const lead = leads.find(lead => lead.id === active.id);
     if (lead) {
       setActiveLead(lead);
@@ -123,7 +123,6 @@ export default function Leads() {
         )
       );
       
-      // Update columns
       const updatedColumns = boardColumns.map(column => ({
         ...column,
         leads: column.leads.filter(lead => lead.id !== leadId)
@@ -155,7 +154,6 @@ export default function Leads() {
     
     setLeads(prev => [...prev, lead]);
     
-    // Add to appropriate column
     const updatedColumns = [...boardColumns];
     const columnIndex = updatedColumns.findIndex(col => col.id === lead.status);
     if (columnIndex !== -1) {
@@ -164,6 +162,18 @@ export default function Leads() {
     }
     
     setShowCreateDialog(false);
+  };
+
+  const handleLeadClick = (lead: Lead) => {
+    setSelectedLead(lead);
+    setShowLeadDetails(true);
+  };
+
+  const handleLeadDetailsClose = (open: boolean) => {
+    setShowLeadDetails(open);
+    if (!open) {
+      setSelectedLead(null);
+    }
   };
 
   return (
@@ -182,10 +192,14 @@ export default function Leads() {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <LeadBoard columns={boardColumns} />
+          <LeadBoard columns={boardColumns} onLeadClick={handleLeadClick} />
           <DragOverlay>
             {activeId && activeLead ? (
-              <LeadCard lead={activeLead} isDragging />
+              <LeadCard 
+                lead={activeLead} 
+                isDragging 
+                onClick={() => {}}
+              />
             ) : null}
           </DragOverlay>
         </DndContext>
@@ -198,6 +212,12 @@ export default function Leads() {
           onSave={handleCreateLead}
         />
       )}
+
+      <LeadDetails 
+        lead={selectedLead}
+        open={showLeadDetails}
+        onOpenChange={handleLeadDetailsClose}
+      />
     </div>
   );
 }
