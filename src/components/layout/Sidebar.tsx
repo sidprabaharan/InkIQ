@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import {
   BarChart2,
@@ -163,6 +164,10 @@ export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
                 title={collapsed ? item.name : undefined}
                 className={`flex items-center gap-3 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors ${
                   collapsed ? 'justify-center p-2' : 'px-3 py-2'
+                } ${
+                  location.pathname === item.path
+                    ? 'bg-inkiq-primary/10 text-inkiq-primary'
+                    : ''
                 }`}
               >
                 <item.icon size={18} />
