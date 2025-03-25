@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { 
   Users, Building, ListChecks, CreditCard, Workflow, ClipboardList, 
   Mail, Upload, DownloadCloud, Truck, FileSpreadsheet, 
-  Zap, CreditCard as BillingIcon, Settings as SettingsIcon 
+  Zap, CreditCard as BillingIcon, Settings as SettingsIcon, Package2
 } from 'lucide-react';
 
 import { UserManagement } from '@/components/settings/UserManagement';
@@ -23,6 +23,7 @@ import { QuickbooksIntegration } from '@/components/settings/QuickbooksIntegrati
 import { ZapierIntegration } from '@/components/settings/ZapierIntegration';
 import { Billing } from '@/components/settings/Billing';
 import { GeneralSettings } from '@/components/settings/GeneralSettings';
+import { SupplierIntegrations } from '@/components/settings/SupplierIntegrations';
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState('users');
@@ -37,6 +38,7 @@ export default function Settings() {
     { id: 'email', name: 'Email Integration', icon: Mail, component: EmailIntegration },
     { id: 'data', name: 'Import/Export Data', icon: DownloadCloud, component: DataManagement },
     { id: 'shipping', name: 'Shipping Integration', icon: Truck, component: ShippingIntegration },
+    { id: 'suppliers', name: 'Supplier Integrations', icon: Package2, component: SupplierIntegrations },
     { id: 'quickbooks', name: 'QuickBooks', icon: FileSpreadsheet, component: QuickbooksIntegration },
     { id: 'zapier', name: 'Zapier Integration', icon: Zap, component: ZapierIntegration },
     { id: 'billing', name: 'Billing & Subscription', icon: BillingIcon, component: Billing },
