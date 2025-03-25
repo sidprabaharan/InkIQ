@@ -1,42 +1,32 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+
+/* ... keep existing code */
+
+:root {
+  --chart-1: 250 84% 74%;   /* Purple */
+  --chart-2: 142 72% 50%;   /* Green */
+  --chart-3: 31 90% 56%;    /* Orange */
+  --chart-4: 201 96% 53%;   /* Blue */
+  --chart-5: 0 84% 60%;     /* Red */
+  --chart-6: 262 83% 58%;   /* Violet */
+  --chart-7: 204 70% 53%;   /* Light Blue */
+  --chart-8: 174 62% 47%;   /* Teal */
+  --chart-9: 43 96% 58%;    /* Yellow */
+  --chart-10: 316 70% 50%;  /* Magenta */
+  --chart-11: 341 79% 55%;  /* Pink */
+  --chart-12: 168 83% 41%;  /* Emerald */
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+.dark {
+  --chart-1: 250 84% 74%;
+  --chart-2: 142 72% 50%;
+  --chart-3: 31 90% 56%;
+  --chart-4: 201 96% 53%;
+  --chart-5: 0 84% 60%;
+  --chart-6: 262 83% 58%;
+  --chart-7: 204 70% 53%;
+  --chart-8: 174 62% 47%;
+  --chart-9: 43 96% 58%;
+  --chart-10: 316 70% 50%;
+  --chart-11: 341 79% 55%;
+  --chart-12: 168 83% 41%;
 }
