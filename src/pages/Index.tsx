@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   BarChart,
@@ -14,7 +13,7 @@ import {
   Mail,
   Phone,
   Image,
-  Vector,
+  Shapes,
   Palette,
   Award,
   MapPin,
@@ -172,7 +171,7 @@ export default function Dashboard() {
             value="2,124"
             change="+11.7%"
             trend="up"
-            icon={<Vector className="h-5 w-5" />}
+            icon={<Shapes className="h-5 w-5" />}
             description={`Total this ${timeRange}`}
           />
           <MetricCard 
