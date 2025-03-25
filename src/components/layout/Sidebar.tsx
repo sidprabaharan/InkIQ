@@ -33,7 +33,7 @@ export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
     {
       name: 'Dashboard',
       icon: Home,
-      path: '/dashboard',
+      path: '/',
     },
     {
       name: 'Calendar',
