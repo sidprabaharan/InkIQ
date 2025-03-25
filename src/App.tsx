@@ -17,6 +17,8 @@ import Messages from "@/pages/Messages";
 import Calendar from "@/pages/Calendar";
 import Leads from "@/pages/Leads";
 import Settings from "@/pages/Settings";
+import Products from "@/pages/Products";
+import PurchaseOrders from "@/pages/PurchaseOrders";
 import NotFound from "@/pages/NotFound";
 import { CustomersProvider } from "./context/CustomersContext";
 
@@ -42,6 +44,8 @@ function App() {
               <Route path="/tasks" element={<AppLayout><Tasks /></AppLayout>} />
               <Route path="/messages" element={<AppLayout><Messages /></AppLayout>} />
               <Route path="/calendar" element={<AppLayout><Calendar /></AppLayout>} />
+              <Route path="/products" element={<AppLayout><Products /></AppLayout>} />
+              <Route path="/purchase-orders" element={<AppLayout><PurchaseOrders /></AppLayout>} />
               <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
               <Route path="*" element={<AppLayout><NotFound /></AppLayout>} />
             </Routes>

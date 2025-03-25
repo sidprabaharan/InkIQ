@@ -19,6 +19,8 @@ import {
   User,
   Users,
   ClipboardList,
+  Package2,
+  Truck,
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -73,7 +75,7 @@ export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
     },
     {
       name: 'Products',
-      icon: ShoppingBag,
+      icon: Package2,
       path: '/products',
     },
     {
