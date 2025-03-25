@@ -4,81 +4,26 @@ import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { Search, Filter, Plus, ArrowUpDown } from 'lucide-react';
-
-// Mock data for products
-const mockProducts = [
-  {
-    id: 1,
-    sku: 'GIL2000',
-    name: 'Gildan Heavy Cotton T-Shirt',
-    category: 'T-Shirts',
-    suppliers: [
-      { name: 'SanMar', price: 3.25, inventory: 1250 },
-      { name: 'Alphabroder', price: 3.15, inventory: 850 },
-      { name: 'S&S Activewear', price: 3.35, inventory: 1500 },
-      { name: 'TSC Apparel', price: 3.30, inventory: 750 }
-    ],
-    lowestPrice: 3.15
-  },
-  {
-    id: 2,
-    sku: 'NL3600',
-    name: 'Next Level Cotton T-Shirt',
-    category: 'T-Shirts',
-    suppliers: [
-      { name: 'SanMar', price: 4.50, inventory: 800 },
-      { name: 'Alphabroder', price: 4.75, inventory: 1200 },
-      { name: 'S&S Activewear', price: 4.35, inventory: 950 }
-    ],
-    lowestPrice: 4.35
-  },
-  {
-    id: 3,
-    sku: 'JRZ996',
-    name: 'Jerzees Hoodie',
-    category: 'Hoodies',
-    suppliers: [
-      { name: 'SanMar', price: 12.75, inventory: 450 },
-      { name: 'S&S Activewear', price: 12.50, inventory: 320 }
-    ],
-    lowestPrice: 12.50
-  },
-  {
-    id: 4,
-    sku: 'FRT1200',
-    name: 'Fruit of the Loom Sweatshirt',
-    category: 'Sweatshirts',
-    suppliers: [
-      { name: 'Alphabroder', price: 8.25, inventory: 620 },
-      { name: 'TSC Apparel', price: 8.15, inventory: 480 }
-    ],
-    lowestPrice: 8.15
-  },
-  {
-    id: 5,
-    sku: 'PC61',
-    name: 'Port & Company Essential Tee',
-    category: 'T-Shirts',
-    suppliers: [
-      { name: 'SanMar', price: 3.10, inventory: 1800 },
-      { name: 'Alphabroder', price: 3.25, inventory: 1250 },
-      { name: 'TSC Apparel', price: 3.20, inventory: 900 }
-    ],
-    lowestPrice: 3.10
-  }
-];
+import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Search, Filter, ChevronDown, RefreshCw, ShoppingCart, Eye } from 'lucide-react';
+import { ProductRow } from '@/components/products/ProductRow';
+import { ProductFilters } from '@/components/products/ProductFilters';
+import { mockProducts } from '@/data/mockProducts';
 
 export default function Products() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [categoryFilter, setCategoryFilter] = useState('All');
-  const [expandedProduct, setExpandedProduct] = useState<number | null>(null);
+  const [showVendors, setShowVendors] = useState(true);
+  const [showPrices, setShowPrices] = useState(true);
+  const [sortBy, setSortBy] = useState('relevancy');
   
   const categories = ['All', 'T-Shirts', 'Hoodies', 'Sweatshirts', 'Polos', 'Hats'];
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
   
   // Filter products based on search term and category
   const filteredProducts = mockProducts.filter(product => {
@@ -94,146 +39,93 @@ export default function Products() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const displayedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
   
-  const toggleProductExpansion = (productId: number) => {
-    if (expandedProduct === productId) {
-      setExpandedProduct(null);
-    } else {
-      setExpandedProduct(productId);
-    }
-  };
+  const totalAmount = 0; // You can calculate actual cart total here
+  const totalItems = 0; // You can calculate actual cart items here
   
   return (
-    <div className="flex-1 p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Products</h1>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Product
-        </Button>
+    <div className="flex-1 flex flex-col h-full overflow-hidden">
+      {/* Top Navigation Bar - Blue header similar to DGI */}
+      <div className="bg-blue-800 text-white p-4 flex items-center justify-between">
+        <div className="flex items-center gap-4 flex-1">
+          <div className="relative flex-1 max-w-xl">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-300" />
+            <Input
+              placeholder="Search items by style number, description, or brand..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 bg-white/10 border-none text-white placeholder:text-gray-300 w-full"
+            />
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" className="text-white flex gap-2">
+            <ShoppingCart className="h-5 w-5" />
+            Cart ({totalItems})
+          </Button>
+        </div>
       </div>
       
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle>Product Catalog</CardTitle>
-          <CardDescription>
-            View and manage all products from different suppliers
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-2 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8"
-              />
+      {/* Main Content Area with Filters and Products */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Sidebar - Filters */}
+        <ProductFilters 
+          showVendors={showVendors} 
+          setShowVendors={setShowVendors}
+          showPrices={showPrices}
+          setShowPrices={setShowPrices}
+          categoryFilter={categoryFilter}
+          setCategoryFilter={setCategoryFilter}
+        />
+        
+        {/* Main Product Listing */}
+        <div className="flex-1 p-4 overflow-auto">
+          <div className="flex items-center justify-between mb-4">
+            <div className="text-sm text-gray-500">
+              Showing results 1-{Math.min(displayedProducts.length, itemsPerPage)} of {filteredProducts.length} items
             </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-full md:w-[180px]">
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button variant="outline" className="gap-2">
-              <Filter className="h-4 w-4" />
-              More Filters
-            </Button>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm">Sort By:</span>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-[160px]">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="relevancy">Relevancy</SelectItem>
+                    <SelectItem value="price-asc">Price: Low to High</SelectItem>
+                    <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                    <SelectItem value="name-asc">Name: A to Z</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button variant="outline" size="sm" className="flex items-center gap-1">
+                <RefreshCw className="h-4 w-4" />
+                Refresh Carts
+              </Button>
+            </div>
           </div>
           
-          <div className="border rounded-md">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[100px]">SKU</TableHead>
-                  <TableHead>Product Name</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="text-right">
-                    Lowest Price
-                    <ArrowUpDown className="ml-1 h-4 w-4 inline" />
-                  </TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {displayedProducts.map((product) => (
-                  <React.Fragment key={product.id}>
-                    <TableRow className="cursor-pointer" onClick={() => toggleProductExpansion(product.id)}>
-                      <TableCell className="font-medium">{product.sku}</TableCell>
-                      <TableCell>{product.name}</TableCell>
-                      <TableCell>{product.category}</TableCell>
-                      <TableCell className="text-right">${product.lowestPrice.toFixed(2)}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" onClick={(e) => { 
-                          e.stopPropagation();
-                          toggleProductExpansion(product.id);
-                        }}>
-                          {expandedProduct === product.id ? 'Hide Details' : 'Show Details'}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                    
-                    {expandedProduct === product.id && (
-                      <TableRow>
-                        <TableCell colSpan={5}>
-                          <div className="py-2 px-4 bg-muted/50 rounded-md">
-                            <h4 className="font-medium mb-2">Supplier Options</h4>
-                            <Table>
-                              <TableHeader>
-                                <TableRow>
-                                  <TableHead>Supplier</TableHead>
-                                  <TableHead className="text-right">Price</TableHead>
-                                  <TableHead className="text-right">Inventory</TableHead>
-                                  <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {product.suppliers.map((supplier, index) => (
-                                  <TableRow key={index}>
-                                    <TableCell>{supplier.name}</TableCell>
-                                    <TableCell className="text-right">
-                                      ${supplier.price.toFixed(2)}
-                                      {supplier.price === product.lowestPrice && (
-                                        <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                                          Best Price
-                                        </span>
-                                      )}
-                                    </TableCell>
-                                    <TableCell className="text-right">{supplier.inventory}</TableCell>
-                                    <TableCell className="text-right">
-                                      <Button size="sm" variant="outline">Add to Cart</Button>
-                                    </TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </React.Fragment>
-                ))}
-                
-                {displayedProducts.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                      No products found. Try adjusting your search or filters.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+          {/* Product Listing Cards */}
+          <div className="space-y-4">
+            {displayedProducts.map((product) => (
+              <ProductRow 
+                key={product.id} 
+                product={product} 
+                showVendors={showVendors}
+                showPrices={showPrices}
+              />
+            ))}
+            
+            {displayedProducts.length === 0 && (
+              <div className="text-center py-12 bg-gray-50 rounded-md">
+                <p className="text-lg text-gray-500">No products found. Try adjusting your search or filters.</p>
+              </div>
+            )}
           </div>
           
+          {/* Pagination */}
           {totalPages > 1 && (
-            <div className="mt-4">
+            <div className="mt-6 flex justify-center">
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
@@ -264,8 +156,26 @@ export default function Products() {
               </Pagination>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+        
+        {/* Right Sidebar - Cart Summary (can be added later) */}
+        <div className="w-64 border-l p-4 bg-gray-50 hidden md:block">
+          <h3 className="font-semibold text-lg mb-4">Cart Summary</h3>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span>Items</span>
+              <span>{totalItems}</span>
+            </div>
+            <div className="flex justify-between font-medium">
+              <span>Total</span>
+              <span>${totalAmount.toFixed(2)}</span>
+            </div>
+            <Button className="w-full mt-4">
+              Checkout
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

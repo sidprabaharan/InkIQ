@@ -1,4 +1,3 @@
-
 /* ... keep existing code */
 
 :root {
@@ -29,4 +28,41 @@
   --chart-10: 316 70% 50%;
   --chart-11: 341 79% 55%;
   --chart-12: 168 83% 41%;
+}
+
+/* Add custom styles for product page */
+.product-inventory-badge {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 4px;
+}
+
+.product-inventory-high {
+  background-color: #22c55e;
+}
+
+.product-inventory-medium {
+  background-color: #f59e0b;
+}
+
+.product-inventory-low {
+  background-color: #ef4444;
+}
+
+/* Color swatches for product page */
+.color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+  display: inline-block;
+  margin-right: 4px;
+  cursor: pointer;
+}
+
+.color-swatch:hover {
+  transform: scale(1.2);
+  transition: transform 0.2s ease;
 }
