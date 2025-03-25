@@ -1,15 +1,11 @@
 
 import React, { useState } from 'react';
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { Card, CardContent } from '@/components/ui/card';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Filter, ChevronDown, RefreshCw, ShoppingCart, Eye } from 'lucide-react';
+import { Search, RefreshCw, ShoppingCart } from 'lucide-react';
 import { ProductRow } from '@/components/products/ProductRow';
 import { ProductFilters } from '@/components/products/ProductFilters';
 import { mockProducts } from '@/data/mockProducts';
@@ -22,7 +18,6 @@ export default function Products() {
   const [showPrices, setShowPrices] = useState(true);
   const [sortBy, setSortBy] = useState('relevancy');
   
-  const categories = ['All', 'T-Shirts', 'Hoodies', 'Sweatshirts', 'Polos', 'Hats'];
   const itemsPerPage = 5;
   
   // Filter products based on search term and category
@@ -39,13 +34,13 @@ export default function Products() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const displayedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
   
-  const totalAmount = 0; // You can calculate actual cart total here
-  const totalItems = 0; // You can calculate actual cart items here
+  const totalItems = 2; // You can calculate actual cart items here
+  const subtotal = 13.20; // You can calculate actual cart subtotal here
   
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       {/* Top Navigation Bar - Blue header similar to DGI */}
-      <div className="bg-blue-800 text-white p-4 flex items-center justify-between">
+      <div className="bg-blue-800 text-white py-2 px-4 flex items-center justify-between">
         <div className="flex items-center gap-4 flex-1">
           <div className="relative flex-1 max-w-xl">
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-300" />
@@ -57,11 +52,18 @@ export default function Products() {
             />
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" className="text-white flex gap-2">
-            <ShoppingCart className="h-5 w-5" />
-            Cart ({totalItems})
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" className="text-white flex gap-2 h-9">
+            Cart <ShoppingCart className="h-5 w-5" />
           </Button>
+        </div>
+      </div>
+      
+      {/* Secondary Navigation */}
+      <div className="bg-blue-50 border-b flex items-center justify-between px-4 py-1">
+        <div className="flex gap-6">
+          <Button variant="ghost" className="text-blue-800 text-sm font-medium">Brands</Button>
+          <Button variant="ghost" className="text-blue-800 text-sm font-medium">Categories</Button>
         </div>
       </div>
       
@@ -106,7 +108,7 @@ export default function Products() {
           </div>
           
           {/* Product Listing Cards */}
-          <div className="space-y-4">
+          <div className="space-y-2">
             {displayedProducts.map((product) => (
               <ProductRow 
                 key={product.id} 
@@ -158,21 +160,31 @@ export default function Products() {
           )}
         </div>
         
-        {/* Right Sidebar - Cart Summary (can be added later) */}
-        <div className="w-64 border-l p-4 bg-gray-50 hidden md:block">
-          <h3 className="font-semibold text-lg mb-4">Cart Summary</h3>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span>Items</span>
-              <span>{totalItems}</span>
+        {/* Right Sidebar - Cart Summary */}
+        <div className="w-64 border-l p-4 bg-white hidden md:block">
+          <div className="border rounded-md p-3">
+            <div className="flex justify-between items-center mb-2">
+              <Button variant="ghost" size="sm" className="text-blue-600 h-7 px-2 text-xs">
+                <RefreshCw className="h-3 w-3 mr-1" />
+                Refresh Carts
+              </Button>
             </div>
-            <div className="flex justify-between font-medium">
-              <span>Total</span>
-              <span>${totalAmount.toFixed(2)}</span>
+            <div className="flex justify-between text-sm mb-1">
+              <span className="font-medium">{totalItems} items</span>
+              <span className="font-medium">${subtotal.toFixed(2)} subtotal</span>
             </div>
-            <Button className="w-full mt-4">
-              Checkout
-            </Button>
+            <div className="flex justify-between text-sm mb-3">
+              <span className="font-medium">1 cart</span>
+            </div>
+            <div className="border-t pt-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xs">
+                  2
+                </div>
+                <span className="text-sm font-medium">CAROLINA MADE</span>
+                <Badge className="ml-auto bg-blue-100 text-blue-800 hover:bg-blue-200">$13.20</Badge>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Eye, ShoppingCart, ChevronDown } from 'lucide-react';
+import { Eye, ShoppingCart, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 type Supplier = {
@@ -30,10 +30,22 @@ interface ProductRowProps {
 
 export function ProductRow({ product, showVendors, showPrices }: ProductRowProps) {
   const [expanded, setExpanded] = useState(false);
+  const [expandedColor, setExpandedColor] = useState<string | null>(null);
+  
+  const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+  const locations = ['DALLAS, TX', 'MEMPHIS, TN', 'GILDAN DISTRIBUTION CENTER'];
+  
+  // Select first color as default expanded color
+  React.useEffect(() => {
+    if (product.colors && product.colors.length > 0 && !expandedColor) {
+      setExpandedColor(product.colors[0]);
+    }
+  }, [product.colors, expandedColor]);
   
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden mb-4">
       <CardContent className="p-0">
+        {/* Basic Product Row */}
         <div className="flex border-b">
           {/* Product Image & Basic Info */}
           <div className="flex p-4 gap-4 min-w-[400px]">
@@ -48,26 +60,33 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
             </div>
             
             <div className="flex flex-col">
-              <div className="font-semibold text-gray-700">{product.sku} - {product.name}</div>
-              <div className="text-sm text-gray-500 mb-2">
-                Category: {product.category}
+              <div className="text-sm text-black mb-1">
+                <span className="font-semibold">{product.sku}</span> • {product.category}
               </div>
+              <div className="font-semibold text-gray-800 mb-2">{product.name}</div>
               
               {product.colors && (
                 <div className="flex gap-1 mb-2">
-                  <span className="text-xs text-gray-500 mt-1">Colors:</span>
-                  {product.colors.map((color, index) => (
+                  <span className="text-xs text-gray-500 mr-1 mt-1">Color:</span>
+                  {product.colors.slice(0, 3).map((color, index) => (
                     <div
                       key={index}
-                      className="w-5 h-5 rounded-full border"
+                      className={`w-5 h-5 rounded-full cursor-pointer border ${expandedColor === color ? 'ring-2 ring-blue-500' : 'border-gray-300'}`}
                       style={{ backgroundColor: color }}
+                      onClick={() => setExpandedColor(color)}
                     />
                   ))}
                   {product.colors.length > 3 && (
-                    <Button variant="ghost" size="sm" className="h-5 px-1 text-xs">
+                    <div className="text-xs text-blue-600 mt-1 cursor-pointer">
                       More colors...
-                    </Button>
+                    </div>
                   )}
+                </div>
+              )}
+              
+              {showPrices && (
+                <div className="text-green-600 font-semibold text-sm">
+                  ${product.lowestPrice.toFixed(2)}
                 </div>
               )}
             </div>
@@ -93,10 +112,6 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
                     <div className={`w-2 h-2 rounded-full ${supplier.inventory > 500 ? 'bg-green-500' : supplier.inventory > 100 ? 'bg-yellow-500' : 'bg-red-500'}`}></div>
                     <span className="text-[10px] text-gray-500">{supplier.inventory}</span>
                   </div>
-                  <Button size="sm" variant="outline" className="mt-2 text-xs h-7 px-2">
-                    <ShoppingCart className="h-3 w-3 mr-1" />
-                    Add
-                  </Button>
                 </div>
               ))}
             </div>
@@ -104,41 +119,141 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
           
           {/* Actions */}
           <div className="flex flex-col items-center justify-center px-4 border-l">
-            <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)}>
-              <Eye className="h-4 w-4 mr-1" />
-              See Inventory
+            <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)} className="text-blue-600">
+              {expanded ? (
+                <>
+                  <ChevronUp className="h-4 w-4 mr-1" />
+                  Close Inventory
+                </>
+              ) : (
+                <>
+                  <Eye className="h-4 w-4 mr-1" />
+                  See Inventory
+                </>
+              )}
             </Button>
           </div>
         </div>
         
-        {/* Expanded Info - Can add more product details, inventory by size, etc. */}
+        {/* Expanded Inventory Section */}
         {expanded && (
-          <div className="p-4 bg-gray-50">
-            <h4 className="font-medium mb-2">Inventory Details</h4>
-            <div className="grid grid-cols-6 gap-2 text-sm">
-              <div className="bg-white p-2 rounded border">
-                <div className="font-medium">S</div>
-                <div className="text-gray-600">{Math.floor(Math.random() * 500)}</div>
+          <div className="bg-gray-50">
+            {/* Supplier Price Comparison */}
+            <div className="px-4 py-3 flex items-center gap-6 border-b bg-white">
+              {/* Supplier logos would go here in real app */}
+              {product.suppliers.slice(0, 4).map((supplier, index) => (
+                <div key={index} className="text-center">
+                  <div className="text-xs font-medium mb-1">
+                    {supplier.price === product.lowestPrice && (
+                      <span className="text-green-600">$ </span>
+                    )}
+                    {supplier.price.toFixed(2)}
+                  </div>
+                </div>
+              ))}
+              
+              <div className="ml-auto">
+                <Button variant="ghost" size="sm" className="text-xs h-7">
+                  More Vendors <ChevronDown className="h-3 w-3 ml-1" />
+                </Button>
               </div>
-              <div className="bg-white p-2 rounded border">
-                <div className="font-medium">M</div>
-                <div className="text-gray-600">{Math.floor(Math.random() * 500)}</div>
+            </div>
+            
+            {/* Sizes and Pricing Grid */}
+            <div className="p-4">
+              <div className="grid grid-cols-8 gap-2 text-center mb-4">
+                <div className="font-medium text-sm"></div>
+                {sizes.map(size => (
+                  <div key={size} className="font-medium text-sm">{size}</div>
+                ))}
               </div>
-              <div className="bg-white p-2 rounded border">
-                <div className="font-medium">L</div>
-                <div className="text-gray-600">{Math.floor(Math.random() * 500)}</div>
+              
+              {/* Price row */}
+              <div className="grid grid-cols-8 gap-2 text-center mb-4">
+                <div className="text-sm text-left font-medium">Price</div>
+                {sizes.map((size, index) => (
+                  <div key={size} className={`text-sm ${index > 3 ? 'text-red-500' : ''}`}>
+                    ${(index > 3 ? product.lowestPrice + 1 + index - 4 : product.lowestPrice).toFixed(2)}
+                  </div>
+                ))}
               </div>
-              <div className="bg-white p-2 rounded border">
-                <div className="font-medium">XL</div>
-                <div className="text-gray-600">{Math.floor(Math.random() * 500)}</div>
+              
+              {/* Color row */}
+              <div className="grid grid-cols-8 gap-2 text-center mb-2 items-center">
+                <div className="text-sm text-left">
+                  <div className="w-5 h-5 rounded-full" style={{ backgroundColor: expandedColor || '#fff' }}></div>
+                </div>
+                {sizes.map((size, index) => (
+                  <div key={size} className={`text-sm text-red-500 font-medium ${index === 4 || index === 5 ? '' : 'opacity-0'}`}>
+                    {index === 4 ? '$4.23' : index === 5 ? '$5.33' : '$0.00'}
+                  </div>
+                ))}
               </div>
-              <div className="bg-white p-2 rounded border">
-                <div className="font-medium">2XL</div>
-                <div className="text-gray-600">{Math.floor(Math.random() * 500)}</div>
-              </div>
-              <div className="bg-white p-2 rounded border">
-                <div className="font-medium">3XL</div>
-                <div className="text-gray-600">{Math.floor(Math.random() * 500)}</div>
+              
+              {/* Location inventory grid */}
+              {locations.map((location, locationIndex) => (
+                <div key={location} className="mt-4">
+                  <div className="grid grid-cols-8 gap-2 text-center items-center mb-1">
+                    <div className="text-xs text-left font-medium">
+                      {location}
+                      {locationIndex < 2 && <div className="text-[10px] text-gray-500">Cutoff 4:00 CT</div>}
+                    </div>
+                    {sizes.map((size, sizeIndex) => (
+                      <div key={`${location}-${size}`} className="relative">
+                        <div className="text-xs bg-white border rounded-md py-1">
+                          {locationIndex === 0 && sizeIndex === 0 ? '217' : 
+                           locationIndex === 0 && sizeIndex === 1 ? '830' :
+                           locationIndex === 0 && sizeIndex === 2 ? '1010' :
+                           locationIndex === 0 && sizeIndex === 3 ? '615' :
+                           locationIndex === 0 && sizeIndex === 4 ? '371' :
+                           locationIndex === 0 && sizeIndex === 5 ? '102' :
+                           locationIndex === 0 && sizeIndex === 6 ? '29' :
+                           locationIndex === 1 && sizeIndex === 0 ? '384' :
+                           locationIndex === 1 && sizeIndex === 1 ? '196' :
+                           locationIndex === 1 && sizeIndex === 2 ? '275' :
+                           locationIndex === 1 && sizeIndex === 3 ? '311' :
+                           locationIndex === 1 && sizeIndex === 4 ? '116' :
+                           locationIndex === 1 && sizeIndex === 5 ? '53' :
+                           locationIndex === 1 && sizeIndex === 6 ? '33' :
+                           locationIndex === 2 && sizeIndex === 0 ? '0' :
+                           locationIndex === 2 && sizeIndex === 1 ? '36144' :
+                           locationIndex === 2 && sizeIndex === 2 ? '37008' :
+                           locationIndex === 2 && sizeIndex === 3 ? '0' :
+                           locationIndex === 2 && sizeIndex === 4 ? '0' :
+                           locationIndex === 2 && sizeIndex === 5 ? '0' :
+                           locationIndex === 2 && sizeIndex === 6 ? '2682' : '0'
+                          }
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {locationIndex < 2 && (
+                    <div className="ml-auto text-right">
+                      <Badge variant="outline" className="bg-green-100 text-green-800 text-xs">
+                        Est. delivery {locationIndex === 0 ? '02/10' : '02/10'}
+                      </Badge>
+                    </div>
+                  )}
+                  
+                  {locationIndex === 2 && (
+                    <div className="ml-auto text-right">
+                      <Badge variant="outline" className="bg-gray-100 text-gray-800 text-xs">
+                        Call For Pricing
+                      </Badge>
+                      <Badge variant="outline" className="bg-gray-100 text-gray-800 text-xs ml-2">
+                        Est. delivery 3-7 Days
+                      </Badge>
+                    </div>
+                  )}
+                </div>
+              ))}
+              
+              {/* Add to cart button */}
+              <div className="mt-6 text-right">
+                <Button variant="outline" className="bg-green-100 text-green-800 hover:bg-green-200">
+                  Save to Cart
+                </Button>
               </div>
             </div>
           </div>
