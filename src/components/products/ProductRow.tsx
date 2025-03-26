@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,6 +34,7 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
   const [expandedColor, setExpandedColor] = useState<string | null>(null);
   const [showAllColors, setShowAllColors] = useState(false);
   const [quantities, setQuantities] = useState<Record<string, Record<string, number>>>({});
+  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   
   const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
   const locations = ['DALLAS, TX', 'MEMPHIS, TN', 'GILDAN DISTRIBUTION CENTER'];
@@ -46,8 +46,9 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
     }
   }, [product.colors, expandedColor]);
   
-  const handleSupplierClick = () => {
-    setExpanded(!expanded);
+  const handleSupplierClick = (supplier: Supplier) => {
+    setSelectedSupplier(supplier);
+    setExpanded(true);
   };
 
   const toggleShowAllColors = () => {
@@ -148,7 +149,7 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
                 <div 
                   key={index} 
                   className="flex-1 flex flex-col items-center justify-center p-3 relative min-w-0 cursor-pointer hover:bg-gray-50"
-                  onClick={handleSupplierClick}
+                  onClick={() => handleSupplierClick(supplier)}
                 >
                   <div className="text-xs font-medium mb-1 text-blue-600 truncate w-full text-center">{supplier.name}</div>
                   {showPrices && (
@@ -172,25 +173,22 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
         </div>
         
         {/* Expanded Inventory Section */}
-        {expanded && (
+        {expanded && selectedSupplier && (
           <div className="bg-gray-50">
-            {/* Supplier Price Comparison */}
+            {/* Supplier Header - Updated to show selected supplier */}
             <div className="px-4 py-3 flex items-center gap-6 border-b bg-white">
-              {/* Supplier logos would go here in real app */}
-              {product.suppliers.slice(0, 4).map((supplier, index) => (
-                <div key={index} className="text-center">
-                  <div className="text-xs font-medium mb-1">
-                    {supplier.price === product.lowestPrice && (
-                      <span className="text-green-600">$ </span>
-                    )}
-                    {supplier.price.toFixed(2)}
-                  </div>
-                </div>
-              ))}
+              <div className="text-sm font-medium flex-1">
+                {selectedSupplier.name}'s Inventory & Pricing
+              </div>
               
               <div className="ml-auto">
-                <Button variant="ghost" size="sm" className="text-xs h-7">
-                  More Vendors <ChevronDown className="h-3 w-3 ml-1" />
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-xs h-7"
+                  onClick={() => setExpanded(false)}
+                >
+                  Close <ChevronUp className="h-3 w-3 ml-1" />
                 </Button>
               </div>
             </div>
@@ -204,17 +202,15 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
                 ))}
               </div>
               
-              {/* Price row - Simplified with consistent styling */}
+              {/* Price row - Using selected supplier price */}
               <div className="grid grid-cols-8 gap-2 text-center mb-4">
                 <div className="text-sm text-left font-medium">Price</div>
-                {sizes.map((size, index) => (
+                {sizes.map((size) => (
                   <div key={size} className="text-sm font-medium">
-                    ${(index > 3 ? product.lowestPrice + 1 + index - 4 : product.lowestPrice).toFixed(2)}
+                    ${selectedSupplier.price.toFixed(2)}
                   </div>
                 ))}
               </div>
-              
-              {/* Remove the special pricing row */}
               
               {/* Location inventory grid - improved display without input field styling */}
               {locations.map((location, locationIndex) => (
@@ -226,28 +222,15 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
                     </div>
                     
                     {sizes.map((size, sizeIndex) => {
+                      // Adjust inventory to reflect selected supplier
+                      // Using supplier inventory as baseline and adjusting by location and size
+                      const baseInventory = selectedSupplier.inventory;
+                      
                       const inventory = 
-                        locationIndex === 0 && sizeIndex === 0 ? 217 : 
-                        locationIndex === 0 && sizeIndex === 1 ? 830 :
-                        locationIndex === 0 && sizeIndex === 2 ? 1010 :
-                        locationIndex === 0 && sizeIndex === 3 ? 615 :
-                        locationIndex === 0 && sizeIndex === 4 ? 371 :
-                        locationIndex === 0 && sizeIndex === 5 ? 102 :
-                        locationIndex === 0 && sizeIndex === 6 ? 29 :
-                        locationIndex === 1 && sizeIndex === 0 ? 384 :
-                        locationIndex === 1 && sizeIndex === 1 ? 196 :
-                        locationIndex === 1 && sizeIndex === 2 ? 275 :
-                        locationIndex === 1 && sizeIndex === 3 ? 311 :
-                        locationIndex === 1 && sizeIndex === 4 ? 116 :
-                        locationIndex === 1 && sizeIndex === 5 ? 53 :
-                        locationIndex === 1 && sizeIndex === 6 ? 33 :
-                        locationIndex === 2 && sizeIndex === 0 ? 0 :
-                        locationIndex === 2 && sizeIndex === 1 ? 36144 :
-                        locationIndex === 2 && sizeIndex === 2 ? 37008 :
-                        locationIndex === 2 && sizeIndex === 3 ? 0 :
-                        locationIndex === 2 && sizeIndex === 4 ? 0 :
-                        locationIndex === 2 && sizeIndex === 5 ? 0 :
-                        locationIndex === 2 && sizeIndex === 6 ? 2682 : 0;
+                        locationIndex === 0 ? Math.floor(baseInventory * 0.2 * (1 - (sizeIndex * 0.1))) :
+                        locationIndex === 1 ? Math.floor(baseInventory * 0.15 * (1 - (sizeIndex * 0.05))) :
+                        locationIndex === 2 && (sizeIndex === 1 || sizeIndex === 2 || sizeIndex === 6) ? 
+                          Math.floor(baseInventory * 0.65 * (1 + (sizeIndex * 0.1))) : 0;
                       
                       return (
                         <div key={`${location}-${size}`} className="relative flex flex-col items-center">
