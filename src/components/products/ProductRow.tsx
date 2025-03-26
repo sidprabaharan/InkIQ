@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -50,9 +51,9 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
       <CardContent className="p-0">
         {/* Basic Product Row */}
         <div className="flex border-b">
-          {/* Product Image & Basic Info */}
-          <div className="flex p-4 gap-4 min-w-[400px]">
-            <div className="w-24 h-24 bg-gray-100 flex items-center justify-center rounded overflow-hidden">
+          {/* Product Image & Basic Info - Now 50% width */}
+          <div className="flex p-4 gap-4 w-1/2">
+            <div className="w-24 h-24 flex-shrink-0 bg-gray-100 flex items-center justify-center rounded overflow-hidden">
               {product.image ? (
                 <img src={product.image} alt={product.name} className="w-full h-full object-contain" />
               ) : (
@@ -62,11 +63,11 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
               )}
             </div>
             
-            <div className="flex flex-col">
-              <div className="text-sm text-black mb-1">
+            <div className="flex flex-col flex-grow min-w-0">
+              <div className="text-sm text-black mb-1 truncate">
                 <span className="font-semibold">{product.sku}</span> • {product.category}
               </div>
-              <div className="font-semibold text-gray-800 mb-2">{product.name}</div>
+              <div className="font-semibold text-gray-800 mb-2 line-clamp-2">{product.name}</div>
               
               {product.colors && (
                 <div className="flex gap-1 mb-2">
@@ -95,16 +96,16 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
             </div>
           </div>
           
-          {/* Supplier Pricing Table */}
+          {/* Supplier Pricing Table - Now 50% width */}
           {showVendors && (
-            <div className="flex-1 flex items-stretch divide-x border-l">
+            <div className="flex-1 flex items-stretch divide-x border-l w-1/2">
               {product.suppliers.slice(0, 4).map((supplier, index) => (
                 <div 
                   key={index} 
-                  className="flex-1 flex flex-col items-center justify-center p-3 relative min-w-[120px] cursor-pointer hover:bg-gray-50"
+                  className="flex-1 flex flex-col items-center justify-center p-3 relative min-w-0 cursor-pointer hover:bg-gray-50"
                   onClick={handleSupplierClick}
                 >
-                  <div className="text-xs font-medium mb-1 text-blue-600">{supplier.name}</div>
+                  <div className="text-xs font-medium mb-1 text-blue-600 truncate w-full text-center">{supplier.name}</div>
                   {showPrices && (
                     <div className="text-base font-semibold mb-1">
                       ${supplier.price.toFixed(2)}
