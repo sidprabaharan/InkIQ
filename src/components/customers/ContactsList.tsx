@@ -16,16 +16,24 @@ interface ContactsListProps {
   };
   onEditContact?: (contact: Contact) => void;
   onEditPrimaryContact?: () => void;
+  onSelectContact?: (contact: Contact) => void;
 }
 
 export function ContactsList({ 
   contacts, 
   primaryContact, 
   onEditContact,
-  onEditPrimaryContact
+  onEditPrimaryContact,
+  onSelectContact
 }: ContactsListProps) {
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
+
+  const handleContactClick = (contact: Contact) => {
+    if (onSelectContact) {
+      onSelectContact(contact);
+    }
   };
 
   return (
@@ -76,7 +84,11 @@ export function ContactsList({
       )}
 
       {contacts.map((contact) => (
-        <Card key={contact.id}>
+        <Card 
+          key={contact.id} 
+          className={onSelectContact ? "cursor-pointer hover:shadow-md transition-shadow" : ""}
+          onClick={onSelectContact ? () => handleContactClick(contact) : undefined}
+        >
           <CardContent className="p-4">
             <div className="flex items-start gap-4">
               <Avatar className="h-10 w-10 bg-gray-100">
@@ -94,7 +106,10 @@ export function ContactsList({
                       variant="ghost" 
                       size="sm" 
                       className="h-8 w-8 p-0"
-                      onClick={() => onEditContact(contact)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEditContact(contact);
+                      }}
                     >
                       <Edit className="h-4 w-4" />
                       <span className="sr-only">Edit contact</span>

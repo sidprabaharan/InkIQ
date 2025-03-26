@@ -50,6 +50,50 @@ interface CustomersContextType {
   updateCustomerContact: (customerId: string, contactId: string, data: Partial<Contact>) => void;
 }
 
+// Sample contact data
+const sampleContacts: Contact[] = [
+  {
+    id: "contact-1",
+    firstName: "Noraiz",
+    lastName: "Shahid",
+    email: "noraizraja@gmail.com",
+    phoneNumber: "+92 302658976",
+    jobTitle: "Marketing Director",
+    department: "Marketing",
+    contactOwner: "Robert Que"
+  },
+  {
+    id: "contact-2",
+    firstName: "Sarah",
+    lastName: "Johnson",
+    email: "sarah.j@nestleprint.com",
+    phoneNumber: "+1 (416) 555-4321",
+    jobTitle: "Procurement Manager",
+    department: "Purchasing",
+    contactOwner: "Robert Que"
+  },
+  {
+    id: "contact-3",
+    firstName: "Michael",
+    lastName: "Chen",
+    email: "michael.chen@globalretail.com",
+    phoneNumber: "+44 20 7946 1234",
+    jobTitle: "CEO",
+    department: "Executive",
+    contactOwner: "Robert Que"
+  },
+  {
+    id: "contact-4",
+    firstName: "Emma",
+    lastName: "Wilson",
+    email: "emma@techinnovators.com",
+    phoneNumber: "+1 (415) 555-7890",
+    jobTitle: "CTO",
+    department: "Technology",
+    contactOwner: "Robert Que"
+  }
+];
+
 // Example customers data
 const exampleCustomers: Customer[] = [
   {
@@ -62,7 +106,7 @@ const exampleCustomers: Customer[] = [
     faxNumber: "+1 (416) 555-1235",
     industry: "tech",
     invoiceOwner: "Finance Department",
-    contacts: [],
+    contacts: [sampleContacts[0], sampleContacts[1]],
     billingAddress: {
       address1: "123 Print Avenue",
       address2: "Suite 400",
@@ -95,7 +139,7 @@ const exampleCustomers: Customer[] = [
     faxNumber: "+1 (415) 555-7891",
     industry: "tech",
     invoiceOwner: "Accounts Payable",
-    contacts: [],
+    contacts: [sampleContacts[3]],
     billingAddress: {
       address1: "456 Innovation Drive",
       address2: "Floor 10",
@@ -128,7 +172,7 @@ const exampleCustomers: Customer[] = [
     faxNumber: "+44 20 7946 0959",
     industry: "retail",
     invoiceOwner: "Finance",
-    contacts: [],
+    contacts: [sampleContacts[2]],
     billingAddress: {
       address1: "789 Retail Row",
       address2: "Building C",

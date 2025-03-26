@@ -12,6 +12,7 @@ import QuoteDetail from "@/pages/QuoteDetail";
 import WorkOrder from "@/pages/WorkOrder";
 import Invoices from "@/pages/Invoices";
 import Customers from "@/pages/Customers";
+import Contacts from "@/pages/Contacts";
 import Tasks from "@/pages/Tasks";
 import Messages from "@/pages/Messages";
 import Calendar from "@/pages/Calendar";
@@ -40,6 +41,7 @@ function App() {
               <Route path="/work-orders/:id" element={<WorkOrder />} />
               <Route path="/invoices" element={<AppLayout><Invoices /></AppLayout>} />
               <Route path="/customers" element={<AppLayout><Customers /></AppLayout>} />
+              <Route path="/contacts" element={<AppLayout><Contacts /></AppLayout>} />
               <Route path="/leads" element={<AppLayout><Leads /></AppLayout>} />
               <Route path="/tasks" element={<AppLayout><Tasks /></AppLayout>} />
               <Route path="/messages" element={<AppLayout><Messages /></AppLayout>} />
