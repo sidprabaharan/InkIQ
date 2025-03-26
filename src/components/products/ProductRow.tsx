@@ -195,7 +195,7 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
               </div>
             </div>
             
-            {/* Sizes and Pricing Grid */}
+            {/* Sizes and Pricing Grid - Redesigned */}
             <div className="p-4">
               <div className="grid grid-cols-8 gap-2 text-center mb-4">
                 <div className="font-medium text-sm"></div>
@@ -204,36 +204,27 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
                 ))}
               </div>
               
-              {/* Price row */}
+              {/* Price row - Simplified with consistent styling */}
               <div className="grid grid-cols-8 gap-2 text-center mb-4">
                 <div className="text-sm text-left font-medium">Price</div>
                 {sizes.map((size, index) => (
-                  <div key={size} className={`text-sm ${index > 3 ? 'text-red-500' : ''}`}>
+                  <div key={size} className="text-sm font-medium">
                     ${(index > 3 ? product.lowestPrice + 1 + index - 4 : product.lowestPrice).toFixed(2)}
                   </div>
                 ))}
               </div>
               
-              {/* Color row */}
-              <div className="grid grid-cols-8 gap-2 text-center mb-2 items-center">
-                <div className="text-sm text-left">
-                  <div className="w-5 h-5 rounded-full" style={{ backgroundColor: expandedColor || '#fff' }}></div>
-                </div>
-                {sizes.map((size, index) => (
-                  <div key={size} className={`text-sm text-red-500 font-medium ${index === 4 || index === 5 ? '' : 'opacity-0'}`}>
-                    {index === 4 ? '$4.23' : index === 5 ? '$5.33' : '$0.00'}
-                  </div>
-                ))}
-              </div>
+              {/* Remove the special pricing row */}
               
-              {/* Location inventory grid with quantity inputs */}
+              {/* Location inventory grid - improved display without input field styling */}
               {locations.map((location, locationIndex) => (
                 <div key={location} className="mt-4">
-                  <div className="grid grid-cols-8 gap-2 text-center items-center mb-1">
+                  <div className="grid grid-cols-8 gap-2 text-center items-center mb-2">
                     <div className="text-xs text-left font-medium">
                       {location}
                       {locationIndex < 2 && <div className="text-[10px] text-gray-500">Cutoff 4:00 CT</div>}
                     </div>
+                    
                     {sizes.map((size, sizeIndex) => {
                       const inventory = 
                         locationIndex === 0 && sizeIndex === 0 ? 217 : 
@@ -260,19 +251,24 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
                       
                       return (
                         <div key={`${location}-${size}`} className="relative flex flex-col items-center">
-                          <div className="text-xs bg-white border rounded-md py-1 w-full mb-1">
-                            {inventory}
+                          {/* Inventory count shown as plain text rather than input-styled */}
+                          <div className="text-xs mb-1 font-medium">
+                            {inventory > 0 ? inventory : '-'}
                           </div>
+                          
+                          {/* Only show quantity selector when inventory > 0 */}
                           {inventory > 0 && (
-                            <Input
-                              type="number"
-                              min="0"
-                              max={inventory}
-                              value={quantities[location]?.[size] || ''}
-                              onChange={(e) => handleQuantityChange(location, size, e.target.value)}
-                              className="h-8 w-full text-xs text-center"
-                              placeholder="Qty"
-                            />
+                            <div className="flex items-center gap-1 w-full">
+                              <Input
+                                type="number"
+                                min="0"
+                                max={inventory}
+                                value={quantities[location]?.[size] || ''}
+                                onChange={(e) => handleQuantityChange(location, size, e.target.value)}
+                                className="h-8 w-full text-xs text-center"
+                                placeholder="Qty"
+                              />
+                            </div>
                           )}
                         </div>
                       );
