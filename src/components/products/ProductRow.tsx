@@ -31,6 +31,7 @@ interface ProductRowProps {
 export function ProductRow({ product, showVendors, showPrices }: ProductRowProps) {
   const [expanded, setExpanded] = useState(false);
   const [expandedColor, setExpandedColor] = useState<string | null>(null);
+  const [showAllColors, setShowAllColors] = useState(false);
   
   const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
   const locations = ['DALLAS, TX', 'MEMPHIS, TN', 'GILDAN DISTRIBUTION CENTER'];
@@ -44,6 +45,10 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
   
   const handleSupplierClick = () => {
     setExpanded(!expanded);
+  };
+
+  const toggleShowAllColors = () => {
+    setShowAllColors(!showAllColors);
   };
   
   return (
@@ -70,9 +75,9 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
               <div className="font-semibold text-gray-800 mb-2 line-clamp-2">{product.name}</div>
               
               {product.colors && (
-                <div className="flex gap-1 mb-2">
+                <div className="flex flex-wrap gap-1 mb-2">
                   <span className="text-xs text-gray-500 mr-1 mt-1">Color:</span>
-                  {product.colors.slice(0, 3).map((color, index) => (
+                  {product.colors.slice(0, showAllColors ? product.colors.length : 5).map((color, index) => (
                     <div
                       key={index}
                       className={`w-5 h-5 rounded-full cursor-pointer border ${expandedColor === color ? 'ring-2 ring-blue-500' : 'border-gray-300'}`}
@@ -80,9 +85,12 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
                       onClick={() => setExpandedColor(color)}
                     />
                   ))}
-                  {product.colors.length > 3 && (
-                    <div className="text-xs text-blue-600 mt-1 cursor-pointer">
-                      More colors...
+                  {product.colors.length > 5 && (
+                    <div 
+                      className="text-xs text-blue-600 mt-1 cursor-pointer hover:underline"
+                      onClick={toggleShowAllColors}
+                    >
+                      {showAllColors ? "Show fewer" : `+${product.colors.length - 5} more colors`}
                     </div>
                   )}
                 </div>
