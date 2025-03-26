@@ -2,8 +2,10 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { toast } from "sonner";
 
 type Supplier = {
   name: string;
@@ -32,6 +34,7 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
   const [expanded, setExpanded] = useState(false);
   const [expandedColor, setExpandedColor] = useState<string | null>(null);
   const [showAllColors, setShowAllColors] = useState(false);
+  const [quantities, setQuantities] = useState<Record<string, Record<string, number>>>({});
   
   const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
   const locations = ['DALLAS, TX', 'MEMPHIS, TN', 'GILDAN DISTRIBUTION CENTER'];
@@ -49,6 +52,40 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
 
   const toggleShowAllColors = () => {
     setShowAllColors(!showAllColors);
+  };
+  
+  const handleQuantityChange = (location: string, size: string, value: string) => {
+    const numValue = value === '' ? 0 : Math.max(0, parseInt(value, 10) || 0);
+    
+    setQuantities(prev => ({
+      ...prev,
+      [location]: {
+        ...(prev[location] || {}),
+        [size]: numValue
+      }
+    }));
+  };
+  
+  const getTotalQuantity = () => {
+    let total = 0;
+    Object.values(quantities).forEach(locationQuantities => {
+      Object.values(locationQuantities).forEach(qty => {
+        total += qty;
+      });
+    });
+    return total;
+  };
+  
+  const handleAddToCart = () => {
+    const total = getTotalQuantity();
+    if (total === 0) {
+      toast.error("Please select at least one item to add to cart");
+      return;
+    }
+    
+    toast.success(`Added ${total} items to cart`);
+    // Reset quantities after adding to cart
+    setQuantities({});
   };
   
   return (
@@ -189,7 +226,7 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
                 ))}
               </div>
               
-              {/* Location inventory grid */}
+              {/* Location inventory grid with quantity inputs */}
               {locations.map((location, locationIndex) => (
                 <div key={location} className="mt-4">
                   <div className="grid grid-cols-8 gap-2 text-center items-center mb-1">
@@ -197,34 +234,49 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
                       {location}
                       {locationIndex < 2 && <div className="text-[10px] text-gray-500">Cutoff 4:00 CT</div>}
                     </div>
-                    {sizes.map((size, sizeIndex) => (
-                      <div key={`${location}-${size}`} className="relative">
-                        <div className="text-xs bg-white border rounded-md py-1">
-                          {locationIndex === 0 && sizeIndex === 0 ? '217' : 
-                           locationIndex === 0 && sizeIndex === 1 ? '830' :
-                           locationIndex === 0 && sizeIndex === 2 ? '1010' :
-                           locationIndex === 0 && sizeIndex === 3 ? '615' :
-                           locationIndex === 0 && sizeIndex === 4 ? '371' :
-                           locationIndex === 0 && sizeIndex === 5 ? '102' :
-                           locationIndex === 0 && sizeIndex === 6 ? '29' :
-                           locationIndex === 1 && sizeIndex === 0 ? '384' :
-                           locationIndex === 1 && sizeIndex === 1 ? '196' :
-                           locationIndex === 1 && sizeIndex === 2 ? '275' :
-                           locationIndex === 1 && sizeIndex === 3 ? '311' :
-                           locationIndex === 1 && sizeIndex === 4 ? '116' :
-                           locationIndex === 1 && sizeIndex === 5 ? '53' :
-                           locationIndex === 1 && sizeIndex === 6 ? '33' :
-                           locationIndex === 2 && sizeIndex === 0 ? '0' :
-                           locationIndex === 2 && sizeIndex === 1 ? '36144' :
-                           locationIndex === 2 && sizeIndex === 2 ? '37008' :
-                           locationIndex === 2 && sizeIndex === 3 ? '0' :
-                           locationIndex === 2 && sizeIndex === 4 ? '0' :
-                           locationIndex === 2 && sizeIndex === 5 ? '0' :
-                           locationIndex === 2 && sizeIndex === 6 ? '2682' : '0'
-                          }
+                    {sizes.map((size, sizeIndex) => {
+                      const inventory = 
+                        locationIndex === 0 && sizeIndex === 0 ? 217 : 
+                        locationIndex === 0 && sizeIndex === 1 ? 830 :
+                        locationIndex === 0 && sizeIndex === 2 ? 1010 :
+                        locationIndex === 0 && sizeIndex === 3 ? 615 :
+                        locationIndex === 0 && sizeIndex === 4 ? 371 :
+                        locationIndex === 0 && sizeIndex === 5 ? 102 :
+                        locationIndex === 0 && sizeIndex === 6 ? 29 :
+                        locationIndex === 1 && sizeIndex === 0 ? 384 :
+                        locationIndex === 1 && sizeIndex === 1 ? 196 :
+                        locationIndex === 1 && sizeIndex === 2 ? 275 :
+                        locationIndex === 1 && sizeIndex === 3 ? 311 :
+                        locationIndex === 1 && sizeIndex === 4 ? 116 :
+                        locationIndex === 1 && sizeIndex === 5 ? 53 :
+                        locationIndex === 1 && sizeIndex === 6 ? 33 :
+                        locationIndex === 2 && sizeIndex === 0 ? 0 :
+                        locationIndex === 2 && sizeIndex === 1 ? 36144 :
+                        locationIndex === 2 && sizeIndex === 2 ? 37008 :
+                        locationIndex === 2 && sizeIndex === 3 ? 0 :
+                        locationIndex === 2 && sizeIndex === 4 ? 0 :
+                        locationIndex === 2 && sizeIndex === 5 ? 0 :
+                        locationIndex === 2 && sizeIndex === 6 ? 2682 : 0;
+                      
+                      return (
+                        <div key={`${location}-${size}`} className="relative flex flex-col items-center">
+                          <div className="text-xs bg-white border rounded-md py-1 w-full mb-1">
+                            {inventory}
+                          </div>
+                          {inventory > 0 && (
+                            <Input
+                              type="number"
+                              min="0"
+                              max={inventory}
+                              value={quantities[location]?.[size] || ''}
+                              onChange={(e) => handleQuantityChange(location, size, e.target.value)}
+                              className="h-8 w-full text-xs text-center"
+                              placeholder="Qty"
+                            />
+                          )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                   
                   {locationIndex < 2 && (
@@ -248,10 +300,20 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
                 </div>
               ))}
               
-              {/* Add to cart button */}
-              <div className="mt-6 text-right">
-                <Button variant="outline" className="bg-green-100 text-green-800 hover:bg-green-200">
-                  Save to Cart
+              {/* Add to cart button with total quantity */}
+              <div className="mt-6 text-right flex justify-end items-center gap-4">
+                {getTotalQuantity() > 0 && (
+                  <div className="text-sm font-medium">
+                    Total Quantity: <span className="text-green-600">{getTotalQuantity()}</span>
+                  </div>
+                )}
+                <Button 
+                  variant="outline" 
+                  className="bg-green-100 text-green-800 hover:bg-green-200"
+                  onClick={handleAddToCart}
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Add to Cart
                 </Button>
               </div>
             </div>
