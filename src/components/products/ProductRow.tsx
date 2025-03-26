@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -249,7 +250,7 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
                                 value={quantities[location]?.[size] || ''}
                                 onChange={(e) => handleQuantityChange(location, size, e.target.value)}
                                 className="h-8 w-full text-xs text-center"
-                                placeholder="Qty"
+                                placeholder=""
                               />
                             </div>
                           )}
