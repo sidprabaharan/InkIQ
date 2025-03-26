@@ -10,8 +10,10 @@ import {
   Phone, 
   MessageSquare, 
   Calendar, 
-  Activity 
+  Activity,
+  ArrowUpRight
 } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface ContactDetailsProps {
   contact: Contact & { companyName?: string };
@@ -24,6 +26,31 @@ export function ContactDetails({ contact, onBack }: ContactDetailsProps) {
   const getInitial = () => {
     return contact.firstName.charAt(0).toUpperCase();
   };
+
+  // Sample orders data
+  const sampleOrders = [
+    {
+      id: "ORD-1234",
+      date: "2023-10-15",
+      amount: "$4,250.00",
+      status: "Completed",
+      items: "Custom T-shirts (250 units)"
+    },
+    {
+      id: "ORD-1235",
+      date: "2023-11-23",
+      amount: "$3,800.00",
+      status: "Completed",
+      items: "Promotional Mugs (150 units)"
+    },
+    {
+      id: "ORD-1236",
+      date: "2024-01-05",
+      amount: "$4,400.00",
+      status: "In Progress",
+      items: "Embroidered Caps (200 units)"
+    }
+  ];
   
   return (
     <div className="bg-gray-50">
@@ -163,10 +190,44 @@ export function ContactDetails({ contact, onBack }: ContactDetailsProps) {
                 </div>
               </div>
               
-              <div className="bg-white rounded-lg border p-6">
-                <h3 className="text-lg font-medium mb-4">Orders</h3>
-                <div className="text-center py-8 text-gray-500">
-                  No orders to show yet.
+              <div className="bg-white rounded-lg border">
+                <div className="p-6 border-b flex justify-between items-center">
+                  <h3 className="text-lg font-medium">Orders</h3>
+                  <Button variant="outline" size="sm" className="text-blue-600 flex items-center gap-1">
+                    View All <ArrowUpRight className="h-3 w-3" />
+                  </Button>
+                </div>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Order ID</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Items</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {sampleOrders.map((order) => (
+                        <TableRow key={order.id} className="hover:bg-gray-50 cursor-pointer">
+                          <TableCell className="font-medium">{order.id}</TableCell>
+                          <TableCell>{order.date}</TableCell>
+                          <TableCell>{order.items}</TableCell>
+                          <TableCell>{order.amount}</TableCell>
+                          <TableCell>
+                            <span className={`px-2 py-1 rounded-full text-xs ${
+                              order.status === 'Completed' 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-blue-100 text-blue-800'
+                            }`}>
+                              {order.status}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
               </div>
               
