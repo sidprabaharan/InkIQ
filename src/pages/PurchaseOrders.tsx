@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -8,16 +8,18 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Search, Plus, Filter, Eye, FileText } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useLocation } from 'react-router-dom';
+import { toast } from 'sonner';
 
 // Mock data for purchase orders
-const mockPurchaseOrders = [
+const initialPurchaseOrders = [
   {
     id: "PO-2023-001",
     supplier: "SanMar",
     dateCreated: "2023-05-15",
     status: "Delivered",
     total: 1250.75,
+    poNumber: "CUST-001",
     items: [
       { id: 1, name: "Gildan Heavy Cotton T-Shirt", sku: "GIL2000", quantity: 100, price: 3.25, total: 325 },
       { id: 2, name: "Port & Company Essential Tee", sku: "PC61", quantity: 150, price: 3.10, total: 465 },
@@ -29,6 +31,7 @@ const mockPurchaseOrders = [
     supplier: "Alphabroder",
     dateCreated: "2023-06-02",
     status: "Shipped",
+    poNumber: "CUST-002",
     total: 825.50,
     items: [
       { id: 1, name: "Fruit of the Loom Sweatshirt", sku: "FRT1200", quantity: 100, price: 8.25, total: 825.50 }
@@ -39,6 +42,7 @@ const mockPurchaseOrders = [
     supplier: "S&S Activewear",
     dateCreated: "2023-06-10",
     status: "Processing",
+    poNumber: "CUST-003",
     total: 1687.50,
     items: [
       { id: 1, name: "Jerzees Hoodie", sku: "JRZ996", quantity: 75, price: 12.50, total: 937.50 },
@@ -51,6 +55,7 @@ const mockPurchaseOrders = [
     supplier: "TSC Apparel",
     dateCreated: "2023-06-15",
     status: "Pending",
+    poNumber: "CUST-004",
     total: 895.00,
     items: [
       { id: 1, name: "Fruit of the Loom Sweatshirt", sku: "FRT1200", quantity: 110, price: 8.15, total: 896.50 }
@@ -61,6 +66,7 @@ const mockPurchaseOrders = [
     supplier: "SanMar",
     dateCreated: "2023-06-20",
     status: "Cancelled",
+    poNumber: "CUST-005",
     total: 556.25,
     items: [
       { id: 1, name: "Jerzees Hoodie", sku: "JRZ996", quantity: 25, price: 12.75, total: 318.75 },
@@ -75,14 +81,27 @@ export default function PurchaseOrders() {
   const [statusFilter, setStatusFilter] = useState('All');
   const [supplierFilter, setSupplierFilter] = useState('All');
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+  const [purchaseOrders, setPurchaseOrders] = useState(initialPurchaseOrders);
+  const location = useLocation();
   
   const statuses = ['All', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
   const suppliers = ['All', 'SanMar', 'Alphabroder', 'S&S Activewear', 'TSC Apparel'];
   const itemsPerPage = 10;
   
+  // Check if we're navigating from cart checkout
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const newOrder = params.get('newOrder');
+    
+    if (newOrder === 'true') {
+      toast.success("Your purchase order has been created successfully!");
+    }
+  }, [location]);
+  
   // Filter purchase orders based on search term, status, and supplier
-  const filteredOrders = mockPurchaseOrders.filter(order => {
-    const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredOrders = purchaseOrders.filter(order => {
+    const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         (order.poNumber && order.poNumber.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesStatus = statusFilter === 'All' || order.status === statusFilter;
     const matchesSupplier = supplierFilter === 'All' || order.supplier === supplierFilter;
     
@@ -182,6 +201,7 @@ export default function PurchaseOrders() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Order #</TableHead>
+                  <TableHead>PO Number</TableHead>
                   <TableHead>Supplier</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Status</TableHead>
@@ -194,6 +214,7 @@ export default function PurchaseOrders() {
                   <React.Fragment key={order.id}>
                     <TableRow>
                       <TableCell className="font-medium">{order.id}</TableCell>
+                      <TableCell>{order.poNumber || "-"}</TableCell>
                       <TableCell>{order.supplier}</TableCell>
                       <TableCell>{order.dateCreated}</TableCell>
                       <TableCell>
@@ -216,7 +237,7 @@ export default function PurchaseOrders() {
                     
                     {expandedOrder === order.id && (
                       <TableRow>
-                        <TableCell colSpan={6}>
+                        <TableCell colSpan={7}>
                           <div className="py-4 px-6 bg-muted/50 rounded-md">
                             <h4 className="font-medium mb-3">Order Items</h4>
                             <Table>
@@ -254,7 +275,7 @@ export default function PurchaseOrders() {
                 
                 {displayedOrders.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                       No purchase orders found. Try adjusting your search or filters.
                     </TableCell>
                   </TableRow>

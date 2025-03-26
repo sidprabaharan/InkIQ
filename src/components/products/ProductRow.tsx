@@ -6,6 +6,7 @@ import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart } from 'lucide-react
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { toast } from "sonner";
+import { useCart, CartItem } from '@/context/CartContext';
 
 type Supplier = {
   name: string;
@@ -36,6 +37,7 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
   const [showAllColors, setShowAllColors] = useState(false);
   const [quantities, setQuantities] = useState<Record<string, Record<string, number>>>({});
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
+  const { addToCart } = useCart();
   
   const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
   const locations = ['DALLAS, TX', 'MEMPHIS, TN', 'GILDAN DISTRIBUTION CENTER'];
@@ -85,7 +87,41 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
       return;
     }
     
-    toast.success(`Added ${total} items to cart`);
+    if (!selectedSupplier) {
+      toast.error("Please select a supplier first");
+      return;
+    }
+    
+    // Format the cart item
+    const cartQuantities = [];
+    for (const location in quantities) {
+      for (const size in quantities[location]) {
+        const quantity = quantities[location][size];
+        if (quantity > 0) {
+          cartQuantities.push({
+            location,
+            size,
+            quantity
+          });
+        }
+      }
+    }
+    
+    const cartItem: CartItem = {
+      id: product.id,
+      sku: product.sku,
+      name: product.name,
+      category: product.category,
+      price: selectedSupplier.price,
+      supplierName: selectedSupplier.name,
+      image: product.image,
+      quantities: cartQuantities,
+      totalQuantity: total
+    };
+    
+    // Add to cart
+    addToCart(cartItem);
+    
     // Reset quantities after adding to cart
     setQuantities({});
   };
