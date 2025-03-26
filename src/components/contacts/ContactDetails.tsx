@@ -44,30 +44,42 @@ export function ContactDetails({ contact, onBack }: ContactDetailsProps) {
             <p className="text-gray-500 text-center">{contact.email}</p>
           </div>
           
-          <div className="grid grid-cols-2 gap-4 text-center mb-6">
-            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
-              <Book className="h-5 w-5 mb-1 text-gray-500" />
-              <span className="text-xs">Notes</span>
+          <div className="flex flex-wrap -mx-1 mb-6">
+            <div className="px-1 mb-2">
+              <Button variant="outline" className="w-full flex items-center" size="sm">
+                <Book className="mr-2 h-4 w-4" />
+                Note
+              </Button>
             </div>
-            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
-              <Mail className="h-5 w-5 mb-1 text-gray-500" />
-              <span className="text-xs">Emails</span>
+            <div className="px-1 mb-2">
+              <Button variant="outline" className="w-full flex items-center" size="sm">
+                <Mail className="mr-2 h-4 w-4" />
+                Email
+              </Button>
             </div>
-            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
-              <Phone className="h-5 w-5 mb-1 text-gray-500" />
-              <span className="text-xs">Calls</span>
+            <div className="px-1 mb-2">
+              <Button variant="outline" className="w-full flex items-center" size="sm">
+                <Phone className="mr-2 h-4 w-4" />
+                Call
+              </Button>
             </div>
-            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
-              <Calendar className="h-5 w-5 mb-1 text-gray-500" />
-              <span className="text-xs">Meeting</span>
+            <div className="px-1 mb-2">
+              <Button variant="outline" className="w-full flex items-center" size="sm">
+                <Calendar className="mr-2 h-4 w-4" />
+                Meeting
+              </Button>
             </div>
-            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
-              <MessageSquare className="h-5 w-5 mb-1 text-gray-500" />
-              <span className="text-xs">Task</span>
+            <div className="px-1 mb-2">
+              <Button variant="outline" className="w-full flex items-center" size="sm">
+                <MessageSquare className="mr-2 h-4 w-4" />
+                Task
+              </Button>
             </div>
-            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
-              <Activity className="h-5 w-5 mb-1 text-gray-500" />
-              <span className="text-xs">Activity</span>
+            <div className="px-1 mb-2">
+              <Button variant="outline" className="w-full flex items-center" size="sm">
+                <Activity className="mr-2 h-4 w-4" />
+                Activity
+              </Button>
             </div>
           </div>
           
