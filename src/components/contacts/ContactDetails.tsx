@@ -26,7 +26,7 @@ export function ContactDetails({ contact, onBack }: ContactDetailsProps) {
   };
   
   return (
-    <div>
+    <div className="bg-gray-50">
       <Button variant="ghost" onClick={onBack} className="mb-4">
         <ArrowLeft className="h-4 w-4 mr-2" />
         Back to contacts
@@ -147,6 +147,22 @@ export function ContactDetails({ contact, onBack }: ContactDetailsProps) {
             </TabsList>
             
             <TabsContent value="overview" className="mt-6 space-y-6">
+              {/* Metrics cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-white rounded-lg border p-4">
+                  <h3 className="text-sm font-medium text-gray-500">Total Orders</h3>
+                  <p className="text-2xl font-bold">3</p>
+                </div>
+                <div className="bg-white rounded-lg border p-4">
+                  <h3 className="text-sm font-medium text-gray-500">Total Sales Volume</h3>
+                  <p className="text-2xl font-bold">$12,450</p>
+                </div>
+                <div className="bg-white rounded-lg border p-4">
+                  <h3 className="text-sm font-medium text-gray-500">Current Quotes</h3>
+                  <p className="text-2xl font-bold">$5,280</p>
+                </div>
+              </div>
+              
               <div className="bg-white rounded-lg border p-6">
                 <h3 className="text-lg font-medium mb-4">Orders</h3>
                 <div className="text-center py-8 text-gray-500">
