@@ -4,8 +4,6 @@ import { ContactsTable } from "@/components/contacts/ContactsTable";
 import { ContactDetails } from "@/components/contacts/ContactDetails";
 import { useCustomers } from "@/context/CustomersContext";
 import { Contact } from "@/types/customer";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 
 export default function Contacts() {
   const { customers } = useCustomers();
@@ -33,10 +31,6 @@ export default function Contacts() {
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold">Contacts</h1>
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Add New Contact
-            </Button>
           </div>
           <ContactsTable contacts={allContacts} onSelectContact={handleContactSelect} />
         </div>
