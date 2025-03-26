@@ -44,7 +44,7 @@ export function ContactDetails({ contact, onBack }: ContactDetailsProps) {
             <p className="text-gray-500 text-center">{contact.email}</p>
           </div>
           
-          <div className="flex flex-wrap -mx-1 mb-6">
+          <div className="flex flex-wrap justify-center -mx-1 mb-6">
             <div className="px-1 mb-2">
               <Button variant="outline" className="w-full flex items-center" size="sm">
                 <Book className="mr-2 h-4 w-4" />
