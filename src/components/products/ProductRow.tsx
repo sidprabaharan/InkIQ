@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Eye, ShoppingCart, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 type Supplier = {
@@ -41,6 +40,10 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
       setExpandedColor(product.colors[0]);
     }
   }, [product.colors, expandedColor]);
+  
+  const handleSupplierClick = () => {
+    setExpanded(!expanded);
+  };
   
   return (
     <Card className="overflow-hidden mb-4">
@@ -96,8 +99,12 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
           {showVendors && (
             <div className="flex-1 flex items-stretch divide-x border-l">
               {product.suppliers.slice(0, 4).map((supplier, index) => (
-                <div key={index} className="flex-1 flex flex-col items-center justify-center p-3 relative min-w-[120px]">
-                  <div className="text-xs font-medium mb-1">{supplier.name}</div>
+                <div 
+                  key={index} 
+                  className="flex-1 flex flex-col items-center justify-center p-3 relative min-w-[120px] cursor-pointer hover:bg-gray-50"
+                  onClick={handleSupplierClick}
+                >
+                  <div className="text-xs font-medium mb-1 text-blue-600">{supplier.name}</div>
                   {showPrices && (
                     <div className="text-base font-semibold mb-1">
                       ${supplier.price.toFixed(2)}
@@ -116,23 +123,6 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
               ))}
             </div>
           )}
-          
-          {/* Actions */}
-          <div className="flex flex-col items-center justify-center px-4 border-l">
-            <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)} className="text-blue-600">
-              {expanded ? (
-                <>
-                  <ChevronUp className="h-4 w-4 mr-1" />
-                  Close Inventory
-                </>
-              ) : (
-                <>
-                  <Eye className="h-4 w-4 mr-1" />
-                  See Inventory
-                </>
-              )}
-            </Button>
-          </div>
         </div>
         
         {/* Expanded Inventory Section */}
