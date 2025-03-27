@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import {
   BarChart2,
@@ -92,11 +91,6 @@ export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
       name: 'Expenses',
       icon: DollarSign,
       path: '/expenses',
-    },
-    {
-      name: 'Analytics',
-      icon: BarChart2,
-      path: '/analytics',
     },
     {
       name: 'Merch Stores',

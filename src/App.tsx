@@ -20,6 +20,7 @@ import Leads from "@/pages/Leads";
 import Settings from "@/pages/Settings";
 import Products from "@/pages/Products";
 import PurchaseOrders from "@/pages/PurchaseOrders";
+import Expenses from "@/pages/Expenses";
 import NotFound from "@/pages/NotFound";
 import { CustomersProvider } from "./context/CustomersContext";
 
@@ -48,6 +49,7 @@ function App() {
               <Route path="/calendar" element={<AppLayout><Calendar /></AppLayout>} />
               <Route path="/products" element={<AppLayout><Products /></AppLayout>} />
               <Route path="/purchase-orders" element={<AppLayout><PurchaseOrders /></AppLayout>} />
+              <Route path="/expenses" element={<AppLayout><Expenses /></AppLayout>} />
               <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
               <Route path="*" element={<AppLayout><NotFound /></AppLayout>} />
             </Routes>
