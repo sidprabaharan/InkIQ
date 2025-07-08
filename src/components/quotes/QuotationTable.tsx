@@ -1,9 +1,24 @@
 
-import { Search } from "lucide-react";
+import React, { useState } from "react";
+import { Search, ChevronDown, ChevronRight } from "lucide-react";
 import { QuotationStatusBadge } from "./QuotationStatusBadge";
 import { PaymentStatusBadge } from "./PaymentStatusBadge";
+import { StatusDropdown } from "./StatusDropdown";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+
+interface LineItem {
+  id: string;
+  description: string;
+  quantity: number;
+  price: string;
+  status: string;
+}
 
 interface Quotation {
   id: string;
@@ -15,6 +30,7 @@ interface Quotation {
   outstanding: string;
   status: string;
   isPaid: boolean;
+  lineItems?: LineItem[];
 }
 
 // Define which statuses belong to quotes vs invoices
@@ -66,6 +82,11 @@ const allQuotationsData: Quotation[] = [
     outstanding: "$992",
     status: "Purchase Orders",
     isPaid: true,
+    lineItems: [
+      { id: "3033-1", description: "Custom T-Shirts - Large", quantity: 50, price: "$15.00", status: "Production" },
+      { id: "3033-2", description: "Logo Printing", quantity: 50, price: "$5.00", status: "Complete" },
+      { id: "3033-3", description: "Gift Wrapping", quantity: 50, price: "$2.00", status: "Shipping" },
+    ]
   },
   {
     id: "3034",
@@ -77,6 +98,10 @@ const allQuotationsData: Quotation[] = [
     outstanding: "$241",
     status: "Achieved Quote",
     isPaid: false,
+    lineItems: [
+      { id: "3034-1", description: "Business Cards", quantity: 1000, price: "$0.50", status: "Complete" },
+      { id: "3034-2", description: "Letterhead Design", quantity: 1, price: "$150.00", status: "Artwork" },
+    ]
   },
   {
     id: "3035",
@@ -87,6 +112,10 @@ const allQuotationsData: Quotation[] = [
     outstanding: "$0.000",
     status: "Miscellaneous",
     isPaid: true,
+    lineItems: [
+      { id: "3035-1", description: "Promotional Banners", quantity: 5, price: "$75.00", status: "Shipping" },
+      { id: "3035-2", description: "Setup Fee", quantity: 1, price: "$100.00", status: "Complete" },
+    ]
   },
   {
     id: "3036",
@@ -158,6 +187,8 @@ interface QuotationTableProps {
 
 export function QuotationTable({ isInvoicesPage = false }: QuotationTableProps) {
   const navigate = useNavigate();
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [lineItemStatuses, setLineItemStatuses] = useState<{[key: string]: string}>({});
   
   // Filter data based on whether we're on the Quotes or Invoices page
   const quotationsData = allQuotationsData.filter(quotation => {
@@ -172,6 +203,26 @@ export function QuotationTable({ isInvoicesPage = false }: QuotationTableProps) 
   
   const handleRowClick = (quotationId: string) => {
     navigate(`/quotes/${quotationId}`);
+  };
+
+  const toggleRowExpansion = (quotationId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    setExpandedRows(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(quotationId)) {
+        newSet.delete(quotationId);
+      } else {
+        newSet.add(quotationId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleLineItemStatusChange = (lineItemId: string, newStatus: string) => {
+    setLineItemStatuses(prev => ({
+      ...prev,
+      [lineItemId]: newStatus
+    }));
   };
 
   return (
@@ -203,27 +254,101 @@ export function QuotationTable({ isInvoicesPage = false }: QuotationTableProps) 
           </thead>
           <tbody>
             {quotationsData.map((quotation) => (
-              <tr 
-                key={quotation.id} 
-                className="border-b hover:bg-gray-50 transition-colors cursor-pointer"
-                onClick={() => handleRowClick(quotation.id)}
-              >
-                <td className="px-4 py-3 text-sm text-gray-500">
-                  {quotation.id}
-                  {quotation.norisId && (
-                    <div className="text-xs text-gray-400">{quotation.norisId}</div>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-sm">{quotation.customer}</td>
-                <td className="px-4 py-3 text-sm text-gray-500">{quotation.dueDate}</td>
-                <td className="px-4 py-3 text-sm text-gray-500">{quotation.owner}</td>
-                <td className="px-4 py-3 text-sm">{quotation.total}</td>
-                <td className="px-4 py-3 text-sm">{quotation.outstanding}</td>
-                <td className="px-4 py-3 space-x-2">
-                  <QuotationStatusBadge status={quotation.status} />
-                  <PaymentStatusBadge isPaid={quotation.isPaid} />
-                </td>
-              </tr>
+              <React.Fragment key={quotation.id}>
+                <tr className="border-b hover:bg-gray-50 transition-colors cursor-pointer">
+                  <td className="px-4 py-3 text-sm text-gray-500">
+                    <div className="flex items-center gap-2">
+                      {isInvoicesPage && quotation.lineItems && (
+                        <button
+                          onClick={(e) => toggleRowExpansion(quotation.id, e)}
+                          className="hover:bg-gray-200 rounded p-1"
+                        >
+                          {expandedRows.has(quotation.id) ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
+                        </button>
+                      )}
+                      <div>
+                        {quotation.id}
+                        {quotation.norisId && (
+                          <div className="text-xs text-gray-400">{quotation.norisId}</div>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                  <td 
+                    className="px-4 py-3 text-sm"
+                    onClick={() => handleRowClick(quotation.id)}
+                  >
+                    {quotation.customer}
+                  </td>
+                  <td 
+                    className="px-4 py-3 text-sm text-gray-500"
+                    onClick={() => handleRowClick(quotation.id)}
+                  >
+                    {quotation.dueDate}
+                  </td>
+                  <td 
+                    className="px-4 py-3 text-sm text-gray-500"
+                    onClick={() => handleRowClick(quotation.id)}
+                  >
+                    {quotation.owner}
+                  </td>
+                  <td 
+                    className="px-4 py-3 text-sm"
+                    onClick={() => handleRowClick(quotation.id)}
+                  >
+                    {quotation.total}
+                  </td>
+                  <td 
+                    className="px-4 py-3 text-sm"
+                    onClick={() => handleRowClick(quotation.id)}
+                  >
+                    {quotation.outstanding}
+                  </td>
+                  <td 
+                    className="px-4 py-3 space-x-2"
+                    onClick={() => handleRowClick(quotation.id)}
+                  >
+                    <QuotationStatusBadge status={quotation.status} />
+                    <PaymentStatusBadge isPaid={quotation.isPaid} />
+                  </td>
+                </tr>
+                
+                {/* Expandable Line Items Row */}
+                {isInvoicesPage && quotation.lineItems && expandedRows.has(quotation.id) && (
+                  <tr className="bg-gray-50">
+                    <td colSpan={7} className="px-4 py-0">
+                      <div className="py-4">
+                        <h4 className="text-sm font-medium text-gray-700 mb-3">Line Items</h4>
+                        <div className="space-y-2">
+                          {quotation.lineItems.map((lineItem) => (
+                            <div 
+                              key={lineItem.id} 
+                              className="flex items-center justify-between p-3 bg-white rounded border"
+                            >
+                              <div className="flex-1">
+                                <div className="text-sm font-medium">{lineItem.description}</div>
+                                <div className="text-xs text-gray-500">
+                                  Qty: {lineItem.quantity} × {lineItem.price}
+                                </div>
+                              </div>
+                              <div className="ml-4">
+                                <StatusDropdown
+                                  currentStatus={lineItemStatuses[lineItem.id] || lineItem.status}
+                                  onStatusChange={(newStatus) => handleLineItemStatusChange(lineItem.id, newStatus)}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))}
           </tbody>
         </table>
