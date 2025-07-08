@@ -69,6 +69,7 @@ export interface QuoteItem {
   price: string;
   taxed: boolean;
   total: string;
+  status: string;
 }
 
 export interface InvoiceSummary {
@@ -158,7 +159,8 @@ export const quotationData: QuotationData = {
       quantity: "375",
       price: "$12.99",
       taxed: true,
-      total: "$4,871.25"
+      total: "$4,871.25",
+      status: "Artwork"
     },
     {
       category: "Hoodies",
@@ -175,7 +177,8 @@ export const quotationData: QuotationData = {
       quantity: "235",
       price: "$29.99",
       taxed: true,
-      total: "$7,047.65"
+      total: "$7,047.65",
+      status: "Production"
     }
   ],
   summary: {

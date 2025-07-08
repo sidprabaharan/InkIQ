@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { StatusDropdown } from "./StatusDropdown";
 
 interface QuoteItem {
   category: string;
@@ -24,6 +25,7 @@ interface QuoteItem {
   price: string;
   taxed: boolean;
   total: string;
+  status: string;
 }
 
 interface QuoteItemsTableProps {
@@ -31,6 +33,20 @@ interface QuoteItemsTableProps {
 }
 
 export function QuoteItemsTable({ items }: QuoteItemsTableProps) {
+  const [itemStatuses, setItemStatuses] = useState<{[key: number]: string}>(
+    items.reduce((acc, item, index) => ({
+      ...acc,
+      [index]: item.status
+    }), {})
+  );
+
+  const handleStatusChange = (itemIndex: number, newStatus: string) => {
+    setItemStatuses(prev => ({
+      ...prev,
+      [itemIndex]: newStatus
+    }));
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg border">
       <h3 className="font-medium mb-4">Quote Items</h3>
@@ -52,6 +68,7 @@ export function QuoteItemsTable({ items }: QuoteItemsTableProps) {
               <TableHead className="text-center">Price</TableHead>
               <TableHead className="text-center">Taxed</TableHead>
               <TableHead className="text-center">Total</TableHead>
+              <TableHead className="text-center">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -71,6 +88,12 @@ export function QuoteItemsTable({ items }: QuoteItemsTableProps) {
                 <TableCell className="text-center">{item.price}</TableCell>
                 <TableCell className="text-center">{item.taxed ? '✓' : ''}</TableCell>
                 <TableCell className="text-center">{item.total}</TableCell>
+                <TableCell className="text-center">
+                  <StatusDropdown 
+                    currentStatus={itemStatuses[index] || item.status}
+                    onStatusChange={(newStatus) => handleStatusChange(index, newStatus)}
+                  />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
