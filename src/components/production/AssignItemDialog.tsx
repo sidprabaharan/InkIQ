@@ -45,6 +45,7 @@ export function AssignItemDialog({ open, onOpenChange, onAssign, workStations }:
       dueDate: format(formData.dueDate, "yyyy-MM-dd"),
       priority: formData.priority,
       workStationId: formData.workStationId,
+      originalItemIndex: -1, // Manual assignment, not from quote
     });
 
     // Reset form

@@ -3,9 +3,8 @@ import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCorners }
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { KanbanColumn } from "./KanbanColumn";
 import { KanbanItem } from "./KanbanItem";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { AssignItemDialog } from "./AssignItemDialog";
+import { quotationData } from "@/components/quotes/QuoteData";
+import { useToast } from "@/components/ui/use-toast";
 
 export interface ProductionItem {
   id: string;
@@ -17,6 +16,7 @@ export interface ProductionItem {
   dueDate: string;
   priority: "low" | "medium" | "high";
   workStationId: string;
+  originalItemIndex: number; // Track which item in the quote this represents
 }
 
 export interface WorkStation {
@@ -27,45 +27,35 @@ export interface WorkStation {
 }
 
 const defaultWorkStations: WorkStation[] = [
-  { id: "design", name: "Design", color: "#3b82f6", capacity: 5 },
-  { id: "printing", name: "Screen Printing", color: "#8b5cf6", capacity: 8 },
-  { id: "embroidery", name: "Embroidery", color: "#10b981", capacity: 6 },
-  { id: "heat-press", name: "Heat Press", color: "#f59e0b", capacity: 4 },
-  { id: "quality", name: "Quality Control", color: "#ef4444", capacity: 3 },
-  { id: "packaging", name: "Packaging", color: "#6b7280", capacity: 10 },
+  { id: "Artwork", name: "Artwork/Design", color: "#10b981", capacity: 5 },
+  { id: "Production", name: "Production", color: "#f59e0b", capacity: 8 },
+  { id: "Shipping", name: "Shipping", color: "#8b5cf6", capacity: 6 },
+  { id: "Complete", name: "Complete", color: "#22c55e", capacity: 10 },
+  { id: "On Hold", name: "On Hold", color: "#ef4444", capacity: 3 },
+  { id: "Quote", name: "Quote", color: "#3b82f6", capacity: 5 },
 ];
 
-// Mock data for demonstration
-const mockItems: ProductionItem[] = [
-  {
-    id: "1",
-    quoteId: "3032",
-    quoteName: "Project Care Quote",
-    itemName: "T-Shirts",
-    description: "Cotton T-Shirt with logo print",
-    quantity: 375,
-    dueDate: "2024-07-15",
-    priority: "high",
-    workStationId: "design",
-  },
-  {
-    id: "2",
-    quoteId: "3032",
-    quoteName: "Project Care Quote",
-    itemName: "Hoodies",
-    description: "Pullover Hoodie with embroidered logo",
-    quantity: 235,
-    dueDate: "2024-07-20",
-    priority: "medium",
-    workStationId: "embroidery",
-  },
-];
+// Convert quote items to production items
+const convertQuoteItemsToProductionItems = (): ProductionItem[] => {
+  return quotationData.items.map((item, index) => ({
+    id: `${quotationData.id}-${index}`,
+    quoteId: quotationData.id,
+    quoteName: quotationData.nickname,
+    itemName: `${item.category} - ${item.color}`,
+    description: item.description,
+    quantity: parseInt(item.quantity),
+    dueDate: quotationData.details.productionDueDate,
+    priority: item.status === "On Hold" ? "low" : item.status === "Artwork" ? "high" : "medium",
+    workStationId: item.status,
+    originalItemIndex: index,
+  }));
+};
 
 export function KanbanBoard() {
-  const [items, setItems] = useState<ProductionItem[]>(mockItems);
+  const [items, setItems] = useState<ProductionItem[]>(convertQuoteItemsToProductionItems());
   const [workStations] = useState<WorkStation[]>(defaultWorkStations);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const { toast } = useToast();
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
@@ -80,13 +70,24 @@ export function KanbanBoard() {
     if (!activeItem) return;
 
     const newWorkStationId = over.id as string;
+    const newWorkStationName = workStations.find(ws => ws.id === newWorkStationId)?.name || newWorkStationId;
     
     if (activeItem.workStationId !== newWorkStationId) {
+      // Update the item in the kanban
       setItems(items.map(item => 
         item.id === active.id 
           ? { ...item, workStationId: newWorkStationId }
           : item
       ));
+
+      // Show toast notification about the status change
+      toast({
+        title: "Status Updated",
+        description: `${activeItem.itemName} moved to ${newWorkStationName}`,
+      });
+
+      // Note: In a real app, you would also update the quote item status in your backend/state management
+      // For now, we're just updating the local kanban state
     }
 
     setActiveId(null);
@@ -102,10 +103,9 @@ export function KanbanBoard() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-medium">Production Kanban Board</h2>
-        <Button onClick={() => setShowAssignDialog(true)} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Assign Item
-        </Button>
+        <p className="text-sm text-muted-foreground">
+          Line items from quotes shown by status. Drag to update status.
+        </p>
       </div>
 
       <DndContext
@@ -127,16 +127,6 @@ export function KanbanBoard() {
           {activeItem ? <KanbanItem item={activeItem} isDragging /> : null}
         </DragOverlay>
       </DndContext>
-
-      <AssignItemDialog 
-        open={showAssignDialog}
-        onOpenChange={setShowAssignDialog}
-        onAssign={(item) => {
-          setItems([...items, { ...item, id: Date.now().toString() }]);
-          setShowAssignDialog(false);
-        }}
-        workStations={workStations}
-      />
     </div>
   );
 }

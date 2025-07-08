@@ -20,6 +20,7 @@ const mockItems: ProductionItem[] = [
     dueDate: "2024-07-15",
     priority: "high",
     workStationId: "design",
+    originalItemIndex: 0,
   },
   {
     id: "2",
@@ -31,6 +32,7 @@ const mockItems: ProductionItem[] = [
     dueDate: "2024-07-20",
     priority: "medium",
     workStationId: "embroidery",
+    originalItemIndex: 1,
   },
 ];
 
