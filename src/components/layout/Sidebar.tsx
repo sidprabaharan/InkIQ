@@ -74,6 +74,11 @@ export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
       path: '/tasks',
     },
     {
+      name: 'Production',
+      icon: Truck,
+      path: '/production',
+    },
+    {
       name: 'Products',
       icon: Package2,
       path: '/products',
