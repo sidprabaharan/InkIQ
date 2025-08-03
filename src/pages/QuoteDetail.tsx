@@ -5,8 +5,8 @@ import { QuoteDetailHeader } from "@/components/quotes/QuoteDetailHeader";
 import { CompanyInfoCard } from "@/components/quotes/CompanyInfoCard";
 import { QuoteDetailsCard } from "@/components/quotes/QuoteDetailsCard";
 import { CustomerInfoCard } from "@/components/quotes/CustomerInfoCard";
-import { OrderBreakdown } from "@/components/quotes/OrderBreakdown";
-import { mockOrderBreakdownData } from "@/data/mockOrderBreakdown";
+import { QuoteItemsTable } from "@/components/quotes/QuoteItemsTable";
+import { getQuoteById } from "@/components/quotes/QuoteData";
 import { NotesCard } from "@/components/quotes/NotesCard";
 import { InvoiceSummaryCard } from "@/components/quotes/InvoiceSummaryCard";
 import { quotationData } from "@/components/quotes/QuoteData";
@@ -14,7 +14,7 @@ import { quotationData } from "@/components/quotes/QuoteData";
 export default function QuoteDetail() {
   const { id } = useParams();
   const quoteId = id || "3032";
-  const quote = quotationData;
+  const quote = getQuoteById(quoteId) || quotationData;
   
   // Simplify the artwork status if needed
   const status = quote.status.toLowerCase().includes('artwork') ? 'Artwork' : quote.status;
@@ -53,6 +53,44 @@ export default function QuoteDetail() {
   const totalValue = parseFloat(quote.summary.totalDue.replace(/[$,]/g, ''));
   const outstandingValue = parseFloat(amountOutstanding.replace(/[$,]/g, ''));
   const amountPaid = `$${(totalValue - outstandingValue).toFixed(2)}`;
+  
+  // Transform quote items to match QuoteItemsTable expectations
+  const itemGroups = [{
+    id: "1",
+    name: "Product Group",
+    items: quote.items.map((item, index) => ({
+      id: `item-${index}`,
+      category: item.category,
+      itemNumber: item.itemNumber,
+      color: item.color,
+      description: item.description,
+      sizes: {
+        xs: 0,
+        s: 0,
+        m: parseInt(item.quantity) || 0,
+        l: 0,
+        xl: 0,
+        xxl: 0,
+        xxxl: 0,
+      },
+      quantity: parseInt(item.quantity) || 0,
+      price: parseFloat(item.price.replace(/[$,]/g, '')) || 0,
+      taxed: false,
+      total: parseFloat(item.total.replace(/[$,]/g, '')) || 0,
+      status: "Pending",
+      mockups: []
+    })),
+    imprints: [{
+      id: "1",
+      type: "Screen Print",
+      placement: "Front",
+      size: "4\" x 4\"",
+      colours: ["Black", "White"],
+      notes: "High quality screen print",
+      mockups: [],
+      imprintItems: []
+    }]
+  }];
   
   return (
     <div className="p-0 bg-gray-50 min-h-full">
@@ -100,8 +138,8 @@ export default function QuoteDetail() {
             />
           </div>
           
-          {/* Order Breakdown - full width */}
-          <OrderBreakdown groups={mockOrderBreakdownData} quoteId={quoteId} />
+          {/* Quote Items - full width */}
+          <QuoteItemsTable itemGroups={itemGroups} />
           
           {/* Notes and Invoice Summary - bottom row */}
           <div className="grid grid-cols-3 gap-6">
