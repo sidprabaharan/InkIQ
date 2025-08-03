@@ -21,7 +21,7 @@ export function StatusDropdown({ currentStatus, onStatusChange }: StatusDropdown
   const handleStatusSelect = (status: string) => {
     onStatusChange(status);
     toast({
-      title: "Status Updated",
+      title: "Garment Status Updated",
       description: `Garment status changed to "${status}"`,
     });
   };
