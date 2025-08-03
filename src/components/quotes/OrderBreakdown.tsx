@@ -63,9 +63,6 @@ export function OrderBreakdown({ groups, quoteId }: OrderBreakdownProps) {
       <h2 className="text-2xl font-semibold">Order Breakdown</h2>
       {groups.map((group, index) => (
         <Card key={group.id} className="shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg font-bold">Group {index + 1}</CardTitle>
-          </CardHeader>
           <CardContent className="p-0">
             {/* Products Table */}
             <div className="overflow-x-auto p-6 pt-0">
