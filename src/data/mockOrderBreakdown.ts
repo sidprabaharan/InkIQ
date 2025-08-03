@@ -3,7 +3,7 @@ import { LineItemGroupData } from '@/components/quotes/OrderBreakdown';
 export const mockOrderBreakdownData: LineItemGroupData[] = [
   {
     id: 'group-1',
-    title: 'Heimat Logo - Screen Print',
+    title: 'Screen Print',
     products: [
       {
         id: 'product-1',
@@ -71,7 +71,7 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
   },
   {
     id: 'group-2',
-    title: 'Heimat Logo - Embroidery',
+    title: 'Embroidery',
     products: [
       {
         id: 'product-3',
@@ -111,7 +111,7 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
   },
   {
     id: 'group-3',
-    title: 'Heimat Logo - Small Print',
+    title: 'Digital Print',
     products: [
       {
         id: 'product-4',

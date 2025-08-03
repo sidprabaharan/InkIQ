@@ -54,20 +54,18 @@ export function OrderBreakdown({ groups }: OrderBreakdownProps) {
   const formatPrice = (amount: number) => `$${amount.toFixed(2)}`;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Order Breakdown</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-8">
-        {groups.map((group, index) => (
-          <div key={group.id} className="space-y-4">
+    <div className="space-y-8">
+      <h2 className="text-2xl font-semibold">Order Breakdown</h2>
+      {groups.map((group, index) => (
+        <Card key={group.id} className="border-2 shadow-md">
+          <CardContent className="p-0">
             {/* Group Header */}
-            <div className="bg-muted/50 px-4 py-2 rounded-md">
-              <h4 className="font-medium text-sm">Line Item Group {index + 1}: {group.title}</h4>
+            <div className="bg-primary/5 border-b border-border px-6 py-4">
+              <h3 className="text-lg font-semibold text-foreground">{group.title}</h3>
             </div>
 
             {/* Products Table */}
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto p-6 pt-0">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -147,8 +145,8 @@ export function OrderBreakdown({ groups }: OrderBreakdownProps) {
             </div>
 
             {/* Imprint Details */}
-            <div className="bg-muted/30 p-4 rounded-md">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-muted/20 border-t border-border px-6 py-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <span className="font-medium text-sm">Type: </span>
                   <span className="text-sm">{group.imprintDetails.type}</span>
@@ -160,7 +158,7 @@ export function OrderBreakdown({ groups }: OrderBreakdownProps) {
               </div>
               
               {group.imprintDetails.files.length > 0 && (
-                <div className="mt-4">
+                <div>
                   <span className="font-medium text-sm block mb-2">Logo Files:</span>
                   <div className="flex gap-2">
                     {group.imprintDetails.files.map((file) => (
@@ -181,9 +179,9 @@ export function OrderBreakdown({ groups }: OrderBreakdownProps) {
                 </div>
               )}
             </div>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   );
 }
