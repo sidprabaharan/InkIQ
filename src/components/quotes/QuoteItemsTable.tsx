@@ -124,7 +124,6 @@ export function QuoteItemsTable({ itemGroups }: QuoteItemsTableProps) {
                     <TableRow className="border-b hover:bg-gray-50">
                       <TableCell colSpan={14} className="p-2 bg-gray-50">
                         <div className="flex flex-wrap gap-2 p-2">
-                          <span className="text-sm font-medium text-gray-600 mr-2">Mockups:</span>
                           {item.mockups.map((mockup) => (
                             <div 
                               key={mockup.id} 
