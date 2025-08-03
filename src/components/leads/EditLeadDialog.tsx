@@ -403,32 +403,25 @@ export default function EditLeadDialog({ open, onClose, onSave, lead }: EditLead
               </div>
             </div>
 
-            {/* Inquiry Summary & Current Stage */}
+            {/* Notes */}
             <div className="space-y-4">
-              <h4 className="font-medium">Inquiry Summary & Current Stage</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="inquirySummary">Inquiry Summary</Label>
-                  <Textarea
-                    id="inquirySummary"
-                    name="inquirySummary"
-                    rows={5}
-                    value={formData.inquirySummary}
-                    onChange={handleInputChange}
-                    placeholder="Client requirements, products of interest, timeline, budget considerations, special requests..."
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="currentStage">Current Stage</Label>
-                  <Textarea
-                    id="currentStage"
-                    name="currentStage"
-                    rows={5}
-                    value={formData.currentStage}
-                    onChange={handleInputChange}
-                    placeholder="Current stage notes, next steps, priorities, internal comments..."
-                  />
-                </div>
+              <h4 className="font-medium">Notes</h4>
+              <div className="space-y-2">
+                <Label htmlFor="notes">Customer Notes</Label>
+                <Textarea
+                  id="notes"
+                  name="notes"
+                  rows={6}
+                  value={formData.notes}
+                  onChange={handleInputChange}
+                  placeholder="Detailed notes about the customer's needs, including:
+• Product requirements and specifications
+• Quantities and timeline preferences  
+• Budget considerations and constraints
+• Design specifications and branding requirements
+• Current stage progress and next steps
+• Any special requests or important details"
+                />
               </div>
             </div>
           </div>
