@@ -42,9 +42,16 @@ export default function QuoteDetail() {
     number: quoteId,
     date: quote.details.invoiceDate,
     expiryDate: quote.details.paymentDueDate,
+    productionDueDate: quote.details.productionDueDate,
+    customerDueDate: "2024-10-10", // Using fallback date since field doesn't exist in data structure
     salesRep: quote.details.owner,
     terms: quote.details.deliveryMethod
   };
+
+  // Calculate amount paid (total - outstanding)
+  const totalValue = parseFloat(quote.summary.totalDue.replace(/[$,]/g, ''));
+  const outstandingValue = parseFloat(amountOutstanding.replace(/[$,]/g, ''));
+  const amountPaid = `$${(totalValue - outstandingValue).toFixed(2)}`;
   
   return (
     <div className="p-0 bg-gray-50 min-h-full">
@@ -72,6 +79,7 @@ export default function QuoteDetail() {
             <QuoteDetailsCard 
               details={formattedDetails} 
               totalAmount={totalAmount}
+              amountPaid={amountPaid}
               amountOutstanding={amountOutstanding}
             />
           </div>
