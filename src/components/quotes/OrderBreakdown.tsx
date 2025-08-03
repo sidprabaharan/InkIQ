@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LineItemGroup } from './LineItemGroup';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { StatusDropdown } from "./StatusDropdown";
 
 export interface ImprintFile {
   id: string;
@@ -10,24 +11,31 @@ export interface ImprintFile {
 }
 
 export interface ImprintDetails {
-  printMethod: string;
-  logoPlacement: string;
-  logoSize: string;
-  logoColors: string[];
+  type: string;
+  details: string;
   files: ImprintFile[];
 }
 
 export interface ProductItem {
   id: string;
-  name: string;
+  category: string;
+  itemNumber: string;
+  color: string;
   description: string;
   sizes: {
-    [size: string]: number;
+    xs: number;
+    s: number;
+    m: number;
+    l: number;
+    xl: number;
+    xxl: number;
+    xxxl: number;
   };
-  unitPrice: number;
-  totalQuantity: number;
-  totalPrice: number;
-  mockupImage: string;
+  quantity: number;
+  price: number;
+  tax: boolean;
+  total: number;
+  mockupImages: string[];
   status: string;
 }
 
@@ -43,6 +51,8 @@ interface OrderBreakdownProps {
 }
 
 export function OrderBreakdown({ groups }: OrderBreakdownProps) {
+  const formatPrice = (amount: number) => `$${amount.toFixed(2)}`;
+
   return (
     <Card>
       <CardHeader>
@@ -50,11 +60,128 @@ export function OrderBreakdown({ groups }: OrderBreakdownProps) {
       </CardHeader>
       <CardContent className="space-y-8">
         {groups.map((group, index) => (
-          <LineItemGroup 
-            key={group.id} 
-            group={group} 
-            groupNumber={index + 1}
-          />
+          <div key={group.id} className="space-y-4">
+            {/* Group Header */}
+            <div className="bg-muted/50 px-4 py-2 rounded-md">
+              <h4 className="font-medium text-sm">Line Item Group {index + 1}: {group.title}</h4>
+            </div>
+
+            {/* Products Table */}
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>CATEGORY</TableHead>
+                    <TableHead>ITEM#</TableHead>
+                    <TableHead>COLOR</TableHead>
+                    <TableHead>DESCRIPTION</TableHead>
+                    <TableHead className="text-center">XS</TableHead>
+                    <TableHead className="text-center">S</TableHead>
+                    <TableHead className="text-center">M</TableHead>
+                    <TableHead className="text-center">L</TableHead>
+                    <TableHead className="text-center">XL</TableHead>
+                    <TableHead className="text-center">2XL</TableHead>
+                    <TableHead className="text-center">3XL</TableHead>
+                    <TableHead className="text-center">QTY</TableHead>
+                    <TableHead className="text-center">PRICE</TableHead>
+                    <TableHead className="text-center">TAX</TableHead>
+                    <TableHead className="text-center">TOTAL</TableHead>
+                    <TableHead className="text-center">STATUS</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {group.products.map((product) => (
+                    <React.Fragment key={product.id}>
+                      {/* Product Row */}
+                      <TableRow>
+                        <TableCell>{product.category}</TableCell>
+                        <TableCell>{product.itemNumber}</TableCell>
+                        <TableCell>{product.color}</TableCell>
+                        <TableCell>{product.description}</TableCell>
+                        <TableCell className="text-center">{product.sizes.xs || '-'}</TableCell>
+                        <TableCell className="text-center">{product.sizes.s || '-'}</TableCell>
+                        <TableCell className="text-center">{product.sizes.m || '-'}</TableCell>
+                        <TableCell className="text-center">{product.sizes.l || '-'}</TableCell>
+                        <TableCell className="text-center">{product.sizes.xl || '-'}</TableCell>
+                        <TableCell className="text-center">{product.sizes.xxl || '-'}</TableCell>
+                        <TableCell className="text-center">{product.sizes.xxxl || '-'}</TableCell>
+                        <TableCell className="text-center">{product.quantity}</TableCell>
+                        <TableCell className="text-center">{formatPrice(product.price)}</TableCell>
+                        <TableCell className="text-center">{product.tax ? '✓' : ''}</TableCell>
+                        <TableCell className="text-center">{formatPrice(product.total)}</TableCell>
+                        <TableCell className="text-center">
+                          <StatusDropdown 
+                            currentStatus={product.status}
+                            onStatusChange={(newStatus) => {}}
+                          />
+                        </TableCell>
+                      </TableRow>
+                      
+                      {/* Item Mockups Row */}
+                      <TableRow className="bg-muted/30">
+                        <TableCell colSpan={2} className="font-medium text-sm">
+                          Item Mockups
+                        </TableCell>
+                        <TableCell colSpan={14}>
+                          <div className="flex gap-2 py-2">
+                            {product.mockupImages.map((image, imgIndex) => (
+                              <div key={imgIndex} className="w-16 h-16 border rounded overflow-hidden bg-background">
+                                <img 
+                                  src={image} 
+                                  alt={`${product.description} mockup ${imgIndex + 1}`}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = '/placeholder.svg';
+                                  }}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    </React.Fragment>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Imprint Details */}
+            <div className="bg-muted/30 p-4 rounded-md">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <span className="font-medium text-sm">Type: </span>
+                  <span className="text-sm">{group.imprintDetails.type}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-sm">Details: </span>
+                  <span className="text-sm">{group.imprintDetails.details}</span>
+                </div>
+              </div>
+              
+              {group.imprintDetails.files.length > 0 && (
+                <div className="mt-4">
+                  <span className="font-medium text-sm block mb-2">Logo Files:</span>
+                  <div className="flex gap-2">
+                    {group.imprintDetails.files.map((file) => (
+                      <div key={file.id} className="flex items-center gap-2 bg-background px-3 py-2 rounded border text-sm">
+                        <img 
+                          src={file.url} 
+                          alt={file.name}
+                          className="w-6 h-6 object-contain"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = '/placeholder.svg';
+                          }}
+                        />
+                        <span>{file.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         ))}
       </CardContent>
     </Card>

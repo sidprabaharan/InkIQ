@@ -7,56 +7,64 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
     products: [
       {
         id: 'product-1',
-        name: 'Unisex Heavy Cotton Hoodie',
-        description: 'Gildan 18500 - Navy',
+        category: 'Apparel',
+        itemNumber: 'G18500',
+        color: 'Navy',
+        description: 'Unisex Heavy Cotton Hoodie - Gildan 18500',
         sizes: {
-          'S': 2,
-          'M': 5,
-          'L': 8,
-          'XL': 3,
-          '2XL': 1
+          xs: 0,
+          s: 2,
+          m: 5,
+          l: 8,
+          xl: 3,
+          xxl: 1,
+          xxxl: 0
         },
-        unitPrice: 45.50,
-        totalQuantity: 19,
-        totalPrice: 864.50,
-        mockupImage: '/placeholder.svg', // Will use placeholder until real images are available
+        quantity: 19,
+        price: 45.50,
+        tax: true,
+        total: 864.50,
+        mockupImages: ['/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'],
         status: 'Pending'
       },
       {
         id: 'product-2',
-        name: 'Unisex Jersey Short Sleeve Tee',
-        description: 'Bella + Canvas 3001 - Black',
+        category: 'Apparel',
+        itemNumber: 'BC3001',
+        color: 'Black',
+        description: 'Unisex Jersey Short Sleeve Tee - Bella + Canvas 3001',
         sizes: {
-          'S': 3,
-          'M': 7,
-          'L': 10,
-          'XL': 5,
-          '2XL': 2
+          xs: 0,
+          s: 3,
+          m: 7,
+          l: 10,
+          xl: 5,
+          xxl: 2,
+          xxxl: 0
         },
-        unitPrice: 28.75,
-        totalQuantity: 27,
-        totalPrice: 776.25,
-        mockupImage: '/placeholder.svg',
+        quantity: 27,
+        price: 28.75,
+        tax: true,
+        total: 776.25,
+        mockupImages: ['/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'],
         status: 'In Production'
       }
     ],
     imprintDetails: {
-      printMethod: 'Screen Print',
-      logoPlacement: 'Front Center',
-      logoSize: '4" x 3"',
-      logoColors: ['Black', 'White'],
+      type: 'Screen Print',
+      details: 'Front Center, 4" x 3", Black & White',
       files: [
         {
           id: 'file-1',
           name: 'heimat-logo-vector.ai',
           type: 'Adobe Illustrator',
-          url: '/placeholder.svg'
+          url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
         },
         {
           id: 'file-2',
           name: 'heimat-logo-high-res.png',
           type: 'PNG Image',
-          url: '/placeholder.svg'
+          url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
         }
       ]
     }
@@ -67,31 +75,36 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
     products: [
       {
         id: 'product-3',
-        name: 'Unisex Heavy Cotton Hoodie',
-        description: 'Gildan 18500 - Heather Grey',
+        category: 'Apparel',
+        itemNumber: 'G18500',
+        color: 'Heather Grey',
+        description: 'Unisex Heavy Cotton Hoodie - Gildan 18500',
         sizes: {
-          'M': 3,
-          'L': 5,
-          'XL': 2
+          xs: 0,
+          s: 0,
+          m: 3,
+          l: 5,
+          xl: 2,
+          xxl: 0,
+          xxxl: 0
         },
-        unitPrice: 52.00,
-        totalQuantity: 10,
-        totalPrice: 520.00,
-        mockupImage: '/placeholder.svg',
+        quantity: 10,
+        price: 52.00,
+        tax: true,
+        total: 520.00,
+        mockupImages: ['/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'],
         status: 'Complete'
       }
     ],
     imprintDetails: {
-      printMethod: 'Embroidery',
-      logoPlacement: 'Left Chest',
-      logoSize: '3" x 2.5"',
-      logoColors: ['Navy', 'Gold'],
+      type: 'Embroidery',
+      details: 'Left Chest, 3" x 2.5", Navy & Gold',
       files: [
         {
           id: 'file-3',
           name: 'heimat-logo-embroidery.dst',
           type: 'Embroidery File',
-          url: '/placeholder.svg'
+          url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
         }
       ]
     }
@@ -102,29 +115,36 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
     products: [
       {
         id: 'product-4',
-        name: 'Ceramic Coffee Mug',
+        category: 'Drinkware',
+        itemNumber: 'MUG11',
+        color: 'White',
         description: '11oz White Ceramic Mug',
         sizes: {
-          'Standard': 25
+          xs: 0,
+          s: 0,
+          m: 0,
+          l: 0,
+          xl: 0,
+          xxl: 0,
+          xxxl: 25
         },
-        unitPrice: 12.50,
-        totalQuantity: 25,
-        totalPrice: 312.50,
-        mockupImage: '/placeholder.svg',
+        quantity: 25,
+        price: 12.50,
+        tax: true,
+        total: 312.50,
+        mockupImages: ['/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'],
         status: 'Artwork Pending'
       }
     ],
     imprintDetails: {
-      printMethod: 'Digital Print',
-      logoPlacement: 'Front Center',
-      logoSize: '2" x 1.5"',
-      logoColors: ['Full Color'],
+      type: 'Digital Print',
+      details: 'Front Center, 2" x 1.5", Full Color',
       files: [
         {
           id: 'file-4',
           name: 'heimat-logo-full-color.pdf',
           type: 'PDF Document',
-          url: '/placeholder.svg'
+          url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
         }
       ]
     }
