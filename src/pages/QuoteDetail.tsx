@@ -82,14 +82,21 @@ export default function QuoteDetail() {
     })),
     imprints: quote.imprints?.map(imprint => ({
       id: imprint.id,
-      typeOfWork: imprint.type,
-      details: `${imprint.placement} | ${imprint.size} | ${imprint.colours}${imprint.notes ? ` | ${imprint.notes}` : ''}`,
-      mockups: imprint.files.map(file => ({
+      method: imprint.type || "",
+      location: imprint.placement || "",
+      width: 0,
+      height: 0,
+      colorsOrThreads: imprint.colours || "",
+      notes: imprint.notes || "",
+      customerArt: [],
+      productionFiles: [],
+      proofMockup: imprint.files?.map(file => ({
         id: file.id,
         name: file.name,
         url: file.url,
-        type: file.type
-      }))
+        type: file.type,
+        category: 'proofMockup' as const
+      })) || []
     })) || []
   }];
   

@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from "@/components/ui/resizable";
 import { MockupUploadDialog } from "./MockupUploadDialog";
-import { ImprintDialog, ImprintItem } from "./ImprintDialog";
+import { ImprintDialog } from "./ImprintDialog";
+import { ImprintItem } from "@/types/imprint";
 import { toast } from "sonner";
 
 interface ItemMockup {
@@ -69,12 +70,24 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
   // Initialize with quote data if available, otherwise use default empty structure
   const getInitialItemGroups = () => {
     if (quoteData?.items && quoteData.items.length > 0) {
-      // Transform quote data imprints to the format expected by this component
+      // Transform quote data imprints to the new format
       const transformedImprints = quoteData.imprints ? quoteData.imprints.map((imprint: any) => ({
         id: imprint.id,
-        typeOfWork: imprint.type,
-        details: imprint.notes || "",
-        mockups: imprint.files || []
+        method: imprint.type || "",
+        location: imprint.placement || "",
+        width: 0,
+        height: 0,
+        colorsOrThreads: imprint.colours || "",
+        notes: imprint.notes || "",
+        customerArt: [],
+        productionFiles: [],
+        proofMockup: imprint.files ? imprint.files.map((file: any) => ({
+          id: file.id,
+          name: file.name,
+          url: file.url,
+          type: file.type,
+          category: 'proofMockup' as const
+        })) : []
       })) : [];
 
       return [{
@@ -507,29 +520,78 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
                   <div className="space-y-3">
                     <h4 className="font-medium text-sm">Imprint Details</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {group.imprints.map((imprint) => (
+                       {group.imprints.map((imprint) => (
                         <div key={imprint.id} className="border rounded-md p-3 bg-white">
-                          <div className="grid grid-cols-1 gap-2 text-sm">
+                          <div className="grid grid-cols-2 gap-3 text-sm">
                             <div>
-                              <span className="font-medium">Type of Work:</span> {imprint.typeOfWork || "Not specified"}
+                              <span className="font-medium">Method:</span> {imprint.method || "Not specified"}
                             </div>
+                            <div>
+                              <span className="font-medium">Location:</span> {imprint.location || "Not specified"}
+                            </div>
+                            {(imprint.width > 0 || imprint.height > 0) && (
+                              <div>
+                                <span className="font-medium">Size:</span> {imprint.width}" × {imprint.height}"
+                              </div>
+                            )}
+                            {imprint.colorsOrThreads && (
+                              <div>
+                                <span className="font-medium">Colors/Threads:</span> {imprint.colorsOrThreads}
+                              </div>
+                            )}
                           </div>
-                          {imprint.details && (
+                          {imprint.notes && (
                             <div className="mt-2 text-sm">
-                              <span className="font-medium">Details:</span> {imprint.details}
+                              <span className="font-medium">Notes:</span> {imprint.notes}
                             </div>
                           )}
-                          {imprint.mockups && imprint.mockups.length > 0 && (
+                          
+                          {/* Customer Art */}
+                          {imprint.customerArt && imprint.customerArt.length > 0 && (
                             <div className="mt-2">
-                              <span className="font-medium text-sm">Mockups:</span>
+                              <span className="font-medium text-sm">Customer Art:</span>
                               <div className="flex flex-wrap gap-2 mt-1">
-                                {imprint.mockups?.map((mockup) => (
-                                  <div key={mockup.id} className="w-16 h-16 border rounded-md overflow-hidden">
-                                    <img 
-                                      src={mockup.url} 
-                                      alt={mockup.name}
-                                      className="w-full h-full object-cover"
-                                    />
+                                {imprint.customerArt.map((file) => (
+                                  <div key={file.id} className="flex items-center gap-1 bg-muted rounded px-2 py-1">
+                                    <span className="text-xs">{file.name}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Production Files */}
+                          {imprint.productionFiles && imprint.productionFiles.length > 0 && (
+                            <div className="mt-2">
+                              <span className="font-medium text-sm">Production Files:</span>
+                              <div className="flex flex-wrap gap-2 mt-1">
+                                {imprint.productionFiles.map((file) => (
+                                  <div key={file.id} className="flex items-center gap-1 bg-muted rounded px-2 py-1">
+                                    <span className="text-xs">{file.name}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Proof/Mockup */}
+                          {imprint.proofMockup && imprint.proofMockup.length > 0 && (
+                            <div className="mt-2">
+                              <span className="font-medium text-sm">Proof/Mockup:</span>
+                              <div className="flex flex-wrap gap-2 mt-1">
+                                {imprint.proofMockup.map((file) => (
+                                  <div key={file.id} className="w-16 h-16 border rounded-md overflow-hidden">
+                                    {file.type.startsWith('image/') ? (
+                                      <img 
+                                        src={file.url} 
+                                        alt={file.name}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center bg-muted">
+                                        <span className="text-xs">{file.name.split('.').pop()?.toUpperCase()}</span>
+                                      </div>
+                                    )}
                                   </div>
                                 ))}
                               </div>
