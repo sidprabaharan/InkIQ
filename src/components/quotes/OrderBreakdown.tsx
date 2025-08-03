@@ -57,7 +57,7 @@ export function OrderBreakdown({ groups }: OrderBreakdownProps) {
     <div className="space-y-8">
       <h2 className="text-2xl font-semibold">Order Breakdown</h2>
       {groups.map((group, index) => (
-        <Card key={group.id} className="border-2 shadow-md">
+        <Card key={group.id} className="shadow-sm">
           <CardContent className="p-0">
             {/* Group Header */}
             <div className="bg-primary/5 border-b border-border px-6 py-4">
