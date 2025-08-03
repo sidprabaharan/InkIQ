@@ -135,13 +135,12 @@ export function QuoteItemsTable({ itemGroups }: QuoteItemsTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {group.items.map((item, itemIndex) => {
+            {group.items.flatMap((item, itemIndex) => {
               const garmentDetails = getGarmentDetails(item);
               const totalQuantity = getTotalQuantity(item.sizes);
               
-              return (
-                <React.Fragment key={`${group.id}-item-${itemIndex}`}>
-                  <TableRow className="border-b hover:bg-gray-50">
+              const rows = [
+                  <TableRow key={`${group.id}-item-${itemIndex}`} className="border-b hover:bg-gray-50">
                     <TableCell className="p-2 border-r border-gray-200">
                       <div className="text-sm">{item.category}</div>
                     </TableCell>
@@ -199,37 +198,40 @@ export function QuoteItemsTable({ itemGroups }: QuoteItemsTableProps) {
                       </div>
                     </TableCell>
                   </TableRow>
-                  
-                  {(item.mockups && item.mockups.length > 0) || getGarmentDetails(item).stockIssues.length > 0 ? (
-                    <TableRow className="border-b hover:bg-gray-50">
-                      <TableCell colSpan={15} className="p-2 bg-gray-50">
-                        <div className="space-y-4">
-                          {item.mockups && item.mockups.length > 0 && (
-                            <div>
-                              <h5 className="font-medium text-sm mb-2">Mockups</h5>
-                              <div className="flex flex-wrap gap-2">
-                                {item.mockups.map((mockup) => (
-                                  <div 
-                                    key={mockup.id} 
-                                    className="w-20 h-20 border rounded-md overflow-hidden"
-                                  >
-                                    <img 
-                                      src={mockup.url} 
-                                      alt={mockup.name}
-                                      className="w-full h-full object-cover"
-                                    />
-                                  </div>
-                                ))}
-                              </div>
+              ];
+              
+              if ((item.mockups && item.mockups.length > 0) || getGarmentDetails(item).stockIssues.length > 0) {
+                rows.push(
+                  <TableRow key={`${group.id}-item-${itemIndex}-details`} className="border-b hover:bg-gray-50">
+                    <TableCell colSpan={15} className="p-2 bg-gray-50">
+                      <div className="space-y-4">
+                        {item.mockups && item.mockups.length > 0 && (
+                          <div>
+                            <h5 className="font-medium text-sm mb-2">Mockups</h5>
+                            <div className="flex flex-wrap gap-2">
+                              {item.mockups.map((mockup) => (
+                                <div 
+                                  key={mockup.id} 
+                                  className="w-20 h-20 border rounded-md overflow-hidden"
+                                >
+                                  <img 
+                                    src={mockup.url} 
+                                    alt={mockup.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              ))}
                             </div>
-                          )}
-                          <GarmentIssuesList issues={getGarmentDetails(item).stockIssues} />
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ) : null}
-                </React.Fragment>
-              );
+                          </div>
+                        )}
+                        <GarmentIssuesList issues={getGarmentDetails(item).stockIssues} />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              }
+              
+              return rows;
             })}
 
             {group.imprints && group.imprints.length > 0 && (
