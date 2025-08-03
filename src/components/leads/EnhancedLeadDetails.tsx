@@ -256,7 +256,7 @@ export default function EnhancedLeadDetails({
                     <div>
                       <h4 className="font-medium mb-2 text-sm">Client Requirements</h4>
                       <p className="text-sm text-muted-foreground">
-                        {lead.notes || "Client looking for promotional merchandise. Specific requirements need to be documented as more information becomes available."}
+                        {lead.notes || "Custom merchandise inquiry - awaiting details on specific products, quantities, design specifications, branding requirements, and project timeline."}
                       </p>
                     </div>
                     
@@ -284,7 +284,7 @@ export default function EnhancedLeadDetails({
                     <div className="grid grid-cols-2 gap-4 pt-2 border-t">
                       <div>
                         <h4 className="font-medium mb-2 text-sm">Products of Interest</h4>
-                        <p className="text-sm text-muted-foreground">To be determined based on client needs</p>
+                        <p className="text-sm text-muted-foreground">Custom apparel, branded merchandise, or promotional items - specifics to be determined</p>
                       </div>
                       <div>
                         <h4 className="font-medium mb-2 text-sm">Timeline</h4>
