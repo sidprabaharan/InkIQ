@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart } from 'lucide-react';
@@ -44,7 +44,7 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
   const locations = ['DALLAS, TX', 'MEMPHIS, TN', 'GILDAN DISTRIBUTION CENTER'];
   
   // Select first color as default expanded color
-  React.useEffect(() => {
+  useEffect(() => {
     if (product.colors && product.colors.length > 0 && !expandedColor) {
       setExpandedColor(product.colors[0]);
     }
