@@ -12,7 +12,7 @@ import { Search, Plus, Filter, Eye, FileText, ShoppingCart, Package, History, Ed
 import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useCartManager } from '@/context/CartManagerContext';
-import { CartManagerProvider } from '@/context/CartManagerContext';
+
 import { EditableCartItem } from '@/components/cart/EditableCartItem';
 import { CartDetailsSheet } from '@/components/cart/CartDetailsSheet';
 
@@ -581,9 +581,5 @@ function PurchaseOrdersContent() {
 }
 
 export default function PurchaseOrders() {
-  return (
-    <CartManagerProvider>
-      <PurchaseOrdersContent />
-    </CartManagerProvider>
-  );
+  return <PurchaseOrdersContent />;
 }
