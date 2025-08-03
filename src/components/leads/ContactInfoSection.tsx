@@ -20,10 +20,6 @@ export default function ContactInfoSection({ lead, onEdit }: ContactInfoSectionP
 
   const socialLinks = [
     { platform: 'LinkedIn', url: lead.socialProfiles?.linkedin, icon: '💼' },
-    { platform: 'Instagram', url: lead.socialProfiles?.instagram, icon: '📸' },
-    { platform: 'Facebook', url: lead.socialProfiles?.facebook, icon: '👥' },
-    { platform: 'Twitter', url: lead.socialProfiles?.twitter, icon: '🐦' },
-    { platform: 'YouTube', url: lead.socialProfiles?.youtube, icon: '📺' },
   ].filter(link => link.url);
 
   const formatAddress = () => {
@@ -62,6 +58,16 @@ export default function ContactInfoSection({ lead, onEdit }: ContactInfoSectionP
               <div className="text-sm text-muted-foreground">Contact Name</div>
             </div>
           </div>
+
+          {lead.jobTitle && (
+            <div className="flex items-center space-x-3">
+              <User className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <div className="font-medium">{lead.jobTitle}</div>
+                <div className="text-sm text-muted-foreground">Job Title</div>
+              </div>
+            </div>
+          )}
 
           <div className="flex items-center space-x-3">
             <Mail className="h-4 w-4 text-muted-foreground" />

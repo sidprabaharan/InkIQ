@@ -16,6 +16,7 @@ export interface Lead {
   currentStage?: string;
   
   // Contact Details
+  jobTitle?: string;
   address?: {
     street?: string;
     city?: string;
@@ -39,6 +40,12 @@ export interface Lead {
     industry?: string;
     estimatedAnnualSpend?: number;
     website?: string;
+    socialProfiles?: {
+      linkedin?: string;
+      facebook?: string;
+      twitter?: string;
+      youtube?: string;
+    };
   };
   
   // Customer Classification

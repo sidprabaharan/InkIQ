@@ -64,22 +64,9 @@ export default function EnhancedLeadDetails({
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <DialogTitle className="text-xl font-semibold">{lead.name}</DialogTitle>
-              <div className="flex items-center space-x-2">
-                <Badge variant={lead.customerType === 'new' ? 'default' : 'secondary'}>
-                  {lead.customerType === 'new' ? 'New Customer' : 'Existing Customer'}
-                </Badge>
-                {lead.aiEnriched && (
-                  <Badge variant="outline" className="text-xs">
-                    <Bot className="h-3 w-3 mr-1" />
-                    AI Enriched
-                  </Badge>
-                )}
-                {lead.dataSource && (
-                  <Badge variant="outline" className="text-xs capitalize">
-                    {lead.dataSource}
-                  </Badge>
-                )}
-              </div>
+              <Badge variant={lead.customerType === 'new' ? 'default' : 'secondary'}>
+                {lead.customerType === 'new' ? 'New Customer' : 'Existing Customer'}
+              </Badge>
             </div>
             <div className="flex items-center space-x-2">
               <Button variant="outline" size="sm" onClick={handleEdit}>
@@ -183,24 +170,55 @@ export default function EnhancedLeadDetails({
                         </div>
                       )}
 
-                      {/* Data Confidence */}
-                      {lead.confidenceScore && (
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium">Data Confidence</span>
-                            <span className="text-sm font-medium">
-                              {Math.round(lead.confidenceScore * 100)}%
-                            </span>
-                          </div>
-                          <div className="w-full bg-muted rounded-full h-2">
-                            <div 
-                              className="bg-primary h-2 rounded-full transition-all duration-300" 
-                              style={{ width: `${lead.confidenceScore * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                       {/* Company Social Links */}
+                       {lead.companyInfo?.socialProfiles && Object.values(lead.companyInfo.socialProfiles).some(url => url) && (
+                         <div>
+                           <div className="text-sm text-muted-foreground mb-2">Company Social Media</div>
+                           <div className="space-y-2">
+                             {lead.companyInfo.socialProfiles.linkedin && (
+                               <div className="flex items-center justify-between">
+                                 <span className="text-sm">LinkedIn</span>
+                                 <Button variant="ghost" size="sm" asChild>
+                                   <a href={lead.companyInfo.socialProfiles.linkedin} target="_blank" rel="noopener noreferrer">
+                                     <ExternalLink className="h-4 w-4" />
+                                   </a>
+                                 </Button>
+                               </div>
+                             )}
+                             {lead.companyInfo.socialProfiles.facebook && (
+                               <div className="flex items-center justify-between">
+                                 <span className="text-sm">Facebook</span>
+                                 <Button variant="ghost" size="sm" asChild>
+                                   <a href={lead.companyInfo.socialProfiles.facebook} target="_blank" rel="noopener noreferrer">
+                                     <ExternalLink className="h-4 w-4" />
+                                   </a>
+                                 </Button>
+                               </div>
+                             )}
+                             {lead.companyInfo.socialProfiles.twitter && (
+                               <div className="flex items-center justify-between">
+                                 <span className="text-sm">Twitter</span>
+                                 <Button variant="ghost" size="sm" asChild>
+                                   <a href={lead.companyInfo.socialProfiles.twitter} target="_blank" rel="noopener noreferrer">
+                                     <ExternalLink className="h-4 w-4" />
+                                   </a>
+                                 </Button>
+                               </div>
+                             )}
+                             {lead.companyInfo.socialProfiles.youtube && (
+                               <div className="flex items-center justify-between">
+                                 <span className="text-sm">YouTube</span>
+                                 <Button variant="ghost" size="sm" asChild>
+                                   <a href={lead.companyInfo.socialProfiles.youtube} target="_blank" rel="noopener noreferrer">
+                                     <ExternalLink className="h-4 w-4" />
+                                   </a>
+                                 </Button>
+                               </div>
+                             )}
+                           </div>
+                         </div>
+                       )}
+                     </div>
                   </div>
                   
                   {/* Quote Actions Card */}
@@ -240,16 +258,13 @@ export default function EnhancedLeadDetails({
                 </div>
                 
                 {/* Notes */}
-                <div className="bg-card p-6 rounded-lg border">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold flex items-center">
-                      <FileText className="h-5 w-5 mr-2" />
-                      Notes
-                    </h3>
-                    <Button variant="ghost" size="sm" onClick={handleEdit}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <div className="bg-card p-6 rounded-lg border">
+                    <div className="mb-4">
+                      <h3 className="text-lg font-semibold flex items-center">
+                        <FileText className="h-5 w-5 mr-2" />
+                        Notes
+                      </h3>
+                    </div>
                   
                   <div className="text-sm text-muted-foreground whitespace-pre-wrap">
                     {lead.notes || lead.inquirySummary || lead.currentStage || "No notes available for this customer yet."}
