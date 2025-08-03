@@ -493,5 +493,20 @@ export const sampleQuoteData: Record<string, QuotationData> = {
 
 // Function to get quote data by ID
 export const getQuoteById = (id: string): QuotationData | null => {
+  // First check localStorage for saved/modified quotes
+  try {
+    const stored = localStorage.getItem("saved_quotes");
+    if (stored) {
+      const savedQuotes = JSON.parse(stored);
+      if (savedQuotes[id]) {
+        console.log(`Loading saved quote ${id} from localStorage`);
+        return savedQuotes[id];
+      }
+    }
+  } catch (error) {
+    console.error("Failed to load saved quotes from localStorage:", error);
+  }
+  
+  // Fall back to sample data
   return sampleQuoteData[id] || null;
 };

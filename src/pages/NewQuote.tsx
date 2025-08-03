@@ -15,6 +15,7 @@ import { CustomersProvider } from "@/context/CustomersContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { getQuoteById, QuotationData } from "@/components/quotes/QuoteData";
+import { quoteStorage } from "@/lib/quoteStorage";
 
 // Sample data for demonstration purposes
 const generateNewQuoteId = () => {
@@ -103,20 +104,48 @@ export default function NewQuote() {
     // Get current item groups data from QuoteItemsSection if available
     const currentItemGroups = quoteItemsRef.current?.getCurrentItemGroups();
     
-    if (isEditMode) {
+    if (isEditMode && quoteData && quoteId) {
       console.log("Update quote with ID:", quoteId);
       console.log("Saving item groups with imprints:", currentItemGroups);
       
-      // In a real app, this would save to the backend/database
-      // For now, we'll update the local data structure
-      if (currentItemGroups && quoteData) {
-        // Update the quote data with the new item groups
-        const updatedQuoteData = {
-          ...quoteData,
-          itemGroups: currentItemGroups
-        };
-        console.log("Updated quote data:", updatedQuoteData);
-      }
+      // Convert item groups to the format expected by QuotationData
+      const convertedItems = currentItemGroups ? 
+        currentItemGroups.flatMap(group => group.items.map(item => ({
+          category: item.category,
+          itemNumber: item.itemNumber,
+          color: item.color,
+          description: item.description,
+          xs: item.sizes.xs.toString(),
+          s: item.sizes.s.toString(),
+          m: item.sizes.m.toString(),
+          l: item.sizes.l.toString(),
+          xl: item.sizes.xl.toString(),
+          xxl: item.sizes.xxl.toString(),
+          xxxl: item.sizes.xxxl.toString(),
+          quantity: item.quantity.toString(),
+          price: item.price.toString(),
+          taxed: item.taxed,
+          total: item.total.toString(),
+          status: "active",
+          mockups: item.mockups?.map(mockup => ({
+            id: mockup.id,
+            name: mockup.name,
+            url: mockup.url,
+            type: mockup.type
+          }))
+        }))) : 
+        quoteData.items;
+
+      // Update the quote data with the new items including imprints
+      const updatedQuoteData: QuotationData = {
+        ...quoteData,
+        items: convertedItems,
+        nickname: nickname
+      };
+      
+      // Save to localStorage
+      quoteStorage.saveQuote(quoteId, updatedQuoteData);
+      console.log("Updated quote data saved:", updatedQuoteData);
       
       toast({
         title: "Quote updated",
