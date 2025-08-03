@@ -35,13 +35,6 @@ export function EnhancedMockupUploadDialog({
   const [isDragging, setIsDragging] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  const validateFileType = (file: File): boolean => {
-    if (allowedFileTypes.length === 0) return true;
-    
-    const fileExtension = file.name.split('.').pop()?.toLowerCase() || '';
-    return allowedFileTypes.includes(fileExtension);
-  };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
@@ -50,24 +43,11 @@ export function EnhancedMockupUploadDialog({
   };
 
   const processFiles = (files: File[]) => {
-    const errors: string[] = [];
-    const validFiles: File[] = [];
-
-    files.forEach(file => {
-      if (validateFileType(file)) {
-        validFiles.push(file);
-      } else {
-        errors.push(`${file.name}: Invalid file type. Allowed: ${allowedFileTypes.join(', ')}`);
-      }
-    });
-
     if (multiple) {
-      setSelectedFiles(prev => [...prev, ...validFiles]);
+      setSelectedFiles(prev => [...prev, ...files]);
     } else {
-      setSelectedFiles(validFiles.slice(0, 1));
+      setSelectedFiles(files.slice(0, 1));
     }
-    
-    setValidationErrors(errors);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -93,7 +73,6 @@ export function EnhancedMockupUploadDialog({
   const handleSubmit = () => {
     onUpload(selectedFiles);
     setSelectedFiles([]);
-    setValidationErrors([]);
     onOpenChange(false);
   };
 
@@ -138,25 +117,6 @@ export function EnhancedMockupUploadDialog({
           </DialogClose>
         </div>
 
-        {validationErrors.length > 0 && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              <div className="space-y-1">
-                {validationErrors.map((error, index) => (
-                  <div key={index} className="text-sm">{error}</div>
-                ))}
-              </div>
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {allowedFileTypes.length > 0 && (
-          <div className="mb-4 p-3 bg-muted rounded-md">
-            <p className="text-sm font-medium mb-1">Accepted file types:</p>
-            <p className="text-sm text-muted-foreground">{allowedFileTypes.join(', ')}</p>
-          </div>
-        )}
 
         {selectedFiles.length > 0 ? (
           <>
@@ -241,7 +201,7 @@ export function EnhancedMockupUploadDialog({
           className="hidden"
           id="fileUpload"
           onChange={handleFileChange}
-          accept={allowedFileTypes.length > 0 ? allowedFileTypes.map(type => `.${type}`).join(',') : undefined}
+          
         />
 
         <div className="flex justify-end space-x-2">

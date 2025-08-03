@@ -393,15 +393,6 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
         open={uploadDialogOpen}
         onOpenChange={setUploadDialogOpen}
         onUpload={handleUploadComplete}
-        allowedFileTypes={
-          currentImprintIndex !== null && imprints[currentImprintIndex] ? 
-            (currentUploadCategory === 'customerArt' ? 
-              getMethodConfig(imprints[currentImprintIndex].method)?.customerArtTypes || [] :
-              currentUploadCategory === 'productionFiles' ?
-                getMethodConfig(imprints[currentImprintIndex].method)?.productionFileTypes || [] :
-                []
-            ) : []
-        }
         category={currentUploadCategory}
         multiple={currentUploadCategory === 'productionFiles'}
       />
