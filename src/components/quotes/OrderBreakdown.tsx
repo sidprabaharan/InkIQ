@@ -59,11 +59,6 @@ export function OrderBreakdown({ groups }: OrderBreakdownProps) {
       {groups.map((group, index) => (
         <Card key={group.id} className="shadow-sm">
           <CardContent className="p-0">
-            {/* Group Header */}
-            <div className="bg-primary/5 border-b border-border px-6 py-4">
-              <h3 className="text-lg font-semibold text-foreground">{group.title}</h3>
-            </div>
-
             {/* Products Table */}
             <div className="overflow-x-auto p-6 pt-0">
               <Table>
