@@ -96,31 +96,25 @@ export default function ContactInfoSection({ lead, onEdit }: ContactInfoSectionP
               </div>
             </div>
           )}
-        </div>
 
-        {/* Social Media Links */}
-        {socialLinks.length > 0 && (
-          <>
-            <div className="border-t pt-4">
-              <h4 className="font-medium mb-3">Social Media Profiles</h4>
-              <div className="grid grid-cols-1 gap-2">
-                {socialLinks.map((link) => (
-                  <div key={link.platform} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg">{link.icon}</span>
-                      <span className="font-medium">{link.platform}</span>
-                    </div>
-                    <Button variant="ghost" size="sm" asChild>
-                      <a href={link.url} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
-                    </Button>
-                  </div>
-                ))}
+          {/* Social Media Links */}
+          {socialLinks.map((link) => (
+            <div key={link.platform} className="flex items-center space-x-3">
+              <ExternalLink className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <a 
+                  href={link.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="font-medium hover:underline"
+                >
+                  {link.platform}
+                </a>
+                <div className="text-sm text-muted-foreground">Social Profile</div>
               </div>
             </div>
-          </>
-        )}
+          ))}
+        </div>
 
       </CardContent>
     </Card>
