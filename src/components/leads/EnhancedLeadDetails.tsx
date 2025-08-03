@@ -112,7 +112,8 @@ export default function EnhancedLeadDetails({
           <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
             <TabsList className="mx-6 mt-4 w-fit">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="activity">Activity & Communication</TabsTrigger>
+              <TabsTrigger value="activity">Activity</TabsTrigger>
+              <TabsTrigger value="communication">Communication</TabsTrigger>
             </TabsList>
 
             <div className="flex-1 overflow-auto px-6 pb-6">
@@ -270,7 +271,11 @@ export default function EnhancedLeadDetails({
               </TabsContent>
 
               <TabsContent value="activity" className="mt-4">
-                <ActivityTimeline leadId={lead.id} />
+                <ActivityTimeline leadId={lead.id} filterType="activity" />
+              </TabsContent>
+
+              <TabsContent value="communication" className="mt-4">
+                <ActivityTimeline leadId={lead.id} filterType="communication" />
               </TabsContent>
             </div>
           </Tabs>

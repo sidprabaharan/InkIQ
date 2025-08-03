@@ -23,6 +23,7 @@ import EmailThreadDialog from './EmailThreadDialog';
 
 interface ActivityTimelineProps {
   leadId: string;
+  filterType?: 'activity' | 'communication';
 }
 
 // Mock data for demonstration
@@ -72,8 +73,8 @@ const mockActivities: LeadActivity[] = [
     id: '3',
     leadId: '1',
     type: 'logo_upload',
-    title: 'Logo uploaded',
-    description: 'Customer provided company logo file',
+    title: 'Logo received',
+    description: 'Customer sent company logo file',
     timestamp: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
     metadata: {
       fileName: 'company-logo.png',
@@ -99,8 +100,7 @@ const mockActivities: LeadActivity[] = [
   }
 ];
 
-export default function ActivityTimeline({ leadId }: ActivityTimelineProps) {
-  const [activeTab, setActiveTab] = useState('all');
+export default function ActivityTimeline({ leadId, filterType }: ActivityTimelineProps) {
   const [activities] = useState<LeadActivity[]>(mockActivities);
   const [selectedEmailThread, setSelectedEmailThread] = useState(null);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
@@ -158,15 +158,24 @@ export default function ActivityTimeline({ leadId }: ActivityTimelineProps) {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  const filteredActivities = activeTab === 'all' 
-    ? activities 
-    : activities.filter(activity => activity.type === activeTab);
+  // Filter activities based on filterType prop
+  const communicationTypes = ['email', 'call'];
+  const activityTypes = ['quote', 'logo_upload', 'product_selection', 'note', 'meeting', 'form_submission'];
+  
+  const filteredActivities = filterType === 'communication' 
+    ? activities.filter(activity => communicationTypes.includes(activity.type))
+    : filterType === 'activity'
+    ? activities.filter(activity => activityTypes.includes(activity.type))
+    : activities;
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Activity & Communication</h3>
+        <h3 className="text-lg font-semibold">
+          {filterType === 'communication' ? 'Communication History' : 
+           filterType === 'activity' ? 'Activity History' : 'Activity & Communication'}
+        </h3>
         <div className="flex space-x-2">
           <Button variant="outline" size="sm">
             <Filter className="h-4 w-4 mr-2" />
@@ -174,30 +183,22 @@ export default function ActivityTimeline({ leadId }: ActivityTimelineProps) {
           </Button>
           <Button size="sm">
             <Plus className="h-4 w-4 mr-2" />
-            Log Activity
+            {filterType === 'communication' ? 'Log Communication' : 'Log Activity'}
           </Button>
         </div>
       </div>
 
-      {/* Activity Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="all">All Activity</TabsTrigger>
-          <TabsTrigger value="email">Emails</TabsTrigger>
-          <TabsTrigger value="call">Calls</TabsTrigger>
-          <TabsTrigger value="meeting">Meetings</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={activeTab} className="mt-4">
-          <div className="space-y-4">
-            {filteredActivities.length === 0 ? (
-              <Card>
-                <CardContent className="py-8 text-center text-muted-foreground">
-                  No activities found for this filter.
-                </CardContent>
-              </Card>
-            ) : (
-              filteredActivities.map((activity, index) => (
+      {/* Activities List */}
+      <div className="mt-4">
+        <div className="space-y-4">
+          {filteredActivities.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                No {filterType === 'communication' ? 'communications' : 'activities'} found.
+              </CardContent>
+            </Card>
+          ) : (
+            filteredActivities.map((activity, index) => (
                 <Card key={activity.id}>
                   <CardContent className="p-4">
                     <div className="flex items-start space-x-4">
@@ -313,12 +314,11 @@ export default function ActivityTimeline({ leadId }: ActivityTimelineProps) {
                       </div>
                     </div>
                   </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
+              </Card>
+            ))
+          )}
+        </div>
+      </div>
 
       {/* Quick Actions */}
       <Card>
@@ -326,24 +326,52 @@ export default function ActivityTimeline({ leadId }: ActivityTimelineProps) {
           <CardTitle className="text-base">Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <Button variant="outline" size="sm" className="justify-start">
-              <Mail className="h-4 w-4 mr-2" />
-              Send Email
-            </Button>
-            <Button variant="outline" size="sm" className="justify-start">
-              <PhoneCall className="h-4 w-4 mr-2" />
-              Log Call
-            </Button>
-            <Button variant="outline" size="sm" className="justify-start">
-              <Calendar className="h-4 w-4 mr-2" />
-              Schedule Meeting
-            </Button>
-            <Button variant="outline" size="sm" className="justify-start">
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Add Note
-            </Button>
-          </div>
+          {filterType === 'communication' ? (
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="outline" size="sm" className="justify-start">
+                <Mail className="h-4 w-4 mr-2" />
+                Send Email
+              </Button>
+              <Button variant="outline" size="sm" className="justify-start">
+                <PhoneCall className="h-4 w-4 mr-2" />
+                Log Call
+              </Button>
+            </div>
+          ) : filterType === 'activity' ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              <Button variant="outline" size="sm" className="justify-start">
+                <Calendar className="h-4 w-4 mr-2" />
+                Schedule Meeting
+              </Button>
+              <Button variant="outline" size="sm" className="justify-start">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Add Note
+              </Button>
+              <Button variant="outline" size="sm" className="justify-start">
+                <Quote className="h-4 w-4 mr-2" />
+                Create Quote
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <Button variant="outline" size="sm" className="justify-start">
+                <Mail className="h-4 w-4 mr-2" />
+                Send Email
+              </Button>
+              <Button variant="outline" size="sm" className="justify-start">
+                <PhoneCall className="h-4 w-4 mr-2" />
+                Log Call
+              </Button>
+              <Button variant="outline" size="sm" className="justify-start">
+                <Calendar className="h-4 w-4 mr-2" />
+                Schedule Meeting
+              </Button>
+              <Button variant="outline" size="sm" className="justify-start">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Add Note
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
