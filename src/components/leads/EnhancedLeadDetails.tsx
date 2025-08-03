@@ -68,7 +68,7 @@ export default function EnhancedLeadDetails({
                 {lead.customerType === 'new' ? 'New Customer' : 'Existing Customer'}
               </Badge>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 mr-10">
               <Button variant="outline" size="sm" onClick={handleEdit}>
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
