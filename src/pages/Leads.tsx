@@ -6,6 +6,7 @@ import LeadBoard from '@/components/leads/LeadBoard';
 import LeadCard from '@/components/leads/LeadCard';
 import EnhancedLeadDetails from '@/components/leads/EnhancedLeadDetails';
 import CreateLeadDialog from '@/components/leads/CreateLeadDialog';
+import EditLeadDialog from '@/components/leads/EditLeadDialog';
 import { Lead, LeadColumn, LeadStatus } from '@/types/lead';
 
 const initialLeads: Lead[] = [
@@ -159,6 +160,8 @@ export default function Leads() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [showLeadDetails, setShowLeadDetails] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [leadToEdit, setLeadToEdit] = useState<Lead | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -246,6 +249,37 @@ export default function Leads() {
     }
   };
 
+  const handleEditLead = (lead: Lead) => {
+    setLeadToEdit(lead);
+    setShowEditDialog(true);
+    setShowLeadDetails(false); // Close the details dialog
+  };
+
+  const handleSaveEditedLead = (updatedLead: Lead) => {
+    setLeads(prevLeads => 
+      prevLeads.map(lead => 
+        lead.id === updatedLead.id ? updatedLead : lead
+      )
+    );
+
+    // Update the board columns
+    const updatedColumns = boardColumns.map(column => ({
+      ...column,
+      leads: column.leads.map(lead => 
+        lead.id === updatedLead.id ? updatedLead : lead
+      )
+    }));
+    setBoardColumns(updatedColumns);
+
+    // Update selected lead if it's currently displayed
+    if (selectedLead?.id === updatedLead.id) {
+      setSelectedLead(updatedLead);
+    }
+
+    setShowEditDialog(false);
+    setLeadToEdit(null);
+  };
+
   return (
     <div className="flex flex-col w-full h-full p-6 overflow-hidden">
       <div className="flex items-center justify-between mb-6">
@@ -287,6 +321,14 @@ export default function Leads() {
         lead={selectedLead}
         open={showLeadDetails}
         onOpenChange={handleLeadDetailsClose}
+        onEditLead={handleEditLead}
+      />
+
+      <EditLeadDialog
+        open={showEditDialog}
+        onClose={() => setShowEditDialog(false)}
+        onSave={handleSaveEditedLead}
+        lead={leadToEdit}
       />
     </div>
   );
