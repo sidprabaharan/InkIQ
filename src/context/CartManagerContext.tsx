@@ -84,15 +84,12 @@ export const CartManagerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }, [activeCartId]);
   
   const generateCartName = (strategy?: 'separate' | 'combined'): string => {
-    const date = new Date();
-    const dateStr = date.toISOString().split('T')[0];
-    const timeStr = date.toTimeString().slice(0, 5).replace(':', '');
-    const cartCount = carts.length + 1;
+    const orderNumber = Math.floor(Math.random() * 900000) + 100000; // 6-digit order number
     
     if (strategy === 'combined') {
-      return `Combined-Cart-${dateStr}-${timeStr}`;
+      return `Combined-Order-${orderNumber}`;
     }
-    return `Cart-${cartCount.toString().padStart(3, '0')}-${dateStr}`;
+    return `Order-${orderNumber}`;
   };
   
   const createCart = (name?: string, strategy?: 'separate' | 'combined'): string => {
