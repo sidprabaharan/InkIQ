@@ -11,6 +11,10 @@ export interface Lead {
   lastContactedAt?: string;
   notes?: string;
   
+  // New inquiry tracking fields
+  inquirySummary?: string;
+  currentStage?: string;
+  
   // Contact Details
   address?: {
     street?: string;

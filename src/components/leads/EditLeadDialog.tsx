@@ -24,6 +24,8 @@ export default function EditLeadDialog({ open, onClose, onSave, lead }: EditLead
     status: 'new_lead' as LeadStatus,
     value: 0,
     notes: '',
+    inquirySummary: '',
+    currentStage: '',
     // Address fields
     street: '',
     city: '',
@@ -53,6 +55,8 @@ export default function EditLeadDialog({ open, onClose, onSave, lead }: EditLead
         status: lead.status,
         value: lead.value || 0,
         notes: lead.notes || '',
+        inquirySummary: lead.inquirySummary || '',
+        currentStage: lead.currentStage || '',
         // Address
         street: lead.address?.street || '',
         city: lead.address?.city || '',
@@ -101,6 +105,8 @@ export default function EditLeadDialog({ open, onClose, onSave, lead }: EditLead
         status: formData.status,
         value: formData.value,
         notes: formData.notes,
+        inquirySummary: formData.inquirySummary,
+        currentStage: formData.currentStage,
         address: {
           street: formData.street,
           city: formData.city,
@@ -397,19 +403,32 @@ export default function EditLeadDialog({ open, onClose, onSave, lead }: EditLead
               </div>
             </div>
 
-            {/* Notes */}
+            {/* Inquiry Summary & Current Stage */}
             <div className="space-y-4">
-              <h4 className="font-medium">Notes</h4>
-              <div className="space-y-2">
-                <Label htmlFor="notes">Lead Notes</Label>
-                <Textarea
-                  id="notes"
-                  name="notes"
-                  rows={4}
-                  value={formData.notes}
-                  onChange={handleInputChange}
-                  placeholder="Add any relevant notes about this lead..."
-                />
+              <h4 className="font-medium">Inquiry Summary & Current Stage</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="inquirySummary">Inquiry Summary</Label>
+                  <Textarea
+                    id="inquirySummary"
+                    name="inquirySummary"
+                    rows={5}
+                    value={formData.inquirySummary}
+                    onChange={handleInputChange}
+                    placeholder="Client requirements, products of interest, timeline, budget considerations, special requests..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="currentStage">Current Stage</Label>
+                  <Textarea
+                    id="currentStage"
+                    name="currentStage"
+                    rows={5}
+                    value={formData.currentStage}
+                    onChange={handleInputChange}
+                    placeholder="Current stage notes, next steps, priorities, internal comments..."
+                  />
+                </div>
               </div>
             </div>
           </div>

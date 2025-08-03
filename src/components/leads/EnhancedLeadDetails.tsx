@@ -256,28 +256,32 @@ export default function EnhancedLeadDetails({
                     <div>
                       <h4 className="font-medium mb-2 text-sm">Client Requirements</h4>
                       <p className="text-sm text-muted-foreground">
-                        {lead.notes || "Custom merchandise inquiry - awaiting details on specific products, quantities, design specifications, branding requirements, and project timeline."}
+                        {lead.inquirySummary || lead.notes || "Custom merchandise inquiry - awaiting details on specific products, quantities, design specifications, branding requirements, and project timeline."}
                       </p>
                     </div>
                     
                     {/* Current Stage */}
                     <div>
                       <h4 className="font-medium mb-2 text-sm">Current Stage</h4>
-                      <div className="flex items-center space-x-2">
-                        <Badge variant="outline" className="capitalize">
-                          {lead.status.replace('_', ' ')}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          • Next: {
-                            lead.status === 'new_lead' ? 'Initial contact and requirements gathering' :
-                            lead.status === 'in_contact' ? 'Gather detailed specifications and create quote' :
-                            lead.status === 'qualified' ? 'Prepare and send formal quote' :
-                            lead.status === 'quoted' ? 'Follow up on quote and address questions' :
-                            lead.status === 'follow_up' ? 'Continue nurturing relationship' :
-                            'Process completed'
-                          }
-                        </span>
-                      </div>
+                      {lead.currentStage ? (
+                        <p className="text-sm text-muted-foreground mb-2">{lead.currentStage}</p>
+                      ) : (
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="outline" className="capitalize">
+                            {lead.status.replace('_', ' ')}
+                          </Badge>
+                          <span className="text-sm text-muted-foreground">
+                            • Next: {
+                              lead.status === 'new_lead' ? 'Initial contact and requirements gathering' :
+                              lead.status === 'in_contact' ? 'Gather detailed specifications and create quote' :
+                              lead.status === 'qualified' ? 'Prepare and send formal quote' :
+                              lead.status === 'quoted' ? 'Follow up on quote and address questions' :
+                              lead.status === 'follow_up' ? 'Continue nurturing relationship' :
+                              'Process completed'
+                            }
+                          </span>
+                        </div>
+                      )}
                     </div>
                     
                     {/* Key Information */}
