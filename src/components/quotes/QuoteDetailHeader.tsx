@@ -18,7 +18,7 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { StatusDropdown } from "./StatusDropdown";
+import { QuoteStatusDropdown } from "./QuoteStatusDropdown";
 import { useState } from "react";
 import { PackingSlip } from "./PackingSlip";
 import { ShippingLabelDialog } from "./ShippingLabelDialog";
@@ -180,7 +180,7 @@ export function QuoteDetailHeader({
         </Sheet>
       </div>
       <div className="flex items-center gap-2">
-        <StatusDropdown currentStatus={status} onStatusChange={handleStatusChange} />
+        <QuoteStatusDropdown currentStatus={status} onStatusChange={handleStatusChange} />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
