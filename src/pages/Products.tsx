@@ -39,16 +39,16 @@ export default function Products() {
   return (
     <CartProvider>
       <div className="flex-1 flex flex-col h-full overflow-hidden">
-        {/* Top Navigation Bar - Blue header similar to DGI */}
-        <div className="bg-blue-800 text-white py-2 px-4 flex items-center justify-between">
+        {/* Top Navigation Bar */}
+        <div className="bg-white border-b py-2 px-4 flex items-center justify-between">
           <div className="flex items-center gap-4 flex-1">
             <div className="relative flex-1 max-w-xl">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-300" />
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search items by style number, description, or brand..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-white/10 border-none text-white placeholder:text-gray-300 w-full"
+                className="pl-10 w-full"
               />
             </div>
           </div>
@@ -58,10 +58,10 @@ export default function Products() {
         </div>
         
         {/* Secondary Navigation */}
-        <div className="bg-blue-50 border-b flex items-center justify-between px-4 py-1">
+        <div className="bg-gray-50 border-b flex items-center justify-between px-4 py-1">
           <div className="flex gap-6">
-            <Button variant="ghost" className="text-blue-800 text-sm font-medium">Brands</Button>
-            <Button variant="ghost" className="text-blue-800 text-sm font-medium">Categories</Button>
+            <Button variant="ghost" className="text-foreground text-sm font-medium">Brands</Button>
+            <Button variant="ghost" className="text-foreground text-sm font-medium">Categories</Button>
           </div>
         </div>
         
