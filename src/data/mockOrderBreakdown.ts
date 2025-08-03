@@ -50,24 +50,38 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
         status: 'In Production'
       }
     ],
-    imprintDetails: {
-      type: 'Screen Print',
-      details: 'Front Center, 4" x 3", Black & White',
-      files: [
-        {
-          id: 'file-1',
-          name: 'heimat-logo-vector.ai',
-          type: 'Adobe Illustrator',
-          url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
-        },
-        {
-          id: 'file-2',
-          name: 'heimat-logo-high-res.png',
-          type: 'PNG Image',
-          url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
-        }
-      ]
-    }
+    imprintSections: [
+      {
+        type: 'Screen Print',
+        details: 'Front Center, 4" x 3", Black & White',
+        files: [
+          {
+            id: 'file-1',
+            name: 'heimat-logo-vector.ai',
+            type: 'Adobe Illustrator',
+            url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
+          },
+          {
+            id: 'file-2',
+            name: 'heimat-logo-high-res.png',
+            type: 'PNG Image',
+            url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
+          }
+        ]
+      },
+      {
+        type: 'Embroidery',
+        details: 'Left Chest, 2" x 1.5", Navy thread',
+        files: [
+          {
+            id: 'file-1b',
+            name: 'heimat-logo-embroidery.dst',
+            type: 'Embroidery File',
+            url: '/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'
+          }
+        ]
+      }
+    ]
   },
   {
     id: 'group-2',
@@ -96,18 +110,20 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
         status: 'Complete'
       }
     ],
-    imprintDetails: {
-      type: 'Embroidery',
-      details: 'Left Chest, 3" x 2.5", Navy & Gold',
-      files: [
-        {
-          id: 'file-3',
-          name: 'heimat-logo-embroidery.dst',
-          type: 'Embroidery File',
-          url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
-        }
-      ]
-    }
+    imprintSections: [
+      {
+        type: 'Embroidery',
+        details: 'Left Chest, 3" x 2.5", Navy & Gold',
+        files: [
+          {
+            id: 'file-3',
+            name: 'heimat-logo-embroidery.dst',
+            type: 'Embroidery File',
+            url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
+          }
+        ]
+      }
+    ]
   },
   {
     id: 'group-3',
@@ -136,17 +152,31 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
         status: 'Artwork Pending'
       }
     ],
-    imprintDetails: {
-      type: 'Digital Print',
-      details: 'Front Center, 2" x 1.5", Full Color',
-      files: [
-        {
-          id: 'file-4',
-          name: 'heimat-logo-full-color.pdf',
-          type: 'PDF Document',
-          url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
-        }
-      ]
-    }
+    imprintSections: [
+      {
+        type: 'Digital Print',
+        details: 'Front Center, 2" x 1.5", Full Color',
+        files: [
+          {
+            id: 'file-4',
+            name: 'heimat-logo-full-color.pdf',
+            type: 'PDF Document',
+            url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
+          }
+        ]
+      },
+      {
+        type: 'Screen Print',
+        details: 'Back Center, 8" x 6", White ink',
+        files: [
+          {
+            id: 'file-4b',
+            name: 'back-design.ai',
+            type: 'Adobe Illustrator',
+            url: '/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'
+          }
+        ]
+      }
+    ]
   }
 ];

@@ -43,7 +43,7 @@ export interface LineItemGroupData {
   id: string;
   title: string;
   products: ProductItem[];
-  imprintDetails: ImprintDetails;
+  imprintSections: ImprintDetails[];
 }
 
 interface OrderBreakdownProps {
@@ -144,41 +144,43 @@ export function OrderBreakdown({ groups }: OrderBreakdownProps) {
               </Table>
             </div>
 
-            {/* Imprint Details */}
-            <div className="bg-muted/20 border-t border-border px-6 py-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <span className="font-medium text-sm">Type: </span>
-                  <span className="text-sm">{group.imprintDetails.type}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-sm">Details: </span>
-                  <span className="text-sm">{group.imprintDetails.details}</span>
-                </div>
-              </div>
-              
-              {group.imprintDetails.files.length > 0 && (
-                <div>
-                  <span className="font-medium text-sm block mb-2">Logo Files:</span>
-                  <div className="flex gap-2">
-                    {group.imprintDetails.files.map((file) => (
-                      <div key={file.id} className="flex items-center gap-2 bg-background px-3 py-2 rounded border text-sm">
-                        <img 
-                          src={file.url} 
-                          alt={file.name}
-                          className="w-6 h-6 object-contain"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = '/placeholder.svg';
-                          }}
-                        />
-                        <span>{file.name}</span>
-                      </div>
-                    ))}
+            {/* Imprint Sections */}
+            {group.imprintSections.map((imprintSection, sectionIndex) => (
+              <div key={sectionIndex} className="bg-muted/20 border-t border-border px-6 py-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <span className="font-medium text-sm">Type: </span>
+                    <span className="text-sm">{imprintSection.type}</span>
+                  </div>
+                  <div>
+                    <span className="font-medium text-sm">Details: </span>
+                    <span className="text-sm">{imprintSection.details}</span>
                   </div>
                 </div>
-              )}
-            </div>
+                
+                {imprintSection.files.length > 0 && (
+                  <div>
+                    <span className="font-medium text-sm block mb-2">Logo Files:</span>
+                    <div className="flex gap-2">
+                      {imprintSection.files.map((file) => (
+                        <div key={file.id} className="flex items-center gap-2 bg-background px-3 py-2 rounded border text-sm">
+                          <img 
+                            src={file.url} 
+                            alt={file.name}
+                            className="w-6 h-6 object-contain"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = '/placeholder.svg';
+                            }}
+                          />
+                          <span>{file.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
           </CardContent>
         </Card>
       ))}
