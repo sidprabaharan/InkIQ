@@ -47,24 +47,43 @@ export const CartManagerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   
   // Load data from localStorage on mount
   useEffect(() => {
+    console.log('🛒 Loading data from localStorage...');
     const savedCarts = localStorage.getItem('cartManager_carts');
     const savedSettings = localStorage.getItem('cartManager_settings');
     const savedActiveCart = localStorage.getItem('cartManager_activeCart');
     
+    console.log('🛒 Raw saved carts:', savedCarts);
+    console.log('🛒 Raw saved settings:', savedSettings);
+    console.log('🛒 Raw saved active cart:', savedActiveCart);
+    
     if (savedCarts) {
-      const parsedCarts = JSON.parse(savedCarts).map((cart: any) => ({
-        ...cart,
-        createdAt: new Date(cart.createdAt),
-        updatedAt: new Date(cart.updatedAt)
-      }));
-      setCarts(parsedCarts);
+      try {
+        const parsedCarts = JSON.parse(savedCarts).map((cart: any) => ({
+          ...cart,
+          createdAt: new Date(cart.createdAt),
+          updatedAt: new Date(cart.updatedAt)
+        }));
+        console.log('🛒 Parsed carts:', parsedCarts);
+        setCarts(parsedCarts);
+      } catch (error) {
+        console.error('🛒 Error parsing saved carts:', error);
+        localStorage.removeItem('cartManager_carts');
+      }
     }
     
     if (savedSettings) {
-      setUserSettings(JSON.parse(savedSettings));
+      try {
+        const parsedSettings = JSON.parse(savedSettings);
+        console.log('🛒 Parsed settings:', parsedSettings);
+        setUserSettings(parsedSettings);
+      } catch (error) {
+        console.error('🛒 Error parsing saved settings:', error);
+        localStorage.removeItem('cartManager_settings');
+      }
     }
     
     if (savedActiveCart) {
+      console.log('🛒 Setting active cart ID:', savedActiveCart);
       setActiveCartId(savedActiveCart);
     }
   }, []);
@@ -94,8 +113,10 @@ export const CartManagerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
   
   const createCart = (name?: string, strategy?: 'separate' | 'combined'): string => {
+    console.log('🛒 Creating new cart...');
     const cartId = `cart_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const cartName = name || generateCartName(strategy);
+    console.log('🛒 Generated cart ID:', cartId, 'name:', cartName);
     
     const newCart: Cart = {
       id: cartId,
@@ -108,9 +129,16 @@ export const CartManagerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       items: [],
       metadata: {}
     };
+    console.log('🛒 New cart object:', newCart);
+    console.log('🛒 Current carts before update:', carts);
     
-    setCarts(prev => [...prev, newCart]);
+    setCarts(prev => {
+      const updated = [...prev, newCart];
+      console.log('🛒 Updated carts array:', updated);
+      return updated;
+    });
     setActiveCartId(cartId);
+    console.log('🛒 Set active cart ID to:', cartId);
     
     toast.success(`Created new cart: ${cartName}`);
     return cartId;
@@ -150,44 +178,61 @@ export const CartManagerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
   
   const addToCart = (cartId: string, newItem: CartItem) => {
-    setCarts(prev => prev.map(cart => {
-      if (cart.id !== cartId) return cart;
-      
-      const existingItemIndex = cart.items.findIndex(item => 
-        item.id === newItem.id && item.supplierName === newItem.supplierName
-      );
-      
-      let updatedItems;
-      if (existingItemIndex >= 0) {
-        updatedItems = [...cart.items];
-        const existingItem = updatedItems[existingItemIndex];
+    console.log('🛒 addToCart called with cartId:', cartId, 'item:', newItem);
+    console.log('🛒 Current carts before adding item:', carts);
+    
+    setCarts(prev => {
+      console.log('🛒 Previous carts in setCarts:', prev);
+      const updated = prev.map(cart => {
+        if (cart.id !== cartId) {
+          console.log('🛒 Skipping cart:', cart.id);
+          return cart;
+        }
         
-        // Merge quantities
-        newItem.quantities.forEach(newQty => {
-          const existingQtyIndex = existingItem.quantities.findIndex(
-            q => q.location === newQty.location && q.size === newQty.size
-          );
-          
-          if (existingQtyIndex >= 0) {
-            existingItem.quantities[existingQtyIndex].quantity += newQty.quantity;
-          } else {
-            existingItem.quantities.push(newQty);
-          }
-        });
-        
-        existingItem.totalQuantity = existingItem.quantities.reduce(
-          (total, q) => total + q.quantity, 0
+        console.log('🛒 Found target cart:', cart);
+        const existingItemIndex = cart.items.findIndex(item => 
+          item.id === newItem.id && item.supplierName === newItem.supplierName
         );
-      } else {
-        updatedItems = [...cart.items, newItem];
-      }
-      
-      return {
-        ...cart,
-        items: updatedItems,
-        updatedAt: new Date()
-      };
-    }));
+        console.log('🛒 Existing item index:', existingItemIndex);
+        
+        let updatedItems;
+        if (existingItemIndex >= 0) {
+          console.log('🛒 Updating existing item');
+          updatedItems = [...cart.items];
+          const existingItem = updatedItems[existingItemIndex];
+          
+          // Merge quantities
+          newItem.quantities.forEach(newQty => {
+            const existingQtyIndex = existingItem.quantities.findIndex(
+              q => q.location === newQty.location && q.size === newQty.size
+            );
+            
+            if (existingQtyIndex >= 0) {
+              existingItem.quantities[existingQtyIndex].quantity += newQty.quantity;
+            } else {
+              existingItem.quantities.push(newQty);
+            }
+          });
+          
+          existingItem.totalQuantity = existingItem.quantities.reduce(
+            (total, q) => total + q.quantity, 0
+          );
+        } else {
+          console.log('🛒 Adding new item to cart');
+          updatedItems = [...cart.items, newItem];
+        }
+        
+        const updatedCart = {
+          ...cart,
+          items: updatedItems,
+          updatedAt: new Date()
+        };
+        console.log('🛒 Updated cart:', updatedCart);
+        return updatedCart;
+      });
+      console.log('🛒 Final updated carts array:', updated);
+      return updated;
+    });
     
     toast.success(`Added ${newItem.totalQuantity} items to cart`);
   };
@@ -273,7 +318,10 @@ export const CartManagerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const getActiveCartsTotals = () => {
+    console.log('🛒 Getting active carts totals...');
+    console.log('🛒 All carts:', carts);
     const activeCarts = carts.filter(cart => cart.status === 'draft' || cart.status === 'ready');
+    console.log('🛒 Active carts:', activeCarts);
     console.log('getActiveCartsTotals - Active carts:', activeCarts.map(c => ({ id: c.id, name: c.name, status: c.status, itemCount: c.items.length })));
     
     const totalItems = activeCarts.reduce((acc, cart) => {
@@ -284,6 +332,7 @@ export const CartManagerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       return acc + cart.items.reduce((itemAcc, item) => itemAcc + (item.price * item.totalQuantity), 0);
     }, 0);
     
+    console.log('🛒 Final totals:', { totalItems, subtotal });
     return { totalItems, subtotal };
   };
   

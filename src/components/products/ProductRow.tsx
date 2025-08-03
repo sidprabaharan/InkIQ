@@ -82,19 +82,35 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
   };
   
   const handleAddToCart = () => {
+    console.log('🛒 handleAddToCart called');
+    console.log('🛒 Current quantities:', quantities);
+    console.log('🛒 Selected supplier:', selectedSupplier);
+    console.log('🛒 Active cart:', activeCart);
+    
     const total = getTotalQuantity();
+    console.log('🛒 Total quantity:', total);
+    
     if (total === 0) {
+      console.log('🛒 No items selected');
       toast.error("Please select at least one item to add to cart");
       return;
     }
     
     if (!selectedSupplier) {
+      console.log('🛒 No supplier selected');
       toast.error("Please select a supplier first");
       return;
     }
 
     // Create a cart if none exists
-    const currentCartId = activeCart?.id || createCart();
+    let currentCartId = activeCart?.id;
+    if (!currentCartId) {
+      console.log('🛒 No active cart, creating new one...');
+      currentCartId = createCart();
+      console.log('🛒 Created cart with ID:', currentCartId);
+    } else {
+      console.log('🛒 Using existing cart ID:', currentCartId);
+    }
     
     // Format the cart item
     const cartQuantities = [];
@@ -110,6 +126,7 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
         }
       }
     }
+    console.log('🛒 Cart quantities:', cartQuantities);
     
     const cartItem: CartItem = {
       id: product.id,
@@ -122,12 +139,18 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
       quantities: cartQuantities,
       totalQuantity: total
     };
+    console.log('🛒 Cart item to add:', cartItem);
     
     // Add to cart
+    console.log('🛒 Calling addToCart with cartId:', currentCartId);
     addToCart(currentCartId, cartItem);
+    
+    // Show success message
+    toast.success(`Added ${total} items to cart`);
     
     // Reset quantities after adding to cart
     setQuantities({});
+    console.log('🛒 Quantities reset');
   };
   
   return (
