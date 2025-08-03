@@ -487,11 +487,11 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
                     </TableCell>
                   </TableRow>
                   
-                  {item.mockups.length > 0 && (
+                  {item.mockups && item.mockups.length > 0 && (
                     <TableRow className="border-b hover:bg-gray-50">
                       <TableCell colSpan={16} className="p-2 bg-gray-50">
                         <div className="flex flex-wrap gap-2 p-2">
-                          {item.mockups.map((mockup) => (
+                          {item.mockups?.map((mockup) => (
                             <div 
                               key={mockup.id} 
                               className="relative w-20 h-20 border rounded-md overflow-hidden group"
@@ -517,13 +517,13 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
               );
             })}
 
-            {group.imprints.length > 0 && group.imprints.map((imprint) => (
+            {group.imprints && group.imprints.length > 0 && group.imprints.map((imprint) => (
               <TableRow key={imprint.id} className="border-b bg-slate-50">
                 <TableCell colSpan={16} className="p-4">
                   <div className="space-y-3">
                     <h4 className="font-medium text-sm">Imprint Details</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {imprint.imprintItems.map((item) => (
+                      {imprint.imprintItems?.map((item) => (
                         <div key={item.id} className="border rounded-md p-3 bg-white">
                           <div className="grid grid-cols-1 gap-2 text-sm">
                             <div>
@@ -535,11 +535,11 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
                               <span className="font-medium">Details:</span> {item.details}
                             </div>
                           )}
-                          {item.mockups.length > 0 && (
+                          {item.mockups && item.mockups.length > 0 && (
                             <div className="mt-2">
                               <span className="font-medium text-sm">Mockups:</span>
                               <div className="flex flex-wrap gap-2 mt-1">
-                                {item.mockups.map((mockup) => (
+                                {item.mockups?.map((mockup) => (
                                   <div key={mockup.id} className="w-16 h-16 border rounded-md overflow-hidden">
                                     <img 
                                       src={mockup.url} 
@@ -602,7 +602,7 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
         open={imprintDialogOpen}
         onOpenChange={setImprintDialogOpen}
         onSave={handleSaveImprints}
-        initialImprints={currentGroupIndex !== null && itemGroups[currentGroupIndex]?.imprints.length > 0 
+        initialImprints={currentGroupIndex !== null && itemGroups[currentGroupIndex]?.imprints?.length > 0 
           ? itemGroups[currentGroupIndex].imprints[itemGroups[currentGroupIndex].imprints.length - 1].imprintItems 
           : undefined}
       />
