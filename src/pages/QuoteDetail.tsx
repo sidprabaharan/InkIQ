@@ -5,7 +5,8 @@ import { QuoteDetailHeader } from "@/components/quotes/QuoteDetailHeader";
 import { CompanyInfoCard } from "@/components/quotes/CompanyInfoCard";
 import { QuoteDetailsCard } from "@/components/quotes/QuoteDetailsCard";
 import { CustomerInfoCard } from "@/components/quotes/CustomerInfoCard";
-import { QuoteItemsTable } from "@/components/quotes/QuoteItemsTable";
+import { OrderBreakdown } from "@/components/quotes/OrderBreakdown";
+import { mockOrderBreakdownData } from "@/data/mockOrderBreakdown";
 import { NotesCard } from "@/components/quotes/NotesCard";
 import { InvoiceSummaryCard } from "@/components/quotes/InvoiceSummaryCard";
 import { quotationData } from "@/components/quotes/QuoteData";
@@ -99,8 +100,8 @@ export default function QuoteDetail() {
             />
           </div>
           
-          {/* Quote Items - full width */}
-          <QuoteItemsTable items={quote.items} />
+          {/* Order Breakdown - full width */}
+          <OrderBreakdown groups={mockOrderBreakdownData} />
           
           {/* Notes and Invoice Summary - bottom row */}
           <div className="grid grid-cols-3 gap-6">
