@@ -78,7 +78,20 @@ export default function QuoteDetail() {
       taxed: false,
       total: parseFloat(item.total.replace(/[$,]/g, '')) || 0,
       status: "Pending",
-      mockups: []
+      mockups: [
+        {
+          id: "mockup-1",
+          name: "Front Design Mockup",
+          url: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=400&fit=crop",
+          type: "image"
+        },
+        {
+          id: "mockup-2", 
+          name: "Back Design Mockup",
+          url: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=400&fit=crop",
+          type: "image"
+        }
+      ]
     })),
     imprints: [{
       id: "1",
