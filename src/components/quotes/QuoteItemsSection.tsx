@@ -75,6 +75,19 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
   const getInitialItemGroups = () => {
     if (quoteData?.items && quoteData.items.length > 0) {
       // Transform quote data items to the format expected by this component
+      const transformedImprints = quoteData.imprints ? [{
+        id: "imprint-" + Math.random().toString(36).substring(2, 9),
+        imprintItems: quoteData.imprints.map((imprint: any) => ({
+          id: imprint.id,
+          type: imprint.type,
+          placement: imprint.placement,
+          size: imprint.size,
+          colours: imprint.colours,
+          notes: imprint.notes || "",
+          files: imprint.files || []
+        }))
+      }] : [];
+
       return [{
         id: "group-" + Math.random().toString(36).substring(2, 9),
         items: quoteData.items.map((item: any) => ({
@@ -92,12 +105,12 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
             xxxl: parseNumber(item.xxxl)
           },
           quantity: parseNumber(item.quantity),
-          price: parseNumber(item.price),
+          price: parseNumber(item.price.replace('$', '')),
           taxed: item.taxed || false,
-          total: parseNumber(item.total),
+          total: parseNumber(item.total.replace('$', '')),
           mockups: item.mockups || []
         })),
-        imprints: []
+        imprints: transformedImprints
       }];
     }
     

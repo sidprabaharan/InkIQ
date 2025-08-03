@@ -43,6 +43,8 @@ export interface Customer {
 export interface QuoteDetails {
   owner: string;
   deliveryMethod: string;
+  poNumber?: string;
+  created?: string;
   productionDueDate: string;
   paymentDueDate: string;
   invoiceDate: string;
@@ -70,6 +72,12 @@ export interface QuoteItem {
   taxed: boolean;
   total: string;
   status: string;
+  mockups?: Array<{
+    id: string;
+    name: string;
+    url: string;
+    type: string;
+  }>;
 }
 
 export interface InvoiceSummary {
@@ -91,6 +99,20 @@ export interface QuotationData {
   items: QuoteItem[];
   summary: InvoiceSummary;
   status: string;
+  imprints?: Array<{
+    id: string;
+    type: string;
+    placement: string;
+    size: string;
+    colours: string;
+    notes?: string;
+    files: Array<{
+      id: string;
+      name: string;
+      type: string;
+      url: string;
+    }>;
+  }>;
 }
 
 // Sample quote data for different quotes
@@ -136,6 +158,8 @@ export const quotationData: QuotationData = {
   details: {
     owner: "Noraiz shahid",
     deliveryMethod: "Home Delivery",
+    poNumber: "PO-2024-3032",
+    created: "2024-03-15",
     productionDueDate: "10-07-2024",
     paymentDueDate: "09-09-2024",
     invoiceDate: "03-22-2024"
@@ -161,7 +185,15 @@ export const quotationData: QuotationData = {
       price: "$12.99",
       taxed: true,
       total: "$4,871.25",
-      status: "Artwork"
+      status: "Artwork",
+      mockups: [
+        {
+          id: "mockup-tshirt-1",
+          name: "tshirt-red-mockup.png",
+          url: "/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png",
+          type: "image/png"
+        }
+      ]
     },
     {
       category: "Hoodies",
@@ -179,7 +211,15 @@ export const quotationData: QuotationData = {
       price: "$29.99",
       taxed: true,
       total: "$7,047.65",
-      status: "Production"
+      status: "Production",
+      mockups: [
+        {
+          id: "mockup-hoodie-1",
+          name: "hoodie-black-mockup.png",
+          url: "/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png",
+          type: "image/png"
+        }
+      ]
     }
   ],
   summary: {
@@ -190,7 +230,40 @@ export const quotationData: QuotationData = {
     salesTax: "$563.17",
     totalDue: "$11,826.53"
   },
-  status: "Quote"
+  status: "Quote",
+  imprints: [
+    {
+      id: "imprint-screen-print",
+      type: "Screen Print",
+      placement: "Front Center",
+      size: "4\" x 3\"",
+      colours: "Black & White",
+      files: [
+        {
+          id: "file-screen-1",
+          name: "project-care-logo.ai",
+          type: "Adobe Illustrator",
+          url: "/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png"
+        }
+      ]
+    },
+    {
+      id: "imprint-embroidery",
+      type: "Embroidery",
+      placement: "Left Chest",
+      size: "2\" x 1.5\"",
+      colours: "Navy thread",
+      notes: "Match thread color to hoodie",
+      files: [
+        {
+          id: "file-emb-1",
+          name: "project-care-logo.dst",
+          type: "Embroidery File",
+          url: "/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png"
+        }
+      ]
+    }
+  ]
 };
 
 // Additional sample quote data for different IDs

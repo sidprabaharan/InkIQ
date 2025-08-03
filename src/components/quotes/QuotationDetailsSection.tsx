@@ -25,19 +25,19 @@ interface QuotationDetailsSectionProps {
 
 export function QuotationDetailsSection({ quoteData }: QuotationDetailsSectionProps) {
   const [created, setCreated] = useState<Date | undefined>(
-    quoteData?.quoteDetails?.created ? new Date(quoteData.quoteDetails.created) : undefined
+    quoteData?.details?.created ? new Date(quoteData.details.created) : undefined
   );
   const [productionDueDate, setProductionDueDate] = useState<Date | undefined>(
-    quoteData?.quoteDetails?.productionDueDate ? new Date(quoteData.quoteDetails.productionDueDate) : undefined
+    quoteData?.details?.productionDueDate ? new Date(quoteData.details.productionDueDate) : undefined
   );
   const [customerDueDate, setCustomerDueDate] = useState<Date | undefined>(
-    quoteData?.quoteDetails?.customerDueDate ? new Date(quoteData.quoteDetails.customerDueDate) : undefined
+    quoteData?.details?.customerDueDate ? new Date(quoteData.details.customerDueDate) : undefined
   );
   const [paymentDueDate, setPaymentDueDate] = useState<Date | undefined>(
-    quoteData?.quoteDetails?.paymentDueDate ? new Date(quoteData.quoteDetails.paymentDueDate) : undefined
+    quoteData?.details?.paymentDueDate ? new Date(quoteData.details.paymentDueDate) : undefined
   );
   const [invoiceDate, setInvoiceDate] = useState<Date | undefined>(
-    quoteData?.quoteDetails?.invoiceDate ? new Date(quoteData.quoteDetails.invoiceDate) : undefined
+    quoteData?.details?.invoiceDate ? new Date(quoteData.details.invoiceDate) : undefined
   );
 
   return (
@@ -45,26 +45,29 @@ export function QuotationDetailsSection({ quoteData }: QuotationDetailsSectionPr
       <h3 className="text-base font-medium">Quotation Details</h3>
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <Select>
+          <Select value={quoteData?.details?.owner || ""}>
             <SelectTrigger>
               <SelectValue placeholder="Owner" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="owner1">Owner 1</SelectItem>
-              <SelectItem value="owner2">Owner 2</SelectItem>
+              <SelectItem value="Noraiz shahid">Noraiz shahid</SelectItem>
+              <SelectItem value="Sarah Johnson">Sarah Johnson</SelectItem>
+              <SelectItem value="Michael Chen">Michael Chen</SelectItem>
             </SelectContent>
           </Select>
-          <Select>
+          <Select value={quoteData?.details?.deliveryMethod || ""}>
             <SelectTrigger>
               <SelectValue placeholder="Delivery Method" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="method1">Method 1</SelectItem>
-              <SelectItem value="method2">Method 2</SelectItem>
+              <SelectItem value="Home Delivery">Home Delivery</SelectItem>
+              <SelectItem value="Pickup">Pickup</SelectItem>
+              <SelectItem value="Courier">Courier</SelectItem>
+              <SelectItem value="Standard Shipping">Standard Shipping</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <Input placeholder="PO Number" />
+        <Input placeholder="PO Number" value={quoteData?.details?.poNumber || ""} />
         
         {/* Created Date Picker */}
         <Popover>
