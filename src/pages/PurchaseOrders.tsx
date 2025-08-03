@@ -8,12 +8,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Plus, Filter, Eye, FileText, ShoppingCart, Package, History, Edit2, Trash2, Send } from 'lucide-react';
+import { Search, Plus, Filter, Eye, FileText, ShoppingCart, Package, History, Edit2, Trash2, Send, Download } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useCartManager } from '@/context/CartManagerContext';
 import { CartManagerProvider } from '@/context/CartManagerContext';
 import { EditableCartItem } from '@/components/cart/EditableCartItem';
+import { CartDetailsSheet } from '@/components/cart/CartDetailsSheet';
 
 // Mock data for purchase orders
 const initialPurchaseOrders = [
@@ -87,6 +88,8 @@ function PurchaseOrdersContent() {
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [purchaseOrders, setPurchaseOrders] = useState(initialPurchaseOrders);
   const [activeTab, setActiveTab] = useState('active-carts');
+  const [selectedCartDetails, setSelectedCartDetails] = useState<string | null>(null);
+  const [cartDetailsOpen, setCartDetailsOpen] = useState(false);
   const location = useLocation();
   
   const { 
@@ -172,6 +175,21 @@ function PurchaseOrdersContent() {
       default: return 'bg-gray-100 text-gray-800';
     }
   };
+
+  const handleViewCartDetails = (cartId: string) => {
+    setSelectedCartDetails(cartId);
+    setCartDetailsOpen(true);
+  };
+
+  const handleDownloadCartDocument = (cartId: string) => {
+    const cart = carts.find(c => c.id === cartId);
+    if (cart) {
+      toast.success(`Downloading document for ${cart.name}...`);
+      // Future implementation: Generate and download PDF/document
+    }
+  };
+
+  const selectedCart = selectedCartDetails ? carts.find(c => c.id === selectedCartDetails) : null;
 
   return (
     <div className="flex-1 p-6 space-y-6">
@@ -361,10 +379,10 @@ function PurchaseOrdersContent() {
                             </div>
                           </div>
                           <div className="flex gap-2">
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" onClick={() => handleViewCartDetails(cart.id)}>
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" onClick={() => handleDownloadCartDocument(cart.id)}>
                               <FileText className="h-4 w-4" />
                             </Button>
                           </div>
@@ -552,6 +570,12 @@ function PurchaseOrdersContent() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <CartDetailsSheet
+        cart={selectedCart || null}
+        open={cartDetailsOpen}
+        onOpenChange={setCartDetailsOpen}
+      />
     </div>
   );
 }
