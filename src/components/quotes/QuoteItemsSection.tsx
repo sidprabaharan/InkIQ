@@ -67,28 +67,46 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
     return parseFloat(cleaned) || 0;
   };
 
+  // Helper function to parse dimensions from size string (e.g., "4\" x 3\"" -> width: 4, height: 3)
+  const parseDimensions = (sizeString: string) => {
+    if (!sizeString) return { width: 0, height: 0 };
+    
+    const match = sizeString.match(/(\d+(?:\.\d+)?)\s*[\"']?\s*x\s*(\d+(?:\.\d+)?)\s*[\"']?/i);
+    if (match) {
+      return {
+        width: parseFloat(match[1]) || 0,
+        height: parseFloat(match[2]) || 0
+      };
+    }
+    return { width: 0, height: 0 };
+  };
+
   // Initialize with quote data if available, otherwise use default empty structure
   const getInitialItemGroups = () => {
     if (quoteData?.items && quoteData.items.length > 0) {
       // Transform quote data imprints to the new format
-      const transformedImprints = quoteData.imprints ? quoteData.imprints.map((imprint: any) => ({
-        id: imprint.id,
-        method: imprint.type || "",
-        location: imprint.placement || "",
-        width: 0,
-        height: 0,
-        colorsOrThreads: imprint.colours || "",
-        notes: imprint.notes || "",
-        customerArt: [],
-        productionFiles: [],
-        proofMockup: imprint.files ? imprint.files.map((file: any) => ({
-          id: file.id,
-          name: file.name,
-          url: file.url,
-          type: file.type,
-          category: 'proofMockup' as const
-        })) : []
-      })) : [];
+      const transformedImprints = quoteData.imprints ? quoteData.imprints.map((imprint: any) => {
+        const dimensions = parseDimensions(imprint.size || "");
+        
+        return {
+          id: imprint.id,
+          method: imprint.type || "",
+          location: imprint.placement || "",
+          width: dimensions.width,
+          height: dimensions.height,
+          colorsOrThreads: imprint.colours || "",
+          notes: imprint.notes || "",
+          customerArt: imprint.customerArt || [],
+          productionFiles: imprint.productionFiles || [],
+          proofMockup: imprint.files ? imprint.files.map((file: any) => ({
+            id: file.id,
+            name: file.name,
+            url: file.url,
+            type: file.type,
+            category: 'proofMockup' as const
+          })) : (imprint.proofMockup || [])
+        };
+      }) : [];
 
       return [{
         id: "group-" + Math.random().toString(36).substring(2, 9),

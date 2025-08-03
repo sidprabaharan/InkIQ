@@ -106,11 +106,32 @@ export interface QuotationData {
     size: string;
     colours: string;
     notes?: string;
-    files: Array<{
+    files?: Array<{
       id: string;
       name: string;
       type: string;
       url: string;
+    }>;
+    customerArt?: Array<{
+      id: string;
+      name: string;
+      url: string;
+      type: string;
+      category: string;
+    }>;
+    productionFiles?: Array<{
+      id: string;
+      name: string;
+      url: string;
+      type: string;
+      category: string;
+    }>;
+    proofMockup?: Array<{
+      id: string;
+      name: string;
+      url: string;
+      type: string;
+      category: string;
     }>;
   }>;
 }
@@ -238,28 +259,67 @@ export const quotationData: QuotationData = {
       placement: "Front Center",
       size: "4\" x 3\"",
       colours: "Black & White",
-      files: [
+      notes: "Standard screen printing setup",
+      customerArt: [
         {
-          id: "file-screen-1",
-          name: "project-care-logo.ai",
-          type: "Adobe Illustrator",
-          url: "/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png"
+          id: "customer-art-1",
+          name: "client-logo.ai",
+          url: "/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png",
+          type: "application/postscript",
+          category: "customerArt"
+        }
+      ],
+      productionFiles: [
+        {
+          id: "production-file-1",
+          name: "screen-print-separations.eps",
+          url: "/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png",
+          type: "application/postscript",
+          category: "productionFiles"
+        }
+      ],
+      proofMockup: [
+        {
+          id: "proof-mockup-1",
+          name: "screen-print-proof.png",
+          url: "/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png",
+          type: "image/png",
+          category: "proofMockup"
         }
       ]
     },
     {
       id: "imprint-embroidery",
       type: "Embroidery",
-      placement: "Left Chest",
+      placement: "Left Chest", 
       size: "2\" x 1.5\"",
       colours: "Navy thread",
       notes: "Match thread color to hoodie",
-      files: [
+      customerArt: [
         {
-          id: "file-emb-1",
-          name: "project-care-logo.dst",
-          type: "Embroidery File",
-          url: "/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png"
+          id: "customer-art-2",
+          name: "embroidery-design.dst",
+          url: "/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png",
+          type: "application/octet-stream",
+          category: "customerArt"
+        }
+      ],
+      productionFiles: [
+        {
+          id: "production-file-2",
+          name: "embroidery-program.dst",
+          url: "/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png",
+          type: "application/octet-stream",
+          category: "productionFiles"
+        }
+      ],
+      proofMockup: [
+        {
+          id: "proof-mockup-2",
+          name: "embroidery-proof.jpg",
+          url: "/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png",
+          type: "image/jpeg",
+          category: "proofMockup"
         }
       ]
     }
