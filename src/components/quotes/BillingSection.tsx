@@ -229,7 +229,7 @@ export function BillingSection({ quoteData }: BillingSectionProps) {
       <div className="space-y-4">
         <Input 
           placeholder="Company" 
-          value={selectedCustomer?.companyName || billingData?.companyName || ""}
+          value={selectedCustomer?.companyName || billingData?.company || ""}
           readOnly={!!selectedCustomer}
         />
         <Input 
@@ -239,7 +239,7 @@ export function BillingSection({ quoteData }: BillingSectionProps) {
         />
         <Input 
           placeholder="Address" 
-          value={billingData?.address1 || ""}
+          value={billingData?.address1 || billingData?.address || ""}
           readOnly={!!selectedCustomer}
         />
         <Input 
@@ -265,7 +265,7 @@ export function BillingSection({ quoteData }: BillingSectionProps) {
           </Select>
           <Input 
             placeholder="State/ Province" 
-            value={billingData?.stateProvince || ""}
+            value={billingData?.stateProvince || billingData?.region || ""}
             readOnly={!!selectedCustomer}
           />
         </div>
@@ -277,7 +277,7 @@ export function BillingSection({ quoteData }: BillingSectionProps) {
           />
           <Input 
             placeholder="Zip Code Postal Code" 
-            value={billingData?.zipCode || ""}
+            value={billingData?.zipCode || billingData?.postalCode || ""}
             readOnly={!!selectedCustomer}
           />
         </div>

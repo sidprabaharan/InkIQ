@@ -14,7 +14,7 @@ import { InvoiceSummarySection } from "@/components/quotes/InvoiceSummarySection
 import { CustomersProvider } from "@/context/CustomersContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { quotationData, QuotationData } from "@/components/quotes/QuoteData";
+import { getQuoteById, QuotationData } from "@/components/quotes/QuoteData";
 
 // Sample data for demonstration purposes
 const generateNewQuoteId = () => {
@@ -47,14 +47,24 @@ export default function NewQuote() {
       
       // Simulate loading delay
       setTimeout(() => {
-        setQuoteData(quotationData);
-        setNickname(quotationData.nickname || `Edit Quote #${editQuoteId}`);
-        setIsLoading(false);
-        
-        toast({
-          title: "Quote loaded for editing",
-          description: `Editing quote #${editQuoteId}`,
-        });
+        const loadedQuoteData = getQuoteById(editQuoteId);
+        if (loadedQuoteData) {
+          setQuoteData(loadedQuoteData);
+          setNickname(loadedQuoteData.nickname || `Edit Quote #${editQuoteId}`);
+          setIsLoading(false);
+          
+          toast({
+            title: "Quote loaded for editing",
+            description: `Editing quote #${editQuoteId}`,
+          });
+        } else {
+          setIsLoading(false);
+          toast({
+            title: "Quote not found",
+            description: `Quote #${editQuoteId} could not be found`,
+            variant: "destructive"
+          });
+        }
       }, 500);
     } else {
       // Check if creating from a lead

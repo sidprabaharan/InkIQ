@@ -229,22 +229,22 @@ export function ShippingSection({ quoteData }: ShippingSectionProps) {
       <div className="space-y-4">
         <Input 
           placeholder="Company" 
-          value={selectedCustomer?.companyName || shippingData?.companyName || ""}
+          value={selectedCustomer?.companyName || shippingData?.company || ""}
           readOnly={!!selectedCustomer}
         />
         <Input 
           placeholder="Name" 
-          value={selectedCustomer ? `${selectedCustomer.firstName} ${selectedCustomer.lastName}` : shippingData?.name || ""}
+          value={selectedCustomer ? `${selectedCustomer.firstName} ${selectedCustomer.lastName}` : shippingData?.contact || ""}
           readOnly={!!selectedCustomer}
         />
         <Input 
           placeholder="Address" 
-          value={shippingData?.address1 || ""}
+          value={shippingData?.address1 || shippingData?.address || ""}
           readOnly={!!selectedCustomer}
         />
         <Input 
           placeholder="Address" 
-          value={shippingData?.address2 || ""}
+          value={shippingData?.address2 || shippingData?.unit || ""}
           readOnly={!!selectedCustomer}
         />
         <div className="grid grid-cols-2 gap-4">
@@ -265,7 +265,7 @@ export function ShippingSection({ quoteData }: ShippingSectionProps) {
           </Select>
           <Input 
             placeholder="State/ Province" 
-            value={shippingData?.stateProvince || ""}
+            value={shippingData?.stateProvince || shippingData?.region || ""}
             readOnly={!!selectedCustomer}
           />
         </div>
@@ -277,7 +277,7 @@ export function ShippingSection({ quoteData }: ShippingSectionProps) {
           />
           <Input 
             placeholder="Zip Code Postal Code" 
-            value={shippingData?.zipCode || ""}
+            value={shippingData?.zipCode || shippingData?.postalCode || ""}
             readOnly={!!selectedCustomer}
           />
         </div>

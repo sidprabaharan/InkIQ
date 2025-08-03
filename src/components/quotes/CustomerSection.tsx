@@ -29,7 +29,7 @@ export function CustomerSection({ leadData, quoteData }: CustomerSectionProps) {
     if (quoteData?.customer && !selectedCustomer) {
       // Try to find matching customer by company name or create a temporary customer object
       const matchingCustomer = customers.find(c => 
-        c.companyName === quoteData.customer.billing.companyName
+        c.companyName === quoteData.customer.billing.company
       );
       
       if (matchingCustomer) {

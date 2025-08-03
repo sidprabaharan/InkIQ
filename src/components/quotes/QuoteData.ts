@@ -93,6 +93,7 @@ export interface QuotationData {
   status: string;
 }
 
+// Sample quote data for different quotes
 export const quotationData: QuotationData = {
   id: "3032",
   nickname: "Project Care Quote",
@@ -190,4 +191,174 @@ export const quotationData: QuotationData = {
     totalDue: "$11,826.53"
   },
   status: "Quote"
+};
+
+// Additional sample quote data for different IDs
+export const sampleQuoteData: Record<string, QuotationData> = {
+  "3032": quotationData,
+  "3033": {
+    id: "3033",
+    nickname: "Tech Startup Bundle",
+    company: {
+      name: "15493315 Canada Inc",
+      logo: "/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png",
+      address: "226 Rue du Domaine",
+      city: "Laval",
+      region: "Quebec",
+      postalCode: "H7X 3R9",
+      phone: "5148346659",
+      website: "https://www.stitchandink.ca",
+      email: "a.thompson@stitchandink.com",
+      taxNumbers: {
+        gst: "123456789 RT0001",
+        qst: "1234567890 TQ0001"
+      }
+    },
+    customer: {
+      billing: {
+        name: "Sarah Johnson",
+        company: "TechFlow Solutions",
+        contact: "Sarah Johnson",
+        address: "1234 Innovation Drive",
+        city: "Toronto",
+        region: "Ontario",
+        postalCode: "M5V 2N8",
+        phone: "4165551234",
+        email: "sarah.johnson@techflow.ca"
+      },
+      shipping: {
+        company: "TechFlow Solutions",
+        contact: "Mark Stevens",
+        address: "5678 Business Way",
+        unit: "Suite 401",
+        city: "Toronto",
+        region: "M4B 1B3"
+      }
+    },
+    details: {
+      owner: "Sarah Johnson",
+      deliveryMethod: "Pickup",
+      productionDueDate: "15-08-2024",
+      paymentDueDate: "30-08-2024",
+      invoiceDate: "01-08-2024"
+    },
+    notes: {
+      customer: "Please use company brand colors - blue and white only.",
+      production: "Standard DTG printing on premium cotton blend."
+    },
+    items: [
+      {
+        category: "Polo Shirts",
+        itemNumber: "PS-301",
+        color: "Navy Blue",
+        description: "Polo shirt with embroidered company logo",
+        xs: "10",
+        s: "25",
+        m: "40",
+        l: "35",
+        xl: "20",
+        xxl: "10",
+        xxxl: "5",
+        quantity: "145",
+        price: "$24.99",
+        taxed: true,
+        total: "$3,623.55",
+        status: "Ready"
+      }
+    ],
+    summary: {
+      itemTotal: "$3,623.55",
+      feesTotal: "$181.18",
+      subTotal: "$3,804.73",
+      discount: "$0.00",
+      salesTax: "$171.21",
+      totalDue: "$3,975.94"
+    },
+    status: "Quote"
+  },
+  "3034": {
+    id: "3034",
+    nickname: "Restaurant Uniform Order",
+    company: {
+      name: "15493315 Canada Inc",
+      logo: "/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png",
+      address: "226 Rue du Domaine",
+      city: "Laval",
+      region: "Quebec",
+      postalCode: "H7X 3R9",
+      phone: "5148346659",
+      website: "https://www.stitchandink.ca",
+      email: "a.thompson@stitchandink.com",
+      taxNumbers: {
+        gst: "123456789 RT0001",
+        qst: "1234567890 TQ0001"
+      }
+    },
+    customer: {
+      billing: {
+        name: "Michael Chen",
+        company: "Bella Vista Restaurant",
+        contact: "Michael Chen",
+        address: "789 Main Street",
+        city: "Vancouver",
+        region: "British Columbia",
+        postalCode: "V6B 2N9",
+        phone: "6045557890",
+        email: "michael@bellavista.ca"
+      },
+      shipping: {
+        company: "Bella Vista Restaurant",
+        contact: "Lisa Wong",
+        address: "789 Main Street",
+        unit: "",
+        city: "Vancouver",
+        region: "V6B 2N9"
+      }
+    },
+    details: {
+      owner: "Michael Chen",
+      deliveryMethod: "Courier",
+      productionDueDate: "20-08-2024",
+      paymentDueDate: "05-09-2024",
+      invoiceDate: "05-08-2024"
+    },
+    notes: {
+      customer: "Need different sizes for kitchen vs front-of-house staff.",
+      production: "Heat press application for durability in commercial kitchen environment."
+    },
+    items: [
+      {
+        category: "Aprons",
+        itemNumber: "AP-401",
+        color: "Black",
+        description: "Kitchen apron with restaurant logo",
+        xs: "0",
+        s: "15",
+        m: "20",
+        l: "15",
+        xl: "10",
+        xxl: "5",
+        xxxl: "0",
+        quantity: "65",
+        price: "$18.50",
+        taxed: true,
+        total: "$1,202.50",
+        status: "Production"
+      }
+    ],
+    summary: {
+      itemTotal: "$1,202.50",
+      feesTotal: "$60.13",
+      subTotal: "$1,262.63",
+      discount: "$126.26",
+      salesTax: "$56.82",
+      totalDue: "$1,193.19"
+    },
+    status: "Production"
+  }
+};
+
+// Function to get quote data by ID
+export const getQuoteById = (id: string): QuotationData | null => {
+  return sampleQuoteData[id] || null;
 };
