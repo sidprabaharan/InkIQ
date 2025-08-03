@@ -20,7 +20,7 @@ export default function CreateLeadDialog({ open, onClose, onSave }: CreateLeadDi
     company: '',
     email: '',
     phone: '',
-    status: 'new' as LeadStatus,
+    status: 'new_lead' as LeadStatus,
     value: 0,
     notes: '',
   });
@@ -55,7 +55,7 @@ export default function CreateLeadDialog({ open, onClose, onSave }: CreateLeadDi
         company: '',
         email: '',
         phone: '',
-        status: 'new',
+        status: 'new_lead',
         value: 0,
         notes: '',
       });
@@ -132,13 +132,13 @@ export default function CreateLeadDialog({ open, onClose, onSave }: CreateLeadDi
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="new">New Lead</SelectItem>
-                    <SelectItem value="contacted">Contacted</SelectItem>
+                    <SelectItem value="new_lead">New Lead</SelectItem>
+                    <SelectItem value="in_contact">In Contact</SelectItem>
                     <SelectItem value="qualified">Qualified</SelectItem>
-                    <SelectItem value="proposal">Proposal</SelectItem>
-                    <SelectItem value="negotiation">Negotiation</SelectItem>
-                    <SelectItem value="won">Won</SelectItem>
-                    <SelectItem value="lost">Lost</SelectItem>
+                    <SelectItem value="quoted">Quoted</SelectItem>
+                    <SelectItem value="follow_up">Follow Up</SelectItem>
+                    <SelectItem value="closed_won">Closed Won</SelectItem>
+                    <SelectItem value="closed_lost">Closed Lost</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

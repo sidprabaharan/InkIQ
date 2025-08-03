@@ -15,7 +15,7 @@ const initialLeads: Lead[] = [
     company: 'Acme Corp',
     email: 'john@acmecorp.com',
     phone: '555-123-4567',
-    status: 'new',
+    status: 'new_lead',
     value: 5000,
     createdAt: new Date().toISOString(),
     lastContactedAt: new Date().toISOString(),
@@ -50,7 +50,7 @@ const initialLeads: Lead[] = [
     name: 'Sarah Johnson',
     company: 'XYZ Industries',
     email: 'sarah@xyzind.com',
-    status: 'contacted',
+    status: 'in_contact',
     value: 7500,
     createdAt: new Date().toISOString(),
     lastContactedAt: new Date().toISOString(),
@@ -86,7 +86,7 @@ const initialLeads: Lead[] = [
     name: 'Emily Davis',
     company: 'Tech Innovators',
     email: 'emily@techinnovators.com',
-    status: 'proposal',
+    status: 'quoted',
     value: 15000,
     createdAt: new Date().toISOString(),
     lastContactedAt: new Date().toISOString(),
@@ -107,7 +107,7 @@ const initialLeads: Lead[] = [
     name: 'Robert Wilson',
     company: 'Future Enterprises',
     email: 'robert@futureent.com',
-    status: 'negotiation',
+    status: 'follow_up',
     value: 25000,
     createdAt: new Date().toISOString(),
     customerType: 'new',
@@ -130,13 +130,13 @@ const initialLeads: Lead[] = [
 ];
 
 const columns: LeadColumn[] = [
-  { id: 'new', title: 'New Leads', leads: [] },
-  { id: 'contacted', title: 'Contacted', leads: [] },
+  { id: 'new_lead', title: 'New Lead', leads: [] },
+  { id: 'in_contact', title: 'In Contact', leads: [] },
   { id: 'qualified', title: 'Qualified', leads: [] },
-  { id: 'proposal', title: 'Proposal', leads: [] },
-  { id: 'negotiation', title: 'Negotiation', leads: [] },
-  { id: 'won', title: 'Won', leads: [] },
-  { id: 'lost', title: 'Lost', leads: [] },
+  { id: 'quoted', title: 'Quoted', leads: [] },
+  { id: 'follow_up', title: 'Follow Up', leads: [] },
+  { id: 'closed_won', title: 'Closed Won', leads: [] },
+  { id: 'closed_lost', title: 'Closed Lost', leads: [] },
 ];
 
 export default function Leads() {

@@ -17,13 +17,13 @@ import {
 export function LeadStatusChart() {
   // Sample data
   const data = [
-    { name: 'New', value: 110, color: '#9b87f5' },
-    { name: 'Contacted', value: 85, color: '#a3e635' },
+    { name: 'New Lead', value: 110, color: '#9b87f5' },
+    { name: 'In Contact', value: 85, color: '#a3e635' },
     { name: 'Qualified', value: 65, color: '#fbbf24' },
-    { name: 'Proposal', value: 45, color: '#60a5fa' },
-    { name: 'Negotiation', value: 30, color: '#f87171' },
-    { name: 'Won', value: 25, color: '#4ade80' },
-    { name: 'Lost', value: 20, color: '#94a3b8' },
+    { name: 'Quoted', value: 45, color: '#60a5fa' },
+    { name: 'Follow Up', value: 30, color: '#f87171' },
+    { name: 'Closed Won', value: 25, color: '#4ade80' },
+    { name: 'Closed Lost', value: 20, color: '#94a3b8' },
   ];
 
   const config = Object.fromEntries(

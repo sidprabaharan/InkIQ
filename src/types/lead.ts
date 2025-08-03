@@ -52,7 +52,7 @@ export interface Lead {
   lastActivityType?: string;
 }
 
-export type LeadStatus = 'new' | 'contacted' | 'qualified' | 'proposal' | 'negotiation' | 'won' | 'lost';
+export type LeadStatus = 'new_lead' | 'in_contact' | 'qualified' | 'quoted' | 'follow_up' | 'closed_won' | 'closed_lost';
 
 export interface LeadColumn {
   id: LeadStatus;
