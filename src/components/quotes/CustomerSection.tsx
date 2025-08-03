@@ -64,13 +64,6 @@ export function CustomerSection({ leadData, quoteData }: CustomerSectionProps) {
         <div className="flex space-x-2">
           <Button 
             variant="outline" 
-            size="sm"
-            onClick={handleNavigateToContacts}
-          >
-            View Contacts
-          </Button>
-          <Button 
-            variant="outline" 
             className="text-blue-500"
             onClick={() => setOpenDialog(true)}
           >
