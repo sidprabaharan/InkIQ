@@ -14,6 +14,7 @@ import { InvoiceSummarySection } from "@/components/quotes/InvoiceSummarySection
 import { CustomersProvider } from "@/context/CustomersContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
+import { quotationData, QuotationData } from "@/components/quotes/QuoteData";
 
 // Sample data for demonstration purposes
 const generateNewQuoteId = () => {
@@ -34,17 +35,27 @@ export default function NewQuote() {
   const [quoteId] = useState(isEditMode ? editQuoteId : generateNewQuoteId());
   const [nickname, setNickname] = useState(isEditMode ? `Edit Quote #${editQuoteId}` : "New Quotation");
   const [leadData, setLeadData] = useState<any>(null);
+  const [quoteData, setQuoteData] = useState<QuotationData | null>(null);
+  const [isLoading, setIsLoading] = useState(isEditMode);
 
   // Check if this quote is being created from a lead or if we're editing
   useEffect(() => {
     if (isEditMode) {
       // In edit mode, load existing quote data
-      // For demo purposes, we'll just show a toast
-      toast({
-        title: "Quote loaded for editing",
-        description: `Editing quote #${editQuoteId}`,
-      });
-      // In a real app, you would fetch the quote data here and populate the form
+      // For demo purposes, we'll use the sample quotationData
+      setIsLoading(true);
+      
+      // Simulate loading delay
+      setTimeout(() => {
+        setQuoteData(quotationData);
+        setNickname(quotationData.nickname || `Edit Quote #${editQuoteId}`);
+        setIsLoading(false);
+        
+        toast({
+          title: "Quote loaded for editing",
+          description: `Editing quote #${editQuoteId}`,
+        });
+      }, 500);
     } else {
       // Check if creating from a lead
       const leadParam = searchParams.get('lead');
@@ -134,35 +145,44 @@ export default function NewQuote() {
         )}
 
         <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Left Content - 8 columns (2/3 of grid) */}
-            <div className="md:col-span-2 space-y-6">
-              <CustomerSection leadData={leadData} />
-              <BillingSection />
-              <ShippingSection />
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <span className="ml-2">Loading quote data...</span>
             </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Left Content - 8 columns (2/3 of grid) */}
+                <div className="md:col-span-2 space-y-6">
+                  <CustomerSection leadData={leadData} quoteData={quoteData} />
+                  <BillingSection quoteData={quoteData} />
+                  <ShippingSection quoteData={quoteData} />
+                </div>
 
-            {/* Right Content - 4 columns (1/3 of grid) */}
-            <div className="md:col-span-1 space-y-4">
-              <QuotationHeader />
-              <QuotationDetailsSection />
-              <NickNameSection value={nickname} onChange={handleNicknameChange} />
-              <div className="space-y-4">
-                <NotesSection title="Customer Notes" />
-                <NotesSection title="Production Note" />
+                {/* Right Content - 4 columns (1/3 of grid) */}
+                <div className="md:col-span-1 space-y-4">
+                  <QuotationHeader quoteData={quoteData} />
+                  <QuotationDetailsSection quoteData={quoteData} />
+                  <NickNameSection value={nickname} onChange={handleNicknameChange} />
+                  <div className="space-y-4">
+                    <NotesSection title="Customer Notes" initialValue={quoteData?.notes.customer} />
+                    <NotesSection title="Production Note" initialValue={quoteData?.notes.production} />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          
-          {/* Quote Items Section - Full Width */}
-          <div className="mt-6">
-            <QuoteItemsSection />
-          </div>
-          
-          {/* Invoice Summary Section - Full Width but with right alignment */}
-          <div className="mt-6 md:w-1/3 md:ml-auto">
-            <InvoiceSummarySection />
-          </div>
+              
+              {/* Quote Items Section - Full Width */}
+              <div className="mt-6">
+                <QuoteItemsSection quoteData={quoteData} />
+              </div>
+              
+              {/* Invoice Summary Section - Full Width but with right alignment */}
+              <div className="mt-6 md:w-1/3 md:ml-auto">
+                <InvoiceSummarySection quoteData={quoteData} />
+              </div>
+            </>
+          )}
         </div>
       </div>
     </CustomersProvider>

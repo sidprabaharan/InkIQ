@@ -4,13 +4,23 @@ import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Percent, DollarSign } from "lucide-react";
 
-export function InvoiceSummarySection() {
-  const [discountType, setDiscountType] = useState<"percentage" | "fixed">("percentage");
-  const [discountValue, setDiscountValue] = useState<string>("");
-  const [salesTax, setSalesTax] = useState<string>("");
+interface InvoiceSummarySectionProps {
+  quoteData?: any;
+}
 
-  // Dummy values for demonstration
-  const subTotal = 1250.00;
+export function InvoiceSummarySection({ quoteData }: InvoiceSummarySectionProps) {
+  const [discountType, setDiscountType] = useState<"percentage" | "fixed">(
+    quoteData?.invoiceSummary?.discountType || "percentage"
+  );
+  const [discountValue, setDiscountValue] = useState<string>(
+    quoteData?.invoiceSummary?.discountValue?.toString() || ""
+  );
+  const [salesTax, setSalesTax] = useState<string>(
+    quoteData?.invoiceSummary?.salesTaxRate?.toString() || ""
+  );
+
+  // Use quote data values or defaults
+  const subTotal = quoteData?.invoiceSummary?.subTotal || 1250.00;
   
   // Calculate discount amount
   const discountAmount = discountValue 

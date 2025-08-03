@@ -57,35 +57,68 @@ interface ItemGroup {
   imprints: Imprint[];
 }
 
-export function QuoteItemsSection() {
-  const [itemGroups, setItemGroups] = useState<ItemGroup[]>([
-    {
-      id: "group-" + Math.random().toString(36).substring(2, 9),
-      items: [
-        {
-          category: "",
-          itemNumber: "",
-          color: "",
-          description: "",
+interface QuoteItemsSectionProps {
+  quoteData?: any;
+}
+
+export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
+  // Initialize with quote data if available, otherwise use default empty structure
+  const getInitialItemGroups = () => {
+    if (quoteData?.items && quoteData.items.length > 0) {
+      // Transform quote data items to the format expected by this component
+      return [{
+        id: "group-" + Math.random().toString(36).substring(2, 9),
+        items: quoteData.items.map((item: any) => ({
+          category: item.category || "",
+          itemNumber: item.itemNumber || "",
+          color: item.color || "",
+          description: item.description || "",
           sizes: {
-            xs: 0,
-            s: 0,
-            m: 0,
-            l: 0,
-            xl: 0,
-            xxl: 0,
-            xxxl: 0
+            xs: item.sizes?.xs || 0,
+            s: item.sizes?.s || 0,
+            m: item.sizes?.m || 0,
+            l: item.sizes?.l || 0,
+            xl: item.sizes?.xl || 0,
+            xxl: item.sizes?.xxl || 0,
+            xxxl: item.sizes?.xxxl || 0
           },
-          quantity: 0,
-          price: 0,
-          taxed: false,
-          total: 0,
-          mockups: []
-        }
-      ],
-      imprints: []
+          quantity: item.quantity || 0,
+          price: item.price || 0,
+          taxed: item.taxed || false,
+          total: item.total || 0,
+          mockups: item.mockups || []
+        })),
+        imprints: []
+      }];
     }
-  ]);
+    
+    return [{
+      id: "group-" + Math.random().toString(36).substring(2, 9),
+      items: [{
+        category: "",
+        itemNumber: "",
+        color: "",
+        description: "",
+        sizes: {
+          xs: 0,
+          s: 0,
+          m: 0,
+          l: 0,
+          xl: 0,
+          xxl: 0,
+          xxxl: 0
+        },
+        quantity: 0,
+        price: 0,
+        taxed: false,
+        total: 0,
+        mockups: []
+      }],
+      imprints: []
+    }];
+  };
+
+  const [itemGroups, setItemGroups] = useState<ItemGroup[]>(getInitialItemGroups());
 
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [currentItemIndex, setCurrentItemIndex] = useState<{groupIndex: number, itemIndex: number} | null>(null);

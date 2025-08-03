@@ -16,12 +16,27 @@ interface CustomerSectionProps {
     address?: any;
     estimatedValue: number;
   } | null;
+  quoteData?: any;
 }
 
-export function CustomerSection({ leadData }: CustomerSectionProps) {
+export function CustomerSection({ leadData, quoteData }: CustomerSectionProps) {
   const [openDialog, setOpenDialog] = useState(false);
   const { customers, selectedCustomer, selectCustomer } = useCustomers();
   const navigate = useNavigate();
+
+  // Auto-select customer if quote data has customer info and no customer is selected
+  React.useEffect(() => {
+    if (quoteData?.customer && !selectedCustomer) {
+      // Try to find matching customer by company name or create a temporary customer object
+      const matchingCustomer = customers.find(c => 
+        c.companyName === quoteData.customer.billing.companyName
+      );
+      
+      if (matchingCustomer) {
+        selectCustomer(matchingCustomer.id);
+      }
+    }
+  }, [quoteData, selectedCustomer, customers, selectCustomer]);
 
   const handleNavigateToContacts = () => {
     navigate("/contacts");

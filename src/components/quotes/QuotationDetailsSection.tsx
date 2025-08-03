@@ -19,12 +19,26 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export function QuotationDetailsSection() {
-  const [created, setCreated] = useState<Date | undefined>(undefined);
-  const [productionDueDate, setProductionDueDate] = useState<Date | undefined>(undefined);
-  const [customerDueDate, setCustomerDueDate] = useState<Date | undefined>(undefined);
-  const [paymentDueDate, setPaymentDueDate] = useState<Date | undefined>(undefined);
-  const [invoiceDate, setInvoiceDate] = useState<Date | undefined>(undefined);
+interface QuotationDetailsSectionProps {
+  quoteData?: any;
+}
+
+export function QuotationDetailsSection({ quoteData }: QuotationDetailsSectionProps) {
+  const [created, setCreated] = useState<Date | undefined>(
+    quoteData?.quoteDetails?.created ? new Date(quoteData.quoteDetails.created) : undefined
+  );
+  const [productionDueDate, setProductionDueDate] = useState<Date | undefined>(
+    quoteData?.quoteDetails?.productionDueDate ? new Date(quoteData.quoteDetails.productionDueDate) : undefined
+  );
+  const [customerDueDate, setCustomerDueDate] = useState<Date | undefined>(
+    quoteData?.quoteDetails?.customerDueDate ? new Date(quoteData.quoteDetails.customerDueDate) : undefined
+  );
+  const [paymentDueDate, setPaymentDueDate] = useState<Date | undefined>(
+    quoteData?.quoteDetails?.paymentDueDate ? new Date(quoteData.quoteDetails.paymentDueDate) : undefined
+  );
+  const [invoiceDate, setInvoiceDate] = useState<Date | undefined>(
+    quoteData?.quoteDetails?.invoiceDate ? new Date(quoteData.quoteDetails.invoiceDate) : undefined
+  );
 
   return (
     <div className="space-y-4">

@@ -202,8 +202,15 @@ const countries = [
   { code: "zw", name: "Zimbabwe" }
 ];
 
-export function ShippingSection() {
+interface ShippingSectionProps {
+  quoteData?: any;
+}
+
+export function ShippingSection({ quoteData }: ShippingSectionProps) {
   const { selectedCustomer, updateCustomer } = useCustomers();
+  
+  // Use quote data as fallback if no customer is selected
+  const shippingData = selectedCustomer?.shippingAddress || quoteData?.customer?.shipping;
 
   const handleCountryChange = (value: string) => {
     if (selectedCustomer) {
@@ -222,27 +229,27 @@ export function ShippingSection() {
       <div className="space-y-4">
         <Input 
           placeholder="Company" 
-          value={selectedCustomer?.companyName || ""}
+          value={selectedCustomer?.companyName || shippingData?.companyName || ""}
           readOnly={!!selectedCustomer}
         />
         <Input 
           placeholder="Name" 
-          value={selectedCustomer ? `${selectedCustomer.firstName} ${selectedCustomer.lastName}` : ""}
+          value={selectedCustomer ? `${selectedCustomer.firstName} ${selectedCustomer.lastName}` : shippingData?.name || ""}
           readOnly={!!selectedCustomer}
         />
         <Input 
           placeholder="Address" 
-          value={selectedCustomer?.shippingAddress.address1 || ""}
+          value={shippingData?.address1 || ""}
           readOnly={!!selectedCustomer}
         />
         <Input 
           placeholder="Address" 
-          value={selectedCustomer?.shippingAddress.address2 || ""}
+          value={shippingData?.address2 || ""}
           readOnly={!!selectedCustomer}
         />
         <div className="grid grid-cols-2 gap-4">
           <Select 
-            value={selectedCustomer?.shippingAddress.country || ""}
+            value={shippingData?.country || ""}
             onValueChange={handleCountryChange}
           >
             <SelectTrigger>
@@ -258,19 +265,19 @@ export function ShippingSection() {
           </Select>
           <Input 
             placeholder="State/ Province" 
-            value={selectedCustomer?.shippingAddress.stateProvince || ""}
+            value={shippingData?.stateProvince || ""}
             readOnly={!!selectedCustomer}
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Input 
             placeholder="City" 
-            value={selectedCustomer?.shippingAddress.city || ""}
+            value={shippingData?.city || ""}
             readOnly={!!selectedCustomer}
           />
           <Input 
             placeholder="Zip Code Postal Code" 
-            value={selectedCustomer?.shippingAddress.zipCode || ""}
+            value={shippingData?.zipCode || ""}
             readOnly={!!selectedCustomer}
           />
         </div>
