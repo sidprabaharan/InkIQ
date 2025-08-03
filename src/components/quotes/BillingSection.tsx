@@ -1,7 +1,9 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { useCustomers } from "@/context/CustomersContext";
 
 // List of countries with priority countries at the top
@@ -204,53 +206,149 @@ const countries = [
 
 interface BillingSectionProps {
   quoteData?: any;
+  onAddressChange?: (address: any) => void;
 }
 
-export function BillingSection({ quoteData }: BillingSectionProps) {
-  const { selectedCustomer, updateCustomer } = useCustomers();
+export function BillingSection({ quoteData, onAddressChange }: BillingSectionProps) {
+  const { selectedCustomer } = useCustomers();
   
-  // Use quote data as fallback if no customer is selected
-  const billingData = selectedCustomer?.billingAddress || quoteData?.customer?.billing;
+  const [useCustomerDefault, setUseCustomerDefault] = useState(true);
+  const [customAddress, setCustomAddress] = useState({
+    company: "",
+    name: "",
+    address1: "",
+    address2: "",
+    city: "",
+    stateProvince: "",
+    zipCode: "",
+    country: ""
+  });
 
-  const handleCountryChange = (value: string) => {
-    if (selectedCustomer) {
-      updateCustomer(selectedCustomer.id, {
-        billingAddress: {
-          ...selectedCustomer.billingAddress,
-          country: value
-        }
+  // Initialize form data on mount
+  useEffect(() => {
+    if (selectedCustomer?.billingAddress) {
+      setCustomAddress({
+        company: selectedCustomer.companyName || "",
+        name: `${selectedCustomer.firstName} ${selectedCustomer.lastName}`,
+        address1: selectedCustomer.billingAddress.address1 || "",
+        address2: selectedCustomer.billingAddress.address2 || "",
+        city: selectedCustomer.billingAddress.city || "",
+        stateProvince: selectedCustomer.billingAddress.stateProvince || "",
+        zipCode: selectedCustomer.billingAddress.zipCode || "",
+        country: selectedCustomer.billingAddress.country || ""
       });
+    } else if (quoteData?.customer?.billing) {
+      setCustomAddress({
+        company: quoteData.customer.billing.company || "",
+        name: quoteData.customer.billing.name || "",
+        address1: quoteData.customer.billing.address1 || quoteData.customer.billing.address || "",
+        address2: quoteData.customer.billing.address2 || "",
+        city: quoteData.customer.billing.city || "",
+        stateProvince: quoteData.customer.billing.stateProvince || quoteData.customer.billing.region || "",
+        zipCode: quoteData.customer.billing.zipCode || quoteData.customer.billing.postalCode || "",
+        country: quoteData.customer.billing.country || ""
+      });
+      setUseCustomerDefault(false);
+    }
+  }, [selectedCustomer, quoteData]);
+
+  const getCurrentAddress = () => {
+    if (useCustomerDefault && selectedCustomer?.billingAddress) {
+      return {
+        company: selectedCustomer.companyName || "",
+        name: `${selectedCustomer.firstName} ${selectedCustomer.lastName}`,
+        address1: selectedCustomer.billingAddress.address1 || "",
+        address2: selectedCustomer.billingAddress.address2 || "",
+        city: selectedCustomer.billingAddress.city || "",
+        stateProvince: selectedCustomer.billingAddress.stateProvince || "",
+        zipCode: selectedCustomer.billingAddress.zipCode || "",
+        country: selectedCustomer.billingAddress.country || ""
+      };
+    }
+    return customAddress;
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    const updatedAddress = { ...customAddress, [field]: value };
+    setCustomAddress(updatedAddress);
+    onAddressChange?.(updatedAddress);
+  };
+
+  const handleToggleChange = (checked: boolean) => {
+    setUseCustomerDefault(checked);
+    if (checked && selectedCustomer?.billingAddress) {
+      // Reset to customer default
+      const defaultAddress = {
+        company: selectedCustomer.companyName || "",
+        name: `${selectedCustomer.firstName} ${selectedCustomer.lastName}`,
+        address1: selectedCustomer.billingAddress.address1 || "",
+        address2: selectedCustomer.billingAddress.address2 || "",
+        city: selectedCustomer.billingAddress.city || "",
+        stateProvince: selectedCustomer.billingAddress.stateProvince || "",
+        zipCode: selectedCustomer.billingAddress.zipCode || "",
+        country: selectedCustomer.billingAddress.country || ""
+      };
+      setCustomAddress(defaultAddress);
+      onAddressChange?.(defaultAddress);
     }
   };
 
+  const currentData = getCurrentAddress();
+
   return (
     <div className="space-y-4">
-      <h3 className="text-base font-medium">Customer Billing</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-base font-medium">Customer Billing</h3>
+        {selectedCustomer && (
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="use-customer-billing"
+              checked={useCustomerDefault}
+              onCheckedChange={handleToggleChange}
+            />
+            <Label htmlFor="use-customer-billing" className="text-sm">
+              Use customer default
+            </Label>
+          </div>
+        )}
+      </div>
+      
+      {!useCustomerDefault && selectedCustomer && (
+        <div className="text-xs text-muted-foreground bg-orange-50 border border-orange-200 rounded p-2">
+          Custom address for this quote only - won't update customer record
+        </div>
+      )}
+      
       <div className="space-y-4">
         <Input 
           placeholder="Company" 
-          value={selectedCustomer?.companyName || billingData?.company || ""}
-          readOnly={!!selectedCustomer}
+          value={currentData.company}
+          onChange={(e) => handleInputChange('company', e.target.value)}
+          disabled={useCustomerDefault && !!selectedCustomer}
         />
         <Input 
           placeholder="Name" 
-          value={selectedCustomer ? `${selectedCustomer.firstName} ${selectedCustomer.lastName}` : billingData?.name || ""}
-          readOnly={!!selectedCustomer}
+          value={currentData.name}
+          onChange={(e) => handleInputChange('name', e.target.value)}
+          disabled={useCustomerDefault && !!selectedCustomer}
         />
         <Input 
           placeholder="Address" 
-          value={billingData?.address1 || billingData?.address || ""}
-          readOnly={!!selectedCustomer}
+          value={currentData.address1}
+          onChange={(e) => handleInputChange('address1', e.target.value)}
+          disabled={useCustomerDefault && !!selectedCustomer}
         />
         <Input 
-          placeholder="Address" 
-          value={billingData?.address2 || ""}
-          readOnly={!!selectedCustomer}
+          placeholder="Address Line 2" 
+          value={currentData.address2}
+          onChange={(e) => handleInputChange('address2', e.target.value)}
+          disabled={useCustomerDefault && !!selectedCustomer}
         />
         <div className="grid grid-cols-2 gap-4">
           <Select 
-            value={billingData?.country || ""}
-            onValueChange={handleCountryChange}
+            value={currentData.country}
+            onValueChange={(value) => handleInputChange('country', value)}
+            disabled={useCustomerDefault && !!selectedCustomer}
           >
             <SelectTrigger>
               <SelectValue placeholder="Country" />
@@ -265,20 +363,23 @@ export function BillingSection({ quoteData }: BillingSectionProps) {
           </Select>
           <Input 
             placeholder="State/ Province" 
-            value={billingData?.stateProvince || billingData?.region || ""}
-            readOnly={!!selectedCustomer}
+            value={currentData.stateProvince}
+            onChange={(e) => handleInputChange('stateProvince', e.target.value)}
+            disabled={useCustomerDefault && !!selectedCustomer}
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Input 
             placeholder="City" 
-            value={billingData?.city || ""}
-            readOnly={!!selectedCustomer}
+            value={currentData.city}
+            onChange={(e) => handleInputChange('city', e.target.value)}
+            disabled={useCustomerDefault && !!selectedCustomer}
           />
           <Input 
             placeholder="Zip Code Postal Code" 
-            value={billingData?.zipCode || billingData?.postalCode || ""}
-            readOnly={!!selectedCustomer}
+            value={currentData.zipCode}
+            onChange={(e) => handleInputChange('zipCode', e.target.value)}
+            disabled={useCustomerDefault && !!selectedCustomer}
           />
         </div>
       </div>

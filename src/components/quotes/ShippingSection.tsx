@@ -1,7 +1,9 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { useCustomers } from "@/context/CustomersContext";
 
 // List of countries with priority countries at the top
@@ -204,53 +206,149 @@ const countries = [
 
 interface ShippingSectionProps {
   quoteData?: any;
+  onAddressChange?: (address: any) => void;
 }
 
-export function ShippingSection({ quoteData }: ShippingSectionProps) {
-  const { selectedCustomer, updateCustomer } = useCustomers();
+export function ShippingSection({ quoteData, onAddressChange }: ShippingSectionProps) {
+  const { selectedCustomer } = useCustomers();
   
-  // Use quote data as fallback if no customer is selected
-  const shippingData = selectedCustomer?.shippingAddress || quoteData?.customer?.shipping;
+  const [useCustomerDefault, setUseCustomerDefault] = useState(true);
+  const [customAddress, setCustomAddress] = useState({
+    company: "",
+    name: "",
+    address1: "",
+    address2: "",
+    city: "",
+    stateProvince: "",
+    zipCode: "",
+    country: ""
+  });
 
-  const handleCountryChange = (value: string) => {
-    if (selectedCustomer) {
-      updateCustomer(selectedCustomer.id, {
-        shippingAddress: {
-          ...selectedCustomer.shippingAddress,
-          country: value
-        }
+  // Initialize form data on mount
+  useEffect(() => {
+    if (selectedCustomer?.shippingAddress) {
+      setCustomAddress({
+        company: selectedCustomer.companyName || "",
+        name: `${selectedCustomer.firstName} ${selectedCustomer.lastName}`,
+        address1: selectedCustomer.shippingAddress.address1 || "",
+        address2: selectedCustomer.shippingAddress.address2 || "",
+        city: selectedCustomer.shippingAddress.city || "",
+        stateProvince: selectedCustomer.shippingAddress.stateProvince || "",
+        zipCode: selectedCustomer.shippingAddress.zipCode || "",
+        country: selectedCustomer.shippingAddress.country || ""
       });
+    } else if (quoteData?.customer?.shipping) {
+      setCustomAddress({
+        company: quoteData.customer.shipping.company || "",
+        name: quoteData.customer.shipping.contact || "",
+        address1: quoteData.customer.shipping.address1 || quoteData.customer.shipping.address || "",
+        address2: quoteData.customer.shipping.address2 || quoteData.customer.shipping.unit || "",
+        city: quoteData.customer.shipping.city || "",
+        stateProvince: quoteData.customer.shipping.stateProvince || quoteData.customer.shipping.region || "",
+        zipCode: quoteData.customer.shipping.zipCode || quoteData.customer.shipping.postalCode || "",
+        country: quoteData.customer.shipping.country || ""
+      });
+      setUseCustomerDefault(false);
+    }
+  }, [selectedCustomer, quoteData]);
+
+  const getCurrentAddress = () => {
+    if (useCustomerDefault && selectedCustomer?.shippingAddress) {
+      return {
+        company: selectedCustomer.companyName || "",
+        name: `${selectedCustomer.firstName} ${selectedCustomer.lastName}`,
+        address1: selectedCustomer.shippingAddress.address1 || "",
+        address2: selectedCustomer.shippingAddress.address2 || "",
+        city: selectedCustomer.shippingAddress.city || "",
+        stateProvince: selectedCustomer.shippingAddress.stateProvince || "",
+        zipCode: selectedCustomer.shippingAddress.zipCode || "",
+        country: selectedCustomer.shippingAddress.country || ""
+      };
+    }
+    return customAddress;
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    const updatedAddress = { ...customAddress, [field]: value };
+    setCustomAddress(updatedAddress);
+    onAddressChange?.(updatedAddress);
+  };
+
+  const handleToggleChange = (checked: boolean) => {
+    setUseCustomerDefault(checked);
+    if (checked && selectedCustomer?.shippingAddress) {
+      // Reset to customer default
+      const defaultAddress = {
+        company: selectedCustomer.companyName || "",
+        name: `${selectedCustomer.firstName} ${selectedCustomer.lastName}`,
+        address1: selectedCustomer.shippingAddress.address1 || "",
+        address2: selectedCustomer.shippingAddress.address2 || "",
+        city: selectedCustomer.shippingAddress.city || "",
+        stateProvince: selectedCustomer.shippingAddress.stateProvince || "",
+        zipCode: selectedCustomer.shippingAddress.zipCode || "",
+        country: selectedCustomer.shippingAddress.country || ""
+      };
+      setCustomAddress(defaultAddress);
+      onAddressChange?.(defaultAddress);
     }
   };
 
+  const currentData = getCurrentAddress();
+
   return (
     <div className="space-y-4">
-      <h3 className="text-base font-medium">Customer Shipping Address</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-base font-medium">Customer Shipping Address</h3>
+        {selectedCustomer && (
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="use-customer-shipping"
+              checked={useCustomerDefault}
+              onCheckedChange={handleToggleChange}
+            />
+            <Label htmlFor="use-customer-shipping" className="text-sm">
+              Use customer default
+            </Label>
+          </div>
+        )}
+      </div>
+      
+      {!useCustomerDefault && selectedCustomer && (
+        <div className="text-xs text-muted-foreground bg-orange-50 border border-orange-200 rounded p-2">
+          Custom address for this quote only - won't update customer record
+        </div>
+      )}
+      
       <div className="space-y-4">
         <Input 
           placeholder="Company" 
-          value={selectedCustomer?.companyName || shippingData?.company || ""}
-          readOnly={!!selectedCustomer}
+          value={currentData.company}
+          onChange={(e) => handleInputChange('company', e.target.value)}
+          disabled={useCustomerDefault && !!selectedCustomer}
         />
         <Input 
           placeholder="Name" 
-          value={selectedCustomer ? `${selectedCustomer.firstName} ${selectedCustomer.lastName}` : shippingData?.contact || ""}
-          readOnly={!!selectedCustomer}
+          value={currentData.name}
+          onChange={(e) => handleInputChange('name', e.target.value)}
+          disabled={useCustomerDefault && !!selectedCustomer}
         />
         <Input 
           placeholder="Address" 
-          value={shippingData?.address1 || shippingData?.address || ""}
-          readOnly={!!selectedCustomer}
+          value={currentData.address1}
+          onChange={(e) => handleInputChange('address1', e.target.value)}
+          disabled={useCustomerDefault && !!selectedCustomer}
         />
         <Input 
-          placeholder="Address" 
-          value={shippingData?.address2 || shippingData?.unit || ""}
-          readOnly={!!selectedCustomer}
+          placeholder="Address Line 2" 
+          value={currentData.address2}
+          onChange={(e) => handleInputChange('address2', e.target.value)}
+          disabled={useCustomerDefault && !!selectedCustomer}
         />
         <div className="grid grid-cols-2 gap-4">
           <Select 
-            value={shippingData?.country || ""}
-            onValueChange={handleCountryChange}
+            value={currentData.country}
+            onValueChange={(value) => handleInputChange('country', value)}
+            disabled={useCustomerDefault && !!selectedCustomer}
           >
             <SelectTrigger>
               <SelectValue placeholder="Country" />
@@ -265,20 +363,23 @@ export function ShippingSection({ quoteData }: ShippingSectionProps) {
           </Select>
           <Input 
             placeholder="State/ Province" 
-            value={shippingData?.stateProvince || shippingData?.region || ""}
-            readOnly={!!selectedCustomer}
+            value={currentData.stateProvince}
+            onChange={(e) => handleInputChange('stateProvince', e.target.value)}
+            disabled={useCustomerDefault && !!selectedCustomer}
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Input 
             placeholder="City" 
-            value={shippingData?.city || ""}
-            readOnly={!!selectedCustomer}
+            value={currentData.city}
+            onChange={(e) => handleInputChange('city', e.target.value)}
+            disabled={useCustomerDefault && !!selectedCustomer}
           />
           <Input 
             placeholder="Zip Code Postal Code" 
-            value={shippingData?.zipCode || shippingData?.postalCode || ""}
-            readOnly={!!selectedCustomer}
+            value={currentData.zipCode}
+            onChange={(e) => handleInputChange('zipCode', e.target.value)}
+            disabled={useCustomerDefault && !!selectedCustomer}
           />
         </div>
       </div>
