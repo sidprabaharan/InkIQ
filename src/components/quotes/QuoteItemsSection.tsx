@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from "@/components/ui/resizable";
-import { MockupUploadDialog } from "./MockupUploadDialog";
+import { EnhancedMockupUploadDialog } from "./EnhancedMockupUploadDialog";
 import { ImprintDialog } from "./ImprintDialog";
 import { ImprintItem } from "@/types/imprint";
 import { toast } from "sonner";
@@ -638,10 +638,12 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
         </Button>
       </div>
       
-      <MockupUploadDialog 
+      <EnhancedMockupUploadDialog 
         open={uploadDialogOpen}
         onOpenChange={setUploadDialogOpen}
         onUpload={handleUploadComplete}
+        category="proofMockup"
+        allowedFileTypes={["jpg", "png", "pdf", "ai", "eps"]}
       />
 
       <ImprintDialog
