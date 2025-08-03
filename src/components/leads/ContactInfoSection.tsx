@@ -116,23 +116,6 @@ export default function ContactInfoSection({ lead, onEdit }: ContactInfoSectionP
           </>
         )}
 
-        {/* Notes */}
-        {lead.notes && (
-          <div className="border-t pt-4">
-            <h4 className="font-medium mb-2">Notes</h4>
-            <p className="text-sm text-muted-foreground whitespace-pre-line">
-              {lead.notes}
-            </p>
-          </div>
-        )}
-
-        {/* Data Source Badge */}
-        <div className="border-t pt-4 flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">Data Source</div>
-          <Badge variant="outline" className="capitalize">
-            {lead.dataSource || 'manual'}
-          </Badge>
-        </div>
       </CardContent>
     </Card>
   );

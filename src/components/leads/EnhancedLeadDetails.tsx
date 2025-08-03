@@ -239,32 +239,72 @@ export default function EnhancedLeadDetails({
                   </div>
                 </div>
                 
-                {/* Quick Stats */}
-                <div className="grid grid-cols-4 gap-4">
-                  <div className="bg-card p-4 rounded-lg border">
-                    <div className="text-2xl font-semibold">{lead.totalActivities || 0}</div>
-                    <div className="text-sm text-muted-foreground">Total Activities</div>
+                {/* Inquiry Summary & Current Stage */}
+                <div className="bg-card p-6 rounded-lg border">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold flex items-center">
+                      <FileText className="h-5 w-5 mr-2" />
+                      Inquiry Summary & Current Stage
+                    </h3>
+                    <Button variant="ghost" size="sm">
+                      <Edit className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <div className="bg-card p-4 rounded-lg border">
-                    <div className="text-2xl font-semibold">
-                      {lead.lastActivityType || 'None'}
+                  
+                  <div className="space-y-4">
+                    {/* Client Requirements */}
+                    <div>
+                      <h4 className="font-medium mb-2 text-sm">Client Requirements</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {lead.notes || "Client looking for promotional merchandise. Specific requirements need to be documented as more information becomes available."}
+                      </p>
                     </div>
-                    <div className="text-sm text-muted-foreground">Last Activity</div>
-                  </div>
-                  <div className="bg-card p-4 rounded-lg border">
-                    <div className="text-2xl font-semibold">
-                      {lead.confidenceScore ? `${Math.round(lead.confidenceScore * 100)}%` : 'N/A'}
+                    
+                    {/* Current Stage */}
+                    <div>
+                      <h4 className="font-medium mb-2 text-sm">Current Stage</h4>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="outline" className="capitalize">
+                          {lead.status.replace('_', ' ')}
+                        </Badge>
+                        <span className="text-sm text-muted-foreground">
+                          • Next: {
+                            lead.status === 'new_lead' ? 'Initial contact and requirements gathering' :
+                            lead.status === 'in_contact' ? 'Gather detailed specifications and create quote' :
+                            lead.status === 'qualified' ? 'Prepare and send formal quote' :
+                            lead.status === 'quoted' ? 'Follow up on quote and address questions' :
+                            lead.status === 'follow_up' ? 'Continue nurturing relationship' :
+                            'Process completed'
+                          }
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-sm text-muted-foreground">Data Confidence</div>
-                  </div>
-                  <div className="bg-card p-4 rounded-lg border">
-                    <div className="text-2xl font-semibold">
-                      {lead.companyInfo?.estimatedAnnualSpend 
-                        ? `$${(lead.companyInfo.estimatedAnnualSpend / 1000).toFixed(0)}K`
-                        : 'Unknown'
-                      }
+                    
+                    {/* Key Information */}
+                    <div className="grid grid-cols-2 gap-4 pt-2 border-t">
+                      <div>
+                        <h4 className="font-medium mb-2 text-sm">Products of Interest</h4>
+                        <p className="text-sm text-muted-foreground">To be determined based on client needs</p>
+                      </div>
+                      <div>
+                        <h4 className="font-medium mb-2 text-sm">Timeline</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Created {formatDistanceToNow(createdAt, { addSuffix: true })}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-medium mb-2 text-sm">Budget Range</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Estimated: ${lead.value.toLocaleString()}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-medium mb-2 text-sm">Priority Level</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {lead.value > 10000 ? 'High' : lead.value > 5000 ? 'Medium' : 'Standard'}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-sm text-muted-foreground">Est. Annual Spend</div>
                   </div>
                 </div>
               </TabsContent>
