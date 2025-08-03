@@ -80,24 +80,34 @@ export default function QuoteDetail() {
       status: item.status,
       mockups: item.mockups || []
     })),
-    imprints: quote.imprints?.map(imprint => ({
-      id: imprint.id,
-      method: imprint.type || "",
-      location: imprint.placement || "",
-      width: 0,
-      height: 0,
-      colorsOrThreads: imprint.colours || "",
-      notes: imprint.notes || "",
-      customerArt: [],
-      productionFiles: [],
-      proofMockup: imprint.files?.map(file => ({
-        id: file.id,
-        name: file.name,
-        url: file.url,
-        type: file.type,
-        category: 'proofMockup' as const
-      })) || []
-    })) || []
+    imprints: quote.imprints?.map(imprint => {
+      // Parse dimensions from size field (e.g., "4\" x 3\"")
+      const sizeMatch = imprint.size?.match(/(\d+(?:\.\d+)?)"?\s*x\s*(\d+(?:\.\d+)?)"?/);
+      const width = sizeMatch ? parseFloat(sizeMatch[1]) : 0;
+      const height = sizeMatch ? parseFloat(sizeMatch[2]) : 0;
+      
+      return {
+        id: imprint.id,
+        method: imprint.type || "",
+        location: imprint.placement || "",
+        width,
+        height,
+        colorsOrThreads: imprint.colours || "",
+        notes: imprint.notes || "",
+        customerArt: (imprint.customerArt || []).map(file => ({
+          ...file,
+          category: 'customerArt' as const
+        })),
+        productionFiles: (imprint.productionFiles || []).map(file => ({
+          ...file,
+          category: 'productionFiles' as const
+        })),
+        proofMockup: (imprint.proofMockup || []).map(file => ({
+          ...file,
+          category: 'proofMockup' as const
+        }))
+      };
+    }) || []
   }];
   
   return (
