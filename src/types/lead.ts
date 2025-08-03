@@ -50,6 +50,9 @@ export interface Lead {
   // Activity Data
   totalActivities?: number;
   lastActivityType?: string;
+  
+  // Quote Information
+  quoteId?: string;
 }
 
 export type LeadStatus = 'new_lead' | 'in_contact' | 'qualified' | 'quoted' | 'follow_up' | 'closed_won' | 'closed_lost';

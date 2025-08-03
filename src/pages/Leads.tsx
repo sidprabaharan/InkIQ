@@ -94,6 +94,7 @@ const initialLeads: Lead[] = [
     aiEnriched: true,
     dataSource: 'ai',
     confidenceScore: 0.78,
+    quoteId: 'quote-001',
     companyInfo: {
       size: '10-50 employees',
       industry: 'Technology, Startups',
@@ -114,6 +115,7 @@ const initialLeads: Lead[] = [
     aiEnriched: true,
     dataSource: 'email',
     confidenceScore: 0.95,
+    quoteId: 'quote-002',
     socialProfiles: {
       linkedin: 'https://linkedin.com/in/robertwilson',
       facebook: 'https://facebook.com/futureenterprises'

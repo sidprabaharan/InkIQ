@@ -53,9 +53,8 @@ export default function EnhancedLeadDetails({
     onOpenChange(false);
   };
 
-  // Check if AI has enough info to generate a quote
-  const hasEnoughInfoForAI = lead.company && lead.email && lead.companyInfo?.industry && lead.value > 0;
-  const hasExistingQuote = false; // TODO: Check if quote exists for this lead
+  // Check if quote exists based on lead status and quoteId
+  const hasExistingQuote = lead.quoteId || ['quoted', 'follow_up', 'closed_won', 'closed_lost'].includes(lead.status);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -208,12 +207,6 @@ export default function EnhancedLeadDetails({
                   <div className="bg-card p-6 rounded-lg border">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-lg font-semibold">Quote Management</h3>
-                      {hasEnoughInfoForAI && (
-                        <Badge variant="secondary" className="text-xs">
-                          <Zap className="h-3 w-3 mr-1" />
-                          AI Ready
-                        </Badge>
-                      )}
                     </div>
                     
                     <div className="space-y-4">
@@ -231,8 +224,8 @@ export default function EnhancedLeadDetails({
                         </Badge>
                       </div>
                       
-                      {/* Action Buttons */}
-                      <div className="space-y-2 pt-2">
+                      {/* Action Button */}
+                      <div className="pt-2">
                         <Button 
                           onClick={handleCreateQuote} 
                           className="w-full"
@@ -241,31 +234,7 @@ export default function EnhancedLeadDetails({
                           <FileText className="h-4 w-4 mr-2" />
                           {hasExistingQuote ? "View Quote" : "Create Quote"}
                         </Button>
-                        
-                        {hasEnoughInfoForAI && !hasExistingQuote && (
-                          <Button 
-                            onClick={handleCreateQuote} 
-                            variant="secondary" 
-                            className="w-full"
-                          >
-                            <Zap className="h-4 w-4 mr-2" />
-                            AI Generate Quote
-                          </Button>
-                        )}
                       </div>
-                      
-                      {/* AI Info */}
-                      {hasEnoughInfoForAI && (
-                        <div className="bg-muted/50 p-3 rounded text-xs text-muted-foreground">
-                          <div className="font-medium mb-1">AI has detected:</div>
-                          <ul className="space-y-1">
-                            <li>• Company: {lead.company}</li>
-                            <li>• Industry: {lead.companyInfo?.industry}</li>
-                            <li>• Est. Budget: ${lead.value.toLocaleString()}</li>
-                            <li>• Contact Info: Complete</li>
-                          </ul>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
