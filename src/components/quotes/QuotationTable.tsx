@@ -82,11 +82,6 @@ const allQuotationsData: Quotation[] = [
     outstanding: "$992",
     status: "Purchase Orders",
     isPaid: true,
-    lineItems: [
-      { id: "3033-1", description: "Custom T-Shirts - Large", quantity: 50, price: "$15.00", status: "Production" },
-      { id: "3033-2", description: "Logo Printing", quantity: 50, price: "$5.00", status: "Complete" },
-      { id: "3033-3", description: "Gift Wrapping", quantity: 50, price: "$2.00", status: "Shipping" },
-    ]
   },
   {
     id: "3034",
@@ -98,10 +93,6 @@ const allQuotationsData: Quotation[] = [
     outstanding: "$241",
     status: "Achieved Quote",
     isPaid: false,
-    lineItems: [
-      { id: "3034-1", description: "Business Cards", quantity: 1000, price: "$0.50", status: "Complete" },
-      { id: "3034-2", description: "Letterhead Design", quantity: 1, price: "$150.00", status: "Artwork" },
-    ]
   },
   {
     id: "3035",
@@ -112,10 +103,6 @@ const allQuotationsData: Quotation[] = [
     outstanding: "$0.000",
     status: "Miscellaneous",
     isPaid: true,
-    lineItems: [
-      { id: "3035-1", description: "Promotional Banners", quantity: 5, price: "$75.00", status: "Shipping" },
-      { id: "3035-2", description: "Setup Fee", quantity: 1, price: "$100.00", status: "Complete" },
-    ]
   },
   {
     id: "3036",
