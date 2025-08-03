@@ -62,6 +62,15 @@ interface QuoteItemsSectionProps {
 }
 
 export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
+  // Utility functions to parse string values to numbers
+  const parseNumber = (value: string | number): number => {
+    if (typeof value === 'number') return value;
+    if (!value || value === '') return 0;
+    // Remove currency symbols and commas, then parse
+    const cleaned = value.toString().replace(/[\$,]/g, '');
+    return parseFloat(cleaned) || 0;
+  };
+
   // Initialize with quote data if available, otherwise use default empty structure
   const getInitialItemGroups = () => {
     if (quoteData?.items && quoteData.items.length > 0) {
@@ -74,18 +83,18 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
           color: item.color || "",
           description: item.description || "",
           sizes: {
-            xs: item.sizes?.xs || 0,
-            s: item.sizes?.s || 0,
-            m: item.sizes?.m || 0,
-            l: item.sizes?.l || 0,
-            xl: item.sizes?.xl || 0,
-            xxl: item.sizes?.xxl || 0,
-            xxxl: item.sizes?.xxxl || 0
+            xs: parseNumber(item.xs),
+            s: parseNumber(item.s),
+            m: parseNumber(item.m),
+            l: parseNumber(item.l),
+            xl: parseNumber(item.xl),
+            xxl: parseNumber(item.xxl),
+            xxxl: parseNumber(item.xxxl)
           },
-          quantity: item.quantity || 0,
-          price: item.price || 0,
+          quantity: parseNumber(item.quantity),
+          price: parseNumber(item.price),
           taxed: item.taxed || false,
-          total: item.total || 0,
+          total: parseNumber(item.total),
           mockups: item.mockups || []
         })),
         imprints: []
