@@ -7,9 +7,12 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { Search, Plus, Filter, Eye, FileText } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Search, Plus, Filter, Eye, FileText, ShoppingCart, Package, History, Edit2, Trash2, Send } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useCartManager } from '@/context/CartManagerContext';
+import { CartManagerProvider } from '@/context/CartManagerContext';
 
 // Mock data for purchase orders
 const initialPurchaseOrders = [
@@ -75,14 +78,24 @@ const initialPurchaseOrders = [
   }
 ];
 
-export default function PurchaseOrders() {
+function PurchaseOrdersContent() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('All');
   const [supplierFilter, setSupplierFilter] = useState('All');
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [purchaseOrders, setPurchaseOrders] = useState(initialPurchaseOrders);
+  const [activeTab, setActiveTab] = useState('active-carts');
   const location = useLocation();
+  
+  const { 
+    carts, 
+    deleteCart, 
+    convertCartToPO, 
+    updateCart,
+    getCartTotals,
+    createCart 
+  } = useCartManager();
   
   const statuses = ['All', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
   const suppliers = ['All', 'SanMar', 'Alphabroder', 'S&S Activewear', 'TSC Apparel'];
@@ -138,23 +151,222 @@ export default function PurchaseOrders() {
     }
   };
   
+  const activeCarts = carts.filter(cart => cart.status === 'draft' || cart.status === 'ready');
+  const submittedCarts = carts.filter(cart => cart.status === 'submitted');
+  
+  const handleConvertToPO = async (cartId: string) => {
+    try {
+      await convertCartToPO(cartId);
+      toast.success("Cart converted to Purchase Order successfully!");
+    } catch (error) {
+      toast.error("Failed to convert cart to Purchase Order");
+    }
+  };
+
+  const getCartStatusColor = (status: string) => {
+    switch (status) {
+      case 'draft': return 'bg-gray-100 text-gray-800';
+      case 'ready': return 'bg-blue-100 text-blue-800';
+      case 'submitted': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <div className="flex-1 p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Purchase Orders</h1>
-        <Button>
+        <h1 className="text-3xl font-bold tracking-tight">Cart & Purchase Order Management</h1>
+        <Button onClick={() => createCart()}>
           <Plus className="mr-2 h-4 w-4" />
-          Create Purchase Order
+          Create New Cart
         </Button>
       </div>
       
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle>Purchase Order Management</CardTitle>
-          <CardDescription>
-            Create, track and manage orders from your suppliers
-          </CardDescription>
-        </CardHeader>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="active-carts" className="flex items-center gap-2">
+            <ShoppingCart className="h-4 w-4" />
+            Active Carts ({activeCarts.length})
+          </TabsTrigger>
+          <TabsTrigger value="submitted-carts" className="flex items-center gap-2">
+            <Package className="h-4 w-4" />
+            Submitted Carts ({submittedCarts.length})
+          </TabsTrigger>
+          <TabsTrigger value="purchase-orders" className="flex items-center gap-2">
+            <History className="h-4 w-4" />
+            Historical POs ({purchaseOrders.length})
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Active Carts Tab */}
+        <TabsContent value="active-carts">
+          <Card>
+            <CardHeader>
+              <CardTitle>Active Carts</CardTitle>
+              <CardDescription>
+                Draft and ready carts that can be converted to purchase orders
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {activeCarts.length === 0 ? (
+                <div className="text-center py-8">
+                  <ShoppingCart className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 mb-4">No active carts found</p>
+                  <Button onClick={() => createCart()}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create Your First Cart
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {activeCarts.map((cart) => {
+                    const totals = getCartTotals(cart.id);
+                    return (
+                      <div key={cart.id} className="border rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="font-medium">{cart.name}</h3>
+                              <Badge className={getCartStatusColor(cart.status)}>
+                                {cart.status}
+                              </Badge>
+                              <Badge variant="outline" className="capitalize">
+                                {cart.orderingStrategy}
+                              </Badge>
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              Created: {cart.createdAt.toLocaleDateString()} • 
+                              Updated: {cart.updatedAt.toLocaleDateString()}
+                            </div>
+                            {totals.totalItems > 0 && (
+                              <div className="text-sm text-gray-600 mt-1">
+                                {totals.totalItems} items • ${totals.subtotal.toFixed(2)}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                // Navigate to products page with this cart active
+                                // This could be implemented with navigation state
+                              }}
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </Button>
+                            {totals.totalItems > 0 && (
+                              <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => handleConvertToPO(cart.id)}
+                              >
+                                <Send className="h-4 w-4 mr-1" />
+                                Convert to PO
+                              </Button>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => deleteCart(cart.id)}
+                              className="text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        {cart.items.length > 0 && (
+                          <div className="mt-3 pt-3 border-t">
+                            <div className="text-sm font-medium mb-2">Items Preview:</div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                              {cart.items.slice(0, 3).map((item) => (
+                                <div key={`${item.id}-${item.supplierName}`} className="text-sm text-gray-600">
+                                  {item.name} ({item.supplierName}) - {item.totalQuantity} pcs
+                                </div>
+                              ))}
+                              {cart.items.length > 3 && (
+                                <div className="text-sm text-gray-500">
+                                  +{cart.items.length - 3} more items...
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Submitted Carts Tab */}
+        <TabsContent value="submitted-carts">
+          <Card>
+            <CardHeader>
+              <CardTitle>Submitted Carts</CardTitle>
+              <CardDescription>
+                Carts that have been converted to purchase orders and are pending processing
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {submittedCarts.length === 0 ? (
+                <div className="text-center py-8">
+                  <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">No submitted carts found</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {submittedCarts.map((cart) => {
+                    const totals = getCartTotals(cart.id);
+                    return (
+                      <div key={cart.id} className="border rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="font-medium">{cart.name}</h3>
+                              <Badge className="bg-green-100 text-green-800">
+                                Submitted
+                              </Badge>
+                              {cart.metadata.poNumber && (
+                                <Badge variant="outline">
+                                  PO: {cart.metadata.poNumber}
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              Submitted: {cart.updatedAt.toLocaleDateString()} • 
+                              {totals.totalItems} items • ${totals.subtotal.toFixed(2)}
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <FileText className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Historical Purchase Orders Tab */}
+        <TabsContent value="purchase-orders">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle>Historical Purchase Orders</CardTitle>
+              <CardDescription>
+                Track and manage completed purchase orders from your suppliers
+              </CardDescription>
+            </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="relative flex-1">
@@ -316,8 +528,18 @@ export default function PurchaseOrders() {
               </Pagination>
             </div>
           )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
+  );
+}
+
+export default function PurchaseOrders() {
+  return (
+    <CartManagerProvider>
+      <PurchaseOrdersContent />
+    </CartManagerProvider>
   );
 }

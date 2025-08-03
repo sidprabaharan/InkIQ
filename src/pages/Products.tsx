@@ -8,8 +8,8 @@ import { Search, RefreshCw } from 'lucide-react';
 import { ProductRow } from '@/components/products/ProductRow';
 import { ProductFilters } from '@/components/products/ProductFilters';
 import { mockProducts } from '@/data/mockProducts';
-import { CartProvider } from '@/context/CartContext';
-import { CartSidebar } from '@/components/cart/CartSidebar';
+import { CartManagerProvider } from '@/context/CartManagerContext';
+import { EnhancedCartSidebar } from '@/components/cart/EnhancedCartSidebar';
 import { Separator } from '@/components/ui/separator';
 
 export default function Products() {
@@ -37,7 +37,7 @@ export default function Products() {
   const displayedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
   
   return (
-    <CartProvider>
+    <CartManagerProvider>
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* Top Navigation Bar */}
         <div className="bg-white border-b py-2 px-4 flex items-center justify-between">
@@ -53,7 +53,7 @@ export default function Products() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <CartSidebar />
+            <EnhancedCartSidebar />
           </div>
         </div>
         
@@ -159,6 +159,6 @@ export default function Products() {
           </div>
         </div>
       </div>
-    </CartProvider>
+    </CartManagerProvider>
   );
 }
