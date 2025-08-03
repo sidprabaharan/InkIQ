@@ -13,6 +13,7 @@ import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useCartManager } from '@/context/CartManagerContext';
 import { CartManagerProvider } from '@/context/CartManagerContext';
+import { EditableCartItem } from '@/components/cart/EditableCartItem';
 
 // Mock data for purchase orders
 const initialPurchaseOrders = [
@@ -218,81 +219,100 @@ function PurchaseOrdersContent() {
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {activeCarts.map((cart) => {
                     const totals = getCartTotals(cart.id);
+                    
+                    // Group items by supplier
+                    const itemsBySupplier = cart.items.reduce((acc, item) => {
+                      if (!acc[item.supplierName]) {
+                        acc[item.supplierName] = [];
+                      }
+                      acc[item.supplierName].push(item);
+                      return acc;
+                    }, {} as Record<string, typeof cart.items>);
+                    
                     return (
-                      <div key={cart.id} className="border rounded-lg p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="font-medium">{cart.name}</h3>
-                              <Badge className={getCartStatusColor(cart.status)}>
-                                {cart.status}
-                              </Badge>
-                              <Badge variant="outline" className="capitalize">
-                                {cart.orderingStrategy}
-                              </Badge>
-                            </div>
-                            <div className="text-sm text-gray-600">
-                              Created: {cart.createdAt.toLocaleDateString()} • 
-                              Updated: {cart.updatedAt.toLocaleDateString()}
-                            </div>
-                            {totals.totalItems > 0 && (
-                              <div className="text-sm text-gray-600 mt-1">
-                                {totals.totalItems} items • ${totals.subtotal.toFixed(2)}
+                      <Card key={cart.id}>
+                        <CardContent className="p-6">
+                          {/* Cart Header */}
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h3 className="text-lg font-semibold">{cart.name}</h3>
+                                <Badge className={getCartStatusColor(cart.status)}>
+                                  {cart.status}
+                                </Badge>
+                                <Badge variant="outline" className="capitalize">
+                                  {cart.orderingStrategy}
+                                </Badge>
                               </div>
-                            )}
-                          </div>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                // Navigate to products page with this cart active
-                                // This could be implemented with navigation state
-                              }}
-                            >
-                              <Edit2 className="h-4 w-4" />
-                            </Button>
-                            {totals.totalItems > 0 && (
-                              <Button
-                                variant="default"
-                                size="sm"
-                                onClick={() => handleConvertToPO(cart.id)}
-                              >
-                                <Send className="h-4 w-4 mr-1" />
-                                Convert to PO
-                              </Button>
-                            )}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => deleteCart(cart.id)}
-                              className="text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                        {cart.items.length > 0 && (
-                          <div className="mt-3 pt-3 border-t">
-                            <div className="text-sm font-medium mb-2">Items Preview:</div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                              {cart.items.slice(0, 3).map((item) => (
-                                <div key={`${item.id}-${item.supplierName}`} className="text-sm text-gray-600">
-                                  {item.name} ({item.supplierName}) - {item.totalQuantity} pcs
-                                </div>
-                              ))}
-                              {cart.items.length > 3 && (
-                                <div className="text-sm text-gray-500">
-                                  +{cart.items.length - 3} more items...
+                              <div className="text-sm text-gray-600">
+                                Created: {cart.createdAt.toLocaleDateString()} • 
+                                Updated: {cart.updatedAt.toLocaleDateString()}
+                              </div>
+                              {totals.totalItems > 0 && (
+                                <div className="text-lg font-semibold text-primary mt-2">
+                                  {totals.totalItems} items • ${totals.subtotal.toFixed(2)}
                                 </div>
                               )}
                             </div>
+                            <div className="flex gap-2">
+                              {totals.totalItems > 0 && (
+                                <Button
+                                  variant="default"
+                                  onClick={() => handleConvertToPO(cart.id)}
+                                >
+                                  <Send className="h-4 w-4 mr-2" />
+                                  Convert to PO
+                                </Button>
+                              )}
+                              <Button
+                                variant="outline"
+                                onClick={() => deleteCart(cart.id)}
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete Cart
+                              </Button>
+                            </div>
                           </div>
-                        )}
-                      </div>
+
+                          {/* Cart Items */}
+                          {cart.items.length > 0 ? (
+                            <div className="space-y-4">
+                              {Object.entries(itemsBySupplier).map(([supplier, items]) => (
+                                <div key={supplier} className="space-y-3">
+                                  <div className="flex items-center gap-2 border-b pb-2">
+                                    <h4 className="font-medium text-gray-700">Supplier: {supplier}</h4>
+                                    <Badge variant="secondary">
+                                      {items.length} {items.length === 1 ? 'item' : 'items'}
+                                    </Badge>
+                                  </div>
+                                  
+                                  {items.map((item) => (
+                                    <EditableCartItem
+                                      key={`${item.id}-${item.supplierName}`}
+                                      cartId={cart.id}
+                                      item={item}
+                                    />
+                                  ))}
+                                  
+                                  {/* Supplier Subtotal */}
+                                  <div className="text-right text-sm text-gray-600 border-t pt-2">
+                                    Supplier Total: ${items.reduce((sum, item) => sum + (item.price * item.totalQuantity), 0).toFixed(2)}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-center py-8 text-gray-500">
+                              <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                              <p>This cart is empty</p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
                     );
                   })}
                 </div>

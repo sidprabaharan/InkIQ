@@ -11,7 +11,7 @@ interface CartManagerContextType {
   // Cart management
   createCart: (name?: string, strategy?: 'separate' | 'combined') => string;
   deleteCart: (cartId: string) => void;
-  updateCart: (cartId: string, updates: Partial<Cart>) => void;
+  updateCart: (cartId: string, updates: Partial<Cart> | ((prevCart: Cart) => Partial<Cart>)) => void;
   setActiveCart: (cartId: string) => void;
   duplicateCart: (cartId: string) => string;
   
@@ -127,12 +127,13 @@ export const CartManagerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     toast.info("Cart deleted");
   };
   
-  const updateCart = (cartId: string, updates: Partial<Cart>) => {
-    setCarts(prev => prev.map(cart => 
-      cart.id === cartId 
-        ? { ...cart, ...updates, updatedAt: new Date() }
-        : cart
-    ));
+  const updateCart = (cartId: string, updates: Partial<Cart> | ((prevCart: Cart) => Partial<Cart>)) => {
+    setCarts(prev => prev.map(cart => {
+      if (cart.id !== cartId) return cart;
+      
+      const updatesObj = typeof updates === 'function' ? updates(cart) : updates;
+      return { ...cart, ...updatesObj, updatedAt: new Date() };
+    }));
   };
   
   const setActiveCart = (cartId: string) => {

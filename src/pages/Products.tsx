@@ -9,7 +9,7 @@ import { ProductRow } from '@/components/products/ProductRow';
 import { ProductFilters } from '@/components/products/ProductFilters';
 import { mockProducts } from '@/data/mockProducts';
 import { CartManagerProvider } from '@/context/CartManagerContext';
-import { EnhancedCartSidebar } from '@/components/cart/EnhancedCartSidebar';
+import { CartIcon } from '@/components/cart/CartIcon';
 import { Separator } from '@/components/ui/separator';
 
 export default function Products() {
@@ -53,7 +53,7 @@ export default function Products() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <EnhancedCartSidebar />
+            <CartIcon />
           </div>
         </div>
         
