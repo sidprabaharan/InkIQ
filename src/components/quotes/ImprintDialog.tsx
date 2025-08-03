@@ -273,9 +273,9 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
                           Accepted: {methodConfig.customerArtTypes.join(', ')}
                         </p>
                       )}
-                      {imprint.customerArt.length > 0 && (
+                      {imprint.customerArt && imprint.customerArt.length > 0 && (
                         <div className="flex flex-wrap gap-2">
-                          {imprint.customerArt.map((file) => (
+                          {imprint.customerArt?.map((file) => (
                             <div key={file.id} className="relative group">
                               <div className="flex items-center gap-2 bg-muted rounded p-2 pr-8">
                                 <FileText className="h-4 w-4" />
@@ -313,9 +313,9 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
                           Accepted: {methodConfig.productionFileTypes.join(', ')}
                         </p>
                       )}
-                      {imprint.productionFiles.length > 0 && (
+                      {imprint.productionFiles && imprint.productionFiles.length > 0 && (
                         <div className="flex flex-wrap gap-2">
-                          {imprint.productionFiles.map((file) => (
+                          {imprint.productionFiles?.map((file) => (
                             <div key={file.id} className="relative group">
                               <div className="flex items-center gap-2 bg-muted rounded p-2 pr-8">
                                 <FileText className="h-4 w-4" />
@@ -351,9 +351,9 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
                       <p className="text-xs text-muted-foreground mb-2">
                         Visual proof, mockup, or reference images
                       </p>
-                      {imprint.proofMockup.length > 0 && (
+                      {imprint.proofMockup && imprint.proofMockup.length > 0 && (
                         <div className="flex flex-wrap gap-2">
-                          {imprint.proofMockup.map((file) => (
+                          {imprint.proofMockup?.map((file) => (
                             <div key={file.id} className="relative w-16 h-16 border rounded-md overflow-hidden group">
                               {file.type.startsWith('image/') ? (
                                 <img 
