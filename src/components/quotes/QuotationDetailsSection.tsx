@@ -24,20 +24,27 @@ interface QuotationDetailsSectionProps {
 }
 
 export function QuotationDetailsSection({ quoteData }: QuotationDetailsSectionProps) {
+  // Helper function to safely create dates
+  const createSafeDate = (dateValue: any): Date | undefined => {
+    if (!dateValue) return undefined;
+    const date = new Date(dateValue);
+    return isNaN(date.getTime()) ? undefined : date;
+  };
+
   const [created, setCreated] = useState<Date | undefined>(
-    quoteData?.details?.created ? new Date(quoteData.details.created) : undefined
+    createSafeDate(quoteData?.details?.created)
   );
   const [productionDueDate, setProductionDueDate] = useState<Date | undefined>(
-    quoteData?.details?.productionDueDate ? new Date(quoteData.details.productionDueDate) : undefined
+    createSafeDate(quoteData?.details?.productionDueDate)
   );
   const [customerDueDate, setCustomerDueDate] = useState<Date | undefined>(
-    quoteData?.details?.customerDueDate ? new Date(quoteData.details.customerDueDate) : undefined
+    createSafeDate(quoteData?.details?.customerDueDate)
   );
   const [paymentDueDate, setPaymentDueDate] = useState<Date | undefined>(
-    quoteData?.details?.paymentDueDate ? new Date(quoteData.details.paymentDueDate) : undefined
+    createSafeDate(quoteData?.details?.paymentDueDate)
   );
   const [invoiceDate, setInvoiceDate] = useState<Date | undefined>(
-    quoteData?.details?.invoiceDate ? new Date(quoteData.details.invoiceDate) : undefined
+    createSafeDate(quoteData?.details?.invoiceDate)
   );
 
   return (
