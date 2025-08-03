@@ -51,9 +51,11 @@ export interface LineItemGroupData {
 
 interface OrderBreakdownProps {
   groups: LineItemGroupData[];
+  quoteId: string;
 }
 
-export function OrderBreakdown({ groups }: OrderBreakdownProps) {
+export function OrderBreakdown({ groups, quoteId }: OrderBreakdownProps) {
+  let imprintCounter = 0;
   const formatPrice = (amount: number) => `$${amount.toFixed(2)}`;
 
   return (
@@ -61,6 +63,9 @@ export function OrderBreakdown({ groups }: OrderBreakdownProps) {
       <h2 className="text-2xl font-semibold">Order Breakdown</h2>
       {groups.map((group, index) => (
         <Card key={group.id} className="shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-bold">Group {index + 1}</CardTitle>
+          </CardHeader>
           <CardContent className="p-0">
             {/* Products Table */}
             <div className="overflow-x-auto p-6 pt-0">
@@ -140,8 +145,11 @@ export function OrderBreakdown({ groups }: OrderBreakdownProps) {
             </div>
 
             {/* Imprint Sections */}
-            {group.imprintSections.map((imprintSection, sectionIndex) => (
+            {group.imprintSections.map((imprintSection, sectionIndex) => {
+              imprintCounter++;
+              return (
               <div key={sectionIndex} className="bg-muted/20 border-t border-border px-6 py-4">
+                <h4 className="text-sm font-semibold mb-3">Imprint {quoteId} - {imprintCounter}</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                   <div>
                     <span className="font-medium text-sm">Type: </span>
@@ -189,7 +197,8 @@ export function OrderBreakdown({ groups }: OrderBreakdownProps) {
                   </div>
                 )}
               </div>
-            ))}
+            );
+            })}
           </CardContent>
         </Card>
       ))}

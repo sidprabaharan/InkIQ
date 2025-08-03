@@ -101,7 +101,7 @@ export default function QuoteDetail() {
           </div>
           
           {/* Order Breakdown - full width */}
-          <OrderBreakdown groups={mockOrderBreakdownData} />
+          <OrderBreakdown groups={mockOrderBreakdownData} quoteId={quoteId} />
           
           {/* Notes and Invoice Summary - bottom row */}
           <div className="grid grid-cols-3 gap-6">
