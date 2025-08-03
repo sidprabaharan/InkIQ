@@ -117,10 +117,7 @@ export function OrderBreakdown({ groups }: OrderBreakdownProps) {
                       
                       {/* Item Mockups Row */}
                       <TableRow className="bg-muted/30">
-                        <TableCell colSpan={2} className="font-medium text-sm">
-                          Item Mockups
-                        </TableCell>
-                        <TableCell colSpan={14}>
+                        <TableCell colSpan={16}>
                           <div className="flex gap-2 py-2">
                             {product.mockupImages.map((image, imgIndex) => (
                               <div key={imgIndex} className="w-16 h-16 border rounded overflow-hidden bg-background">
