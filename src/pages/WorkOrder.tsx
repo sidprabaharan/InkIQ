@@ -3,7 +3,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { CompanyInfoCard } from "@/components/quotes/CompanyInfoCard";
 import { QuoteDetailsCard } from "@/components/quotes/QuoteDetailsCard";
 import { CustomerInfoCard } from "@/components/quotes/CustomerInfoCard";
-import { WorkOrderItemsTable } from "@/components/quotes/WorkOrderItemsTable";
+import { QuoteItemsTable } from "@/components/quotes/QuoteItemsTable";
 import { NotesCard } from "@/components/quotes/NotesCard";
 import { quotationData } from "@/components/quotes/QuoteData";
 import { Button } from "@/components/ui/button";
@@ -26,20 +26,45 @@ export default function WorkOrder() {
     terms: quote.details.deliveryMethod
   };
   
-  // Map quote items to the structure expected by WorkOrderItemsTable
-  const formattedItems = quote.items.map((item, index) => ({
-    id: index.toString(),
-    name: item.category,
-    description: item.description,
-    quantity: parseInt(item.quantity) || 0,
-    price: parseFloat(item.price.replace('$', '')) || 0,
-    total: parseFloat(item.total.replace('$', '')) || 0,
-    sku: item.itemNumber,
-    imprintDetails: {
-      locations: ['Front', 'Back'],
-      colors: [item.color],
-    }
-  }));
+  // Transform quote data to match the new QuoteItemsTable structure
+  const formattedItemGroups = [{
+    id: "group-1",
+    items: quote.items.map((item, index) => ({
+      id: index.toString(),
+      category: item.category,
+      itemNumber: item.itemNumber,
+      color: item.color,
+      description: item.description,
+      sizes: {
+        xs: parseInt(item.xs) || 0,
+        s: parseInt(item.s) || 0,
+        m: parseInt(item.m) || 0,
+        l: parseInt(item.l) || 0,
+        xl: parseInt(item.xl) || 0,
+        xxl: parseInt(item.xxl) || 0,
+        xxxl: parseInt(item.xxxl) || 0,
+      },
+      price: parseFloat(item.price.replace('$', '')) || 0,
+      taxed: item.taxed,
+      total: parseFloat(item.total.replace('$', '')) || 0,
+      status: item.status,
+      mockups: item.mockups || []
+    })),
+    imprints: (quote.imprints || []).map(imprint => ({
+      id: imprint.id,
+      imprintItems: [{
+        id: imprint.id + "-item",
+        typeOfWork: imprint.type,
+        details: `${imprint.placement} - ${imprint.size} - ${imprint.colours}${imprint.notes ? ` - ${imprint.notes}` : ''}`,
+        mockups: imprint.files?.map(file => ({
+          id: file.id,
+          name: file.name,
+          url: file.url,
+          type: file.type
+        })) || []
+      }]
+    }))
+  }];
   
   const handlePrint = () => {
     window.print();
@@ -91,7 +116,7 @@ export default function WorkOrder() {
           )}
           
           {/* Work Order Items - full width */}
-          <WorkOrderItemsTable items={formattedItems} />
+          <QuoteItemsTable itemGroups={formattedItemGroups} />
           
           {/* Notes and Production Notes - bottom row */}
           <div className="grid grid-cols-2 gap-6">
