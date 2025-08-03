@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -8,6 +8,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ImprintItem, ImprintFile } from "@/types/imprint";
+import { GarmentDetails, GarmentStatus, GarmentIssue } from "@/types/garment";
+import { GarmentStatusDropdown } from "@/components/garment/GarmentStatusDropdown";
+import { StockIssueDialog } from "@/components/garment/StockIssueDialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface Mockup {
   id: string;
@@ -36,6 +40,7 @@ interface QuoteItem {
   total: number | string;
   status: string;
   mockups: Mockup[];
+  garmentDetails?: GarmentDetails;
 }
 
 interface ItemGroup {
@@ -49,30 +54,90 @@ interface QuoteItemsTableProps {
 }
 
 export function QuoteItemsTable({ itemGroups }: QuoteItemsTableProps) {
+  const { toast } = useToast();
+  const [issueDialogOpen, setIssueDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<QuoteItem | null>(null);
+
+  // Helper function to get total quantity for an item
+  const getTotalQuantity = (sizes: QuoteItem['sizes']) => {
+    return Object.values(sizes).reduce((sum, qty) => sum + qty, 0);
+  };
+
+  // Initialize default garment details if not present
+  const getGarmentDetails = (item: QuoteItem): GarmentDetails => {
+    if (item.garmentDetails) {
+      return item.garmentDetails;
+    }
+    
+    const totalQuantity = getTotalQuantity(item.sizes);
+    return {
+      status: 'pending',
+      stockIssues: [],
+      receivedQuantity: 0,
+      expectedQuantity: totalQuantity,
+      statusHistory: [{
+        id: `${item.id}-initial`,
+        status: 'pending',
+        timestamp: new Date(),
+        notes: 'Initial status'
+      }],
+      lastUpdated: new Date()
+    };
+  };
+
+  const handleStatusChange = (item: QuoteItem, newStatus: GarmentStatus, notes?: string) => {
+    // In a real app, this would update the backend
+    toast({
+      title: "Status Updated",
+      description: `${item.description} status changed to ${newStatus}`,
+    });
+  };
+
+  const handleReportIssue = (item: QuoteItem) => {
+    setSelectedItem(item);
+    setIssueDialogOpen(true);
+  };
+
+  const handleIssueSubmit = (issueData: Omit<GarmentIssue, 'id' | 'reportedDate'>) => {
+    if (!selectedItem) return;
+    
+    // In a real app, this would update the backend
+    toast({
+      title: "Issue Reported",
+      description: `${issueData.type} reported for ${selectedItem.description}`,
+      variant: "destructive",
+    });
+    
+    setSelectedItem(null);
+  };
   const renderItemGroup = (group: ItemGroup, groupIndex: number) => {
     return (
       <div key={group.id} className="mb-8 border rounded-md overflow-hidden">
         <Table className="w-full table-fixed">
           <TableHeader>
             <TableRow className="bg-gray-50">
-              <TableHead className="py-2 text-xs uppercase w-[10%]">Category</TableHead>
-              <TableHead className="py-2 text-xs uppercase w-[7.5%]">Item#</TableHead>
-              <TableHead className="py-2 text-xs uppercase w-[7.5%]">Color</TableHead>
-              <TableHead className="py-2 text-xs uppercase w-[20%]">Description</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">XS</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">S</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">M</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">L</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">XL</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">2XL</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">3XL</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[6%]">Price</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[6%]">Taxed</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[8%]">Total</TableHead>
+              <TableHead className="py-2 text-xs uppercase w-[8%]">Category</TableHead>
+              <TableHead className="py-2 text-xs uppercase w-[6%]">Item#</TableHead>
+              <TableHead className="py-2 text-xs uppercase w-[6%]">Color</TableHead>
+              <TableHead className="py-2 text-xs uppercase w-[15%]">Description</TableHead>
+              <TableHead className="py-2 text-xs uppercase text-center w-[4%]">XS</TableHead>
+              <TableHead className="py-2 text-xs uppercase text-center w-[4%]">S</TableHead>
+              <TableHead className="py-2 text-xs uppercase text-center w-[4%]">M</TableHead>
+              <TableHead className="py-2 text-xs uppercase text-center w-[4%]">L</TableHead>
+              <TableHead className="py-2 text-xs uppercase text-center w-[4%]">XL</TableHead>
+              <TableHead className="py-2 text-xs uppercase text-center w-[4%]">2XL</TableHead>
+              <TableHead className="py-2 text-xs uppercase text-center w-[4%]">3XL</TableHead>
+              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">Price</TableHead>
+              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">Taxed</TableHead>
+              <TableHead className="py-2 text-xs uppercase text-center w-[6%]">Total</TableHead>
+              <TableHead className="py-2 text-xs uppercase w-[12%]">Garment Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {group.items.map((item, itemIndex) => {
+              const garmentDetails = getGarmentDetails(item);
+              const totalQuantity = getTotalQuantity(item.sizes);
+              
               return (
                 <React.Fragment key={`${group.id}-item-${itemIndex}`}>
                   <TableRow className="border-b hover:bg-gray-50">
@@ -118,11 +183,25 @@ export function QuoteItemsTable({ itemGroups }: QuoteItemsTableProps) {
                     <TableCell className="p-2 border-r border-gray-200">
                       <div className="text-sm font-medium">${typeof item.total === 'number' ? item.total.toFixed(2) : parseFloat(item.total.toString().replace(/[$,]/g, '')).toFixed(2)}</div>
                     </TableCell>
+                    <TableCell className="p-2">
+                      <div className="flex flex-col gap-1">
+                        <GarmentStatusDropdown
+                          garmentDetails={garmentDetails}
+                          onStatusChange={(status, notes) => handleStatusChange(item, status, notes)}
+                          onReportIssue={() => handleReportIssue(item)}
+                        />
+                        {totalQuantity > 0 && garmentDetails.receivedQuantity !== garmentDetails.expectedQuantity && (
+                          <div className="text-xs text-muted-foreground">
+                            {garmentDetails.receivedQuantity}/{garmentDetails.expectedQuantity} received
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
                   </TableRow>
                   
                   {item.mockups && item.mockups.length > 0 && (
                     <TableRow className="border-b hover:bg-gray-50">
-                      <TableCell colSpan={14} className="p-2 bg-gray-50">
+                      <TableCell colSpan={15} className="p-2 bg-gray-50">
                         <div className="flex flex-wrap gap-2 p-2">
                           {item.mockups.map((mockup) => (
                             <div 
@@ -146,7 +225,7 @@ export function QuoteItemsTable({ itemGroups }: QuoteItemsTableProps) {
 
             {group.imprints && group.imprints.length > 0 && (
               <TableRow className="border-b bg-slate-50">
-                <TableCell colSpan={14} className="p-4">
+                <TableCell colSpan={15} className="p-4">
                     <div className="space-y-3">
                     <h4 className="font-medium text-sm">Imprint Details</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -276,6 +355,13 @@ export function QuoteItemsTable({ itemGroups }: QuoteItemsTableProps) {
     <div className="space-y-2">
       <h3 className="text-base font-medium">Quote Items</h3>
       {itemGroups.map((group, groupIndex) => renderItemGroup(group, groupIndex))}
+      
+      <StockIssueDialog
+        open={issueDialogOpen}
+        onOpenChange={setIssueDialogOpen}
+        onSubmit={handleIssueSubmit}
+        maxQuantity={selectedItem ? getTotalQuantity(selectedItem.sizes) : 1}
+      />
     </div>
   );
 }
