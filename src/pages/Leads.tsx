@@ -20,7 +20,7 @@ const initialLeads: Lead[] = [
     value: 5000,
     createdAt: new Date().toISOString(),
     lastContactedAt: new Date().toISOString(),
-    notes: 'Interested in our premium package',
+    notes: 'Customer needs custom t-shirts and hats for their annual music festival scheduled for September 1st. They are expecting approximately 2,500 attendees and want to offer branded merchandise at their vendor booths. • T-shirt requirements: 500 units in various sizes (S-XXL), preferably 100% cotton, with festival logo and date on front, sponsor logos on back • Hat requirements: 300 units, adjustable baseball caps or snapbacks, embroidered festival logo • Timeline is tight - need final designs approved by August 15th for production to meet September 1st deadline • Budget range: $8,000-$12,000 total • Previous experience with local suppliers was disappointing due to quality issues • Looking for a reliable partner who can handle rush orders and maintain consistent quality standards • Interested in potential ongoing partnership for future events',
     customerType: 'new',
     aiEnriched: true,
     dataSource: 'email',
