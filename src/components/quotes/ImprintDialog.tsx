@@ -271,11 +271,25 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
                       {imprint.customerArt && imprint.customerArt.length > 0 && (
                         <div className="flex flex-wrap gap-2">
                           {imprint.customerArt?.map((file) => (
-                            <div key={file.id} className="relative group">
-                              <div className="flex items-center gap-2 bg-muted rounded p-2 pr-8">
-                                <FileText className="h-4 w-4" />
-                                <span className="text-xs truncate max-w-[120px]">{file.name}</span>
-                              </div>
+                            <div key={file.id} className="relative w-16 h-16 border rounded-md overflow-hidden group">
+                              {file.type.startsWith('image/') ? (
+                                <img 
+                                  src={file.url} 
+                                  alt={file.name}
+                                  className="w-full h-full object-cover cursor-pointer"
+                                  onClick={() => window.open(file.url, '_blank')}
+                                  title={file.name}
+                                />
+                              ) : (
+                                <div 
+                                  className="w-full h-full flex flex-col items-center justify-center bg-muted cursor-pointer hover:bg-muted/80 transition-colors"
+                                  onClick={() => window.open(file.url, '_blank')}
+                                  title={file.name}
+                                >
+                                  <FileText className="h-4 w-4 mb-1" />
+                                  <span className="text-xs truncate max-w-full px-1">{file.name.split('.').pop()?.toUpperCase()}</span>
+                                </div>
+                              )}
                               <button
                                 onClick={() => handleRemoveFile(index, 'customerArt', file.id)}
                                 className="absolute top-1 right-1 bg-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
@@ -306,11 +320,25 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
                       {imprint.productionFiles && imprint.productionFiles.length > 0 && (
                         <div className="flex flex-wrap gap-2">
                           {imprint.productionFiles?.map((file) => (
-                            <div key={file.id} className="relative group">
-                              <div className="flex items-center gap-2 bg-muted rounded p-2 pr-8">
-                                <FileText className="h-4 w-4" />
-                                <span className="text-xs truncate max-w-[120px]">{file.name}</span>
-                              </div>
+                            <div key={file.id} className="relative w-16 h-16 border rounded-md overflow-hidden group">
+                              {file.type.startsWith('image/') ? (
+                                <img 
+                                  src={file.url} 
+                                  alt={file.name}
+                                  className="w-full h-full object-cover cursor-pointer"
+                                  onClick={() => window.open(file.url, '_blank')}
+                                  title={file.name}
+                                />
+                              ) : (
+                                <div 
+                                  className="w-full h-full flex flex-col items-center justify-center bg-muted cursor-pointer hover:bg-muted/80 transition-colors"
+                                  onClick={() => window.open(file.url, '_blank')}
+                                  title={file.name}
+                                >
+                                  <FileText className="h-4 w-4 mb-1" />
+                                  <span className="text-xs truncate max-w-full px-1">{file.name.split('.').pop()?.toUpperCase()}</span>
+                                </div>
+                              )}
                               <button
                                 onClick={() => handleRemoveFile(index, 'productionFiles', file.id)}
                                 className="absolute top-1 right-1 bg-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"

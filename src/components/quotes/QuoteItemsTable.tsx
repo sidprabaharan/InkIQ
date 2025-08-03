@@ -183,8 +183,24 @@ export function QuoteItemsTable({ itemGroups }: QuoteItemsTableProps) {
                               <span className="font-medium text-sm">Customer Art:</span>
                               <div className="flex flex-wrap gap-2 mt-1">
                                 {imprint.customerArt.map((file) => (
-                                  <div key={file.id} className="flex items-center gap-1 bg-muted rounded px-2 py-1">
-                                    <span className="text-xs">{file.name}</span>
+                                  <div key={file.id} className="w-16 h-16 border rounded-md overflow-hidden">
+                                    {file.type.startsWith('image/') ? (
+                                      <img 
+                                        src={file.url} 
+                                        alt={file.name}
+                                        className="w-full h-full object-cover cursor-pointer"
+                                        onClick={() => window.open(file.url, '_blank')}
+                                        title={file.name}
+                                      />
+                                    ) : (
+                                      <div 
+                                        className="w-full h-full flex flex-col items-center justify-center bg-muted cursor-pointer hover:bg-muted/80 transition-colors"
+                                        onClick={() => window.open(file.url, '_blank')}
+                                        title={file.name}
+                                      >
+                                        <span className="text-xs">{file.name.split('.').pop()?.toUpperCase()}</span>
+                                      </div>
+                                    )}
                                   </div>
                                 ))}
                               </div>
@@ -197,8 +213,24 @@ export function QuoteItemsTable({ itemGroups }: QuoteItemsTableProps) {
                               <span className="font-medium text-sm">Production Files:</span>
                               <div className="flex flex-wrap gap-2 mt-1">
                                 {imprint.productionFiles.map((file) => (
-                                  <div key={file.id} className="flex items-center gap-1 bg-muted rounded px-2 py-1">
-                                    <span className="text-xs">{file.name}</span>
+                                  <div key={file.id} className="w-16 h-16 border rounded-md overflow-hidden">
+                                    {file.type.startsWith('image/') ? (
+                                      <img 
+                                        src={file.url} 
+                                        alt={file.name}
+                                        className="w-full h-full object-cover cursor-pointer"
+                                        onClick={() => window.open(file.url, '_blank')}
+                                        title={file.name}
+                                      />
+                                    ) : (
+                                      <div 
+                                        className="w-full h-full flex flex-col items-center justify-center bg-muted cursor-pointer hover:bg-muted/80 transition-colors"
+                                        onClick={() => window.open(file.url, '_blank')}
+                                        title={file.name}
+                                      >
+                                        <span className="text-xs">{file.name.split('.').pop()?.toUpperCase()}</span>
+                                      </div>
+                                    )}
                                   </div>
                                 ))}
                               </div>
