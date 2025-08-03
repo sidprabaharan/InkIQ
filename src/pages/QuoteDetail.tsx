@@ -1,23 +1,29 @@
 
 import { useParams } from "react-router-dom";
+import { useState } from "react";
 import { QuoteHeader } from "@/components/quotes/QuoteHeader";
 import { QuoteDetailHeader } from "@/components/quotes/QuoteDetailHeader";
+import { StatusDashboard } from "@/components/quotes/StatusDashboard";
 import { CompanyInfoCard } from "@/components/quotes/CompanyInfoCard";
 import { QuoteDetailsCard } from "@/components/quotes/QuoteDetailsCard";
 import { CustomerInfoCard } from "@/components/quotes/CustomerInfoCard";
-import { OrderBreakdown } from "@/components/quotes/OrderBreakdown";
+import { RedesignedOrderBreakdown } from "@/components/quotes/RedesignedOrderBreakdown";
+import { QuickActions } from "@/components/quotes/QuickActions";
 import { mockOrderBreakdownData } from "@/data/mockOrderBreakdown";
 import { NotesCard } from "@/components/quotes/NotesCard";
 import { InvoiceSummaryCard } from "@/components/quotes/InvoiceSummaryCard";
 import { quotationData } from "@/components/quotes/QuoteData";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function QuoteDetail() {
   const { id } = useParams();
   const quoteId = id || "3032";
   const quote = quotationData;
+  const [currentStatus, setCurrentStatus] = useState(quote.status.toLowerCase().includes('artwork') ? 'Artwork Pending' : quote.status);
   
-  // Simplify the artwork status if needed
-  const status = quote.status.toLowerCase().includes('artwork') ? 'Artwork' : quote.status;
+  const handleStatusChange = (newStatus: string) => {
+    setCurrentStatus(newStatus);
+  };
   
   // For demonstration purposes, we'll use the totalDue from the summary
   // and create a mock amount outstanding (75% of total)
@@ -55,63 +61,88 @@ export default function QuoteDetail() {
   const amountPaid = `$${(totalValue - outstandingValue).toFixed(2)}`;
   
   return (
-    <div className="p-0 bg-gray-50 min-h-full">
+    <div className="p-0 bg-background min-h-full">
       <QuoteHeader
         quoteId={quoteId}
         isNewQuote={false}
-        status={status}
+        status={currentStatus}
       />
       
-      <div className="p-6">
-        <QuoteDetailHeader 
-          quoteId={quoteId} 
-          status={status} 
-          customerInfo={customerShipping}
-          items={quote.items}
+      <div className="p-6 max-w-7xl mx-auto">
+        {/* Status Dashboard - Critical info at top */}
+        <StatusDashboard
+          status={currentStatus}
+          quoteId={quoteId}
+          totalAmount={totalAmount}
+          amountPaid={amountPaid}
+          amountOutstanding={amountOutstanding}
+          dueDate={formattedDetails.customerDueDate}
+          onStatusChange={handleStatusChange}
         />
 
-        <div className="space-y-6">
-          {/* Company and Quote Details - top row */}
-          <div className="grid grid-cols-2 gap-6">
-            {/* Company Information - top left */}
-            <CompanyInfoCard company={quote.company} />
-            
-            {/* Quote Details - top right */}
-            <QuoteDetailsCard 
-              details={formattedDetails} 
-              totalAmount={totalAmount}
-              amountPaid={amountPaid}
-              amountOutstanding={amountOutstanding}
-            />
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Main Content - 3 columns */}
+          <div className="lg:col-span-3 space-y-6">
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="products">Products & Imprints</TabsTrigger>
+                <TabsTrigger value="details">Details & Notes</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="overview" className="space-y-6 mt-6">
+                {/* Company and Quote Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <CompanyInfoCard company={quote.company} />
+                  <QuoteDetailsCard 
+                    details={formattedDetails} 
+                    hideFinancials={true}
+                  />
+                </div>
+                
+                {/* Customer Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <CustomerInfoCard 
+                    title="Billing Information" 
+                    customerInfo={quote.customer.billing} 
+                  />
+                  <CustomerInfoCard 
+                    title="Shipping Information" 
+                    customerInfo={quote.customer.shipping} 
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="products" className="mt-6">
+                <RedesignedOrderBreakdown 
+                  groups={mockOrderBreakdownData} 
+                  quoteId={quoteId} 
+                />
+              </TabsContent>
+
+              <TabsContent value="details" className="space-y-6 mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <NotesCard title="Customer Notes" content={quote.notes.customer} />
+                  <NotesCard title="Production Notes" content={quote.notes.production} />
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
-          
-          {/* Billing and Shipping - second row */}
-          <div className="grid grid-cols-2 gap-6">
-            {/* Billing Information */}
-            <CustomerInfoCard 
-              title="Customer Billing" 
-              customerInfo={quote.customer.billing} 
+
+          {/* Sidebar - 1 column */}
+          <div className="space-y-6">
+            <QuickActions
+              onSendEmail={() => console.log('Send email')}
+              onPrint={() => window.print()}
+              onDownload={() => console.log('Download PDF')}
+              onDuplicate={() => console.log('Duplicate quote')}
+              onPackingSlip={() => console.log('Generate packing slip')}
+              onShippingLabel={() => console.log('Generate shipping label')}
+              onGenerateInvoice={() => console.log('Generate invoice')}
+              onEdit={() => console.log('Edit quote')}
+              onAddNote={() => console.log('Add note')}
             />
             
-            {/* Shipping Information */}
-            <CustomerInfoCard 
-              title="Customer Shipping" 
-              customerInfo={quote.customer.shipping} 
-            />
-          </div>
-          
-          {/* Order Breakdown - full width */}
-          <OrderBreakdown groups={mockOrderBreakdownData} quoteId={quoteId} />
-          
-          {/* Notes and Invoice Summary - bottom row */}
-          <div className="grid grid-cols-3 gap-6">
-            {/* Customer Notes */}
-            <NotesCard title="Customer Notes" content={quote.notes.customer} />
-            
-            {/* Production Notes */}
-            <NotesCard title="Production Notes" content={quote.notes.production} />
-            
-            {/* Invoice Summary */}
             <InvoiceSummaryCard summary={quote.summary} />
           </div>
         </div>
