@@ -69,6 +69,86 @@ export const CartManagerProvider: React.FC<{ children: React.ReactNode }> = ({ c
         console.error('🛒 Error parsing saved carts:', error);
         localStorage.removeItem('cartManager_carts');
       }
+    } else {
+      // Add test data if no saved carts
+      const testCarts: Cart[] = [
+        {
+          id: 'test_cart_1',
+          name: 'Test Order - Apparel',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          status: 'draft',
+          orderingStrategy: 'separate',
+          automationLevel: 'manual',
+          items: [
+            {
+              id: 1,
+              sku: 'G185',
+              name: 'Gildan Heavy Blend Adult Hooded Sweatshirt',
+              category: 'Apparel',
+              price: 12.50,
+              supplierName: 'Gildan',
+              image: '/placeholder.svg',
+              quantities: [
+                { location: 'DALLAS, TX', size: 'M', quantity: 25 },
+                { location: 'DALLAS, TX', size: 'L', quantity: 35 },
+                { location: 'MEMPHIS, TN', size: 'XL', quantity: 15 }
+              ],
+              totalQuantity: 75
+            },
+            {
+              id: 2,
+              sku: 'G500',
+              name: 'Gildan Heavy Cotton T-Shirt',
+              category: 'Apparel',
+              price: 4.25,
+              supplierName: 'Gildan',
+              image: '/placeholder.svg',
+              quantities: [
+                { location: 'DALLAS, TX', size: 'S', quantity: 50 },
+                { location: 'DALLAS, TX', size: 'M', quantity: 100 },
+                { location: 'DALLAS, TX', size: 'L', quantity: 75 }
+              ],
+              totalQuantity: 225
+            }
+          ],
+          metadata: {
+            notes: 'Rush order for client presentation',
+            priority: 'high' as const
+          }
+        },
+        {
+          id: 'test_cart_2',
+          name: 'Test Order - Promotional Items',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          status: 'ready',
+          orderingStrategy: 'combined',
+          automationLevel: 'hybrid',
+          items: [
+            {
+              id: 3,
+              sku: 'PROMO123',
+              name: 'Custom Branded Pens',
+              category: 'Promotional',
+              price: 0.85,
+              supplierName: 'PromoShop',
+              quantities: [
+                { location: 'DALLAS, TX', size: 'One Size', quantity: 500 }
+              ],
+              totalQuantity: 500
+            }
+          ],
+          metadata: {
+            notes: 'Trade show giveaways',
+            priority: 'medium' as const
+          }
+        }
+      ];
+      
+      setCarts(testCarts);
+      setActiveCartId('test_cart_1');
+      console.log('🛒 Added test cart data');
     }
     
     if (savedSettings) {
