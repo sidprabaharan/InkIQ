@@ -42,9 +42,9 @@ interface QuoteItem {
     xxl: number;
     xxxl: number;
   };
-  price: number;
+  price: number | string;
   taxed: boolean;
-  total: number;
+  total: number | string;
   status: string;
   mockups: Mockup[];
 }
@@ -121,13 +121,13 @@ export function QuoteItemsTable({ itemGroups }: QuoteItemsTableProps) {
                       <div className="text-sm">{item.sizes.xxxl || 0}</div>
                     </TableCell>
                     <TableCell className="p-2 border-r border-gray-200">
-                      <div className="text-sm">${item.price.toFixed(2)}</div>
+                      <div className="text-sm">${typeof item.price === 'number' ? item.price.toFixed(2) : parseFloat(item.price.toString().replace(/[$,]/g, '')).toFixed(2)}</div>
                     </TableCell>
                     <TableCell className="p-2 text-center border-r border-gray-200">
                       <div className="text-sm">{item.taxed ? '✓' : ''}</div>
                     </TableCell>
                     <TableCell className="p-2 border-r border-gray-200">
-                      <div className="text-sm font-medium">${item.total.toFixed(2)}</div>
+                      <div className="text-sm font-medium">${typeof item.total === 'number' ? item.total.toFixed(2) : parseFloat(item.total.toString().replace(/[$,]/g, '')).toFixed(2)}</div>
                     </TableCell>
                   </TableRow>
                   
