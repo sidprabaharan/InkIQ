@@ -65,44 +65,31 @@ export default function QuoteDetail() {
       color: item.color,
       description: item.description,
       sizes: {
-        xs: 0,
-        s: 0,
-        m: parseInt(item.quantity) || 0,
-        l: 0,
-        xl: 0,
-        xxl: 0,
-        xxxl: 0,
+        xs: parseInt(item.xs) || 0,
+        s: parseInt(item.s) || 0,
+        m: parseInt(item.m) || 0,
+        l: parseInt(item.l) || 0,
+        xl: parseInt(item.xl) || 0,
+        xxl: parseInt(item.xxl) || 0,
+        xxxl: parseInt(item.xxxl) || 0,
       },
       quantity: parseInt(item.quantity) || 0,
       price: parseFloat(item.price.replace(/[$,]/g, '')) || 0,
-      taxed: false,
+      taxed: item.taxed,
       total: parseFloat(item.total.replace(/[$,]/g, '')) || 0,
-      status: "Pending",
-      mockups: [
-        {
-          id: "mockup-1",
-          name: "Front Design Mockup",
-          url: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=400&fit=crop",
-          type: "image"
-        },
-        {
-          id: "mockup-2", 
-          name: "Back Design Mockup",
-          url: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=400&fit=crop",
-          type: "image"
-        }
-      ]
+      status: item.status,
+      mockups: item.mockups || []
     })),
-    imprints: [{
-      id: "1",
-      type: "Screen Print",
-      placement: "Front",
-      size: "4\" x 4\"",
-      colours: ["Black", "White"],
-      notes: "High quality screen print",
-      mockups: [],
+    imprints: quote.imprints?.map(imprint => ({
+      id: imprint.id,
+      type: imprint.type,
+      placement: imprint.placement,
+      size: imprint.size,
+      colours: imprint.colours.split(' & '), // Convert "Black & White" to ["Black", "White"]
+      notes: imprint.notes || "",
+      mockups: imprint.files || [],
       imprintItems: []
-    }]
+    })) || []
   }];
   
   return (
