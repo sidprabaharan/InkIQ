@@ -53,7 +53,9 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
     imprintSections: [
       {
         type: 'Screen Print',
-        details: 'Front Center, 4" x 3", Black & White',
+        placement: 'Front Center',
+        size: '4" x 3"',
+        colours: 'Black & White',
         files: [
           {
             id: 'file-1',
@@ -71,7 +73,10 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
       },
       {
         type: 'Embroidery',
-        details: 'Left Chest, 2" x 1.5", Navy thread',
+        placement: 'Left Chest',
+        size: '2" x 1.5"',
+        colours: 'Navy thread',
+        notes: 'Ensure thread matches hoodie color',
         files: [
           {
             id: 'file-1b',
@@ -113,7 +118,9 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
     imprintSections: [
       {
         type: 'Embroidery',
-        details: 'Left Chest, 3" x 2.5", Navy & Gold',
+        placement: 'Left Chest',
+        size: '3" x 2.5"',
+        colours: 'Navy & Gold',
         files: [
           {
             id: 'file-3',
@@ -155,7 +162,9 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
     imprintSections: [
       {
         type: 'Digital Print',
-        details: 'Front Center, 2" x 1.5", Full Color',
+        placement: 'Front Center',
+        size: '2" x 1.5"',
+        colours: 'Full Color',
         files: [
           {
             id: 'file-4',
@@ -167,7 +176,10 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
       },
       {
         type: 'Screen Print',
-        details: 'Back Center, 8" x 6", White ink',
+        placement: 'Back Center',
+        size: '8" x 6"',
+        colours: 'White ink',
+        notes: 'Large back print requires special setup',
         files: [
           {
             id: 'file-4b',

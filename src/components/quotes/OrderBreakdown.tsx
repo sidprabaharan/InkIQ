@@ -12,7 +12,10 @@ export interface ImprintFile {
 
 export interface ImprintDetails {
   type: string;
-  details: string;
+  placement: string;
+  size: string;
+  colours: string;
+  notes?: string;
   files: ImprintFile[];
 }
 
@@ -139,15 +142,29 @@ export function OrderBreakdown({ groups }: OrderBreakdownProps) {
             {/* Imprint Sections */}
             {group.imprintSections.map((imprintSection, sectionIndex) => (
               <div key={sectionIndex} className="bg-muted/20 border-t border-border px-6 py-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                   <div>
                     <span className="font-medium text-sm">Type: </span>
                     <span className="text-sm">{imprintSection.type}</span>
                   </div>
                   <div>
-                    <span className="font-medium text-sm">Details: </span>
-                    <span className="text-sm">{imprintSection.details}</span>
+                    <span className="font-medium text-sm">Placement: </span>
+                    <span className="text-sm">{imprintSection.placement}</span>
                   </div>
+                  <div>
+                    <span className="font-medium text-sm">Size: </span>
+                    <span className="text-sm">{imprintSection.size}</span>
+                  </div>
+                  <div>
+                    <span className="font-medium text-sm">Colours: </span>
+                    <span className="text-sm">{imprintSection.colours}</span>
+                  </div>
+                  {imprintSection.notes && (
+                    <div className="col-span-full">
+                      <span className="font-medium text-sm">Notes: </span>
+                      <span className="text-sm">{imprintSection.notes}</span>
+                    </div>
+                  )}
                 </div>
                 
                 {imprintSection.files.length > 0 && (
