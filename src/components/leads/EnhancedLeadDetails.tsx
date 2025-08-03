@@ -73,9 +73,6 @@ export default function EnhancedLeadDetails({
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
               </Button>
-              <Button size="sm">
-                Schedule Follow-up
-              </Button>
             </div>
           </div>
           <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-2">

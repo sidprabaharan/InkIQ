@@ -120,9 +120,6 @@ export default function LeadDetails({ lead, open, onOpenChange }: LeadDetailsPro
           )}
         </div>
 
-        <SheetFooter>
-          <Button>Schedule Follow-up</Button>
-        </SheetFooter>
       </SheetContent>
     </Sheet>
   );
