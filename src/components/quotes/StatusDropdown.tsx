@@ -1,5 +1,5 @@
 
-import { Check, Image, Package, Tag, CheckCircle2, Ban, Clock, AlertCircle, Truck } from "lucide-react";
+import { Check, Package, Tag, Clock, AlertTriangle, Truck, ShoppingCart, FileText, PackageX, RotateCcw } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,54 +22,38 @@ export function StatusDropdown({ currentStatus, onStatusChange }: StatusDropdown
     onStatusChange(status);
     toast({
       title: "Status Updated",
-      description: `Quote status changed to "${status}"`,
+      description: `Garment status changed to "${status}"`,
     });
   };
 
-  // Define the status options with their styling - focused on line item production statuses
+  // Define the status options with their styling - focused on garment procurement workflow
   const statusOptions = [
-    // Blue statuses
-    { name: "Quote", color: "bg-blue-500 text-white", icon: <Tag className="h-4 w-4 mr-2" /> },
+    // Core procurement flow
+    { name: "Pending", color: "bg-slate-500 text-white", icon: <ShoppingCart className="h-4 w-4 mr-2" /> },
+    { name: "PO", color: "bg-amber-500 text-white", icon: <FileText className="h-4 w-4 mr-2" /> },
+    { name: "Ordered", color: "bg-blue-500 text-white", icon: <Truck className="h-4 w-4 mr-2" /> },
+    { name: "Received", color: "bg-green-600 text-white", icon: <Package className="h-4 w-4 mr-2" /> },
     
-    // Green statuses
-    { name: "Artwork", color: "bg-green-500 text-white", icon: <Image className="h-4 w-4 mr-2" /> },
-    
-    // Orange statuses  
-    { name: "Production", color: "bg-orange-400 text-white", icon: <Package className="h-4 w-4 mr-2" /> },
-    
-    // Purple statuses
-    { name: "Quality Control", color: "bg-purple-600 text-white", icon: <CheckCircle2 className="h-4 w-4 mr-2" /> },
-    { name: "Shipping", color: "bg-purple-500 text-white", icon: <Truck className="h-4 w-4 mr-2" /> },
-    
-    // Yellow/Green statuses
-    { name: "Complete", color: "bg-green-600 text-white", icon: <Check className="h-4 w-4 mr-2" /> },
-    
-    // Red statuses
-    { name: "On Hold", color: "bg-red-600 text-white", icon: <Clock className="h-4 w-4 mr-2" /> },
-    { name: "Canceled", color: "bg-red-800 text-white", icon: <Ban className="h-4 w-4 mr-2" /> },
+    // Additional status handling
+    { name: "Backordered", color: "bg-yellow-500 text-white", icon: <Clock className="h-4 w-4 mr-2" /> },
+    { name: "Partial Received", color: "bg-orange-500 text-white", icon: <PackageX className="h-4 w-4 mr-2" /> },
+    { name: "Quality Issue", color: "bg-red-600 text-white", icon: <AlertTriangle className="h-4 w-4 mr-2" /> },
+    { name: "Returned", color: "bg-red-800 text-white", icon: <RotateCcw className="h-4 w-4 mr-2" /> },
   ];
 
-  // Determine if current status is any type of Artwork status
-  const isArtworkStatus = currentStatus.toLowerCase().includes('artwork');
-  
-  // Display status should be Artwork if it's any artwork variation
-  const displayStatus = isArtworkStatus ? "Artwork" : currentStatus;
+  // Display status as is (no special handling needed for these simple statuses)
+  const displayStatus = currentStatus;
   
   // Find the class for the current status button
   let currentStatusData = statusOptions.find(option => option.name === displayStatus);
   
-  // If not found (could be a custom or old status format), try to match by category
+  // If not found (could be a custom or old status format), use fallback
   if (!currentStatusData) {
-    if (isArtworkStatus) {
-      currentStatusData = statusOptions.find(option => option.name === "Artwork");
-    } else {
-      // Fix: Add the required 'name' property to the default fallback object
-      currentStatusData = { 
-        name: "Unknown Status", 
-        color: "bg-gray-500 text-white", 
-        icon: <Tag className="h-4 w-4 mr-2" /> 
-      };
-    }
+    currentStatusData = { 
+      name: "Unknown Status", 
+      color: "bg-gray-500 text-white", 
+      icon: <Tag className="h-4 w-4 mr-2" /> 
+    };
   }
 
   return (
