@@ -31,15 +31,22 @@ interface ImprintDialogProps {
 }
 
 export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = [] }: ImprintDialogProps) {
-  const [imprints, setImprints] = useState<ImprintItem[]>(initialImprints.length > 0 ? 
-    initialImprints : 
-    [{
-      id: `imprint-${Math.random().toString(36).substring(2, 9)}`,
-      typeOfWork: "",
-      details: "",
-      mockups: []
-    }]
-  );
+  const [imprints, setImprints] = useState<ImprintItem[]>([]);
+  
+  // Reset state when dialog opens with new initialImprints
+  React.useEffect(() => {
+    if (open) {
+      setImprints(initialImprints.length > 0 ? 
+        initialImprints : 
+        [{
+          id: `imprint-${Math.random().toString(36).substring(2, 9)}`,
+          typeOfWork: "",
+          details: "",
+          mockups: []
+        }]
+      );
+    }
+  }, [open, initialImprints]);
 
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [currentImprintIndex, setCurrentImprintIndex] = useState<number | null>(null);

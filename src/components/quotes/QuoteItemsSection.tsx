@@ -46,15 +46,10 @@ interface Item {
   mockups: ItemMockup[];
 }
 
-interface Imprint {
-  id: string;
-  imprintItems: ImprintItem[];
-}
-
 interface ItemGroup {
   id: string;
   items: Item[];
-  imprints: Imprint[];
+  imprints: ImprintItem[];
 }
 
 interface QuoteItemsSectionProps {
@@ -74,19 +69,13 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
   // Initialize with quote data if available, otherwise use default empty structure
   const getInitialItemGroups = () => {
     if (quoteData?.items && quoteData.items.length > 0) {
-      // Transform quote data items to the format expected by this component
-      const transformedImprints = quoteData.imprints ? [{
-        id: "imprint-" + Math.random().toString(36).substring(2, 9),
-        imprintItems: quoteData.imprints.map((imprint: any) => ({
-          id: imprint.id,
-          type: imprint.type,
-          placement: imprint.placement,
-          size: imprint.size,
-          colours: imprint.colours,
-          notes: imprint.notes || "",
-          files: imprint.files || []
-        }))
-      }] : [];
+      // Transform quote data imprints to the format expected by this component
+      const transformedImprints = quoteData.imprints ? quoteData.imprints.map((imprint: any) => ({
+        id: imprint.id,
+        typeOfWork: imprint.type,
+        details: imprint.notes || "",
+        mockups: imprint.files || []
+      })) : [];
 
       return [{
         id: "group-" + Math.random().toString(36).substring(2, 9),
@@ -291,14 +280,9 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
 
   const handleSaveImprints = (imprintItems: ImprintItem[]) => {
     if (currentGroupIndex !== null) {
-      const newImprints = {
-        id: "imprint-" + Math.random().toString(36).substring(2, 9),
-        imprintItems: imprintItems
-      };
-
       setItemGroups(prevItemGroups => {
         const updatedGroups = [...prevItemGroups];
-        updatedGroups[currentGroupIndex].imprints.push(newImprints);
+        updatedGroups[currentGroupIndex].imprints = imprintItems;
         return updatedGroups;
       });
       
@@ -517,29 +501,29 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
               );
             })}
 
-            {group.imprints && group.imprints.length > 0 && group.imprints.map((imprint) => (
-              <TableRow key={imprint.id} className="border-b bg-slate-50">
+            {group.imprints && group.imprints.length > 0 && (
+              <TableRow className="border-b bg-slate-50">
                 <TableCell colSpan={16} className="p-4">
                   <div className="space-y-3">
                     <h4 className="font-medium text-sm">Imprint Details</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {imprint.imprintItems?.map((item) => (
-                        <div key={item.id} className="border rounded-md p-3 bg-white">
+                      {group.imprints.map((imprint) => (
+                        <div key={imprint.id} className="border rounded-md p-3 bg-white">
                           <div className="grid grid-cols-1 gap-2 text-sm">
                             <div>
-                              <span className="font-medium">Type of Work:</span> {item.typeOfWork || "Not specified"}
+                              <span className="font-medium">Type of Work:</span> {imprint.typeOfWork || "Not specified"}
                             </div>
                           </div>
-                          {item.details && (
+                          {imprint.details && (
                             <div className="mt-2 text-sm">
-                              <span className="font-medium">Details:</span> {item.details}
+                              <span className="font-medium">Details:</span> {imprint.details}
                             </div>
                           )}
-                          {item.mockups && item.mockups.length > 0 && (
+                          {imprint.mockups && imprint.mockups.length > 0 && (
                             <div className="mt-2">
                               <span className="font-medium text-sm">Mockups:</span>
                               <div className="flex flex-wrap gap-2 mt-1">
-                                {item.mockups?.map((mockup) => (
+                                {imprint.mockups?.map((mockup) => (
                                   <div key={mockup.id} className="w-16 h-16 border rounded-md overflow-hidden">
                                     <img 
                                       src={mockup.url} 
@@ -557,7 +541,7 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
         
@@ -602,9 +586,7 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
         open={imprintDialogOpen}
         onOpenChange={setImprintDialogOpen}
         onSave={handleSaveImprints}
-        initialImprints={currentGroupIndex !== null && itemGroups[currentGroupIndex]?.imprints?.length > 0 
-          ? itemGroups[currentGroupIndex].imprints[itemGroups[currentGroupIndex].imprints.length - 1].imprintItems 
-          : undefined}
+        initialImprints={currentGroupIndex !== null ? itemGroups[currentGroupIndex]?.imprints : undefined}
       />
     </div>
   );
