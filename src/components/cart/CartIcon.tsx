@@ -6,9 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import { useCartManager } from '@/context/CartManagerContext';
 
 export function CartIcon() {
-  const { getAllCartsTotals } = useCartManager();
+  const { getActiveCartsTotals } = useCartManager();
   const navigate = useNavigate();
-  const allTotals = getAllCartsTotals();
+  const activeTotals = getActiveCartsTotals();
 
   const handleClick = () => {
     navigate('/purchase-orders');
@@ -17,9 +17,9 @@ export function CartIcon() {
   return (
     <Button variant="ghost" className="relative" onClick={handleClick}>
       <ShoppingCart className="h-5 w-5" />
-      {allTotals.totalItems > 0 && (
+      {activeTotals.totalItems > 0 && (
         <Badge className="absolute -top-2 -right-2 px-1 min-w-5 h-5 flex items-center justify-center">
-          {allTotals.totalItems}
+          {activeTotals.totalItems}
         </Badge>
       )}
       <span className="sr-only">View cart</span>

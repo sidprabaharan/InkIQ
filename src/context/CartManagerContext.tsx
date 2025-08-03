@@ -30,6 +30,7 @@ interface CartManagerContextType {
   // Totals
   getCartTotals: (cartId: string) => { totalItems: number; subtotal: number };
   getAllCartsTotals: () => { totalItems: number; subtotal: number };
+  getActiveCartsTotals: () => { totalItems: number; subtotal: number };
 }
 
 const CartManagerContext = createContext<CartManagerContextType | undefined>(undefined);
@@ -258,11 +259,28 @@ export const CartManagerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
   
   const getAllCartsTotals = () => {
+    console.log('getAllCartsTotals - All carts:', carts.map(c => ({ id: c.id, name: c.name, status: c.status, itemCount: c.items.length })));
+    
     const totalItems = carts.reduce((acc, cart) => {
       return acc + cart.items.reduce((itemAcc, item) => itemAcc + item.totalQuantity, 0);
     }, 0);
     
     const subtotal = carts.reduce((acc, cart) => {
+      return acc + cart.items.reduce((itemAcc, item) => itemAcc + (item.price * item.totalQuantity), 0);
+    }, 0);
+    
+    return { totalItems, subtotal };
+  };
+
+  const getActiveCartsTotals = () => {
+    const activeCarts = carts.filter(cart => cart.status === 'draft' || cart.status === 'ready');
+    console.log('getActiveCartsTotals - Active carts:', activeCarts.map(c => ({ id: c.id, name: c.name, status: c.status, itemCount: c.items.length })));
+    
+    const totalItems = activeCarts.reduce((acc, cart) => {
+      return acc + cart.items.reduce((itemAcc, item) => itemAcc + item.totalQuantity, 0);
+    }, 0);
+    
+    const subtotal = activeCarts.reduce((acc, cart) => {
       return acc + cart.items.reduce((itemAcc, item) => itemAcc + (item.price * item.totalQuantity), 0);
     }, 0);
     
@@ -289,7 +307,8 @@ export const CartManagerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       saveCartTemplate,
       updateUserSettings,
       getCartTotals,
-      getAllCartsTotals
+      getAllCartsTotals,
+      getActiveCartsTotals
     }}>
       {children}
     </CartManagerContext.Provider>
