@@ -268,11 +268,6 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
                           <span>Upload</span>
                         </Button>
                       </div>
-                      {methodConfig && (
-                        <p className="text-xs text-muted-foreground mb-2">
-                          Accepted: {methodConfig.customerArtTypes.join(', ')}
-                        </p>
-                      )}
                       {imprint.customerArt && imprint.customerArt.length > 0 && (
                         <div className="flex flex-wrap gap-2">
                           {imprint.customerArt?.map((file) => (
@@ -308,11 +303,6 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
                           <span>Upload</span>
                         </Button>
                       </div>
-                      {methodConfig && (
-                        <p className="text-xs text-muted-foreground mb-2">
-                          Accepted: {methodConfig.productionFileTypes.join(', ')}
-                        </p>
-                      )}
                       {imprint.productionFiles && imprint.productionFiles.length > 0 && (
                         <div className="flex flex-wrap gap-2">
                           {imprint.productionFiles?.map((file) => (
