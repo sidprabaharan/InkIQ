@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, AlertTriangle, Plus } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { GarmentStatus, GARMENT_STATUS_CONFIG, GarmentDetails } from '@/types/garment';
 import { GarmentStatusBadge } from './GarmentStatusBadge';
 
@@ -74,7 +74,6 @@ export function GarmentStatusDropdown({
           onClick={onReportIssue}
           className="cursor-pointer text-orange-600 hover:text-orange-700"
         >
-          <AlertTriangle className="h-4 w-4 mr-2" />
           Report Issue
         </DropdownMenuItem>
       </DropdownMenuContent>
