@@ -9,9 +9,7 @@ import { X, Edit, Building2, User, Globe, Phone, Mail, MapPin, DollarSign, Calen
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import ContactInfoSection from './ContactInfoSection';
-import CompanyIntelligenceCard from './CompanyIntelligenceCard';
 import ActivityTimeline from './ActivityTimeline';
-import AIInsightsPanel from './AIInsightsPanel';
 
 interface EnhancedLeadDetailsProps {
   lead: Lead | null;
@@ -115,15 +113,96 @@ export default function EnhancedLeadDetails({
           <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
             <TabsList className="mx-6 mt-4 w-fit">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="company">Company Intelligence</TabsTrigger>
               <TabsTrigger value="activity">Activity & Communication</TabsTrigger>
-              <TabsTrigger value="ai-insights">AI Insights</TabsTrigger>
             </TabsList>
 
             <div className="flex-1 overflow-auto px-6 pb-6">
               <TabsContent value="overview" className="mt-4 space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <ContactInfoSection lead={lead} />
+                  
+                  {/* Company Information Card */}
+                  <div className="bg-card p-6 rounded-lg border">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold flex items-center">
+                        <Building2 className="h-5 w-5 mr-2" />
+                        Company Information
+                      </h3>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {/* Company Name */}
+                      <div>
+                        <div className="font-medium">{lead.company}</div>
+                        <div className="text-sm text-muted-foreground">Company Name</div>
+                      </div>
+
+                      {/* Website */}
+                      {lead.companyInfo?.website && (
+                        <div>
+                          <div className="font-medium flex items-center">
+                            <span className="mr-2">{lead.companyInfo.website}</span>
+                            <Button variant="ghost" size="sm" asChild>
+                              <a href={lead.companyInfo.website} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="h-3 w-3" />
+                              </a>
+                            </Button>
+                          </div>
+                          <div className="text-sm text-muted-foreground">Website</div>
+                        </div>
+                      )}
+
+                      {/* Company Size */}
+                      {lead.companyInfo?.size && (
+                        <div>
+                          <div className="font-medium">{lead.companyInfo.size}</div>
+                          <div className="text-sm text-muted-foreground">Company Size</div>
+                        </div>
+                      )}
+
+                      {/* Industry */}
+                      {lead.companyInfo?.industry && (
+                        <div>
+                          <div className="flex flex-wrap gap-1 mb-1">
+                            {lead.companyInfo.industry.split(',').map((industry, index) => (
+                              <Badge key={index} variant="secondary" className="text-xs">
+                                {industry.trim()}
+                              </Badge>
+                            ))}
+                          </div>
+                          <div className="text-sm text-muted-foreground">Industry</div>
+                        </div>
+                      )}
+
+                      {/* Estimated Annual Spend */}
+                      {lead.companyInfo?.estimatedAnnualSpend && (
+                        <div>
+                          <div className="font-medium">
+                            ${(lead.companyInfo.estimatedAnnualSpend / 1000).toFixed(0)}K annually
+                          </div>
+                          <div className="text-sm text-muted-foreground">Estimated Merch Spend</div>
+                        </div>
+                      )}
+
+                      {/* Data Confidence */}
+                      {lead.confidenceScore && (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium">Data Confidence</span>
+                            <span className="text-sm font-medium">
+                              {Math.round(lead.confidenceScore * 100)}%
+                            </span>
+                          </div>
+                          <div className="w-full bg-muted rounded-full h-2">
+                            <div 
+                              className="bg-primary h-2 rounded-full transition-all duration-300" 
+                              style={{ width: `${lead.confidenceScore * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                   
                   {/* Quote Actions Card */}
                   <div className="bg-card p-6 rounded-lg border">
@@ -221,16 +300,8 @@ export default function EnhancedLeadDetails({
                 </div>
               </TabsContent>
 
-              <TabsContent value="company" className="mt-4">
-                <CompanyIntelligenceCard lead={lead} expanded />
-              </TabsContent>
-
               <TabsContent value="activity" className="mt-4">
                 <ActivityTimeline leadId={lead.id} />
-              </TabsContent>
-
-              <TabsContent value="ai-insights" className="mt-4">
-                <AIInsightsPanel lead={lead} />
               </TabsContent>
             </div>
           </Tabs>
