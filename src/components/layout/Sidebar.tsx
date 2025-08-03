@@ -10,7 +10,7 @@ import {
   FileText,
   Home,
   LogOut,
-  MessageSquare,
+  Mail,
   PlayCircle,
   Settings,
   ShoppingBag,
@@ -89,8 +89,8 @@ export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
       path: '/purchase-orders',
     },
     {
-      name: 'Messages',
-      icon: MessageSquare,
+      name: 'Emails',
+      icon: Mail,
       path: '/messages',
     },
     {

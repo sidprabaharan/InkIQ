@@ -14,7 +14,7 @@ import Invoices from "@/pages/Invoices";
 import Customers from "@/pages/Customers";
 import Contacts from "@/pages/Contacts";
 import Tasks from "@/pages/Tasks";
-import Messages from "@/pages/Messages";
+import Emails from "@/pages/Emails";
 import Calendar from "@/pages/Calendar";
 import Leads from "@/pages/Leads";
 import Settings from "@/pages/Settings";
@@ -45,7 +45,7 @@ function App() {
               <Route path="/contacts" element={<AppLayout><Contacts /></AppLayout>} />
               <Route path="/leads" element={<AppLayout><Leads /></AppLayout>} />
               <Route path="/tasks" element={<AppLayout><Tasks /></AppLayout>} />
-              <Route path="/messages" element={<AppLayout><Messages /></AppLayout>} />
+              <Route path="/messages" element={<AppLayout><Emails /></AppLayout>} />
               <Route path="/calendar" element={<AppLayout><Calendar /></AppLayout>} />
               <Route path="/products" element={<AppLayout><Products /></AppLayout>} />
               <Route path="/purchase-orders" element={<AppLayout><PurchaseOrders /></AppLayout>} />
