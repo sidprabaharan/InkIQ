@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, MoreVertical, Trash2, Copy, Image, X } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -57,7 +57,12 @@ interface QuoteItemsSectionProps {
   quoteData?: any;
 }
 
-export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
+export interface QuoteItemsSectionRef {
+  getCurrentItemGroups: () => ItemGroup[];
+}
+
+export const QuoteItemsSection = forwardRef<QuoteItemsSectionRef, QuoteItemsSectionProps>(
+  ({ quoteData }, ref) => {
   // Utility functions to parse string values to numbers
   const parseNumber = (value: string | number): number => {
     if (typeof value === 'number') return value;
@@ -167,6 +172,11 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
   
   const [imprintDialogOpen, setImprintDialogOpen] = useState(false);
   const [currentGroupIndex, setCurrentGroupIndex] = useState<number | null>(null);
+
+  // Expose methods to parent component
+  useImperativeHandle(ref, () => ({
+    getCurrentItemGroups: () => itemGroups,
+  }));
 
   const handleInputChange = (groupIndex: number, itemIndex: number, field: string, value: string | number | boolean) => {
     const newItemGroups = [...itemGroups];
@@ -672,4 +682,6 @@ export function QuoteItemsSection({ quoteData }: QuoteItemsSectionProps) {
       />
     </div>
   );
-}
+});
+
+QuoteItemsSection.displayName = "QuoteItemsSection";

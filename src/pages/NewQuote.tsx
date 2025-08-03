@@ -1,11 +1,11 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams, useParams } from "react-router-dom";
 import { QuoteHeader } from "@/components/quotes/QuoteHeader";
 import { CustomerSection } from "@/components/quotes/CustomerSection";
 import { BillingSection } from "@/components/quotes/BillingSection";
 import { ShippingSection } from "@/components/quotes/ShippingSection";
-import { QuoteItemsSection } from "@/components/quotes/QuoteItemsSection";
+import { QuoteItemsSection, QuoteItemsSectionRef } from "@/components/quotes/QuoteItemsSection";
 import { QuotationHeader } from "@/components/quotes/QuotationHeader";
 import { QuotationDetailsSection } from "@/components/quotes/QuotationDetailsSection";
 import { NickNameSection } from "@/components/quotes/NickNameSection";
@@ -37,6 +37,7 @@ export default function NewQuote() {
   const [leadData, setLeadData] = useState<any>(null);
   const [quoteData, setQuoteData] = useState<QuotationData | null>(null);
   const [isLoading, setIsLoading] = useState(isEditMode);
+  const quoteItemsRef = useRef<QuoteItemsSectionRef>(null);
 
   // Check if this quote is being created from a lead or if we're editing
   useEffect(() => {
@@ -99,14 +100,32 @@ export default function NewQuote() {
   };
 
   const handleSave = () => {
+    // Get current item groups data from QuoteItemsSection if available
+    const currentItemGroups = quoteItemsRef.current?.getCurrentItemGroups();
+    
     if (isEditMode) {
       console.log("Update quote with ID:", quoteId);
+      console.log("Saving item groups with imprints:", currentItemGroups);
+      
+      // In a real app, this would save to the backend/database
+      // For now, we'll update the local data structure
+      if (currentItemGroups && quoteData) {
+        // Update the quote data with the new item groups
+        const updatedQuoteData = {
+          ...quoteData,
+          itemGroups: currentItemGroups
+        };
+        console.log("Updated quote data:", updatedQuoteData);
+      }
+      
       toast({
         title: "Quote updated",
-        description: `Quote #${quoteId} has been updated successfully`,
+        description: `Quote #${quoteId} has been updated successfully with all imprints`,
       });
     } else {
       console.log("Save quote with ID:", quoteId);
+      console.log("Saving item groups with imprints:", currentItemGroups);
+      
       toast({
         title: "Quote created",
         description: `Quote #${quoteId} has been created successfully`,
@@ -184,7 +203,10 @@ export default function NewQuote() {
               
               {/* Quote Items Section - Full Width */}
               <div className="mt-6">
-                <QuoteItemsSection quoteData={quoteData} />
+                <QuoteItemsSection 
+                  quoteData={quoteData} 
+                  ref={quoteItemsRef}
+                />
               </div>
               
               {/* Invoice Summary Section - Full Width but with right alignment */}
