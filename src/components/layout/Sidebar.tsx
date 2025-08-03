@@ -44,11 +44,6 @@ export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
       path: '/calendar',
     },
     {
-      name: 'Contacts',
-      icon: Users,
-      path: '/contacts',
-    },
-    {
       name: 'Leads',
       icon: User,
       path: '/leads',

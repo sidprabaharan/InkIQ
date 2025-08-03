@@ -38,9 +38,6 @@ export function CustomerSection({ leadData, quoteData }: CustomerSectionProps) {
     }
   }, [quoteData, selectedCustomer, customers, selectCustomer]);
 
-  const handleNavigateToContacts = () => {
-    navigate("/contacts");
-  };
 
   return (
     <div className="space-y-2">
