@@ -22,11 +22,6 @@ interface ImprintItem {
   mockups: Mockup[];
 }
 
-interface Imprint {
-  id: string;
-  imprintItems: ImprintItem[];
-}
-
 interface QuoteItem {
   id: string;
   category: string;
@@ -52,7 +47,7 @@ interface QuoteItem {
 interface ItemGroup {
   id: string;
   items: QuoteItem[];
-  imprints: Imprint[];
+  imprints: ImprintItem[];
 }
 
 interface QuoteItemsTableProps {
@@ -156,29 +151,29 @@ export function QuoteItemsTable({ itemGroups }: QuoteItemsTableProps) {
               );
             })}
 
-            {group.imprints && group.imprints.length > 0 && group.imprints.map((imprint) => (
-              <TableRow key={imprint.id} className="border-b bg-slate-50">
+            {group.imprints && group.imprints.length > 0 && (
+              <TableRow className="border-b bg-slate-50">
                 <TableCell colSpan={14} className="p-4">
                   <div className="space-y-3">
                     <h4 className="font-medium text-sm">Imprint Details</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {imprint.imprintItems?.map((item) => (
-                        <div key={item.id} className="border rounded-md p-3 bg-white">
+                      {group.imprints.map((imprint) => (
+                        <div key={imprint.id} className="border rounded-md p-3 bg-white">
                           <div className="grid grid-cols-1 gap-2 text-sm">
                             <div>
-                              <span className="font-medium">Type of Work:</span> {item.typeOfWork || "Not specified"}
+                              <span className="font-medium">Type of Work:</span> {imprint.typeOfWork || "Not specified"}
                             </div>
                           </div>
-                          {item.details && (
+                          {imprint.details && (
                             <div className="mt-2 text-sm">
-                              <span className="font-medium">Details:</span> {item.details}
+                              <span className="font-medium">Details:</span> {imprint.details}
                             </div>
                           )}
-                          {item.mockups && item.mockups.length > 0 && (
+                          {imprint.mockups && imprint.mockups.length > 0 && (
                             <div className="mt-2">
                               <span className="font-medium text-sm">Mockups:</span>
                               <div className="flex flex-wrap gap-2 mt-1">
-                                {item.mockups?.map((mockup) => (
+                                {imprint.mockups.map((mockup) => (
                                   <div key={mockup.id} className="w-16 h-16 border rounded-md overflow-hidden">
                                     <img 
                                       src={mockup.url} 
@@ -196,7 +191,7 @@ export function QuoteItemsTable({ itemGroups }: QuoteItemsTableProps) {
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </div>

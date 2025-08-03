@@ -52,17 +52,14 @@ export default function WorkOrder() {
     })),
     imprints: (quote.imprints || []).map(imprint => ({
       id: imprint.id,
-      imprintItems: [{
-        id: imprint.id + "-item",
-        typeOfWork: imprint.type,
-        details: `${imprint.placement} - ${imprint.size} - ${imprint.colours}${imprint.notes ? ` - ${imprint.notes}` : ''}`,
-        mockups: imprint.files?.map(file => ({
-          id: file.id,
-          name: file.name,
-          url: file.url,
-          type: file.type
-        })) || []
-      }]
+      typeOfWork: imprint.type,
+      details: `${imprint.placement} | ${imprint.size} | ${imprint.colours}${imprint.notes ? ` | ${imprint.notes}` : ''}`,
+      mockups: imprint.files?.map(file => ({
+        id: file.id,
+        name: file.name,
+        url: file.url,
+        type: file.type
+      })) || []
     }))
   }];
   

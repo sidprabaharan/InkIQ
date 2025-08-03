@@ -82,13 +82,14 @@ export default function QuoteDetail() {
     })),
     imprints: quote.imprints?.map(imprint => ({
       id: imprint.id,
-      type: imprint.type,
-      placement: imprint.placement,
-      size: imprint.size,
-      colours: imprint.colours.split(' & '), // Convert "Black & White" to ["Black", "White"]
-      notes: imprint.notes || "",
-      mockups: imprint.files || [],
-      imprintItems: []
+      typeOfWork: imprint.type,
+      details: `${imprint.placement} | ${imprint.size} | ${imprint.colours}${imprint.notes ? ` | ${imprint.notes}` : ''}`,
+      mockups: imprint.files.map(file => ({
+        id: file.id,
+        name: file.name,
+        url: file.url,
+        type: file.type
+      }))
     })) || []
   }];
   
