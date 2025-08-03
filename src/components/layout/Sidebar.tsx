@@ -93,16 +93,6 @@ export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
       icon: DollarSign,
       path: '/expenses',
     },
-    {
-      name: 'Analytics',
-      icon: BarChart2,
-      path: '/analytics',
-    },
-    {
-      name: 'Merch Stores',
-      icon: Store,
-      path: '/merch-stores',
-    },
   ];
 
   const bottomItems = [
