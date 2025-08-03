@@ -88,7 +88,7 @@ export function QuoteHeader({
             </BreadcrumbSeparator>
             <BreadcrumbItem>
               <BreadcrumbPage className="text-sm">
-                {isNewQuote ? `Create ${documentType}` : `${documentType} #${quoteId}`}
+                {isNewQuote ? `Create ${documentType}` : `Edit ${documentType} #${quoteId}`}
               </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
@@ -108,8 +108,8 @@ export function QuoteHeader({
             Save & Finish
           </Button>
         ) : (
-          <Button variant="outline" className="text-gray-500" onClick={() => navigate(`/quotes/new`)}>
-            Create New {documentType}
+          <Button className="bg-inkiq-primary hover:bg-inkiq-primary/90 text-white" onClick={handleSave}>
+            Update {documentType}
           </Button>
         )}
       </div>

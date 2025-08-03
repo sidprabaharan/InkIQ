@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useParams } from "react-router-dom";
 import { QuoteHeader } from "@/components/quotes/QuoteHeader";
 import { CustomerSection } from "@/components/quotes/CustomerSection";
 import { BillingSection } from "@/components/quotes/BillingSection";
@@ -25,30 +25,45 @@ export default function NewQuote() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
+  const { id: editQuoteId } = useParams();
   
-  // Generate a new quote ID for this quote
-  const [quoteId] = useState(generateNewQuoteId());
-  const [nickname, setNickname] = useState("New Quotation");
+  // Determine if we're in edit mode
+  const isEditMode = !!editQuoteId;
+  
+  // Generate a new quote ID for this quote (only if creating new)
+  const [quoteId] = useState(isEditMode ? editQuoteId : generateNewQuoteId());
+  const [nickname, setNickname] = useState(isEditMode ? `Edit Quote #${editQuoteId}` : "New Quotation");
   const [leadData, setLeadData] = useState<any>(null);
 
-  // Check if this quote is being created from a lead
+  // Check if this quote is being created from a lead or if we're editing
   useEffect(() => {
-    const leadParam = searchParams.get('lead');
-    if (leadParam) {
-      try {
-        const data = JSON.parse(decodeURIComponent(leadParam));
-        setLeadData(data);
-        setNickname(`Quote for ${data.company || data.customerName}`);
-        
-        toast({
-          title: "Lead data loaded",
-          description: `Creating quote for ${data.customerName} at ${data.company}`,
-        });
-      } catch (error) {
-        console.error('Error parsing lead data:', error);
+    if (isEditMode) {
+      // In edit mode, load existing quote data
+      // For demo purposes, we'll just show a toast
+      toast({
+        title: "Quote loaded for editing",
+        description: `Editing quote #${editQuoteId}`,
+      });
+      // In a real app, you would fetch the quote data here and populate the form
+    } else {
+      // Check if creating from a lead
+      const leadParam = searchParams.get('lead');
+      if (leadParam) {
+        try {
+          const data = JSON.parse(decodeURIComponent(leadParam));
+          setLeadData(data);
+          setNickname(`Quote for ${data.company || data.customerName}`);
+          
+          toast({
+            title: "Lead data loaded",
+            description: `Creating quote for ${data.customerName} at ${data.company}`,
+          });
+        } catch (error) {
+          console.error('Error parsing lead data:', error);
+        }
       }
     }
-  }, [searchParams, toast]);
+  }, [searchParams, toast, isEditMode, editQuoteId]);
   
   const handleCancel = () => {
     navigate("/quotes");
@@ -63,10 +78,21 @@ export default function NewQuote() {
   };
 
   const handleSave = () => {
-    console.log("Save quote with ID:", quoteId);
+    if (isEditMode) {
+      console.log("Update quote with ID:", quoteId);
+      toast({
+        title: "Quote updated",
+        description: `Quote #${quoteId} has been updated successfully`,
+      });
+    } else {
+      console.log("Save quote with ID:", quoteId);
+      toast({
+        title: "Quote created",
+        description: `Quote #${quoteId} has been created successfully`,
+      });
+    }
     
-    // In a real app, this would save the quote data to a database
-    // For demo purposes, we'll just navigate to the quote detail page
+    // Navigate to the quote detail page
     navigate(`/quotes/${quoteId}`);
   };
 
@@ -82,7 +108,7 @@ export default function NewQuote() {
           onPreview={handlePreview}
           onSave={handleSave}
           quoteId={quoteId}
-          isNewQuote={true}
+          isNewQuote={!isEditMode}
         />
 
         {/* Lead Context Banner */}

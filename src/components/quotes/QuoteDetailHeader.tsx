@@ -66,10 +66,7 @@ export function QuoteDetailHeader({
   };
   
   const handleEditDocument = () => {
-    toast({
-      title: `Edit ${documentType}`,
-      description: `Editing ${documentType.toLowerCase()} #${quoteId}`,
-    });
+    navigate(`/quotes/${quoteId}/edit`);
   };
   
   const handleDocumentLink = () => {

@@ -38,6 +38,7 @@ function App() {
               <Route path="/" element={<AppLayout><Index /></AppLayout>} />
               <Route path="/quotes" element={<AppLayout><Quotes /></AppLayout>} />
               <Route path="/quotes/new" element={<AppLayout><NewQuote /></AppLayout>} />
+              <Route path="/quotes/:id/edit" element={<AppLayout><NewQuote /></AppLayout>} />
               <Route path="/quotes/:id" element={<AppLayout><QuoteDetail /></AppLayout>} />
               <Route path="/work-orders/:id" element={<WorkOrder />} />
               <Route path="/invoices" element={<AppLayout><Invoices /></AppLayout>} />
