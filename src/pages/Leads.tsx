@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import LeadBoard from '@/components/leads/LeadBoard';
 import LeadCard from '@/components/leads/LeadCard';
-import LeadDetails from '@/components/leads/LeadDetails';
+import EnhancedLeadDetails from '@/components/leads/EnhancedLeadDetails';
 import CreateLeadDialog from '@/components/leads/CreateLeadDialog';
 import { Lead, LeadColumn, LeadStatus } from '@/types/lead';
 
@@ -19,7 +19,31 @@ const initialLeads: Lead[] = [
     value: 5000,
     createdAt: new Date().toISOString(),
     lastContactedAt: new Date().toISOString(),
-    notes: 'Interested in our premium package'
+    notes: 'Interested in our premium package',
+    customerType: 'new',
+    aiEnriched: true,
+    dataSource: 'email',
+    confidenceScore: 0.85,
+    address: {
+      street: '123 Business Ave',
+      city: 'New York',
+      state: 'NY',
+      zip: '10001',
+      country: 'USA'
+    },
+    socialProfiles: {
+      linkedin: 'https://linkedin.com/in/johnsmith',
+      instagram: 'https://instagram.com/acmecorp'
+    },
+    companyInfo: {
+      size: '50-200 employees',
+      industry: 'Technology, Software',
+      estimatedAnnualSpend: 15000,
+      website: 'https://acmecorp.com'
+    },
+    lastEnrichedAt: new Date().toISOString(),
+    totalActivities: 3,
+    lastActivityType: 'email'
   },
   {
     id: '2',
@@ -30,6 +54,18 @@ const initialLeads: Lead[] = [
     value: 7500,
     createdAt: new Date().toISOString(),
     lastContactedAt: new Date().toISOString(),
+    customerType: 'existing',
+    existingCustomerId: 'cust-123',
+    aiEnriched: true,
+    dataSource: 'form',
+    confidenceScore: 0.92,
+    companyInfo: {
+      size: '200-500 employees',
+      industry: 'Manufacturing',
+      estimatedAnnualSpend: 25000
+    },
+    totalActivities: 5,
+    lastActivityType: 'call'
   },
   {
     id: '3',
@@ -39,6 +75,11 @@ const initialLeads: Lead[] = [
     status: 'qualified',
     value: 10000,
     createdAt: new Date().toISOString(),
+    customerType: 'new',
+    aiEnriched: false,
+    dataSource: 'manual',
+    totalActivities: 1,
+    lastActivityType: 'note'
   },
   {
     id: '4',
@@ -49,6 +90,17 @@ const initialLeads: Lead[] = [
     value: 15000,
     createdAt: new Date().toISOString(),
     lastContactedAt: new Date().toISOString(),
+    customerType: 'new',
+    aiEnriched: true,
+    dataSource: 'ai',
+    confidenceScore: 0.78,
+    companyInfo: {
+      size: '10-50 employees',
+      industry: 'Technology, Startups',
+      estimatedAnnualSpend: 8000
+    },
+    totalActivities: 7,
+    lastActivityType: 'meeting'
   },
   {
     id: '5',
@@ -58,6 +110,22 @@ const initialLeads: Lead[] = [
     status: 'negotiation',
     value: 25000,
     createdAt: new Date().toISOString(),
+    customerType: 'new',
+    aiEnriched: true,
+    dataSource: 'email',
+    confidenceScore: 0.95,
+    socialProfiles: {
+      linkedin: 'https://linkedin.com/in/robertwilson',
+      facebook: 'https://facebook.com/futureenterprises'
+    },
+    companyInfo: {
+      size: '500+ employees',
+      industry: 'Enterprise, Consulting',
+      estimatedAnnualSpend: 50000,
+      website: 'https://futureenterprises.com'
+    },
+    totalActivities: 12,
+    lastActivityType: 'email'
   }
 ];
 
@@ -213,7 +281,7 @@ export default function Leads() {
         />
       )}
 
-      <LeadDetails 
+      <EnhancedLeadDetails 
         lead={selectedLead}
         open={showLeadDetails}
         onOpenChange={handleLeadDetailsClose}

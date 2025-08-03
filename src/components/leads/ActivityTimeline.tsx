@@ -1,0 +1,260 @@
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { LeadActivity, EmailThread, CallLog } from '@/types/lead';
+import { formatDistanceToNow } from 'date-fns';
+import { 
+  Activity, 
+  Mail, 
+  Phone, 
+  Calendar, 
+  MessageSquare, 
+  Clock,
+  PhoneCall,
+  Plus,
+  Filter
+} from 'lucide-react';
+
+interface ActivityTimelineProps {
+  leadId: string;
+}
+
+// Mock data for demonstration
+const mockActivities: LeadActivity[] = [
+  {
+    id: '1',
+    leadId: '1',
+    type: 'email',
+    title: 'Initial inquiry received',
+    description: 'Customer inquired about custom t-shirt printing for company event',
+    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    metadata: {
+      emailThread: {
+        id: 'thread1',
+        subject: 'Custom T-Shirt Printing Inquiry',
+        participants: ['john@acmecorp.com', 'sales@inkiq.com'],
+        messages: [],
+        lastMessageAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+      }
+    }
+  },
+  {
+    id: '2',
+    leadId: '1',
+    type: 'call',
+    title: 'Discovery call completed',
+    description: 'Discussed requirements: 100 custom t-shirts, 3-color design, needed by end of month',
+    timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    metadata: {
+      callLog: {
+        id: 'call1',
+        duration: 1800,
+        direction: 'outbound',
+        outcome: 'answered',
+        notes: 'Very interested, decision maker, budget confirmed at $5000'
+      }
+    }
+  },
+  {
+    id: '3',
+    leadId: '1',
+    type: 'email',
+    title: 'Quote sent',
+    description: 'Detailed quote with samples and timeline sent to customer',
+    timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+  }
+];
+
+export default function ActivityTimeline({ leadId }: ActivityTimelineProps) {
+  const [activeTab, setActiveTab] = useState('all');
+  const [activities] = useState<LeadActivity[]>(mockActivities);
+
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case 'email':
+        return <Mail className="h-4 w-4" />;
+      case 'call':
+        return <Phone className="h-4 w-4" />;
+      case 'meeting':
+        return <Calendar className="h-4 w-4" />;
+      case 'note':
+        return <MessageSquare className="h-4 w-4" />;
+      default:
+        return <Activity className="h-4 w-4" />;
+    }
+  };
+
+  const getActivityColor = (type: string) => {
+    switch (type) {
+      case 'email':
+        return 'bg-blue-100 text-blue-600 border-blue-200';
+      case 'call':
+        return 'bg-green-100 text-green-600 border-green-200';
+      case 'meeting':
+        return 'bg-purple-100 text-purple-600 border-purple-200';
+      case 'note':
+        return 'bg-yellow-100 text-yellow-600 border-yellow-200';
+      default:
+        return 'bg-gray-100 text-gray-600 border-gray-200';
+    }
+  };
+
+  const formatCallDuration = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const filteredActivities = activeTab === 'all' 
+    ? activities 
+    : activities.filter(activity => activity.type === activeTab);
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Activity & Communication</h3>
+        <div className="flex space-x-2">
+          <Button variant="outline" size="sm">
+            <Filter className="h-4 w-4 mr-2" />
+            Filter
+          </Button>
+          <Button size="sm">
+            <Plus className="h-4 w-4 mr-2" />
+            Log Activity
+          </Button>
+        </div>
+      </div>
+
+      {/* Activity Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="all">All Activity</TabsTrigger>
+          <TabsTrigger value="email">Emails</TabsTrigger>
+          <TabsTrigger value="call">Calls</TabsTrigger>
+          <TabsTrigger value="meeting">Meetings</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value={activeTab} className="mt-4">
+          <div className="space-y-4">
+            {filteredActivities.length === 0 ? (
+              <Card>
+                <CardContent className="py-8 text-center text-muted-foreground">
+                  No activities found for this filter.
+                </CardContent>
+              </Card>
+            ) : (
+              filteredActivities.map((activity, index) => (
+                <Card key={activity.id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start space-x-4">
+                      {/* Activity Icon */}
+                      <div className={`
+                        p-2 rounded-full border
+                        ${getActivityColor(activity.type)}
+                      `}>
+                        {getActivityIcon(activity.type)}
+                      </div>
+
+                      {/* Activity Content */}
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium">{activity.title}</h4>
+                          <div className="flex items-center space-x-2">
+                            <Badge variant="outline" className="capitalize">
+                              {activity.type}
+                            </Badge>
+                            <span className="text-sm text-muted-foreground flex items-center">
+                              <Clock className="h-3 w-3 mr-1" />
+                              {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
+                            </span>
+                          </div>
+                        </div>
+
+                        <p className="text-sm text-muted-foreground mb-3">
+                          {activity.description}
+                        </p>
+
+                        {/* Activity-specific content */}
+                        {activity.type === 'email' && activity.metadata?.emailThread && (
+                          <div className="bg-muted/50 p-3 rounded-lg">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium">
+                                📧 {activity.metadata.emailThread.subject}
+                              </span>
+                              <Button variant="ghost" size="sm">
+                                View Thread
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+
+                        {activity.type === 'call' && activity.metadata?.callLog && (
+                          <div className="bg-muted/50 p-3 rounded-lg">
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <span className="font-medium">Duration:</span>{' '}
+                                {formatCallDuration(activity.metadata.callLog.duration)}
+                              </div>
+                              <div>
+                                <span className="font-medium">Direction:</span>{' '}
+                                <Badge variant="outline" className="ml-1 capitalize">
+                                  {activity.metadata.callLog.direction}
+                                </Badge>
+                              </div>
+                              <div>
+                                <span className="font-medium">Outcome:</span>{' '}
+                                <Badge variant="outline" className="ml-1 capitalize">
+                                  {activity.metadata.callLog.outcome}
+                                </Badge>
+                              </div>
+                            </div>
+                            {activity.metadata.callLog.notes && (
+                              <div className="mt-2 text-sm">
+                                <span className="font-medium">Notes:</span>{' '}
+                                {activity.metadata.callLog.notes}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <Button variant="outline" size="sm" className="justify-start">
+              <Mail className="h-4 w-4 mr-2" />
+              Send Email
+            </Button>
+            <Button variant="outline" size="sm" className="justify-start">
+              <PhoneCall className="h-4 w-4 mr-2" />
+              Log Call
+            </Button>
+            <Button variant="outline" size="sm" className="justify-start">
+              <Calendar className="h-4 w-4 mr-2" />
+              Schedule Meeting
+            </Button>
+            <Button variant="outline" size="sm" className="justify-start">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Add Note
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

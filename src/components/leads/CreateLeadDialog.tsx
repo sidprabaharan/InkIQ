@@ -15,12 +15,12 @@ interface CreateLeadDialogProps {
 }
 
 export default function CreateLeadDialog({ open, onClose, onSave }: CreateLeadDialogProps) {
-  const [formData, setFormData] = useState<Omit<Lead, 'id' | 'createdAt'>>({
+  const [formData, setFormData] = useState({
     name: '',
     company: '',
     email: '',
     phone: '',
-    status: 'new',
+    status: 'new' as LeadStatus,
     value: 0,
     notes: '',
   });
@@ -42,7 +42,24 @@ export default function CreateLeadDialog({ open, onClose, onSave }: CreateLeadDi
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    if (isValid) {
+      onSave({
+        ...formData,
+        customerType: 'new', // Default to new customer for manual leads
+        dataSource: 'manual',
+        aiEnriched: false,
+      });
+      // Reset form
+      setFormData({
+        name: '',
+        company: '',
+        email: '',
+        phone: '',
+        status: 'new',
+        value: 0,
+        notes: '',
+      });
+    }
   };
 
   const isValid = formData.name && formData.company && formData.email;

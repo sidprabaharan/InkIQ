@@ -10,6 +10,46 @@ export interface Lead {
   createdAt: string;
   lastContactedAt?: string;
   notes?: string;
+  
+  // Contact Details
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+    country?: string;
+  };
+  
+  // Social Media Profiles
+  socialProfiles?: {
+    linkedin?: string;
+    instagram?: string;
+    facebook?: string;
+    twitter?: string;
+    youtube?: string;
+  };
+  
+  // Company Intelligence
+  companyInfo?: {
+    size?: string;
+    industry?: string;
+    estimatedAnnualSpend?: number;
+    website?: string;
+  };
+  
+  // Customer Classification
+  customerType: 'new' | 'existing';
+  existingCustomerId?: string;
+  
+  // AI Enrichment Data
+  aiEnriched?: boolean;
+  dataSource?: 'manual' | 'email' | 'form' | 'ai';
+  confidenceScore?: number;
+  lastEnrichedAt?: string;
+  
+  // Activity Data
+  totalActivities?: number;
+  lastActivityType?: string;
 }
 
 export type LeadStatus = 'new' | 'contacted' | 'qualified' | 'proposal' | 'negotiation' | 'won' | 'lost';
@@ -18,4 +58,45 @@ export interface LeadColumn {
   id: LeadStatus;
   title: string;
   leads: Lead[];
+}
+
+export interface LeadActivity {
+  id: string;
+  leadId: string;
+  type: 'email' | 'call' | 'meeting' | 'note' | 'form_submission';
+  title: string;
+  description?: string;
+  timestamp: string;
+  metadata?: {
+    emailThread?: EmailThread;
+    callLog?: CallLog;
+    [key: string]: any;
+  };
+}
+
+export interface EmailThread {
+  id: string;
+  subject: string;
+  participants: string[];
+  messages: EmailMessage[];
+  lastMessageAt: string;
+}
+
+export interface EmailMessage {
+  id: string;
+  from: string;
+  to: string[];
+  subject: string;
+  body: string;
+  timestamp: string;
+  isRead: boolean;
+}
+
+export interface CallLog {
+  id: string;
+  duration: number;
+  direction: 'inbound' | 'outbound';
+  outcome: 'answered' | 'voicemail' | 'no_answer' | 'busy';
+  notes?: string;
+  recordingUrl?: string;
 }
