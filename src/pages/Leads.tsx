@@ -25,6 +25,7 @@ const initialLeads: Lead[] = [
     aiEnriched: true,
     dataSource: 'email',
     confidenceScore: 0.85,
+    jobTitle: 'Marketing Director',
     address: {
       street: '123 Business Ave',
       city: 'New York',
@@ -33,14 +34,18 @@ const initialLeads: Lead[] = [
       country: 'USA'
     },
     socialProfiles: {
-      linkedin: 'https://linkedin.com/in/johnsmith',
-      instagram: 'https://instagram.com/acmecorp'
+      linkedin: 'https://linkedin.com/in/johnsmith'
     },
     companyInfo: {
       size: '50-200 employees',
       industry: 'Technology, Software',
       estimatedAnnualSpend: 15000,
-      website: 'https://acmecorp.com'
+      website: 'https://acmecorp.com',
+      socialProfiles: {
+        linkedin: 'https://linkedin.com/company/acme-corp',
+        facebook: 'https://facebook.com/acmecorp',
+        twitter: 'https://twitter.com/acmecorp'
+      }
     },
     lastEnrichedAt: new Date().toISOString(),
     totalActivities: 3,
@@ -60,10 +65,19 @@ const initialLeads: Lead[] = [
     aiEnriched: true,
     dataSource: 'form',
     confidenceScore: 0.92,
+    jobTitle: 'Operations Manager',
+    socialProfiles: {
+      linkedin: 'https://linkedin.com/in/sarahjohnson'
+    },
     companyInfo: {
       size: '200-500 employees',
       industry: 'Manufacturing',
-      estimatedAnnualSpend: 25000
+      estimatedAnnualSpend: 25000,
+      website: 'https://xyzindustries.com',
+      socialProfiles: {
+        linkedin: 'https://linkedin.com/company/xyz-industries',
+        facebook: 'https://facebook.com/xyzindustries'
+      }
     },
     totalActivities: 5,
     lastActivityType: 'call'
@@ -79,6 +93,21 @@ const initialLeads: Lead[] = [
     customerType: 'new',
     aiEnriched: false,
     dataSource: 'manual',
+    jobTitle: 'VP of Operations',
+    socialProfiles: {
+      linkedin: 'https://linkedin.com/in/michaelbrown'
+    },
+    companyInfo: {
+      size: '1000+ employees',
+      industry: 'Consulting, Enterprise Solutions',
+      estimatedAnnualSpend: 35000,
+      website: 'https://globalsolutions.com',
+      socialProfiles: {
+        linkedin: 'https://linkedin.com/company/global-solutions',
+        twitter: 'https://twitter.com/globalsolutions',
+        youtube: 'https://youtube.com/globalsolutions'
+      }
+    },
     totalActivities: 1,
     lastActivityType: 'note'
   },
@@ -96,10 +125,20 @@ const initialLeads: Lead[] = [
     dataSource: 'ai',
     confidenceScore: 0.78,
     quoteId: 'quote-001',
+    jobTitle: 'Product Manager',
+    socialProfiles: {
+      linkedin: 'https://linkedin.com/in/emilydavis'
+    },
     companyInfo: {
       size: '10-50 employees',
       industry: 'Technology, Startups',
-      estimatedAnnualSpend: 8000
+      estimatedAnnualSpend: 8000,
+      website: 'https://techinnovators.com',
+      socialProfiles: {
+        linkedin: 'https://linkedin.com/company/tech-innovators',
+        twitter: 'https://twitter.com/techinnovators',
+        facebook: 'https://facebook.com/techinnovators'
+      }
     },
     totalActivities: 7,
     lastActivityType: 'meeting'
@@ -117,15 +156,21 @@ const initialLeads: Lead[] = [
     dataSource: 'email',
     confidenceScore: 0.95,
     quoteId: 'quote-002',
+    jobTitle: 'Chief Technology Officer',
     socialProfiles: {
-      linkedin: 'https://linkedin.com/in/robertwilson',
-      facebook: 'https://facebook.com/futureenterprises'
+      linkedin: 'https://linkedin.com/in/robertwilson'
     },
     companyInfo: {
       size: '500+ employees',
       industry: 'Enterprise, Consulting',
       estimatedAnnualSpend: 50000,
-      website: 'https://futureenterprises.com'
+      website: 'https://futureenterprises.com',
+      socialProfiles: {
+        linkedin: 'https://linkedin.com/company/future-enterprises',
+        facebook: 'https://facebook.com/futureenterprises',
+        twitter: 'https://twitter.com/futureent',
+        youtube: 'https://youtube.com/futureenterprises'
+      }
     },
     totalActivities: 12,
     lastActivityType: 'email'
