@@ -47,7 +47,7 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
         tax: true,
         total: 776.25,
         mockupImages: ['/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'],
-        status: 'In Production'
+        status: 'Ordered'
       }
     ],
     imprintSections: [
@@ -112,7 +112,7 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
         tax: true,
         total: 520.00,
         mockupImages: ['/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'],
-        status: 'Complete'
+        status: 'Received'
       }
     ],
     imprintSections: [
@@ -156,7 +156,7 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
         tax: true,
         total: 312.50,
         mockupImages: ['/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'],
-        status: 'Artwork Pending'
+        status: 'Pending'
       }
     ],
     imprintSections: [
