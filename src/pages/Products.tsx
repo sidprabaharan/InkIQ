@@ -37,8 +37,7 @@ export default function Products() {
   const displayedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
   
   return (
-    <CartManagerProvider>
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
+    <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* Top Navigation Bar */}
         <div className="bg-white border-b py-2 px-4 flex items-center justify-between">
           <div className="flex items-center gap-4 flex-1">
@@ -159,6 +158,5 @@ export default function Products() {
           </div>
         </div>
       </div>
-    </CartManagerProvider>
   );
 }
