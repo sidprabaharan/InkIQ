@@ -136,10 +136,28 @@ export default function NewQuote() {
         }))) : 
         quoteData.items;
 
-      // Update the quote data with the new items including imprints
+      // Extract and flatten imprints from all item groups
+      const convertedImprints = currentItemGroups ? 
+        currentItemGroups.flatMap(group => 
+          group.imprints?.map(imprint => ({
+            id: imprint.id,
+            type: imprint.method,
+            placement: imprint.location,
+            size: `${imprint.width}" x ${imprint.height}"`,
+            colours: imprint.colorsOrThreads,
+            notes: imprint.notes,
+            customerArt: imprint.customerArt || [],
+            productionFiles: imprint.productionFiles || [],
+            proofMockup: imprint.proofMockup || []
+          })) || []
+        ) : 
+        quoteData.imprints || [];
+
+      // Update the quote data with the new items and imprints
       const updatedQuoteData: QuotationData = {
         ...quoteData,
         items: convertedItems,
+        imprints: convertedImprints,
         nickname: nickname
       };
       
