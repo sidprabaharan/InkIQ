@@ -1,14 +1,16 @@
 import { QuotationData } from "@/components/quotes/QuoteData";
+import { GarmentDetails } from "@/types/garment";
 
 const STORAGE_KEY = "saved_quotes";
 
 export interface SavedQuote extends QuotationData {
   lastModified: string;
+  garmentDetails?: Record<string, GarmentDetails>;
 }
 
 export const quoteStorage = {
   // Save a quote to localStorage
-  saveQuote: (quoteId: string, quoteData: QuotationData): void => {
+  saveQuote: (quoteId: string, quoteData: QuotationData | SavedQuote): void => {
     try {
       const savedQuotes = quoteStorage.getAllSavedQuotes();
       const savedQuote: SavedQuote = {

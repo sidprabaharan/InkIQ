@@ -157,7 +157,7 @@ export default function QuoteDetail() {
           </div>
           
           {/* Quote Items - full width */}
-          <QuoteItemsTable itemGroups={itemGroups} />
+          <QuoteItemsTable itemGroups={itemGroups} quoteId={id} />
           
           {/* Notes and Invoice Summary - bottom row */}
           <div className="grid grid-cols-3 gap-6">

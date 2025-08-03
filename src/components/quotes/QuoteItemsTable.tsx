@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -13,6 +13,7 @@ import { GarmentStatusDropdown } from "@/components/garment/GarmentStatusDropdow
 import { StockIssueDialog } from "@/components/garment/StockIssueDialog";
 import { GarmentIssuesList } from "@/components/garment/GarmentIssuesList";
 import { useToast } from "@/hooks/use-toast";
+import { quoteStorage } from "@/lib/quoteStorage";
 
 interface Mockup {
   id: string;
@@ -52,26 +53,54 @@ interface ItemGroup {
 
 interface QuoteItemsTableProps {
   itemGroups: ItemGroup[];
+  quoteId?: string;
 }
 
-export function QuoteItemsTable({ itemGroups }: QuoteItemsTableProps) {
+export function QuoteItemsTable({ itemGroups, quoteId }: QuoteItemsTableProps) {
   const { toast } = useToast();
   const [issueDialogOpen, setIssueDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<QuoteItem | null>(null);
+  const [garmentDetailsMap, setGarmentDetailsMap] = useState<Record<string, GarmentDetails>>({});
 
   // Helper function to get total quantity for an item
   const getTotalQuantity = (sizes: QuoteItem['sizes']) => {
     return Object.values(sizes).reduce((sum, qty) => sum + qty, 0);
   };
 
-  // Initialize default garment details if not present
+  // Load garment details from localStorage on mount
+  useEffect(() => {
+    if (!quoteId) return;
+    
+    const savedQuote = quoteStorage.loadQuote(quoteId);
+    if (savedQuote && savedQuote.garmentDetails) {
+      setGarmentDetailsMap(savedQuote.garmentDetails);
+    }
+  }, [quoteId]);
+
+  // Save garment details to localStorage whenever they change
+  const saveGarmentDetails = (updatedDetails: Record<string, GarmentDetails>) => {
+    if (!quoteId) return;
+    
+    const savedQuote = quoteStorage.loadQuote(quoteId);
+    if (savedQuote) {
+      const updatedQuote = {
+        ...savedQuote,
+        garmentDetails: updatedDetails,
+        lastModified: new Date().toISOString()
+      };
+      quoteStorage.saveQuote(quoteId, updatedQuote);
+    }
+  };
+
+  // Get garment details for an item (from state or create default)
   const getGarmentDetails = (item: QuoteItem): GarmentDetails => {
-    if (item.garmentDetails) {
-      return item.garmentDetails;
+    const existingDetails = garmentDetailsMap[item.id] || item.garmentDetails;
+    if (existingDetails) {
+      return existingDetails;
     }
     
     const totalQuantity = getTotalQuantity(item.sizes);
-    return {
+    const defaultDetails: GarmentDetails = {
       status: 'pending',
       stockIssues: [],
       receivedQuantity: 0,
@@ -84,10 +113,38 @@ export function QuoteItemsTable({ itemGroups }: QuoteItemsTableProps) {
       }],
       lastUpdated: new Date()
     };
+    
+    return defaultDetails;
   };
 
   const handleStatusChange = (item: QuoteItem, newStatus: GarmentStatus, notes?: string) => {
-    // In a real app, this would update the backend
+    const currentDetails = getGarmentDetails(item);
+    
+    // Create new status history entry
+    const newHistoryEntry = {
+      id: `${item.id}-${Date.now()}`,
+      status: newStatus,
+      timestamp: new Date(),
+      notes,
+    };
+    
+    // Update garment details
+    const updatedDetails: GarmentDetails = {
+      ...currentDetails,
+      status: newStatus,
+      statusHistory: [...currentDetails.statusHistory, newHistoryEntry],
+      lastUpdated: new Date()
+    };
+    
+    // Update state
+    const updatedDetailsMap = {
+      ...garmentDetailsMap,
+      [item.id]: updatedDetails
+    };
+    
+    setGarmentDetailsMap(updatedDetailsMap);
+    saveGarmentDetails(updatedDetailsMap);
+    
     toast({
       title: "Status Updated",
       description: `${item.description} status changed to ${newStatus}`,
@@ -102,7 +159,38 @@ export function QuoteItemsTable({ itemGroups }: QuoteItemsTableProps) {
   const handleIssueSubmit = (issueData: Omit<GarmentIssue, 'id' | 'reportedDate'>) => {
     if (!selectedItem) return;
     
-    // In a real app, this would update the backend
+    const currentDetails = getGarmentDetails(selectedItem);
+    
+    // Create new issue
+    const newIssue: GarmentIssue = {
+      ...issueData,
+      id: `${selectedItem.id}-issue-${Date.now()}`,
+      reportedDate: new Date()
+    };
+    
+    // Update garment details with new issue and set status to stock_issue
+    const updatedDetails: GarmentDetails = {
+      ...currentDetails,
+      status: 'stock_issue',
+      stockIssues: [...currentDetails.stockIssues, newIssue],
+      statusHistory: [...currentDetails.statusHistory, {
+        id: `${selectedItem.id}-${Date.now()}`,
+        status: 'stock_issue',
+        timestamp: new Date(),
+        notes: `Issue reported: ${issueData.type}`
+      }],
+      lastUpdated: new Date()
+    };
+    
+    // Update state
+    const updatedDetailsMap = {
+      ...garmentDetailsMap,
+      [selectedItem.id]: updatedDetails
+    };
+    
+    setGarmentDetailsMap(updatedDetailsMap);
+    saveGarmentDetails(updatedDetailsMap);
+    
     toast({
       title: "Issue Reported",
       description: `${issueData.type} reported for ${selectedItem.description}`,
