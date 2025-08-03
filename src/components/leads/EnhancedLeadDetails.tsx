@@ -9,6 +9,7 @@ import { X, Edit, Building2, User, Globe, Phone, Mail, MapPin, DollarSign, Calen
 import { formatDistanceToNow } from 'date-fns';
 import ContactInfoSection from './ContactInfoSection';
 import CompanyIntelligenceCard from './CompanyIntelligenceCard';
+import OrderRequirements from './OrderRequirements';
 import ActivityTimeline from './ActivityTimeline';
 import AIInsightsPanel from './AIInsightsPanel';
 
@@ -103,7 +104,7 @@ export default function EnhancedLeadDetails({
               <TabsContent value="overview" className="mt-4 space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <ContactInfoSection lead={lead} />
-                  <CompanyIntelligenceCard lead={lead} />
+                  <OrderRequirements lead={lead} />
                 </div>
                 
                 {/* Quick Stats */}

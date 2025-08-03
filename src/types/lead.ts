@@ -63,13 +63,19 @@ export interface LeadColumn {
 export interface LeadActivity {
   id: string;
   leadId: string;
-  type: 'email' | 'call' | 'meeting' | 'note' | 'form_submission';
+  type: 'email' | 'call' | 'meeting' | 'note' | 'form_submission' | 'quote' | 'logo_upload' | 'product_selection';
   title: string;
   description?: string;
   timestamp: string;
   metadata?: {
     emailThread?: EmailThread;
     callLog?: CallLog;
+    quoteId?: string;
+    totalAmount?: number;
+    products?: string[];
+    printMethod?: string;
+    fileName?: string;
+    fileSize?: string;
     [key: string]: any;
   };
 }
