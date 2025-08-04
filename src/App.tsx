@@ -21,7 +21,7 @@ import Settings from "@/pages/Settings";
 import Products from "@/pages/Products";
 import PurchaseOrders from "@/pages/PurchaseOrders";
 import Production from "@/pages/Production";
-import DecoratorNetwork from "@/pages/DecoratorNetwork";
+
 import NotFound from "@/pages/NotFound";
 import { CustomersProvider } from "./context/CustomersContext";
 import { CartManagerProvider } from "./context/CartManagerContext";
@@ -54,7 +54,7 @@ function App() {
                 <Route path="/products" element={<AppLayout><Products /></AppLayout>} />
                 <Route path="/purchase-orders" element={<AppLayout><PurchaseOrders /></AppLayout>} />
                 <Route path="/production" element={<AppLayout><Production /></AppLayout>} />
-                <Route path="/decorator-network" element={<AppLayout><DecoratorNetwork /></AppLayout>} />
+                
                 <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
                 <Route path="*" element={<AppLayout><NotFound /></AppLayout>} />
               </Routes>

@@ -85,11 +85,6 @@ export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
       path: '/purchase-orders',
     },
     {
-      name: 'Decorator Network',
-      icon: Network,
-      path: '/decorator-network',
-    },
-    {
       name: 'Emails',
       icon: Mail,
       path: '/messages',

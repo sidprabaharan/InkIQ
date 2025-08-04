@@ -24,6 +24,7 @@ import { PackingSlip } from "./PackingSlip";
 import { ShippingLabelDialog } from "./ShippingLabelDialog";
 import { BoxLabelDialog } from "./BoxLabelDialog";
 import { OrderTasksDialog } from "@/components/tasks/OrderTasksDialog";
+import { DecoratorSelectionDialog } from "./DecoratorSelectionDialog";
 
 interface QuoteDetailHeaderProps {
   quoteId: string;
@@ -45,6 +46,7 @@ export function QuoteDetailHeader({
   const [shippingLabelOpen, setShippingLabelOpen] = useState(false);
   const [boxLabelOpen, setBoxLabelOpen] = useState(false);
   const [tasksDialogOpen, setTasksDialogOpen] = useState(false);
+  const [showDecoratorSelection, setShowDecoratorSelection] = useState(false);
   
   const isInvoice = !status.toLowerCase().startsWith('quote');
   const documentType = isInvoice ? "Invoice" : "Quote";
@@ -212,6 +214,10 @@ export function QuoteDetailHeader({
               <ListPlus className="h-4 w-4 mr-2" />
               Add Line Items to PO
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowDecoratorSelection(true)}>
+              <Package className="mr-2 h-4 w-4" />
+              Outsource Decorations
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={handleWorkOrder}>
               <Wrench className="h-4 w-4 mr-2" />
               Work Order
@@ -268,6 +274,13 @@ export function QuoteDetailHeader({
         quoteId={quoteId}
         customerInfo={customerInfo}
         orderNickname="Project Care Quote"
+      />
+
+      <DecoratorSelectionDialog
+        open={showDecoratorSelection}
+        onOpenChange={setShowDecoratorSelection}
+        quoteId={quoteId}
+        quoteItems={items}
       />
     </div>
   );
