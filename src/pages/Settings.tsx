@@ -24,6 +24,7 @@ import { ZapierIntegration } from '@/components/settings/ZapierIntegration';
 import { Billing } from '@/components/settings/Billing';
 import { GeneralSettings } from '@/components/settings/GeneralSettings';
 import { SupplierIntegrations } from '@/components/settings/SupplierIntegrations';
+import { OutsourcingPreferences } from '@/components/settings/OutsourcingPreferences';
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState('users');
@@ -39,6 +40,7 @@ export default function Settings() {
     { id: 'data', name: 'Import/Export Data', icon: DownloadCloud, component: DataManagement },
     { id: 'shipping', name: 'Shipping Integration', icon: Truck, component: ShippingIntegration },
     { id: 'suppliers', name: 'Supplier Integrations', icon: Package2, component: SupplierIntegrations },
+    { id: 'outsourcing', name: 'Outsourcing', icon: Workflow, component: () => <OutsourcingPreferences onSave={(prefs) => console.log(prefs)} /> },
     { id: 'quickbooks', name: 'QuickBooks', icon: FileSpreadsheet, component: QuickbooksIntegration },
     { id: 'zapier', name: 'Zapier Integration', icon: Zap, component: ZapierIntegration },
     { id: 'billing', name: 'Billing & Subscription', icon: BillingIcon, component: Billing },
