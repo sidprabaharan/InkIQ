@@ -21,6 +21,7 @@ import {
   ClipboardList,
   Package2,
   Truck,
+  Network,
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -82,6 +83,11 @@ export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
       name: 'Purchase Orders',
       icon: ShoppingCart,
       path: '/purchase-orders',
+    },
+    {
+      name: 'Decorator Network',
+      icon: Network,
+      path: '/decorator-network',
     },
     {
       name: 'Emails',

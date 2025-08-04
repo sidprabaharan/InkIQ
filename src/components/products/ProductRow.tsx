@@ -2,12 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart } from 'lucide-react';
+import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, Palette } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { toast } from "sonner";
 import { useCartManager } from '@/context/CartManagerContext';
 import { CartItem } from '@/types/cart';
+import { ProductCustomizationDialog } from './ProductCustomizationDialog';
 
 type Supplier = {
   name: string;
@@ -38,6 +39,7 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
   const [showAllColors, setShowAllColors] = useState(false);
   const [quantities, setQuantities] = useState<Record<string, Record<string, number>>>({});
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
+  const [showCustomizationDialog, setShowCustomizationDialog] = useState(false);
   const { addToCart, activeCart, createCart } = useCartManager();
   
   const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
@@ -245,7 +247,16 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
                 {selectedSupplier.name}'s Inventory & Pricing
               </div>
               
-              <div className="ml-auto">
+              <div className="ml-auto flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs h-7"
+                  onClick={() => setShowCustomizationDialog(true)}
+                >
+                  <Palette className="h-3 w-3 mr-1" />
+                  Customize
+                </Button>
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -363,6 +374,16 @@ export function ProductRow({ product, showVendors, showPrices }: ProductRowProps
           </div>
         )}
       </CardContent>
+      
+      {/* Customization Dialog */}
+      {selectedSupplier && (
+        <ProductCustomizationDialog
+          open={showCustomizationDialog}
+          onOpenChange={setShowCustomizationDialog}
+          product={product}
+          supplier={selectedSupplier}
+        />
+      )}
     </Card>
   );
 }

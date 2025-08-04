@@ -18,6 +18,14 @@ export type CartItem = {
     quantity: number;
   }[];
   totalQuantity: number;
+  customization?: {
+    printMethod?: string;
+    logoFile?: File;
+    canvasData?: any;
+    preview?: string;
+    position?: { x: number; y: number };
+    size?: { width: number; height: number };
+  };
 };
 
 export type Cart = {
