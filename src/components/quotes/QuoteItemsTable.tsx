@@ -199,6 +199,90 @@ export function QuoteItemsTable({ itemGroups, quoteId }: QuoteItemsTableProps) {
     
     setSelectedItem(null);
   };
+
+  const handleResolveIssue = (item: QuoteItem, issueId: string) => {
+    const currentDetails = getGarmentDetails(item);
+    
+    // Find and resolve the issue
+    const updatedIssues = currentDetails.stockIssues.map(issue => 
+      issue.id === issueId 
+        ? { ...issue, resolvedDate: new Date() }
+        : issue
+    );
+
+    // Update garment details
+    const updatedDetails: GarmentDetails = {
+      ...currentDetails,
+      stockIssues: updatedIssues,
+      // If all issues are resolved and status is stock_issue, change to ready
+      status: updatedIssues.every(issue => issue.resolvedDate) && currentDetails.status === 'stock_issue' 
+        ? 'ready' 
+        : currentDetails.status,
+      statusHistory: [...currentDetails.statusHistory, {
+        id: `${item.id}-${Date.now()}`,
+        status: updatedIssues.every(issue => issue.resolvedDate) && currentDetails.status === 'stock_issue' 
+          ? 'ready' 
+          : currentDetails.status,
+        timestamp: new Date(),
+        notes: `Issue ${issueId} resolved`
+      }],
+      lastUpdated: new Date()
+    };
+
+    // Update state
+    const updatedDetailsMap = {
+      ...garmentDetailsMap,
+      [item.id]: updatedDetails
+    };
+
+    setGarmentDetailsMap(updatedDetailsMap);
+    saveGarmentDetails(updatedDetailsMap);
+
+    toast({
+      title: "Issue Resolved",
+      description: "Stock issue has been marked as resolved",
+    });
+  };
+
+  const handleRemoveIssue = (item: QuoteItem, issueId: string) => {
+    const currentDetails = getGarmentDetails(item);
+    
+    // Remove the issue completely
+    const updatedIssues = currentDetails.stockIssues.filter(issue => issue.id !== issueId);
+
+    // Update garment details
+    const updatedDetails: GarmentDetails = {
+      ...currentDetails,
+      stockIssues: updatedIssues,
+      // If no more issues and status is stock_issue, change to ready
+      status: updatedIssues.length === 0 && currentDetails.status === 'stock_issue' 
+        ? 'ready' 
+        : currentDetails.status,
+      statusHistory: [...currentDetails.statusHistory, {
+        id: `${item.id}-${Date.now()}`,
+        status: updatedIssues.length === 0 && currentDetails.status === 'stock_issue' 
+          ? 'ready' 
+          : currentDetails.status,
+        timestamp: new Date(),
+        notes: `Issue ${issueId} removed`
+      }],
+      lastUpdated: new Date()
+    };
+
+    // Update state
+    const updatedDetailsMap = {
+      ...garmentDetailsMap,
+      [item.id]: updatedDetails
+    };
+
+    setGarmentDetailsMap(updatedDetailsMap);
+    saveGarmentDetails(updatedDetailsMap);
+
+    toast({
+      title: "Issue Removed",
+      description: "Stock issue has been removed",
+    });
+  };
   const renderItemGroup = (group: ItemGroup, groupIndex: number) => {
     return (
       <div key={group.id} className="mb-8 border rounded-md overflow-hidden">
@@ -312,7 +396,12 @@ export function QuoteItemsTable({ itemGroups, quoteId }: QuoteItemsTableProps) {
                             </div>
                           </div>
                         )}
-                        <GarmentIssuesList issues={getGarmentDetails(item).stockIssues} />
+                        <GarmentIssuesList 
+                          issues={getGarmentDetails(item).stockIssues}
+                          onResolveIssue={(issueId) => handleResolveIssue(item, issueId)}
+                          onRemoveIssue={(issueId) => handleRemoveIssue(item, issueId)}
+                          showResolved={true}
+                        />
                       </div>
                     </TableCell>
                   </TableRow>
