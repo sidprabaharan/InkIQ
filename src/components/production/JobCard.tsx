@@ -28,12 +28,13 @@ export function JobCard({ job, variant, draggable = false, className, onStageAdv
   return (
     <div
       className={cn(
-        "bg-card border border-border rounded-lg p-3 transition-all hover:shadow-sm",
+        "bg-card border border-border rounded-lg p-3 transition-all hover:shadow-sm relative",
         variant === "scheduled" && "bg-muted/50 border-muted",
         isPriority && "border-orange-300 bg-orange-50",
         isOverdue && "border-red-300 bg-red-50",
         draggable && "cursor-grab active:cursor-grabbing",
         onClick && "cursor-pointer hover:border-primary/50",
+        job.orderGroupColor && job.orderGroupColor,
         className
       )}
       draggable={draggable}
@@ -46,6 +47,11 @@ export function JobCard({ job, variant, draggable = false, className, onStageAdv
             <span className="font-semibold text-sm text-foreground">
               {job.jobNumber}
             </span>
+            {job.sequenceOrder && (
+              <Badge variant="outline" className="text-xs px-1 py-0 h-4">
+                {job.sequenceOrder}
+              </Badge>
+            )}
             {isPriority && (
               <Badge variant="destructive" className="text-xs px-1 py-0">
                 HIGH
@@ -64,16 +70,21 @@ export function JobCard({ job, variant, draggable = false, className, onStageAdv
       <div className="space-y-1">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span className="truncate">{job.customerName}</span>
+          {job.relatedJobIds.length > 0 && (
+            <Badge variant="secondary" className="text-xs px-1 py-0 h-4">
+              +{job.relatedJobIds.length}
+            </Badge>
+          )}
         </div>
         
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Package className="h-3 w-3" />
-          <span>{job.quantity} pieces</span>
+          <span>{job.quantity} {job.garmentType}</span>
         </div>
         
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Clock className="h-3 w-3" />
-          <span>{job.estimatedHours}h</span>
+          <span>{job.estimatedHours}h • {job.imprintLocation}</span>
         </div>
         
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
