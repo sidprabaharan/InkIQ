@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KanbanBoard } from "@/components/production/KanbanBoard";
 import { ProductionScheduler } from "@/components/production/ProductionScheduler";
+import { EnhancedProductionScheduler } from "@/components/production/EnhancedProductionScheduler";
+import { SmartJobRouter } from "@/components/production/SmartJobRouter";
+import { ProductionFlowManager } from "@/components/production/ProductionFlowManager";
 import { EquipmentManager } from "@/components/production/EquipmentManager";
 import { ProductionListView } from "@/components/production/ProductionListView";
 import { CalendarMonth } from "@/components/calendar/CalendarMonth";
@@ -40,7 +43,7 @@ const mockProductionEvents: CalendarEvent[] = [
 ];
 
 export default function Production() {
-  const [activeTab, setActiveTab] = useState("kanban");
+  const [activeTab, setActiveTab] = useState("scheduler");
   const [calendarView, setCalendarView] = useState<CalendarView>("month");
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>(mockProductionEvents);
@@ -73,14 +76,22 @@ export default function Production() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-fit grid-cols-4">
+        <TabsList className="grid w-fit grid-cols-6">
+          <TabsTrigger value="scheduler" className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            Smart Scheduler
+          </TabsTrigger>
+          <TabsTrigger value="router" className="flex items-center gap-2">
+            <LayoutGrid className="h-4 w-4" />
+            Job Router
+          </TabsTrigger>
+          <TabsTrigger value="workflow" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Workflow
+          </TabsTrigger>
           <TabsTrigger value="kanban" className="flex items-center gap-2">
             <LayoutGrid className="h-4 w-4" />
             Kanban
-          </TabsTrigger>
-          <TabsTrigger value="timeline" className="flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            Timeline
           </TabsTrigger>
           <TabsTrigger value="calendar" className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
@@ -92,12 +103,20 @@ export default function Production() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="kanban" className="mt-6">
-          <KanbanBoard />
+        <TabsContent value="scheduler" className="mt-6">
+          <EnhancedProductionScheduler />
         </TabsContent>
 
-        <TabsContent value="timeline" className="mt-6">
-          <ProductionScheduler />
+        <TabsContent value="router" className="mt-6">
+          <SmartJobRouter />
+        </TabsContent>
+
+        <TabsContent value="workflow" className="mt-6">
+          <ProductionFlowManager />
+        </TabsContent>
+
+        <TabsContent value="kanban" className="mt-6">
+          <KanbanBoard />
         </TabsContent>
 
         <TabsContent value="calendar" className="mt-6">

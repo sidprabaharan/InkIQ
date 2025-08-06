@@ -1,5 +1,26 @@
-import { ProductionJob } from "@/types/equipment";
+import { ProductionJob, ProductionEquipment } from "@/types/equipment";
 import { GarmentStatus } from "@/types/garment";
+
+// Storage functions for production jobs
+export const getStoredProductionJobs = (): ProductionJob[] => {
+  const stored = localStorage.getItem('productionJobs');
+  return stored ? JSON.parse(stored) : [];
+};
+
+export const updateProductionJob = (jobId: string, updatedJob: ProductionJob): void => {
+  const jobs = getStoredProductionJobs();
+  const index = jobs.findIndex(job => job.id === jobId);
+  if (index !== -1) {
+    jobs[index] = updatedJob;
+    localStorage.setItem('productionJobs', JSON.stringify(jobs));
+  }
+};
+
+export const saveProductionJob = (job: ProductionJob): void => {
+  const jobs = getStoredProductionJobs();
+  jobs.push(job);
+  localStorage.setItem('productionJobs', JSON.stringify(jobs));
+};
 
 // Helper function to map production job status to garment status
 export const mapProductionStatusToGarmentStatus = (productionStatus: ProductionJob['status']): GarmentStatus => {
