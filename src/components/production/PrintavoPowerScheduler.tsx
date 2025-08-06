@@ -4,6 +4,7 @@ import { DecorationMethodTabs } from "./DecorationMethodTabs";
 import { ProductionStageTabs } from "./ProductionStageTabs";
 import { UnscheduledJobsPanel } from "./UnscheduledJobsPanel";
 import { SchedulingGrid } from "./SchedulingGrid";
+import { JobDetailModal } from "./JobDetailModal";
 
 export type DecorationMethod = "screen_printing" | "embroidery" | "dtf" | "dtg";
 
@@ -29,12 +30,21 @@ export interface PrintavoJob {
   equipmentId?: string;
   scheduledStart?: Date;
   scheduledEnd?: Date;
+  // Enhanced fields for detailed tracking
+  quoteId?: string;
+  lineItemId?: string;
+  imprintId?: string;
+  orderId?: string;
+  setupRequired?: boolean;
+  specialInstructions?: string;
 }
 
 export default function PrintavoPowerScheduler() {
   const [selectedMethod, setSelectedMethod] = useState<DecorationMethod>("screen_printing");
   const [selectedStage, setSelectedStage] = useState<ProductionStage>("burn_screens");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedJob, setSelectedJob] = useState<PrintavoJob | null>(null);
+  const [isJobDetailModalOpen, setIsJobDetailModalOpen] = useState(false);
   
   // Production stages by decoration method
   const stagesByMethod = {
@@ -153,6 +163,17 @@ export default function PrintavoPowerScheduler() {
           : job
       ));
     }
+    setIsJobDetailModalOpen(false);
+  };
+
+  const handleJobClick = (job: PrintavoJob) => {
+    setSelectedJob(job);
+    setIsJobDetailModalOpen(true);
+  };
+
+  const handleJobUnscheduleFromModal = (jobId: string) => {
+    handleJobUnschedule(jobId);
+    setIsJobDetailModalOpen(false);
   };
 
   return (
@@ -179,6 +200,7 @@ export default function PrintavoPowerScheduler() {
         jobs={unscheduledJobs}
         selectedDate={selectedDate}
         onStageAdvance={handleStageAdvance}
+        onJobClick={handleJobClick}
       />
       
       <SchedulingGrid 
@@ -189,6 +211,15 @@ export default function PrintavoPowerScheduler() {
         onJobSchedule={handleJobSchedule}
         onJobUnschedule={handleJobUnschedule}
         onStageAdvance={handleStageAdvance}
+        onJobClick={handleJobClick}
+      />
+
+      <JobDetailModal
+        job={selectedJob}
+        open={isJobDetailModalOpen}
+        onOpenChange={setIsJobDetailModalOpen}
+        onStageAdvance={selectedJob ? () => handleStageAdvance(selectedJob.id) : undefined}
+        onUnschedule={selectedJob ? () => handleJobUnscheduleFromModal(selectedJob.id) : undefined}
       />
     </div>
   );

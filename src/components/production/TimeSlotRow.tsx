@@ -22,6 +22,7 @@ interface TimeSlotRowProps {
   onJobSchedule: (jobId: string, equipmentId: string, startTime: Date, endTime: Date) => void;
   onJobUnschedule: (jobId: string) => void;
   onStageAdvance: (jobId: string) => void;
+  onJobClick?: (job: PrintavoJob) => void;
 }
 
 export function TimeSlotRow({ 
@@ -31,7 +32,8 @@ export function TimeSlotRow({
   selectedDate,
   onJobSchedule,
   onJobUnschedule,
-  onStageAdvance
+  onStageAdvance,
+  onJobClick
 }: TimeSlotRowProps) {
   
   const handleDrop = (e: React.DragEvent, equipmentId: string) => {
@@ -57,6 +59,13 @@ export function TimeSlotRow({
     return jobs.filter(job => job.equipmentId === equipmentId);
   };
 
+  // Calculate equipment utilization for visual feedback
+  const getEquipmentUtilization = (equipmentId: string) => {
+    const equipmentJobs = getJobsForEquipment(equipmentId);
+    const totalHours = equipmentJobs.reduce((sum, job) => sum + job.estimatedHours, 0);
+    return Math.min(totalHours, 1); // Cap at 100%
+  };
+
   return (
     <div className={`grid min-h-[80px] hover:bg-muted/20`} style={{ gridTemplateColumns: `80px repeat(${equipment.length}, 1fr)` }}>
       {/* Time info */}
@@ -69,27 +78,39 @@ export function TimeSlotRow({
       {/* Equipment columns */}
       {equipment.map(eq => {
         const equipmentJobs = getJobsForEquipment(eq.id);
+        const utilization = getEquipmentUtilization(eq.id);
+        const isOverUtilized = utilization > 0.8;
         
         return (
           <div
             key={eq.id}
             className={cn(
               "border-r border-border p-2 min-h-[80px] relative",
-              "hover:bg-blue-50 transition-colors",
-              equipmentJobs.length > 0 && "bg-blue-100"
+              "hover:bg-muted/20 transition-colors",
+              equipmentJobs.length > 0 && "bg-muted/10",
+              isOverUtilized && "bg-amber-50 border-amber-200"
             )}
             onDrop={(e) => handleDrop(e, eq.id)}
             onDragOver={handleDragOver}
           >
-            {equipmentJobs.map(job => (
-              <JobCard
-                key={job.id}
-                job={job}
-                variant="scheduled"
-                className="mb-1 last:mb-0 text-xs"
-                onStageAdvance={() => onStageAdvance(job.id)}
-              />
-            ))}
+            {/* Capacity warning indicator */}
+            {isOverUtilized && (
+              <div className="absolute top-1 right-1 h-2 w-2 bg-amber-500 rounded-full" />
+            )}
+            
+            {/* Multiple jobs stacked vertically */}
+            <div className="space-y-1 max-h-[72px] overflow-y-auto">
+              {equipmentJobs.map(job => (
+                <JobCard
+                  key={job.id}
+                  job={job}
+                  variant="scheduled"
+                  className="text-xs cursor-pointer hover:shadow-sm"
+                  onStageAdvance={() => onStageAdvance(job.id)}
+                  onClick={onJobClick ? () => onJobClick(job) : undefined}
+                />
+              ))}
+            </div>
           </div>
         );
       })}

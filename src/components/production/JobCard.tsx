@@ -11,9 +11,10 @@ interface JobCardProps {
   draggable?: boolean;
   className?: string;
   onStageAdvance?: () => void;
+  onClick?: () => void;
 }
 
-export function JobCard({ job, variant, draggable = false, className, onStageAdvance }: JobCardProps) {
+export function JobCard({ job, variant, draggable = false, className, onStageAdvance, onClick }: JobCardProps) {
   const isPriority = job.priority === "high";
   const isOverdue = job.dueDate < new Date() && job.status !== "completed";
 
@@ -28,14 +29,16 @@ export function JobCard({ job, variant, draggable = false, className, onStageAdv
     <div
       className={cn(
         "bg-card border border-border rounded-lg p-3 transition-all hover:shadow-sm",
-        variant === "scheduled" && "bg-blue-50 border-blue-200",
+        variant === "scheduled" && "bg-muted/50 border-muted",
         isPriority && "border-orange-300 bg-orange-50",
         isOverdue && "border-red-300 bg-red-50",
         draggable && "cursor-grab active:cursor-grabbing",
+        onClick && "cursor-pointer hover:border-primary/50",
         className
       )}
       draggable={draggable}
       onDragStart={handleDragStart}
+      onClick={onClick}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex-1 min-w-0">

@@ -9,6 +9,7 @@ interface SchedulingGridProps {
   onJobSchedule: (jobId: string, equipmentId: string, startTime: Date, endTime: Date) => void;
   onJobUnschedule: (jobId: string) => void;
   onStageAdvance: (jobId: string) => void;
+  onJobClick?: (job: PrintavoJob) => void;
 }
 
 // Equipment configurations for different decoration methods and stages
@@ -76,7 +77,8 @@ export function SchedulingGrid({
   selectedStage,
   onJobSchedule, 
   onJobUnschedule,
-  onStageAdvance
+  onStageAdvance,
+  onJobClick
 }: SchedulingGridProps) {
   const equipment = equipmentConfig[selectedMethod]?.[selectedStage] || [];
   
@@ -128,6 +130,7 @@ export function SchedulingGrid({
               onJobSchedule={onJobSchedule}
               onJobUnschedule={onJobUnschedule}
               onStageAdvance={onStageAdvance}
+              onJobClick={onJobClick}
             />
           ))}
         </div>

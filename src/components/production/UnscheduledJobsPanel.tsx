@@ -10,9 +10,10 @@ interface UnscheduledJobsPanelProps {
   jobs: PrintavoJob[];
   selectedDate: Date;
   onStageAdvance: (jobId: string) => void;
+  onJobClick?: (job: PrintavoJob) => void;
 }
 
-export function UnscheduledJobsPanel({ jobs, onStageAdvance }: UnscheduledJobsPanelProps) {
+export function UnscheduledJobsPanel({ jobs, onStageAdvance, onJobClick }: UnscheduledJobsPanelProps) {
   // Group jobs by due date
   const jobsByDate = jobs.reduce((acc, job) => {
     const dateKey = format(job.dueDate, "yyyy-MM-dd");
@@ -71,14 +72,15 @@ export function UnscheduledJobsPanel({ jobs, onStageAdvance }: UnscheduledJobsPa
             <CollapsibleContent className="space-y-1 pt-2">
               <div className="flex gap-2 flex-wrap">
                 {group.jobs.map(job => (
-                  <JobCard
-                    key={job.id}
-                    job={job}
-                    variant="unscheduled"
-                    draggable={true}
-                    className="w-64 flex-shrink-0"
-                    onStageAdvance={() => onStageAdvance(job.id)}
-                  />
+                   <JobCard
+                     key={job.id}
+                     job={job}
+                     variant="unscheduled"
+                     draggable={true}
+                     className="w-64 flex-shrink-0"
+                     onStageAdvance={() => onStageAdvance(job.id)}
+                     onClick={onJobClick ? () => onJobClick(job) : undefined}
+                   />
                 ))}
               </div>
             </CollapsibleContent>
