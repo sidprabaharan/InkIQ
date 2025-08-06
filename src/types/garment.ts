@@ -1,11 +1,19 @@
 export type GarmentStatus = 
   | 'pending'
+  | 'artwork_pending'
+  | 'artwork_approved'
+  | 'scheduled'
+  | 'in_production'
+  | 'quality_check'
+  | 'production_complete'
   | 'po_created'
   | 'ordered'
   | 'received'
   | 'damaged'
   | 'stock_issue'
-  | 'ready';
+  | 'ready'
+  | 'shipped'
+  | 'delivered';
 
 export type GarmentIssueType = 
   | 'damaged'
@@ -49,7 +57,37 @@ export const GARMENT_STATUS_CONFIG = {
   pending: {
     label: 'Pending',
     color: 'bg-gray-100 text-gray-800',
-    description: 'Waiting to be processed'
+    description: 'Awaiting production scheduling'
+  },
+  artwork_pending: {
+    label: 'Artwork Pending',
+    color: 'bg-amber-100 text-amber-800',
+    description: 'Waiting for artwork approval'
+  },
+  artwork_approved: {
+    label: 'Artwork Approved',
+    color: 'bg-lime-100 text-lime-800',
+    description: 'Artwork ready for production'
+  },
+  scheduled: {
+    label: 'Scheduled',
+    color: 'bg-indigo-100 text-indigo-800',
+    description: 'Scheduled for production'
+  },
+  in_production: {
+    label: 'In Production',
+    color: 'bg-purple-100 text-purple-800',
+    description: 'Currently being produced'
+  },
+  quality_check: {
+    label: 'Quality Check',
+    color: 'bg-cyan-100 text-cyan-800',
+    description: 'In quality control'
+  },
+  production_complete: {
+    label: 'Production Complete',
+    color: 'bg-teal-100 text-teal-800',
+    description: 'Production finished, ready for shipping'
   },
   po_created: {
     label: 'PO Created',
@@ -79,6 +117,16 @@ export const GARMENT_STATUS_CONFIG = {
   ready: {
     label: 'Ready',
     color: 'bg-emerald-100 text-emerald-800',
-    description: 'Ready for production/delivery'
+    description: 'Ready for delivery'
+  },
+  shipped: {
+    label: 'Shipped',
+    color: 'bg-sky-100 text-sky-800',
+    description: 'Shipped to customer'
+  },
+  delivered: {
+    label: 'Delivered',
+    color: 'bg-green-200 text-green-900',
+    description: 'Delivered to customer'
   }
 } as const;

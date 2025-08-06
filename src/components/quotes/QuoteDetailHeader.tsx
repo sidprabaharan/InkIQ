@@ -140,6 +140,18 @@ export function QuoteDetailHeader({
     });
     navigate("/quotes");
   };
+
+  const handleScheduleProduction = () => {
+    setProductionSchedulingOpen(true);
+  };
+
+  const handleItemsScheduled = (scheduledItems: any[]) => {
+    console.log('Items scheduled:', scheduledItems);
+    toast({
+      title: "Production Scheduled",
+      description: `${scheduledItems.length} items scheduled for production`,
+    });
+  };
   
   const handleStatusChange = (newStatus: string) => {
     setStatus(newStatus);

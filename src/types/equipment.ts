@@ -36,6 +36,7 @@ export interface ProductionJob {
   id: string;
   quoteId: string;
   quoteName: string;
+  itemId: string;
   itemName: string;
   description: string;
   quantity: number;
