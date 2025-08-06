@@ -1,5 +1,4 @@
 import { JobCard } from "./JobCard";
-import { CapacityBadge } from "./CapacityBadge";
 import { PrintavoJob } from "./PrintavoPowerScheduler";
 import { cn } from "@/lib/utils";
 
@@ -56,14 +55,6 @@ export function TimeSlotRow({
     return jobs.filter(job => job.equipmentId === equipmentId);
   };
 
-  // Calculate capacity for equipment
-  const getEquipmentCapacity = (eq: Equipment) => {
-    const equipmentJobs = getJobsForEquipment(eq.id);
-    const totalScheduled = equipmentJobs.reduce((sum, job) => sum + job.quantity, 0);
-    const utilizationPercentage = Math.round((totalScheduled / eq.capacity) * 100);
-    return { totalScheduled, utilizationPercentage };
-  };
-
   return (
     <div className={`grid min-h-[80px] hover:bg-muted/20`} style={{ gridTemplateColumns: `80px repeat(${equipment.length}, 1fr)` }}>
       {/* Time info */}
@@ -76,7 +67,6 @@ export function TimeSlotRow({
       {/* Equipment columns */}
       {equipment.map(eq => {
         const equipmentJobs = getJobsForEquipment(eq.id);
-        const { totalScheduled, utilizationPercentage } = getEquipmentCapacity(eq);
         
         return (
           <div
@@ -89,13 +79,6 @@ export function TimeSlotRow({
             onDrop={(e) => handleDrop(e, eq.id)}
             onDragOver={handleDragOver}
           >
-            <div className="flex justify-between items-start mb-2">
-              <CapacityBadge 
-                current={totalScheduled}
-                total={eq.capacity}
-                utilizationPercentage={utilizationPercentage}
-              />
-            </div>
             {equipmentJobs.map(job => (
               <JobCard
                 key={job.id}

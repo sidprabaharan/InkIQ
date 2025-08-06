@@ -100,34 +100,30 @@ export default function PrintavoPowerScheduler() {
   };
 
   return (
-    <div className="flex h-full bg-background">
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <SchedulerHeader 
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
-          selectedMethod={selectedMethod}
-        />
-        
-        <DecorationMethodTabs 
-          selectedMethod={selectedMethod}
-          onMethodChange={setSelectedMethod}
-        />
-        
-        <div className="flex flex-1 overflow-hidden">
-          <UnscheduledJobsPanel 
-            jobs={unscheduledJobs}
-            selectedDate={selectedDate}
-          />
-          
-          <SchedulingGrid 
-            jobs={scheduledJobs}
-            selectedDate={selectedDate}
-            selectedMethod={selectedMethod}
-            onJobSchedule={handleJobSchedule}
-            onJobUnschedule={handleJobUnschedule}
-          />
-        </div>
-      </div>
+    <div className="h-full flex flex-col bg-background">
+      <SchedulerHeader 
+        selectedDate={selectedDate}
+        onDateChange={setSelectedDate}
+        selectedMethod={selectedMethod}
+      />
+      
+      <DecorationMethodTabs 
+        selectedMethod={selectedMethod}
+        onMethodChange={setSelectedMethod}
+      />
+      
+      <UnscheduledJobsPanel 
+        jobs={unscheduledJobs}
+        selectedDate={selectedDate}
+      />
+      
+      <SchedulingGrid 
+        jobs={scheduledJobs}
+        selectedDate={selectedDate}
+        selectedMethod={selectedMethod}
+        onJobSchedule={handleJobSchedule}
+        onJobUnschedule={handleJobUnschedule}
+      />
     </div>
   );
 }
