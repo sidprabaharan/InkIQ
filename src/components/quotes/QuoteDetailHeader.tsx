@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Printer, Copy, ListChecks, MessageCircle, Edit, Link, File, Trash, Download, DollarSign, Truck, Package, ListPlus, Wrench, Box } from "lucide-react";
+import { ChevronRight, Printer, Copy, ListChecks, MessageCircle, Edit, Link, File, Trash, Download, DollarSign, Truck, Package, ListPlus, Wrench, Box, Calendar } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +25,7 @@ import { ShippingLabelDialog } from "./ShippingLabelDialog";
 import { BoxLabelDialog } from "./BoxLabelDialog";
 import { OrderTasksDialog } from "@/components/tasks/OrderTasksDialog";
 import { DecoratorSelectionDialog } from "./DecoratorSelectionDialog";
+import { ProductionSchedulingDialog } from "@/components/production/ProductionSchedulingDialog";
 
 interface QuoteDetailHeaderProps {
   quoteId: string;
@@ -47,6 +48,7 @@ export function QuoteDetailHeader({
   const [boxLabelOpen, setBoxLabelOpen] = useState(false);
   const [tasksDialogOpen, setTasksDialogOpen] = useState(false);
   const [showDecoratorSelection, setShowDecoratorSelection] = useState(false);
+  const [showProductionScheduling, setShowProductionScheduling] = useState(false);
   
   const isInvoice = !status.toLowerCase().startsWith('quote');
   const documentType = isInvoice ? "Invoice" : "Quote";
@@ -214,6 +216,10 @@ export function QuoteDetailHeader({
               <ListPlus className="h-4 w-4 mr-2" />
               Add Line Items to PO
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowProductionScheduling(true)}>
+              <Calendar className="h-4 w-4 mr-2" />
+              Schedule Production
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setShowDecoratorSelection(true)}>
               <Package className="mr-2 h-4 w-4" />
               Outsource Decorations
@@ -279,6 +285,13 @@ export function QuoteDetailHeader({
       <DecoratorSelectionDialog
         open={showDecoratorSelection}
         onOpenChange={setShowDecoratorSelection}
+        quoteId={quoteId}
+        quoteItems={items}
+      />
+
+      <ProductionSchedulingDialog
+        open={showProductionScheduling}
+        onOpenChange={setShowProductionScheduling}
         quoteId={quoteId}
         quoteItems={items}
       />
