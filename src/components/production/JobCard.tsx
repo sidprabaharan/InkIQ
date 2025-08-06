@@ -1,18 +1,20 @@
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { PrintavoJob } from "./PrintavoPowerScheduler";
-import { format } from "date-fns";
-import { Clock, User, Package, AlertTriangle } from "lucide-react";
+import { Clock, Calendar, Package, FileCheck, AlertCircle, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 interface JobCardProps {
   job: PrintavoJob;
   variant: "unscheduled" | "scheduled";
   draggable?: boolean;
   className?: string;
+  onStageAdvance?: () => void;
 }
 
-export function JobCard({ job, variant, draggable = false, className }: JobCardProps) {
-  const isPriority = job.priority === "rush";
+export function JobCard({ job, variant, draggable = false, className, onStageAdvance }: JobCardProps) {
+  const isPriority = job.priority === "high";
   const isOverdue = job.dueDate < new Date() && job.status !== "completed";
 
   const handleDragStart = (e: React.DragEvent) => {
@@ -25,7 +27,7 @@ export function JobCard({ job, variant, draggable = false, className }: JobCardP
   return (
     <div
       className={cn(
-        "bg-card border border-border rounded-lg p-3 cursor-pointer transition-all hover:shadow-sm",
+        "bg-card border border-border rounded-lg p-3 transition-all hover:shadow-sm",
         variant === "scheduled" && "bg-blue-50 border-blue-200",
         isPriority && "border-orange-300 bg-orange-50",
         isOverdue && "border-red-300 bg-red-50",
@@ -43,11 +45,11 @@ export function JobCard({ job, variant, draggable = false, className }: JobCardP
             </span>
             {isPriority && (
               <Badge variant="destructive" className="text-xs px-1 py-0">
-                RUSH
+                HIGH
               </Badge>
             )}
             {isOverdue && (
-              <AlertTriangle className="h-3 w-3 text-red-500" />
+              <AlertCircle className="h-3 w-3 text-red-500" />
             )}
           </div>
           <p className="text-sm text-muted-foreground truncate">
@@ -58,8 +60,7 @@ export function JobCard({ job, variant, draggable = false, className }: JobCardP
 
       <div className="space-y-1">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <User className="h-3 w-3" />
-          <span className="truncate">{job.customer}</span>
+          <span className="truncate">{job.customerName}</span>
         </div>
         
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -69,31 +70,34 @@ export function JobCard({ job, variant, draggable = false, className }: JobCardP
         
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Clock className="h-3 w-3" />
-          <span>{job.estimatedHours}h estimated</span>
+          <span>{job.estimatedHours}h</span>
+        </div>
+        
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Calendar className="h-3 w-3" />
+          <span>Due: {format(job.dueDate, "MMM d")}</span>
         </div>
       </div>
 
-      <div className="mt-2 pt-2 border-t border-border/50">
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-muted-foreground">
-            Due: {format(job.dueDate, "MMM d")}
-          </span>
-          <Badge 
-            variant={job.artworkStatus === "approved" ? "default" : "secondary"}
-            className="text-xs px-2 py-0"
-          >
-            {job.artworkStatus}
-          </Badge>
-        </div>
-        
-        {job.colors && job.colors.length > 0 && (
-          <div className="mt-1">
-            <span className="text-xs text-muted-foreground">
-              Colors: {job.colors.join(", ")}
-            </span>
-          </div>
+      <div className="mt-2 flex items-center gap-1">
+        {job.artworkApproved && (
+          <FileCheck className="h-3 w-3 text-green-600" />
         )}
       </div>
+      
+      {onStageAdvance && variant === "scheduled" && (
+        <div className="mt-2 pt-2 border-t border-border">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onStageAdvance}
+            className="w-full text-xs"
+          >
+            <ChevronRight className="h-3 w-3 mr-1" />
+            Next Stage
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

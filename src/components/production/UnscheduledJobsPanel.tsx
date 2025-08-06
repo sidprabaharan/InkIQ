@@ -9,9 +9,10 @@ import { cn } from "@/lib/utils";
 interface UnscheduledJobsPanelProps {
   jobs: PrintavoJob[];
   selectedDate: Date;
+  onStageAdvance: (jobId: string) => void;
 }
 
-export function UnscheduledJobsPanel({ jobs }: UnscheduledJobsPanelProps) {
+export function UnscheduledJobsPanel({ jobs, onStageAdvance }: UnscheduledJobsPanelProps) {
   // Group jobs by due date
   const jobsByDate = jobs.reduce((acc, job) => {
     const dateKey = format(job.dueDate, "yyyy-MM-dd");
@@ -76,6 +77,7 @@ export function UnscheduledJobsPanel({ jobs }: UnscheduledJobsPanelProps) {
                     variant="unscheduled"
                     draggable={true}
                     className="w-64 flex-shrink-0"
+                    onStageAdvance={() => onStageAdvance(job.id)}
                   />
                 ))}
               </div>

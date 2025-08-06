@@ -21,6 +21,7 @@ interface TimeSlotRowProps {
   selectedDate: Date;
   onJobSchedule: (jobId: string, equipmentId: string, startTime: Date, endTime: Date) => void;
   onJobUnschedule: (jobId: string) => void;
+  onStageAdvance: (jobId: string) => void;
 }
 
 export function TimeSlotRow({ 
@@ -29,7 +30,8 @@ export function TimeSlotRow({
   jobs, 
   selectedDate,
   onJobSchedule,
-  onJobUnschedule 
+  onJobUnschedule,
+  onStageAdvance
 }: TimeSlotRowProps) {
   
   const handleDrop = (e: React.DragEvent, equipmentId: string) => {
@@ -85,6 +87,7 @@ export function TimeSlotRow({
                 job={job}
                 variant="scheduled"
                 className="mb-1 last:mb-0 text-xs"
+                onStageAdvance={() => onStageAdvance(job.id)}
               />
             ))}
           </div>

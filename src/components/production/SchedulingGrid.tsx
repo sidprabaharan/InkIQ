@@ -1,47 +1,84 @@
 import { TimeSlotRow } from "./TimeSlotRow";
-import { PrintavoJob, DecorationMethod } from "./PrintavoPowerScheduler";
+import { PrintavoJob, DecorationMethod, ProductionStage } from "./PrintavoPowerScheduler";
 
 interface SchedulingGridProps {
   jobs: PrintavoJob[];
   selectedDate: Date;
   selectedMethod: DecorationMethod;
+  selectedStage: ProductionStage;
   onJobSchedule: (jobId: string, equipmentId: string, startTime: Date, endTime: Date) => void;
   onJobUnschedule: (jobId: string) => void;
+  onStageAdvance: (jobId: string) => void;
 }
 
-// Equipment configurations for different decoration methods
+// Equipment configurations for different decoration methods and stages
 const equipmentConfig = {
-  screen_printing: [
-    { id: "press-1", name: "M&R Sportsman E", capacity: 840, type: "Automatic Press" },
-    { id: "press-2", name: "M&R Gauntlet III", capacity: 720, type: "Automatic Press" },
-    { id: "press-3", name: "Manual Press #1", capacity: 300, type: "Manual Press" },
-    { id: "press-4", name: "Manual Press #2", capacity: 300, type: "Manual Press" }
-  ],
-  embroidery: [
-    { id: "emb-1", name: "Brother PR-1050X", capacity: 200, type: "10-Head Machine" },
-    { id: "emb-2", name: "Tajima TMAR-1501", capacity: 180, type: "15-Head Machine" },
-    { id: "emb-3", name: "Barudan BEVS-1204", capacity: 160, type: "12-Head Machine" }
-  ],
-  dtf: [
-    { id: "dtf-1", name: "Epson F570", capacity: 400, type: "DTF Printer" },
-    { id: "dtf-2", name: "Heat Press Station 1", capacity: 200, type: "Heat Press" },
-    { id: "dtf-3", name: "Heat Press Station 2", capacity: 200, type: "Heat Press" }
-  ],
-  dtg: [
-    { id: "dtg-1", name: "Brother GTX", capacity: 300, type: "DTG Printer" },
-    { id: "dtg-2", name: "Epson F2100", capacity: 250, type: "DTG Printer" },
-    { id: "dtg-3", name: "Pretreat Station", capacity: 500, type: "Pretreatment" }
-  ]
+  screen_printing: {
+    burn_screens: [
+      { id: "screen-room-1", name: "Screen Room A", capacity: 20, type: "Screen Station" },
+      { id: "screen-room-2", name: "Screen Room B", capacity: 20, type: "Screen Station" }
+    ],
+    mix_ink: [
+      { id: "ink-station-1", name: "Ink Station 1", capacity: 10, type: "Ink Mixing" },
+      { id: "ink-station-2", name: "Ink Station 2", capacity: 10, type: "Ink Mixing" }
+    ],
+    print: [
+      { id: "press-1", name: "M&R Sportsman E", capacity: 840, type: "Automatic Press" },
+      { id: "press-2", name: "M&R Gauntlet III", capacity: 720, type: "Automatic Press" },
+      { id: "press-3", name: "Manual Press #1", capacity: 300, type: "Manual Press" }
+    ]
+  },
+  embroidery: {
+    digitize: [
+      { id: "digitize-1", name: "Digitizing Station 1", capacity: 5, type: "Digitizing" },
+      { id: "digitize-2", name: "Digitizing Station 2", capacity: 5, type: "Digitizing" }
+    ],
+    hoop: [
+      { id: "hoop-station-1", name: "Hooping Station", capacity: 50, type: "Hooping" }
+    ],
+    embroider: [
+      { id: "emb-1", name: "Brother PR-1050X", capacity: 200, type: "10-Head Machine" },
+      { id: "emb-2", name: "Tajima TMAR-1501", capacity: 180, type: "15-Head Machine" }
+    ]
+  },
+  dtf: {
+    design_file: [
+      { id: "design-station-1", name: "Design Station", capacity: 10, type: "Design Work" }
+    ],
+    dtf_print: [
+      { id: "dtf-printer-1", name: "Epson F570", capacity: 400, type: "DTF Printer" }
+    ],
+    powder: [
+      { id: "powder-station-1", name: "Powder Station", capacity: 200, type: "Powder Application" }
+    ],
+    cure: [
+      { id: "cure-oven-1", name: "Cure Oven", capacity: 100, type: "Curing Oven" }
+    ]
+  },
+  dtg: {
+    pretreat: [
+      { id: "pretreat-1", name: "Pretreat Station", capacity: 500, type: "Pretreatment" }
+    ],
+    dtg_print: [
+      { id: "dtg-1", name: "Brother GTX", capacity: 300, type: "DTG Printer" },
+      { id: "dtg-2", name: "Epson F2100", capacity: 250, type: "DTG Printer" }
+    ],
+    dtg_cure: [
+      { id: "dtg-cure-1", name: "DTG Cure Tunnel", capacity: 200, type: "Curing" }
+    ]
+  }
 };
 
 export function SchedulingGrid({ 
   jobs, 
   selectedDate, 
   selectedMethod, 
+  selectedStage,
   onJobSchedule, 
-  onJobUnschedule 
+  onJobUnschedule,
+  onStageAdvance
 }: SchedulingGridProps) {
-  const equipment = equipmentConfig[selectedMethod];
+  const equipment = equipmentConfig[selectedMethod]?.[selectedStage] || [];
   
   // Time slots for the day (8 AM to 6 PM)
   const timeSlots = Array.from({ length: 10 }, (_, i) => {
@@ -90,6 +127,7 @@ export function SchedulingGrid({
               selectedDate={selectedDate}
               onJobSchedule={onJobSchedule}
               onJobUnschedule={onJobUnschedule}
+              onStageAdvance={onStageAdvance}
             />
           ))}
         </div>
