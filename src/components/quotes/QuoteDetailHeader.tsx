@@ -142,7 +142,7 @@ export function QuoteDetailHeader({
   };
 
   const handleScheduleProduction = () => {
-    setProductionSchedulingOpen(true);
+    setShowProductionScheduling(true);
   };
 
   const handleItemsScheduled = (scheduledItems: any[]) => {
@@ -306,6 +306,7 @@ export function QuoteDetailHeader({
         onOpenChange={setShowProductionScheduling}
         quoteId={quoteId}
         quoteItems={items}
+        onItemsScheduled={handleItemsScheduled}
       />
     </div>
   );

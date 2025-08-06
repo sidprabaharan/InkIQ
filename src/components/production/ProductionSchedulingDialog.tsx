@@ -83,13 +83,14 @@ export function ProductionSchedulingDialog({
   // Helper function to get item quantity
   const getItemQuantity = (item: any): number => {
     if (item.sizes) {
-      return Object.values(item.sizes).reduce((sum: number, qty: any) => {
-        const quantity = typeof qty === 'number' ? qty : parseInt(String(qty) || "0");
-        const validQuantity = isNaN(quantity) ? 0 : quantity;
+      const result = Object.values(item.sizes).reduce((sum: number, qty: any): number => {
+        const quantity: number = typeof qty === 'number' ? qty : parseInt(String(qty) || "0");
+        const validQuantity: number = isNaN(quantity) ? 0 : quantity;
         return sum + validQuantity;
       }, 0);
+      return result as number;
     }
-    const itemQuantity = parseInt(String(item.quantity || "0"));
+    const itemQuantity: number = parseInt(String(item.quantity || "0"));
     return isNaN(itemQuantity) ? 0 : itemQuantity;
   };
 

@@ -21,15 +21,15 @@ export const determineDecorationMethod = (item: any): ProductionJob['decorationM
   if (item.description?.toLowerCase().includes('embroid')) return 'embroidery';
   
   // For screen printing, consider quantity thresholds
-  const totalQuantity = item.sizes ? 
-    Object.values(item.sizes).reduce((sum: number, qty: any) => {
-      const quantity = typeof qty === 'number' ? qty : parseInt(String(qty) || "0");
-      const validQuantity = isNaN(quantity) ? 0 : quantity;
+  const totalQuantity: number = item.sizes ? 
+    (Object.values(item.sizes).reduce((sum: number, qty: any): number => {
+      const quantity: number = typeof qty === 'number' ? qty : parseInt(String(qty) || "0");
+      const validQuantity: number = isNaN(quantity) ? 0 : quantity;
       return sum + validQuantity;
-    }, 0) :
+    }, 0) as number) :
     parseInt(String(item.quantity || "0"));
     
-  const validQuantity = isNaN(totalQuantity) ? 0 : totalQuantity;
+  const validQuantity: number = isNaN(totalQuantity) ? 0 : totalQuantity;
     
   if (validQuantity > 50) return 'screen_printing';
   
