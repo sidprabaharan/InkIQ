@@ -25,7 +25,7 @@ import { ShippingLabelDialog } from "./ShippingLabelDialog";
 import { BoxLabelDialog } from "./BoxLabelDialog";
 import { OrderTasksDialog } from "@/components/tasks/OrderTasksDialog";
 import { DecoratorSelectionDialog } from "./DecoratorSelectionDialog";
-import { ProductionSchedulingDialog } from "@/components/production/ProductionSchedulingDialog";
+// Production scheduling functionality moved to PrintavoPowerScheduler
 
 interface QuoteDetailHeaderProps {
   quoteId: string;
@@ -301,13 +301,7 @@ export function QuoteDetailHeader({
         quoteItems={items}
       />
 
-      <ProductionSchedulingDialog
-        open={showProductionScheduling}
-        onOpenChange={setShowProductionScheduling}
-        quoteId={quoteId}
-        quoteItems={items}
-        onItemsScheduled={handleItemsScheduled}
-      />
+      {/* Production scheduling moved to dedicated PrintavoPowerScheduler page */}
     </div>
   );
 }
