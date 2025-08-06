@@ -3,8 +3,13 @@ import { GarmentStatus } from "@/types/garment";
 
 // Storage functions for production jobs
 export const getStoredProductionJobs = (): ProductionJob[] => {
-  const stored = localStorage.getItem('productionJobs');
-  return stored ? JSON.parse(stored) : [];
+  try {
+    const stored = localStorage.getItem('productionJobs');
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error('Error loading production jobs:', error);
+    return [];
+  }
 };
 
 export const updateProductionJob = (jobId: string, updatedJob: ProductionJob): void => {
