@@ -1,4 +1,4 @@
-import { EquipmentLane } from "./EquipmentLane";
+import { TimeSlotRow } from "./TimeSlotRow";
 import { PrintavoJob, DecorationMethod } from "./PrintavoPowerScheduler";
 
 interface SchedulingGridProps {
@@ -54,33 +54,39 @@ export function SchedulingGrid({
 
   return (
     <div className="flex-1 overflow-auto bg-background">
-      <div className="min-w-[1000px]">
-        {/* Time header */}
+      <div className="min-h-[600px]">
+        {/* Equipment header */}
         <div className="sticky top-0 bg-background border-b border-border z-10">
-          <div className="grid grid-cols-[200px_1fr] min-h-[60px]">
+          <div className={`grid min-h-[60px]`} style={{ gridTemplateColumns: `80px repeat(${equipment.length}, 1fr)` }}>
             <div className="border-r border-border p-4 bg-muted/30">
-              <span className="font-semibold text-foreground">Equipment</span>
+              <span className="font-semibold text-foreground">Time</span>
             </div>
-            <div className="grid grid-cols-10">
-              {timeSlots.map(slot => (
-                <div key={slot.hour} className="border-r border-border p-4 text-center bg-muted/30">
+            {equipment.map(eq => (
+              <div key={eq.id} className="border-r border-border p-4 text-center bg-muted/30">
+                <div className="flex flex-col items-center gap-1">
                   <span className="text-sm font-medium text-foreground">
-                    {slot.label}
+                    {eq.name}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {eq.type}
                   </span>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Equipment lanes */}
+        {/* Time slot rows */}
         <div className="divide-y divide-border">
-          {equipment.map(eq => (
-            <EquipmentLane
-              key={eq.id}
-              equipment={eq}
-              jobs={jobs.filter(job => job.equipmentId === eq.id)}
-              timeSlots={timeSlots}
+          {timeSlots.map(slot => (
+            <TimeSlotRow
+              key={slot.hour}
+              timeSlot={slot}
+              equipment={equipment}
+              jobs={jobs.filter(job => {
+                if (!job.scheduledStart) return false;
+                return job.scheduledStart.getHours() === slot.hour;
+              })}
               selectedDate={selectedDate}
               onJobSchedule={onJobSchedule}
               onJobUnschedule={onJobUnschedule}
