@@ -41,46 +41,46 @@ export function HourlyTimeSlot({
   onStageAdvance,
   onJobClick
 }: HourlyTimeSlotProps) {
-  const [draggedOverQuarter, setDraggedOverQuarter] = useState<number | null>(null);
-  
-  // Calculate drop position based on mouse position within the hour row
-  const calculateDropTime = (e: React.DragEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const y = e.clientY - rect.top;
-    const hourHeight = rect.height;
-    const quarterHeight = hourHeight / 4;
-    const quarter = Math.floor(y / quarterHeight);
-    const clampedQuarter = Math.max(0, Math.min(3, quarter));
-    return clampedQuarter * 15; // 0, 15, 30, or 45 minutes
-  };
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    setDraggedOverQuarter(null);
+    setIsDragOver(false);
     
-    const jobData = e.dataTransfer.getData("application/json");
-    if (jobData) {
-      const job = JSON.parse(jobData) as ImprintJob;
-      const minuteOffset = calculateDropTime(e);
+    try {
+      const jobData = e.dataTransfer.getData("application/json");
+      if (!jobData) {
+        console.warn("No job data in drag transfer");
+        return;
+      }
+
+      const job = JSON.parse(jobData) as ImprintJob & { isScheduledMove?: boolean };
+      console.log("Dropping job:", job.jobNumber, "onto equipment:", equipment.name, "at hour:", timeSlot.hour);
       
+      // Simplify to start-of-hour scheduling
       const startTime = new Date(selectedDate);
-      startTime.setHours(timeSlot.hour, minuteOffset, 0, 0);
+      startTime.setHours(timeSlot.hour, 0, 0, 0);
       const endTime = new Date(startTime);
       endTime.setTime(endTime.getTime() + (job.estimatedHours * 60 * 60 * 1000));
       
+      console.log("Scheduling from:", startTime.toLocaleTimeString(), "to:", endTime.toLocaleTimeString());
       onJobSchedule(job.id, equipment.id, startTime, endTime);
+    } catch (error) {
+      console.error("Error handling job drop:", error);
     }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    const minuteOffset = calculateDropTime(e);
-    const quarter = minuteOffset / 15;
-    setDraggedOverQuarter(quarter);
+    e.dataTransfer.dropEffect = "move";
+    setIsDragOver(true);
   };
 
-  const handleDragLeave = () => {
-    setDraggedOverQuarter(null);
+  const handleDragLeave = (e: React.DragEvent) => {
+    // Only clear if we're truly leaving the drop zone
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setIsDragOver(false);
+    }
   };
 
   // Detect overlapping jobs and assign columns
@@ -132,10 +132,16 @@ export function HourlyTimeSlot({
     const leftPercent = column * columnWidth;
     const widthPercent = columnWidth - 1; // Small gap between columns
     
-    // Check if job visually extends beyond the displayed area
-    // Only show "Continues..." if the job is visually cut off, not just because it's long
-    const maxDisplayHeight = Math.min(heightPercent, 100);
-    const spansNextHour = heightPercent > 100;
+    // Fix "Continues..." logic: Only show if job actually spans beyond current hour
+    // Calculate the actual end time of the job
+    const jobEndTime = new Date(job.scheduledStart);
+    jobEndTime.setTime(jobEndTime.getTime() + (durationMinutes * 60 * 1000));
+    
+    // Check if job ends in a different hour than it starts
+    const currentHourEnd = new Date(job.scheduledStart);
+    currentHourEnd.setMinutes(59, 59, 999); // End of current hour
+    
+    const spansNextHour = jobEndTime > currentHourEnd;
     
     return {
       job,
@@ -156,7 +162,8 @@ export function HourlyTimeSlot({
       className={cn(
         "relative h-12 flex border-b border-border/50 transition-colors",
         isOverUtilized && "bg-amber-50 border-l-2 border-amber-400",
-        hasJobs && "hover:bg-muted/5"
+        hasJobs && "hover:bg-muted/5",
+        isDragOver && "bg-primary/5"
       )}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
@@ -174,19 +181,11 @@ export function HourlyTimeSlot({
         )}
       </div>
 
-      {/* Drop zone quarters with visual feedback */}
-      <div className="absolute left-16 right-0 top-0 bottom-0 pointer-events-none">
-        {[0, 1, 2, 3].map(quarter => (
-          <div
-            key={quarter}
-            className={cn(
-              "absolute left-0 right-0 h-1/4 border-b border-dashed border-transparent transition-all",
-              draggedOverQuarter === quarter && "bg-primary/10 border-primary/30"
-            )}
-            style={{ top: `${quarter * 25}%` }}
-          />
-        ))}
-      </div>
+      {/* Drop zone visual feedback */}
+      <div className={cn(
+        "absolute left-16 right-0 top-0 bottom-0 pointer-events-none transition-all",
+        isDragOver && "bg-primary/10 border-2 border-dashed border-primary/50 rounded"
+      )} />
 
       {/* Jobs container */}
       <div className="flex-1 relative">
