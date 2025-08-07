@@ -130,9 +130,9 @@ export function EquipmentConstraintsForm({ constraints, onChange, equipmentType 
     <div className="space-y-6">
       {/* Color/Screen Constraints - Production Critical */}
       {(equipmentType.toLowerCase().includes('screen') || equipmentType.toLowerCase().includes('embroidery')) && (
-        <Card className="border-l-4 border-l-primary">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-base font-semibold text-primary">
+            <CardTitle className="text-sm">
               Color & Screen Limitations
             </CardTitle>
             <p className="text-sm text-muted-foreground">
