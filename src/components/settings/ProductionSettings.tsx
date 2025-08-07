@@ -19,6 +19,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { IMPRINT_METHODS, getMethodConfig } from '@/types/imprint';
+import { EquipmentConstraints } from '@/types/equipment';
+import { EquipmentConstraintsForm } from '@/components/settings/EquipmentConstraintsForm';
 
 interface DecorationMethod {
   id: string;
@@ -51,25 +53,6 @@ interface Equipment {
   constraints: EquipmentConstraints;
 }
 
-interface EquipmentConstraints {
-  maxColors?: number;
-  maxScreens?: number;
-  supportedSizes: string[];
-  maxImprintWidth: number;
-  maxImprintHeight: number;
-  minImprintWidth: number;
-  minImprintHeight: number;
-  supportedGarmentTypes: string[];
-  supportedPlacements: string[];
-  supportsMultiColorRegistration?: boolean;
-  supportsFourColorProcess?: boolean;
-  supportsMetallicInks?: boolean;
-  supportsWaterBased?: boolean;
-  minQuantityPerRun: number;
-  maxQuantityPerRun: number;
-  requiresSpecialSetup?: boolean;
-  setupNotes?: string;
-}
 
 interface WorkingHours {
   monday: { enabled: boolean; start: string; end: string };
@@ -299,6 +282,7 @@ export function ProductionSettings() {
       capacity: 100,
       workingHours: defaultWorkingHours,
       status: 'active',
+      constraints: defaultConstraints,
     });
     setIsEquipmentDialogOpen(false);
   };
@@ -824,6 +808,24 @@ export function ProductionSettings() {
                         </div>
                       </div>
 
+                      <Separator />
+
+                      {/* Equipment Constraints */}
+                      <div className="space-y-4">
+                        <h4 className="font-medium">Equipment Constraints</h4>
+                        <EquipmentConstraintsForm
+                          constraints={isEditingEquipment ? editingEquipment?.constraints || defaultConstraints : newEquipment.constraints || defaultConstraints}
+                          onChange={(constraints) => {
+                            if (isEditingEquipment && editingEquipment) {
+                              setEditingEquipment({ ...editingEquipment, constraints });
+                            } else {
+                              setNewEquipment({ ...newEquipment, constraints });
+                            }
+                          }}
+                          equipmentType={isEditingEquipment ? editingEquipment?.type || '' : newEquipment.type || ''}
+                        />
+                      </div>
+
                       {/* Action Buttons */}
                       <div className="flex justify-end gap-2 pt-4">
                         <Button 
@@ -858,6 +860,31 @@ export function ProductionSettings() {
                           <Badge variant={item.status === 'active' ? 'default' : 'secondary'}>
                             {item.status}
                           </Badge>
+                        </div>
+                        
+                        {/* Constraints Summary */}
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {item.constraints.maxColors && (
+                            <Badge variant="outline" className="text-xs">
+                              Max {item.constraints.maxColors} Colors
+                            </Badge>
+                          )}
+                          {item.constraints.maxScreens && (
+                            <Badge variant="outline" className="text-xs">
+                              {item.constraints.maxScreens} Screens
+                            </Badge>
+                          )}
+                          <Badge variant="outline" className="text-xs">
+                            {item.constraints.supportedGarmentTypes.length} Garment Types
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {item.constraints.supportedSizes.length} Sizes
+                          </Badge>
+                          {item.constraints.supportedPlacements.length > 0 && (
+                            <Badge variant="outline" className="text-xs">
+                              {item.constraints.supportedPlacements.length} Placements
+                            </Badge>
+                          )}
                         </div>
                         
                         {/* Stage Assignments Display */}
