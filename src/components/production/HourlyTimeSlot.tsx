@@ -93,8 +93,8 @@ export function HourlyTimeSlot({
     // Position within the hour (0-100%)
     const topPercent = (startMinutes / 60) * 100;
     
-    // Height based on duration (can span beyond current hour)
-    const heightPercent = Math.min((durationMinutes / 60) * 100, 100 - topPercent);
+    // Height based on full duration (allow spanning beyond current hour)
+    const heightPercent = (durationMinutes / 60) * 100;
     
     return {
       job,
@@ -166,7 +166,8 @@ export function HourlyTimeSlot({
             <div 
               className={cn(
                 "bg-card border border-border rounded shadow-sm h-full flex items-center px-1 cursor-grab active:cursor-grabbing hover:shadow-md transition-all text-xs",
-                spansNextHour && "border-b-dashed border-b-primary"
+                spansNextHour && "border-b-dashed border-b-primary",
+                onJobClick && "cursor-pointer"
               )}
               draggable
               onDragStart={(e) => {
@@ -175,6 +176,12 @@ export function HourlyTimeSlot({
                   isScheduledMove: true
                 }));
                 e.dataTransfer.effectAllowed = "move";
+              }}
+              onClick={(e) => {
+                if (onJobClick && !e.defaultPrevented) {
+                  e.stopPropagation();
+                  onJobClick(job);
+                }
               }}
             >
               <div className="flex-1 min-w-0">
