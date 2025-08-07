@@ -141,6 +141,7 @@ export default function PrintavoPowerScheduler() {
       
       <UnscheduledJobsPanel 
         jobs={unscheduledJobs}
+        allJobs={jobs}
         selectedDate={selectedDate}
         onStageAdvance={handleStageAdvance}
         onJobClick={handleJobClick}
@@ -148,6 +149,7 @@ export default function PrintavoPowerScheduler() {
       
       <SchedulingGrid 
         jobs={scheduledJobs}
+        allJobs={jobs}
         selectedDate={selectedDate}
         selectedMethod={selectedMethod}
         selectedStage={selectedStage}

@@ -18,6 +18,7 @@ interface StationTimeSlotProps {
   timeSlot: TimeSlot;
   equipment: Equipment;
   jobs: ImprintJob[];
+  allJobs: ImprintJob[]; // All jobs for dependency checking
   selectedDate: Date;
   onJobSchedule: (jobId: string, equipmentId: string, startTime: Date, endTime: Date) => void;
   onJobUnschedule: (jobId: string) => void;
@@ -28,7 +29,8 @@ interface StationTimeSlotProps {
 export function StationTimeSlot({ 
   timeSlot, 
   equipment, 
-  jobs, 
+  jobs,
+  allJobs,
   selectedDate,
   onJobSchedule,
   onJobUnschedule,
@@ -91,6 +93,7 @@ export function StationTimeSlot({
             <HorizontalJobCard
               key={job.id}
               job={job}
+              allJobs={allJobs}
               variant="scheduled"
               onStageAdvance={() => onStageAdvance(job.id)}
               onClick={onJobClick ? () => onJobClick(job) : undefined}

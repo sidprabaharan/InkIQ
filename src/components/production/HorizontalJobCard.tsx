@@ -4,9 +4,11 @@ import { ImprintJob } from "@/types/imprint-job";
 import { Clock, Calendar, Package, FileCheck, AlertCircle, ChevronRight, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { getJobReadinessStatus } from "@/utils/stageDependencyUtils";
 
 interface HorizontalJobCardProps {
   job: ImprintJob;
+  allJobs?: ImprintJob[]; // All jobs for dependency checking
   variant: "unscheduled" | "scheduled";
   draggable?: boolean;
   className?: string;
@@ -17,6 +19,7 @@ interface HorizontalJobCardProps {
 
 export function HorizontalJobCard({ 
   job, 
+  allJobs = [],
   variant, 
   draggable = false, 
   className, 
@@ -26,6 +29,9 @@ export function HorizontalJobCard({
 }: HorizontalJobCardProps) {
   const isPriority = job.priority === "high";
   const isOverdue = job.dueDate < new Date() && job.status !== "completed";
+  
+  // Get dependency status for unscheduled jobs
+  const readinessStatus = variant === "unscheduled" ? getJobReadinessStatus(job, allJobs) : { isReady: true };
 
   const handleDragStart = (e: React.DragEvent) => {
     if (draggable) {
@@ -40,6 +46,9 @@ export function HorizontalJobCard({
         "bg-card border border-border rounded-lg p-3 transition-all hover:shadow-sm relative",
         "flex items-center gap-3 min-h-[60px]", // Horizontal layout
         variant === "scheduled" && "bg-muted/50 border-muted",
+        variant === "unscheduled" && (readinessStatus.isReady 
+          ? "bg-green-50 border-green-200" 
+          : "bg-red-50 border-red-200"),
         isPriority && "border-orange-300 bg-orange-50",
         isOverdue && "border-red-300 bg-red-50",
         draggable && "cursor-grab active:cursor-grabbing",
@@ -92,6 +101,16 @@ export function HorizontalJobCard({
 
       {/* Priority and status indicators */}
       <div className="flex items-center gap-1 flex-shrink-0">
+        {variant === "unscheduled" && !readinessStatus.isReady && (
+          <Badge variant="destructive" className="text-xs px-1 py-0 h-4">
+            WAITING
+          </Badge>
+        )}
+        {variant === "unscheduled" && readinessStatus.isReady && (
+          <Badge variant="secondary" className="text-xs px-1 py-0 h-4 bg-green-100 text-green-700">
+            READY
+          </Badge>
+        )}
         {isPriority && (
           <Badge variant="destructive" className="text-xs px-1 py-0 h-4">
             HIGH

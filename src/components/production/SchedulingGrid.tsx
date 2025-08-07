@@ -4,6 +4,7 @@ import { DecorationMethod, ProductionStage } from "./PrintavoPowerScheduler";
 
 interface SchedulingGridProps {
   jobs: ImprintJob[];
+  allJobs: ImprintJob[]; // All jobs for dependency checking
   selectedDate: Date;
   selectedMethod: DecorationMethod;
   selectedStage: ProductionStage;
@@ -73,10 +74,11 @@ const equipmentConfig = {
 
 export function SchedulingGrid({ 
   jobs, 
+  allJobs,
   selectedDate, 
   selectedMethod, 
   selectedStage,
-  onJobSchedule, 
+  onJobSchedule,
   onJobUnschedule,
   onStageAdvance,
   onJobClick
@@ -96,6 +98,7 @@ export function SchedulingGrid({
               key={eq.id}
               equipment={eq}
               jobs={jobs}
+              allJobs={allJobs}
               selectedDate={selectedDate}
               onJobSchedule={onJobSchedule}
               onJobUnschedule={onJobUnschedule}

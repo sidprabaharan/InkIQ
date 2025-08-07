@@ -17,6 +17,7 @@ interface Equipment {
 interface StationGridProps {
   equipment: Equipment;
   jobs: ImprintJob[];
+  allJobs: ImprintJob[]; // All jobs for dependency checking
   selectedDate: Date;
   onJobSchedule: (jobId: string, equipmentId: string, startTime: Date, endTime: Date) => void;
   onJobUnschedule: (jobId: string) => void;
@@ -27,6 +28,7 @@ interface StationGridProps {
 export function StationGrid({
   equipment,
   jobs,
+  allJobs,
   selectedDate,
   onJobSchedule,
   onJobUnschedule,
@@ -109,6 +111,7 @@ export function StationGrid({
                     if (!job.scheduledStart || job.equipmentId !== equipment.id) return false;
                     return job.scheduledStart.getHours() === slot.hour;
                   })}
+                  allJobs={allJobs}
                   selectedDate={selectedDate}
                   onJobSchedule={onJobSchedule}
                   onJobUnschedule={onJobUnschedule}

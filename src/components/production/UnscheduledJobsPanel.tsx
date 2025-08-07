@@ -7,12 +7,13 @@ import { useState } from "react";
 
 interface UnscheduledJobsPanelProps {
   jobs: ImprintJob[];
+  allJobs: ImprintJob[]; // All jobs for dependency checking
   selectedDate: Date;
   onStageAdvance: (jobId: string) => void;
   onJobClick?: (job: ImprintJob) => void;
 }
 
-export function UnscheduledJobsPanel({ jobs, onStageAdvance, onJobClick }: UnscheduledJobsPanelProps) {
+export function UnscheduledJobsPanel({ jobs, allJobs, onStageAdvance, onJobClick }: UnscheduledJobsPanelProps) {
   const [isOpen, setIsOpen] = useState(true);
   
   // Sort jobs by due date and priority, then group related jobs together
@@ -50,6 +51,7 @@ export function UnscheduledJobsPanel({ jobs, onStageAdvance, onJobClick }: Unsch
                 <HorizontalJobCard
                   key={job.id}
                   job={job}
+                  allJobs={allJobs}
                   variant="unscheduled"
                   draggable={true}
                   onStageAdvance={() => onStageAdvance(job.id)}

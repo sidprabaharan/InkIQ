@@ -7,6 +7,7 @@ import {
   determineArtworkApproval, 
   determinePriority 
 } from "@/types/imprint-job";
+import { ProductionStage } from "@/components/production/PrintavoPowerScheduler";
 
 // Import sample images
 import tshirtWhite from "@/assets/mockups/tshirt-white.jpg";
@@ -73,6 +74,7 @@ export function convertOrderBreakdownToImprintJobs(): ImprintJob[] {
         setupRequired: true,
         sequenceOrder: sectionIndex,
         orderGroupColor: getOrderGroupColor(groupIndex),
+        currentStage: getInitialStage(decorationMethod),
         
         // Visual elements - placeholder images for now
         mockupImage: getMockupImageForProduct(lineItemGroup.products[0]?.itemNumber || ""),
@@ -114,6 +116,16 @@ export function convertOrderBreakdownToImprintJobs(): ImprintJob[] {
   });
 
   return imprintJobs;
+}
+
+function getInitialStage(decorationMethod: string): ProductionStage {
+  const stageMap: Record<string, ProductionStage> = {
+    "screen_printing": "burn_screens",
+    "embroidery": "digitize", 
+    "dtf": "design_file",
+    "dtg": "pretreat"
+  };
+  return stageMap[decorationMethod] || "burn_screens";
 }
 
 function getOrderGroupColor(index: number): string {
