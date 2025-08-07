@@ -37,12 +37,20 @@ export function StationGrid({
 }: StationGridProps) {
   const [isOpen, setIsOpen] = useState(false);
   
-  // Time slots for the day (8 AM to 6 PM)
-  const timeSlots = Array.from({ length: 10 }, (_, i) => {
-    const hour = i + 8;
+  // Time slots for the day (8 AM to 6 PM) in 15-minute intervals
+  const timeSlots = Array.from({ length: 40 }, (_, i) => {
+    const totalMinutes = 8 * 60 + i * 15; // Start at 8 AM, add 15 minutes per slot
+    const hour = Math.floor(totalMinutes / 60);
+    const minute = totalMinutes % 60;
+    const hour12 = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    
     return {
       hour,
-      label: `${hour > 12 ? hour - 12 : hour}:00 ${hour >= 12 ? 'PM' : 'AM'}`
+      minute,
+      totalMinutes,
+      label: `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`,
+      isHourMark: minute === 0
     };
   });
 
@@ -102,23 +110,35 @@ export function StationGrid({
             
             {/* Time slots */}
             <div className="divide-y divide-border">
-              {timeSlots.map(slot => (
-                <StationTimeSlot
-                  key={slot.hour}
-                  timeSlot={slot}
-                  equipment={equipment}
-                  jobs={jobs.filter(job => {
-                    if (!job.scheduledStart || job.equipmentId !== equipment.id) return false;
-                    return job.scheduledStart.getHours() === slot.hour;
-                  })}
-                  allJobs={allJobs}
-                  selectedDate={selectedDate}
-                  onJobSchedule={onJobSchedule}
-                  onJobUnschedule={onJobUnschedule}
-                  onStageAdvance={onStageAdvance}
-                  onJobClick={onJobClick}
-                />
-              ))}
+              {timeSlots.map(slot => {
+                // Filter jobs that should be displayed in this time slot
+                const slotJobs = jobs.filter(job => {
+                  if (!job.scheduledStart || job.equipmentId !== equipment.id) return false;
+                  
+                  const jobStartMinutes = job.scheduledStart.getHours() * 60 + job.scheduledStart.getMinutes();
+                  const jobEndMinutes = job.scheduledEnd ? 
+                    job.scheduledEnd.getHours() * 60 + job.scheduledEnd.getMinutes() :
+                    jobStartMinutes + (job.estimatedHours * 60);
+                  
+                  // Show job if this slot is within the job's time range
+                  return slot.totalMinutes >= jobStartMinutes && slot.totalMinutes < jobEndMinutes;
+                });
+
+                return (
+                  <StationTimeSlot
+                    key={`${slot.hour}-${slot.minute}`}
+                    timeSlot={slot}
+                    equipment={equipment}
+                    jobs={slotJobs}
+                    allJobs={allJobs}
+                    selectedDate={selectedDate}
+                    onJobSchedule={onJobSchedule}
+                    onJobUnschedule={onJobUnschedule}
+                    onStageAdvance={onStageAdvance}
+                    onJobClick={onJobClick}
+                  />
+                );
+              })}
             </div>
           </div>
         </CollapsibleContent>

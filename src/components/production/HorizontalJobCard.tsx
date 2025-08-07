@@ -35,7 +35,10 @@ export function HorizontalJobCard({
 
   const handleDragStart = (e: React.DragEvent) => {
     if (draggable) {
-      e.dataTransfer.setData("application/json", JSON.stringify(job));
+      e.dataTransfer.setData("application/json", JSON.stringify({
+        ...job,
+        isScheduledMove: variant === "scheduled"
+      }));
       e.dataTransfer.effectAllowed = "move";
     }
   };
