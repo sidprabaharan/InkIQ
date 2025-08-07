@@ -120,7 +120,7 @@ export function JobDetailModal({
               <div className="space-y-4">
                 {/* Dependencies */}
                 {(dependentJobs.length > 0 || blockingJobs.length > 0) && (
-                  <Card className="bg-background">
+                  <Card className="bg-background h-full">
                     <CardHeader>
                       <CardTitle className="text-base flex items-center gap-2">
                         <Link className="h-4 w-4" />
@@ -283,7 +283,7 @@ export function JobDetailModal({
               {/* Right Column - Related Jobs */}
               <div className="space-y-4">
                 {relatedJobs.length > 0 && (
-                  <Card className="bg-background">
+                  <Card className="bg-background h-full">
                     <CardHeader>
                       <CardTitle className="text-base">Related Imprints</CardTitle>
                     </CardHeader>
