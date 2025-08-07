@@ -132,9 +132,52 @@ export function JobDetailModal({
                         <div>
                           <p className="text-sm font-medium mb-2">Must complete first:</p>
                           {dependentJobs.map(depJob => (
-                            <div key={depJob.id} className="bg-orange-50 border border-orange-200 rounded p-2">
-                              <p className="text-sm font-medium text-orange-900">{depJob.jobNumber}</p>
-                              <p className="text-xs text-orange-700">{depJob.description}</p>
+                            <div key={depJob.id} className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-2">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="font-medium text-sm text-orange-900">{depJob.jobNumber}</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {depJob.status.replace("_", " ")}
+                                </Badge>
+                              </div>
+                              <div className="flex gap-3">
+                                {depJob.mockupImage && (
+                                  <div className="w-12 h-12 rounded border overflow-hidden bg-white flex-shrink-0">
+                                    <img 
+                                      src={depJob.mockupImage} 
+                                      alt="Job mockup" 
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        e.currentTarget.src = '/placeholder.svg';
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                                {depJob.imprintLogo && (
+                                  <div className="w-12 h-12 rounded border overflow-hidden bg-white flex-shrink-0">
+                                    <img 
+                                      src={depJob.imprintLogo} 
+                                      alt="Imprint logo" 
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        e.currentTarget.src = '/placeholder.svg';
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                                <div className="flex-1">
+                                  <p className="text-sm text-orange-900 mb-1">{depJob.description}</p>
+                                  <div className="grid grid-cols-2 gap-1 text-xs text-orange-700">
+                                    <div className="flex items-center gap-1">
+                                      <MapPin className="h-3 w-3" />
+                                      <span>{depJob.placement}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <Clock className="h-3 w-3" />
+                                      <span>{depJob.estimatedHours}h</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -143,9 +186,52 @@ export function JobDetailModal({
                         <div>
                           <p className="text-sm font-medium mb-2">Waiting for this job:</p>
                           {blockingJobs.map(blockJob => (
-                            <div key={blockJob.id} className="bg-blue-50 border border-blue-200 rounded p-2">
-                              <p className="text-sm font-medium text-blue-900">{blockJob.jobNumber}</p>
-                              <p className="text-xs text-blue-700">{blockJob.description}</p>
+                            <div key={blockJob.id} className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="font-medium text-sm text-blue-900">{blockJob.jobNumber}</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {blockJob.status.replace("_", " ")}
+                                </Badge>
+                              </div>
+                              <div className="flex gap-3">
+                                {blockJob.mockupImage && (
+                                  <div className="w-12 h-12 rounded border overflow-hidden bg-white flex-shrink-0">
+                                    <img 
+                                      src={blockJob.mockupImage} 
+                                      alt="Job mockup" 
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        e.currentTarget.src = '/placeholder.svg';
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                                {blockJob.imprintLogo && (
+                                  <div className="w-12 h-12 rounded border overflow-hidden bg-white flex-shrink-0">
+                                    <img 
+                                      src={blockJob.imprintLogo} 
+                                      alt="Imprint logo" 
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        e.currentTarget.src = '/placeholder.svg';
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                                <div className="flex-1">
+                                  <p className="text-sm text-blue-900 mb-1">{blockJob.description}</p>
+                                  <div className="grid grid-cols-2 gap-1 text-xs text-blue-700">
+                                    <div className="flex items-center gap-1">
+                                      <MapPin className="h-3 w-3" />
+                                      <span>{blockJob.placement}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <Clock className="h-3 w-3" />
+                                      <span>{blockJob.estimatedHours}h</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           ))}
                         </div>
