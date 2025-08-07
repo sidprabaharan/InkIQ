@@ -34,6 +34,7 @@ import { TopProductsChart } from '@/components/dashboard/TopProductsChart';
 import { PerformanceMetrics } from '@/components/dashboard/PerformanceMetrics';
 
 export default function Dashboard() {
+  console.log('Dashboard component rendering...');
   const [timeRange, setTimeRange] = useState('month');
 
   return (
