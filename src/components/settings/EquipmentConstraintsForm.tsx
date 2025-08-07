@@ -129,14 +129,14 @@ export function EquipmentConstraintsForm({ constraints, onChange, equipmentType 
   return (
     <div className="space-y-6">
       {/* Color/Screen Constraints - Production Critical */}
-      {(equipmentType === 'screen_printing' || equipmentType === 'embroidery') && (
+      {(equipmentType.toLowerCase().includes('screen') || equipmentType.toLowerCase().includes('embroidery')) && (
         <Card className="border-l-4 border-l-primary">
           <CardHeader>
             <CardTitle className="text-base font-semibold text-primary">
               Color & Screen Limitations
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              {equipmentType === 'embroidery' 
+              {equipmentType.toLowerCase().includes('embroidery') 
                 ? 'Set maximum thread colors (typically 9, 12, or 15 colors)'
                 : 'Set maximum screens (typically 6, 12, or 20 screens)'
               }
@@ -146,18 +146,18 @@ export function EquipmentConstraintsForm({ constraints, onChange, equipmentType 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="maxColors" className="text-sm font-medium">
-                  Max Colors {equipmentType === 'embroidery' ? '(Thread Colors)' : ''}
+                  Max Colors {equipmentType.toLowerCase().includes('embroidery') ? '(Thread Colors)' : ''}
                 </Label>
                 <Input
                   id="maxColors"
                   type="number"
                   value={constraints.maxColors || ''}
                   onChange={(e) => updateConstraints({ maxColors: parseInt(e.target.value) || undefined })}
-                  placeholder={equipmentType === 'embroidery' ? "9, 12, 15" : "6, 8, 12"}
+                  placeholder={equipmentType.toLowerCase().includes('embroidery') ? "9, 12, 15" : "6, 8, 12"}
                   className="font-medium"
                 />
               </div>
-              {equipmentType === 'screen_printing' && (
+              {equipmentType.toLowerCase().includes('screen') && (
                 <div>
                   <Label htmlFor="maxScreens" className="text-sm font-medium">Max Screens</Label>
                   <Input
