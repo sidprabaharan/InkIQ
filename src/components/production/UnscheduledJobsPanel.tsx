@@ -14,7 +14,7 @@ interface UnscheduledJobsPanelProps {
 }
 
 export function UnscheduledJobsPanel({ jobs, allJobs, onStageAdvance, onJobClick }: UnscheduledJobsPanelProps) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   
   // Sort jobs by due date and priority, then group related jobs together
   const sortedJobs = [...jobs].sort((a, b) => {
