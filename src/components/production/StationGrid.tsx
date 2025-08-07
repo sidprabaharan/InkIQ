@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ImprintJob } from "@/types/imprint-job";
-import { StationTimeSlot } from "./StationTimeSlot";
+import { HourlyTimeSlot } from "./HourlyTimeSlot";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
@@ -25,8 +25,8 @@ interface StationGridProps {
   onJobClick?: (job: ImprintJob) => void;
 }
 
-export function StationGrid({
-  equipment,
+export function StationGrid({ 
+  equipment, 
   jobs,
   allJobs,
   selectedDate,
@@ -35,114 +35,82 @@ export function StationGrid({
   onStageAdvance,
   onJobClick
 }: StationGridProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  
-  // Time slots for the day (8 AM to 6 PM) in 15-minute intervals
-  const timeSlots = Array.from({ length: 40 }, (_, i) => {
-    const totalMinutes = 8 * 60 + i * 15; // Start at 8 AM, add 15 minutes per slot
-    const hour = Math.floor(totalMinutes / 60);
-    const minute = totalMinutes % 60;
-    const hour12 = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    
+  const [isOpen, setIsOpen] = useState(true);
+
+  // Generate hourly time slots from 8 AM to 6 PM (Google Calendar style)
+  const timeSlots = Array.from({ length: 10 }, (_, i) => {
+    const hour = 8 + i; // 8 AM to 5 PM (10 hours)
     return {
       hour,
-      minute,
-      totalMinutes,
-      label: `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`,
-      isHourMark: minute === 0
+      minute: 0,
+      totalMinutes: hour * 60,
+      label: `${hour % 12 || 12}:00 ${hour >= 12 ? 'PM' : 'AM'}`,
+      isHourMark: true
     };
   });
 
-  // Get utilization data
-  const scheduledJobs = jobs.filter(job => job.equipmentId === equipment.id);
-  const totalHours = scheduledJobs.reduce((sum, job) => sum + job.estimatedHours, 0);
-  const utilizationPercentage = Math.min((totalHours / 10) * 100, 100); // 10 hour workday
-  const isOverUtilized = utilizationPercentage > 80;
+  // Filter jobs for this equipment
+  const equipmentJobs = jobs.filter(job => job.equipmentId === equipment.id);
+  
+  // Calculate utilization
+  const totalScheduledHours = equipmentJobs.reduce((sum, job) => sum + job.estimatedHours, 0);
+  const maxHours = 10; // 10 hours (8 AM to 6 PM)
+  const utilization = Math.round((totalScheduledHours / maxHours) * 100);
 
   return (
-    <div className="border border-border rounded-lg mb-4 bg-card">
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CollapsibleTrigger asChild>
-          <Button
-            variant="ghost"
-            className="w-full justify-between p-4 h-auto hover:bg-muted/50"
-          >
-            <div className="flex items-center gap-3">
-              <div className="text-left">
-                <h3 className="font-semibold text-base text-foreground">
-                  {equipment.name}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {equipment.type} • Capacity: {equipment.capacity}/day
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge 
-                  variant={isOverUtilized ? "destructive" : utilizationPercentage > 50 ? "default" : "secondary"}
-                  className="text-xs"
-                >
-                  {utilizationPercentage.toFixed(0)}% utilized
-                </Badge>
-                {scheduledJobs.length > 0 && (
-                  <Badge variant="outline" className="text-xs">
-                    {scheduledJobs.length} jobs
-                  </Badge>
-                )}
-              </div>
-            </div>
-            {isOpen ? (
-              <ChevronDown className="h-4 w-4" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
-          </Button>
-        </CollapsibleTrigger>
-        
-        <CollapsibleContent>
-          <div className="border-t border-border">
-            {/* Time header */}
-            <div className="sticky top-0 bg-muted/30 border-b border-border z-10 px-4 py-2">
-              <span className="text-sm font-medium text-muted-foreground">
-                Time Slots - {selectedDate.toLocaleDateString()}
-              </span>
-            </div>
-            
-            {/* Time slots */}
-            <div className="divide-y divide-border">
-              {timeSlots.map(slot => {
-                // Filter jobs that should be displayed in this time slot
-                const slotJobs = jobs.filter(job => {
-                  if (!job.scheduledStart || job.equipmentId !== equipment.id) return false;
-                  
-                  const jobStartMinutes = job.scheduledStart.getHours() * 60 + job.scheduledStart.getMinutes();
-                  const jobEndMinutes = job.scheduledEnd ? 
-                    job.scheduledEnd.getHours() * 60 + job.scheduledEnd.getMinutes() :
-                    jobStartMinutes + (job.estimatedHours * 60);
-                  
-                  // Show job if this slot is within the job's time range
-                  return slot.totalMinutes >= jobStartMinutes && slot.totalMinutes < jobEndMinutes;
-                });
-
-                return (
-                  <StationTimeSlot
-                    key={`${slot.hour}-${slot.minute}`}
-                    timeSlot={slot}
-                    equipment={equipment}
-                    jobs={slotJobs}
-                    allJobs={allJobs}
-                    selectedDate={selectedDate}
-                    onJobSchedule={onJobSchedule}
-                    onJobUnschedule={onJobUnschedule}
-                    onStageAdvance={onStageAdvance}
-                    onJobClick={onJobClick}
-                  />
-                );
-              })}
-            </div>
+    <Collapsible 
+      open={isOpen} 
+      onOpenChange={setIsOpen}
+      className="w-full border border-border rounded-lg bg-card"
+    >
+      <CollapsibleTrigger asChild>
+        <div className="flex items-center justify-between p-4 hover:bg-muted/50 cursor-pointer">
+          <div className="flex items-center gap-3">
+            <h3 className="font-semibold text-foreground">{equipment.name}</h3>
+            <Badge variant="outline" className="text-xs">
+              {equipment.type}
+            </Badge>
+            <Badge 
+              variant={utilization > 80 ? "destructive" : utilization > 50 ? "default" : "secondary"}
+              className="text-xs"
+            >
+              {utilization}% utilized
+            </Badge>
+            <Badge variant="outline" className="text-xs">
+              {equipmentJobs.length} jobs
+            </Badge>
           </div>
-        </CollapsibleContent>
-      </Collapsible>
-    </div>
+          <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </div>
+      </CollapsibleTrigger>
+      
+      <CollapsibleContent className="border-t border-border">
+        <div className="w-full">
+          {timeSlots.map(timeSlot => {
+            // Filter jobs that start in this hour
+            const slotJobs = equipmentJobs.filter(job => {
+              if (!job.scheduledStart) return false;
+              const jobStartHour = job.scheduledStart.getHours();
+              return jobStartHour === timeSlot.hour;
+            });
+
+            return (
+              <HourlyTimeSlot
+                key={timeSlot.hour}
+                timeSlot={timeSlot}
+                equipment={equipment}
+                jobs={slotJobs}
+                allJobs={allJobs}
+                selectedDate={selectedDate}
+                onJobSchedule={onJobSchedule}
+                onJobUnschedule={onJobUnschedule}
+                onStageAdvance={onStageAdvance}
+                onJobClick={onJobClick}
+              />
+            );
+          })}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
