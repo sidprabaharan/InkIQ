@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/collapsible';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Dialog,
   DialogContent,
@@ -159,29 +161,340 @@ export function ImprintSettings() {
     switch (methodValue) {
       case 'screen_printing':
         return (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Mesh Count Range</Label>
-                <Input placeholder="e.g., 110-305" />
+          <div className="space-y-8">
+            {/* Screen Printing Information */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold">Screen Printing Information</h3>
+                <p className="text-sm text-muted-foreground">Fill out this page if you offer screen printing. Skip if you don't.</p>
               </div>
-              <div className="space-y-2">
-                <Label>Squeegee Hardness</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select hardness" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="soft">Soft (60-70 durometer)</SelectItem>
-                    <SelectItem value="medium">Medium (70-80 durometer)</SelectItem>
-                    <SelectItem value="hard">Hard (80-90 durometer)</SelectItem>
-                  </SelectContent>
-                </Select>
+              
+              <div className="space-y-3">
+                <Label className="text-base font-medium">Select the screen printing inks / specialties you offer.</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    'Plastisol (Industry Standard)',
+                    'Water Based',
+                    'Discharge',
+                    'Puff Ink',
+                    'High Density',
+                    'Glitter',
+                    'Silicone',
+                    'Metallic',
+                    'Shimmer',
+                    'Foil',
+                    'Reflective',
+                    'Glow in the Dark',
+                    'Flocking',
+                    'Other'
+                  ].map((ink) => (
+                    <div key={ink} className="flex items-center space-x-2">
+                      <Checkbox id={ink} />
+                      <Label htmlFor={ink} className="text-sm">{ink}</Label>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label>Ink Types</Label>
-              <Textarea placeholder="Water-based, plastisol, discharge..." />
+
+            {/* Capability Questions */}
+            <div className="space-y-4">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Are you good at simulated process screen printing?</Label>
+                  <RadioGroup defaultValue="no" className="flex space-x-4">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="yes" id="sim-yes" />
+                      <Label htmlFor="sim-yes">Yes</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="no" id="sim-no" />
+                      <Label htmlFor="sim-no">No</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                {[
+                  'Do you print over zippers?',
+                  'Do you print over hoodie pockets?',
+                  'Do you print off the bottom edge of shirts?',
+                  'Do you print on t-shirt pockets?',
+                  'Do you print on sleeves?',
+                  'Do you print neck labels?',
+                  'Do you offer over sized / all over prints?',
+                  'Do you print on foam trucker caps?',
+                  'Do you print on kid or infant shirts?'
+                ].map((question, index) => (
+                  <div key={index} className="space-y-2">
+                    <Label className="text-sm font-medium">{question}</Label>
+                    <RadioGroup defaultValue="no" className="flex space-x-4">
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="yes" id={`q${index}-yes`} />
+                        <Label htmlFor={`q${index}-yes`}>Yes</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="no" id={`q${index}-no`} />
+                        <Label htmlFor={`q${index}-no`}>No</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Technical Specifications */}
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="maxColors" className="text-sm font-medium">Maximum Colors (Screens)</Label>
+                <Input
+                  id="maxColors"
+                  type="number"
+                  placeholder="Enter maximum colors"
+                  className="mt-1"
+                />
+                <p className="text-xs text-muted-foreground mt-1">What's the max number of colors / screens you can print?</p>
+              </div>
+
+              <div>
+                <Label htmlFor="inkColorNotes" className="text-sm font-medium">Ink Color Additional Notes</Label>
+                <Textarea
+                  id="inkColorNotes"
+                  placeholder="Any additional notes about ink colors..."
+                  className="mt-1"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="maxWidth" className="text-sm font-medium">Maximum Width in Inches</Label>
+                  <Input
+                    id="maxWidth"
+                    type="number"
+                    placeholder="Width"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="maxHeight" className="text-sm font-medium">Maximum Height in Inches</Label>
+                  <Input
+                    id="maxHeight"
+                    type="number"
+                    placeholder="Height"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="maxSleeveWidth" className="text-sm font-medium">Maximum Sleeve Width</Label>
+                  <Input
+                    id="maxSleeveWidth"
+                    type="number"
+                    placeholder="Sleeve Width"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="maxSleeveHeight" className="text-sm font-medium">Maximum Sleeve Height</Label>
+                  <Input
+                    id="maxSleeveHeight"
+                    type="number"
+                    placeholder="Sleeve Height"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="logoSizeNotes" className="text-sm font-medium">Logo size additional notes</Label>
+                <Textarea
+                  id="logoSizeNotes"
+                  placeholder="Any additional notes about logo sizing..."
+                  className="mt-1"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="minOrderQty" className="text-sm font-medium">Minimum Order Quantity</Label>
+                  <Input
+                    id="minOrderQty"
+                    type="number"
+                    placeholder="Min quantity"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="maxOrderQty" className="text-sm font-medium">Maximum Order Quantity</Label>
+                  <Input
+                    id="maxOrderQty"
+                    type="number"
+                    placeholder="Max quantity"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="dailyCapacity" className="text-sm font-medium">Daily Capacity</Label>
+                  <Input
+                    id="dailyCapacity"
+                    type="number"
+                    placeholder="Daily capacity"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="damageRate" className="text-sm font-medium">Damage Rate %</Label>
+                  <Input
+                    id="damageRate"
+                    type="number"
+                    placeholder="Damage rate"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Turnaround Times */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold">Screen Printing Production Turnaround Times</h3>
+                <p className="text-sm text-muted-foreground">
+                  How many business days does it take you to produce screen printing orders? Don't include shipping time here - 
+                  that's handled elsewhere. If you don't offer rush, you can delete those rows.
+                </p>
+              </div>
+              
+              <div className="border rounded-lg">
+                <table className="w-full">
+                  <thead className="bg-muted/50 border-b">
+                    <tr>
+                      <th className="text-left p-3 font-medium">Type</th>
+                      <th className="text-left p-3 font-medium">Days</th>
+                      <th className="text-left p-3 font-medium">Extra Charge %</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b">
+                      <td className="p-3">Standard</td>
+                      <td className="p-3">
+                        <Input type="number" placeholder="Days" className="w-20" />
+                      </td>
+                      <td className="p-3">0%</td>
+                    </tr>
+                    {['Rush 1', 'Rush 2', 'Rush 3'].map((type) => (
+                      <tr key={type} className="border-b last:border-b-0">
+                        <td className="p-3">{type}</td>
+                        <td className="p-3">
+                          <Input type="number" placeholder="Days" className="w-20" />
+                        </td>
+                        <td className="p-3">
+                          <Input type="number" placeholder="%" className="w-20" />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Pricing Grid */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Pricing Grid</h3>
+              
+              <div className="border rounded-lg p-4 space-y-4">
+                <div className="flex space-x-2">
+                  <Button variant="outline" size="sm">Add Quantity Range</Button>
+                  <Button variant="outline" size="sm">Add Color Count</Button>
+                </div>
+                
+                <div className="overflow-x-auto">
+                  <table className="w-full border">
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="border p-2 text-left">Quantity</th>
+                        <th className="border p-2 text-center">1 Color</th>
+                        <th className="border p-2 text-center">2 Colors</th>
+                        <th className="border p-2 text-center">3 Colors</th>
+                        <th className="border p-2 text-center">4+ Colors</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {['12-23', '24-47', '48-71', '72-143', '144-287', '288+'].map((qty) => (
+                        <tr key={qty}>
+                          <td className="border p-2 font-medium">{qty}</td>
+                          {[1, 2, 3, 4].map((color) => (
+                            <td key={color} className="border p-1">
+                              <Input type="number" placeholder="$0.00" className="text-center" />
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            {/* Fees and Extra Charges */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold">Fees</h3>
+                <div className="border rounded-lg">
+                  <table className="w-full">
+                    <thead className="bg-muted/50 border-b">
+                      <tr>
+                        <th className="text-left p-3 font-medium">Name</th>
+                        <th className="text-left p-3 font-medium">Price</th>
+                        <th className="text-left p-3 font-medium">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="p-3" colSpan={3}>
+                          <p className="text-sm text-muted-foreground">No fees added yet</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <Button variant="outline" size="sm" className="mt-2">Add Fee</Button>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold">Extra Charges</h3>
+                <div className="border rounded-lg">
+                  <table className="w-full">
+                    <thead className="bg-muted/50 border-b">
+                      <tr>
+                        <th className="text-left p-3 font-medium">Name</th>
+                        <th className="text-left p-3 font-medium">Price</th>
+                        <th className="text-left p-3 font-medium">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="p-3" colSpan={3}>
+                          <p className="text-sm text-muted-foreground">No extra charges added yet</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <Button variant="outline" size="sm" className="mt-2">Add Extra Charge</Button>
+              </div>
+
+              <div>
+                <Label htmlFor="extraNotes" className="text-sm font-medium">Extra Notes</Label>
+                <Textarea
+                  id="extraNotes"
+                  placeholder="Any additional notes..."
+                  className="mt-1"
+                />
+              </div>
             </div>
           </div>
         );
