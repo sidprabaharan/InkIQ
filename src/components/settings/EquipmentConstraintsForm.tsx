@@ -128,33 +128,45 @@ export function EquipmentConstraintsForm({ constraints, onChange, equipmentType 
 
   return (
     <div className="space-y-6">
-      {/* Color/Screen Constraints */}
+      {/* Color/Screen Constraints - Production Critical */}
       {(equipmentType === 'screen_printing' || equipmentType === 'embroidery') && (
-        <Card>
+        <Card className="border-l-4 border-l-primary">
           <CardHeader>
-            <CardTitle className="text-sm">Color & Screen Constraints</CardTitle>
+            <CardTitle className="text-base font-semibold text-primary">
+              Color & Screen Limitations
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              {equipmentType === 'embroidery' 
+                ? 'Set maximum thread colors (typically 9, 12, or 15 colors)'
+                : 'Set maximum screens (typically 6, 12, or 20 screens)'
+              }
+            </p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="maxColors">Max Colors</Label>
+                <Label htmlFor="maxColors" className="text-sm font-medium">
+                  Max Colors {equipmentType === 'embroidery' ? '(Thread Colors)' : ''}
+                </Label>
                 <Input
                   id="maxColors"
                   type="number"
                   value={constraints.maxColors || ''}
                   onChange={(e) => updateConstraints({ maxColors: parseInt(e.target.value) || undefined })}
-                  placeholder="e.g., 6"
+                  placeholder={equipmentType === 'embroidery' ? "9, 12, 15" : "6, 8, 12"}
+                  className="font-medium"
                 />
               </div>
               {equipmentType === 'screen_printing' && (
                 <div>
-                  <Label htmlFor="maxScreens">Max Screens</Label>
+                  <Label htmlFor="maxScreens" className="text-sm font-medium">Max Screens</Label>
                   <Input
                     id="maxScreens"
                     type="number"
                     value={constraints.maxScreens || ''}
                     onChange={(e) => updateConstraints({ maxScreens: parseInt(e.target.value) || undefined })}
-                    placeholder="e.g., 8"
+                    placeholder="6, 12, 20"
+                    className="font-medium"
                   />
                 </div>
               )}
@@ -169,45 +181,27 @@ export function EquipmentConstraintsForm({ constraints, onChange, equipmentType 
           <CardTitle className="text-sm">Size Constraints</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="maxWidth">Max Width (in)</Label>
+              <Label htmlFor="maxWidth">Max Imprint Width (inches)</Label>
               <Input
                 id="maxWidth"
                 type="number"
                 step="0.1"
                 value={constraints.maxImprintWidth}
                 onChange={(e) => updateConstraints({ maxImprintWidth: parseFloat(e.target.value) })}
+                placeholder="e.g., 14"
               />
             </div>
             <div>
-              <Label htmlFor="maxHeight">Max Height (in)</Label>
+              <Label htmlFor="maxHeight">Max Imprint Height (inches)</Label>
               <Input
                 id="maxHeight"
                 type="number"
                 step="0.1"
                 value={constraints.maxImprintHeight}
                 onChange={(e) => updateConstraints({ maxImprintHeight: parseFloat(e.target.value) })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="minWidth">Min Width (in)</Label>
-              <Input
-                id="minWidth"
-                type="number"
-                step="0.1"
-                value={constraints.minImprintWidth}
-                onChange={(e) => updateConstraints({ minImprintWidth: parseFloat(e.target.value) })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="minHeight">Min Height (in)</Label>
-              <Input
-                id="minHeight"
-                type="number"
-                step="0.1"
-                value={constraints.minImprintHeight}
-                onChange={(e) => updateConstraints({ minImprintHeight: parseFloat(e.target.value) })}
+                placeholder="e.g., 18"
               />
             </div>
           </div>

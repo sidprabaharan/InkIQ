@@ -196,8 +196,6 @@ export function ProductionSettings() {
     supportedSizes: ['S', 'M', 'L', 'XL'],
     maxImprintWidth: 12,
     maxImprintHeight: 14,
-    minImprintWidth: 1,
-    minImprintHeight: 1,
     supportedGarmentTypes: ['tshirt', 'polo', 'hoodie'],
     supportedPlacements: ['front_center', 'back_center'],
     minQuantityPerRun: 1,

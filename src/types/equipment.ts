@@ -22,14 +22,11 @@ export interface EquipmentConstraints {
   // Color/Screen limitations
   maxColors?: number;
   maxScreens?: number;
-  minColors?: number;
   
   // Size constraints
   supportedSizes: GarmentSize[];
   maxImprintWidth: number;  // in inches
   maxImprintHeight: number; // in inches
-  minImprintWidth: number;
-  minImprintHeight: number;
   
   // Garment type constraints
   supportedGarmentTypes: GarmentType[];
