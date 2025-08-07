@@ -35,11 +35,16 @@ interface ProductionStage {
   order: number;
 }
 
+interface StageAssignment {
+  decorationMethod: string;
+  stageIds: string[];
+}
+
 interface Equipment {
   id: string;
   name: string;
   type: string;
-  decorationMethods: string[];
+  stageAssignments: StageAssignment[];
   capacity: number;
   workingHours: WorkingHours;
   status: 'active' | 'maintenance' | 'offline';
@@ -188,7 +193,9 @@ export function ProductionSettings() {
       id: 'screen_press_1',
       name: 'Manual Screen Press #1',
       type: 'Screen Printing Press',
-      decorationMethods: ['screen_printing'],
+      stageAssignments: [
+        { decorationMethod: 'screenPrinting', stageIds: ['printing', 'curing'] }
+      ],
       capacity: 200,
       workingHours: defaultWorkingHours,
       status: 'active',
@@ -197,7 +204,9 @@ export function ProductionSettings() {
       id: 'embroidery_1',
       name: 'Brother 6-Head Embroidery',
       type: 'Embroidery Machine',
-      decorationMethods: ['embroidery'],
+      stageAssignments: [
+        { decorationMethod: 'embroidery', stageIds: ['hooping', 'embroidering', 'trimming'] }
+      ],
       capacity: 150,
       workingHours: { ...defaultWorkingHours, saturday: { enabled: true, start: '09:00', end: '15:00' } },
       status: 'active',
@@ -206,14 +215,136 @@ export function ProductionSettings() {
       id: 'dtf_printer_1',
       name: 'DTF Printer Station',
       type: 'DTF Printer',
-      decorationMethods: ['dtf'],
+      stageAssignments: [
+        { decorationMethod: 'dtf', stageIds: ['printing', 'powder'] }
+      ],
       capacity: 100,
       workingHours: defaultWorkingHours,
       status: 'active',
     },
   ]);
 
+  const [newEquipment, setNewEquipment] = useState<Partial<Equipment>>({
+    name: '',
+    type: '',
+    stageAssignments: [],
+    capacity: 100,
+    workingHours: defaultWorkingHours,
+    status: 'active',
+  });
+
+  const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
+  const [isEquipmentDialogOpen, setIsEquipmentDialogOpen] = useState(false);
+  const [isEditingEquipment, setIsEditingEquipment] = useState(false);
+
   const [globalWorkingHours, setGlobalWorkingHours] = useState<WorkingHours>(defaultWorkingHours);
+
+  // Equipment handlers
+  const handleAddEquipment = () => {
+    if (!newEquipment.name || !newEquipment.type) return;
+    
+    const equipment: Equipment = {
+      id: `equipment_${Date.now()}`,
+      name: newEquipment.name,
+      type: newEquipment.type,
+      stageAssignments: newEquipment.stageAssignments || [],
+      capacity: newEquipment.capacity || 100,
+      workingHours: newEquipment.workingHours || defaultWorkingHours,
+      status: newEquipment.status || 'active',
+    };
+    
+    setEquipment(prev => [...prev, equipment]);
+    setNewEquipment({
+      name: '',
+      type: '',
+      stageAssignments: [],
+      capacity: 100,
+      workingHours: defaultWorkingHours,
+      status: 'active',
+    });
+    setIsEquipmentDialogOpen(false);
+  };
+
+  const handleEditEquipment = (equipment: Equipment) => {
+    setEditingEquipment({ ...equipment });
+    setIsEditingEquipment(true);
+    setIsEquipmentDialogOpen(true);
+  };
+
+  const handleSaveEquipment = () => {
+    if (!editingEquipment) return;
+    
+    setEquipment(prev => 
+      prev.map(eq => 
+        eq.id === editingEquipment.id ? editingEquipment : eq
+      )
+    );
+    setIsEquipmentDialogOpen(false);
+    setEditingEquipment(null);
+    setIsEditingEquipment(false);
+  };
+
+  const handleDeleteEquipment = (equipmentId: string) => {
+    setEquipment(prev => prev.filter(eq => eq.id !== equipmentId));
+  };
+
+  const handleAddStageAssignment = (equipmentToEdit: Equipment | Partial<Equipment>) => {
+    const newAssignment: StageAssignment = {
+      decorationMethod: '',
+      stageIds: []
+    };
+    
+    if (isEditingEquipment && editingEquipment) {
+      setEditingEquipment({
+        ...editingEquipment,
+        stageAssignments: [...editingEquipment.stageAssignments, newAssignment]
+      });
+    } else {
+      setNewEquipment({
+        ...newEquipment,
+        stageAssignments: [...(newEquipment.stageAssignments || []), newAssignment]
+      });
+    }
+  };
+
+  const handleUpdateStageAssignment = (index: number, updates: Partial<StageAssignment>) => {
+    if (isEditingEquipment && editingEquipment) {
+      const updatedAssignments = editingEquipment.stageAssignments.map((assignment, i) =>
+        i === index ? { ...assignment, ...updates } : assignment
+      );
+      setEditingEquipment({
+        ...editingEquipment,
+        stageAssignments: updatedAssignments
+      });
+    } else {
+      const updatedAssignments = (newEquipment.stageAssignments || []).map((assignment, i) =>
+        i === index ? { ...assignment, ...updates } : assignment
+      );
+      setNewEquipment({
+        ...newEquipment,
+        stageAssignments: updatedAssignments
+      });
+    }
+  };
+
+  const handleRemoveStageAssignment = (index: number) => {
+    if (isEditingEquipment && editingEquipment) {
+      setEditingEquipment({
+        ...editingEquipment,
+        stageAssignments: editingEquipment.stageAssignments.filter((_, i) => i !== index)
+      });
+    } else {
+      setNewEquipment({
+        ...newEquipment,
+        stageAssignments: (newEquipment.stageAssignments || []).filter((_, i) => i !== index)
+      });
+    }
+  };
+
+  const getStagesForMethod = (methodId: string) => {
+    const method = decorationMethods.find(m => m.id === methodId);
+    return method?.stages || [];
+  };
 
   return (
     <div className="space-y-6">
@@ -479,46 +610,197 @@ export function ProductionSettings() {
                     Manage your production equipment and their capabilities
                   </CardDescription>
                 </div>
-                <Dialog>
+                <Dialog open={isEquipmentDialogOpen} onOpenChange={setIsEquipmentDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button>
+                    <Button onClick={() => {
+                      setIsEditingEquipment(false);
+                      setNewEquipment({
+                        name: '',
+                        type: '',
+                        stageAssignments: [],
+                        capacity: 100,
+                        workingHours: defaultWorkingHours,
+                        status: 'active',
+                      });
+                    }}>
                       <Plus className="h-4 w-4 mr-2" />
                       Add Equipment
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
-                      <DialogTitle>Add Equipment</DialogTitle>
+                      <DialogTitle>
+                        {isEditingEquipment ? 'Edit Equipment' : 'Add Equipment'}
+                      </DialogTitle>
                       <DialogDescription>
-                        Add a new piece of production equipment
+                        {isEditingEquipment 
+                          ? 'Update equipment configuration and stage assignments'
+                          : 'Add new production equipment and assign it to production stages'
+                        }
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="equipment-name">Equipment Name</Label>
-                        <Input id="equipment-name" placeholder="e.g., Screen Press #2" />
+                    
+                    <div className="space-y-6">
+                      {/* Basic Equipment Info */}
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="equipment-name">Equipment Name</Label>
+                          <Input 
+                            id="equipment-name" 
+                            placeholder="e.g., Screen Press #2"
+                            value={isEditingEquipment ? editingEquipment?.name || '' : newEquipment.name || ''}
+                            onChange={(e) => {
+                              if (isEditingEquipment && editingEquipment) {
+                                setEditingEquipment({ ...editingEquipment, name: e.target.value });
+                              } else {
+                                setNewEquipment({ ...newEquipment, name: e.target.value });
+                              }
+                            }}
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="equipment-type">Equipment Type</Label>
+                          <Input
+                            id="equipment-type"
+                            placeholder="e.g., Screen Printing Press"
+                            value={isEditingEquipment ? editingEquipment?.type || '' : newEquipment.type || ''}
+                            onChange={(e) => {
+                              if (isEditingEquipment && editingEquipment) {
+                                setEditingEquipment({ ...editingEquipment, type: e.target.value });
+                              } else {
+                                setNewEquipment({ ...newEquipment, type: e.target.value });
+                              }
+                            }}
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="capacity">Daily Capacity</Label>
+                          <Input 
+                            id="capacity" 
+                            type="number" 
+                            placeholder="Items per day"
+                            value={isEditingEquipment ? editingEquipment?.capacity || 100 : newEquipment.capacity || 100}
+                            onChange={(e) => {
+                              const capacity = parseInt(e.target.value) || 100;
+                              if (isEditingEquipment && editingEquipment) {
+                                setEditingEquipment({ ...editingEquipment, capacity });
+                              } else {
+                                setNewEquipment({ ...newEquipment, capacity });
+                              }
+                            }}
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <Label htmlFor="equipment-type">Equipment Type</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="screen_printing">Screen Printing Press</SelectItem>
-                            <SelectItem value="embroidery">Embroidery Machine</SelectItem>
-                            <SelectItem value="dtf">DTF Printer</SelectItem>
-                            <SelectItem value="dtg">DTG Printer</SelectItem>
-                          </SelectContent>
-                        </Select>
+
+                      <Separator />
+
+                      {/* Stage Assignments */}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium">Stage Assignments</h4>
+                          <Button 
+                            onClick={() => handleAddStageAssignment(isEditingEquipment ? editingEquipment! : newEquipment)} 
+                            size="sm"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Assignment
+                          </Button>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          {((isEditingEquipment ? editingEquipment?.stageAssignments : newEquipment.stageAssignments) || []).map((assignment, index) => (
+                            <div key={index} className="border rounded-lg p-4">
+                              <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                  <div className="flex-1">
+                                    <Label>Decoration Method</Label>
+                                    <Select
+                                      value={assignment.decorationMethod}
+                                      onValueChange={(value) => handleUpdateStageAssignment(index, { decorationMethod: value, stageIds: [] })}
+                                    >
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select decoration method" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {decorationMethods.filter(m => m.enabled).map((method) => (
+                                          <SelectItem key={method.id} value={method.id}>
+                                            {method.label}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleRemoveStageAssignment(index)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                                
+                                {assignment.decorationMethod && (
+                                  <div>
+                                    <Label>Production Stages</Label>
+                                    <div className="grid grid-cols-2 gap-2 mt-2">
+                                      {getStagesForMethod(assignment.decorationMethod).map((stage) => (
+                                        <div key={stage.id} className="flex items-center space-x-2">
+                                          <input
+                                            type="checkbox"
+                                            id={`stage-${index}-${stage.id}`}
+                                            checked={assignment.stageIds.includes(stage.id)}
+                                            onChange={(e) => {
+                                              const updatedStageIds = e.target.checked
+                                                ? [...assignment.stageIds, stage.id]
+                                                : assignment.stageIds.filter(id => id !== stage.id);
+                                              handleUpdateStageAssignment(index, { stageIds: updatedStageIds });
+                                            }}
+                                            className="rounded border-gray-300"
+                                          />
+                                          <label 
+                                            htmlFor={`stage-${index}-${stage.id}`}
+                                            className="text-sm flex items-center gap-2"
+                                          >
+                                            <div className={`w-3 h-3 rounded-full ${stage.color}`} />
+                                            {stage.name}
+                                          </label>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                          
+                          {((isEditingEquipment ? editingEquipment?.stageAssignments : newEquipment.stageAssignments) || []).length === 0 && (
+                            <div className="text-center text-muted-foreground py-8">
+                              <Factory className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                              <p>No stage assignments yet</p>
+                              <p className="text-sm">Click "Add Assignment" to configure which stages this equipment handles</p>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <Label htmlFor="capacity">Daily Capacity</Label>
-                        <Input id="capacity" type="number" placeholder="Items per day" />
-                      </div>
-                      <div className="flex justify-end gap-2">
-                        <Button variant="outline">Cancel</Button>
-                        <Button>Add Equipment</Button>
+
+                      {/* Action Buttons */}
+                      <div className="flex justify-end gap-2 pt-4">
+                        <Button 
+                          variant="outline" 
+                          onClick={() => {
+                            setIsEquipmentDialogOpen(false);
+                            setEditingEquipment(null);
+                            setIsEditingEquipment(false);
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button onClick={isEditingEquipment ? handleSaveEquipment : handleAddEquipment}>
+                          {isEditingEquipment ? 'Save Changes' : 'Add Equipment'}
+                        </Button>
                       </div>
                     </div>
                   </DialogContent>
@@ -530,7 +812,7 @@ export function ProductionSettings() {
                 {equipment.map((item) => (
                   <div key={item.id} className="border rounded-lg p-4">
                     <div className="flex items-center justify-between">
-                      <div>
+                      <div className="flex-1">
                         <h4 className="font-medium">{item.name}</h4>
                         <p className="text-sm text-muted-foreground">{item.type}</p>
                         <div className="flex items-center gap-4 mt-2 text-sm">
@@ -539,12 +821,50 @@ export function ProductionSettings() {
                             {item.status}
                           </Badge>
                         </div>
+                        
+                        {/* Stage Assignments Display */}
+                        <div className="mt-3">
+                          <p className="text-sm font-medium mb-2">Assigned Stages:</p>
+                          {item.stageAssignments.length > 0 ? (
+                            <div className="space-y-2">
+                              {item.stageAssignments.map((assignment, index) => {
+                                const method = decorationMethods.find(m => m.id === assignment.decorationMethod);
+                                return (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <span className="text-sm font-medium">{method?.label}:</span>
+                                    <div className="flex flex-wrap gap-1">
+                                      {assignment.stageIds.map(stageId => {
+                                        const stage = method?.stages.find(s => s.id === stageId);
+                                        return stage ? (
+                                          <Badge key={stageId} variant="outline" className="gap-1 text-xs">
+                                            <div className={`w-2 h-2 rounded-full ${stage.color}`} />
+                                            {stage.name}
+                                          </Badge>
+                                        ) : null;
+                                      })}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">No stages assigned</p>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm">
-                          <Settings className="h-4 w-4" />
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleEditEquipment(item)}
+                        >
+                          <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDeleteEquipment(item.id)}
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>

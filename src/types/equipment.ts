@@ -1,3 +1,8 @@
+export interface StageAssignment {
+  decorationMethod: string;
+  stageIds: string[];
+}
+
 export interface EmbroideryMachine {
   id: string;
   name: string;
@@ -10,6 +15,7 @@ export interface EmbroideryMachine {
   currentLoad: number; // current utilization percentage
   status: "available" | "busy" | "maintenance" | "offline";
   setupTime: number; // minutes
+  stageAssignments: StageAssignment[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -26,6 +32,7 @@ export interface ScreenPrintingPress {
   currentLoad: number; // current utilization percentage
   status: "available" | "busy" | "maintenance" | "offline";
   setupTime: number; // minutes
+  stageAssignments: StageAssignment[];
   createdAt: Date;
   updatedAt: Date;
 }
