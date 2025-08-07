@@ -77,6 +77,36 @@ export function JobCard({ job, variant, draggable = false, className, onStageAdv
           )}
         </div>
         
+        {/* Visual preview thumbnails */}
+        {(job.mockupImage || job.imprintLogo) && (
+          <div className="flex items-center gap-1 mt-1">
+            {job.mockupImage && (
+              <div className="w-6 h-6 rounded border overflow-hidden bg-muted">
+                <img 
+                  src={job.mockupImage} 
+                  alt="Garment mockup" 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+            {job.imprintLogo && (
+              <div className="w-6 h-6 rounded border overflow-hidden bg-muted">
+                <img 
+                  src={job.imprintLogo} 
+                  alt="Imprint logo" 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        )}
+        
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Package className="h-3 w-3" />
           <span>{job.totalQuantity} pcs • {job.decorationMethod}</span>

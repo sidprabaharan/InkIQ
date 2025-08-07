@@ -62,7 +62,24 @@ export function convertOrderBreakdownToImprintJobs(): ImprintJob[] {
         artworkApproved,
         setupRequired: true,
         sequenceOrder: sectionIndex,
-        orderGroupColor: getOrderGroupColor(groupIndex)
+        orderGroupColor: getOrderGroupColor(groupIndex),
+        
+        // Visual elements - placeholder images for now
+        mockupImage: getMockupImageForProduct(lineItemGroup.products[0]?.itemNumber || ""),
+        imprintLogo: getImprintLogoForMethod(decorationMethod),
+        
+        // Detailed imprint specifications
+        imprintMethod: `${decorationMethod.replace('_', ' ').toUpperCase()} - ${imprintSection.type}`,
+        imprintLocation: imprintSection.placement,
+        imprintSize: imprintSection.size,
+        imprintColors: imprintSection.colours,
+        imprintNotes: imprintSection.notes,
+        customerArt: imprintSection.files?.filter(f => f.type === 'customer_art') || [],
+        productionFiles: imprintSection.files?.filter(f => f.type === 'production_file') || [],
+        proofMockup: imprintSection.files?.filter(f => f.type === 'proof' || f.type === 'mockup') || [],
+        
+        // Product size breakdown
+        sizeBreakdown: createSizeBreakdown(lineItemGroup.products)
       };
 
       imprintJobs.push(imprintJob);
@@ -118,4 +135,47 @@ export function getUnscheduledJobs(jobs: ImprintJob[]): ImprintJob[] {
 
 export function getScheduledJobs(jobs: ImprintJob[]): ImprintJob[] {
   return jobs.filter(job => job.status === "scheduled" || job.status === "in_progress");
+}
+
+function getMockupImageForProduct(itemNumber: string): string {
+  // Return different mockup images based on item type
+  const mockupImages = [
+    "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop",
+    "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&h=400&fit=crop",
+    "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=400&h=400&fit=crop",
+    "https://images.unsplash.com/photo-1583743814966-8936f37f4a70?w=400&h=400&fit=crop"
+  ];
+  
+  const index = itemNumber.length % mockupImages.length;
+  return mockupImages[index];
+}
+
+function getImprintLogoForMethod(method: string): string {
+  // Return different logo examples based on decoration method
+  const logoImages = [
+    "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=200&h=200&fit=crop",
+    "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=200&fit=crop",
+    "https://images.unsplash.com/photo-1614028674026-a65e31bfd27c?w=200&h=200&fit=crop",
+    "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop"
+  ];
+  
+  const methodIndex = method === "screen_printing" ? 0 : method === "embroidery" ? 1 : method === "dtf" ? 2 : 3;
+  return logoImages[methodIndex];
+}
+
+function createSizeBreakdown(products: any[]): { [productId: string]: { [size: string]: number } } {
+  const breakdown: { [productId: string]: { [size: string]: number } } = {};
+  
+  products.forEach(product => {
+    // Mock size distribution for demonstration
+    breakdown[product.id] = {
+      "S": Math.floor(product.quantity * 0.1),
+      "M": Math.floor(product.quantity * 0.3),
+      "L": Math.floor(product.quantity * 0.4),
+      "XL": Math.floor(product.quantity * 0.15),
+      "XXL": Math.floor(product.quantity * 0.05)
+    };
+  });
+  
+  return breakdown;
 }

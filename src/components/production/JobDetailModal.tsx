@@ -3,8 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ImprintJob } from "@/types/imprint-job";
-import { Calendar, Clock, Package, User, MapPin, FileCheck, AlertCircle, ChevronRight, XCircle, Palette, Shirt, Link } from "lucide-react";
+import { Calendar, Clock, Package, User, MapPin, FileCheck, AlertCircle, ChevronRight, XCircle, Palette, Shirt, Link, Image, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -68,6 +69,50 @@ export function JobDetailModal({
 
         {job && (
           <div className="space-y-6">
+            {/* Visual Reference */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Image className="h-5 w-5" />
+                  Visual Reference
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  {job.mockupImage && (
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">Garment Mockup</p>
+                      <div className="aspect-square rounded-lg border overflow-hidden bg-muted">
+                        <img 
+                          src={job.mockupImage} 
+                          alt="Garment mockup" 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder.svg';
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {job.imprintLogo && (
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">Imprint Logo</p>
+                      <div className="aspect-square rounded-lg border overflow-hidden bg-muted">
+                        <img 
+                          src={job.imprintLogo} 
+                          alt="Imprint logo" 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder.svg';
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Order Overview */}
             <Card className={job.orderGroupColor}>
               <CardHeader className="pb-3">
@@ -89,7 +134,7 @@ export function JobDetailModal({
                   </div>
                   <div className="flex items-center gap-2">
                     <Shirt className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{job.products.map(p => p.description).join(", ")}</span>
+                    <span className="text-sm">{job.products?.map(p => p.description).join(", ")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Package className="h-4 w-4 text-muted-foreground" />
@@ -292,6 +337,135 @@ export function JobDetailModal({
                 </Card>
               </div>
             </div>
+
+            {/* Imprint Details */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Palette className="h-5 w-5" />
+                  Imprint Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Method</p>
+                    <p className="font-medium">{job.imprintMethod || job.decorationMethod.replace('_', ' ').toUpperCase()}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Location</p>
+                    <p className="font-medium">{job.imprintLocation || job.placement}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Size</p>
+                    <p className="font-medium">{job.imprintSize || job.size}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Colors/Threads</p>
+                    <p className="font-medium">{job.imprintColors || job.colours}</p>
+                  </div>
+                </div>
+                
+                {job.imprintNotes && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Notes</p>
+                    <p className="text-sm bg-muted p-3 rounded-lg">{job.imprintNotes}</p>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {job.customerArt && job.customerArt.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">Customer Art</p>
+                      <div className="space-y-1">
+                        {job.customerArt.map((file) => (
+                          <div key={file.id} className="text-xs p-2 bg-muted rounded flex items-center gap-2">
+                            <FileText className="h-3 w-3" />
+                            {file.name}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {job.productionFiles && job.productionFiles.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">Production Files</p>
+                      <div className="space-y-1">
+                        {job.productionFiles.map((file) => (
+                          <div key={file.id} className="text-xs p-2 bg-muted rounded flex items-center gap-2">
+                            <FileText className="h-3 w-3" />
+                            {file.name}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {job.proofMockup && job.proofMockup.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">Proof/Mockup</p>
+                      <div className="space-y-1">
+                        {job.proofMockup.map((file) => (
+                          <div key={file.id} className="text-xs p-2 bg-muted rounded flex items-center gap-2">
+                            <FileText className="h-3 w-3" />
+                            {file.name}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Line Items with Size Breakdown */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Line Items & Size Breakdown</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Item #</TableHead>
+                      <TableHead>Color</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>S</TableHead>
+                      <TableHead>M</TableHead>
+                      <TableHead>L</TableHead>
+                      <TableHead>XL</TableHead>
+                      <TableHead>XXL</TableHead>
+                      <TableHead>Total Qty</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {job.products?.map((product) => {
+                      const sizes = job.sizeBreakdown?.[product.id] || {};
+                      return (
+                        <TableRow key={product.id}>
+                          <TableCell className="font-medium">{product.itemNumber}</TableCell>
+                          <TableCell>{product.color}</TableCell>
+                          <TableCell>{product.description}</TableCell>
+                          <TableCell>{sizes.S || 0}</TableCell>
+                          <TableCell>{sizes.M || 0}</TableCell>
+                          <TableCell>{sizes.L || 0}</TableCell>
+                          <TableCell>{sizes.XL || 0}</TableCell>
+                          <TableCell>{sizes.XXL || 0}</TableCell>
+                          <TableCell className="font-medium">{product.quantity}</TableCell>
+                          <TableCell>
+                            <Badge variant={product.status === "Complete" ? "default" : "secondary"}>
+                              {product.status}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
 
             {/* Action Buttons */}
             <div className="flex justify-end gap-2 pt-4 border-t border-border">

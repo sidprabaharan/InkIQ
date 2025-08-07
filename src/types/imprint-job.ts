@@ -47,6 +47,27 @@ export interface ImprintJob {
   dependsOnJobs?: string[];
   blocksJobs?: string[];
   orderGroupColor?: string;
+  
+  // Visual elements
+  mockupImage?: string;
+  imprintLogo?: string;
+  
+  // Detailed imprint specifications
+  imprintMethod?: string;
+  imprintLocation?: string;
+  imprintSize?: string;
+  imprintColors?: string;
+  imprintNotes?: string;
+  customerArt?: ImprintFile[];
+  productionFiles?: ImprintFile[];
+  proofMockup?: ImprintFile[];
+  
+  // Product size breakdown
+  sizeBreakdown?: {
+    [productId: string]: {
+      [size: string]: number;
+    };
+  };
 }
 
 export function getDecorationMethodFromType(type: string): DecorationMethod {
