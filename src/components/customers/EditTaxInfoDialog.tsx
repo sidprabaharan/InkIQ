@@ -24,10 +24,11 @@ import {
 } from "@/components/ui/form";
 
 // Define the schema for the tax info form
+// Using non-optional strings to match the Customer type in CustomersContext
 const taxInfoSchema = z.object({
-  taxId: z.string(),
-  taxRate: z.string(),
-  taxExemptionNumber: z.string(),
+  taxId: z.string().default(""),
+  taxRate: z.string().default(""),
+  taxExemptionNumber: z.string().default(""),
 });
 
 export type TaxInfoFormValues = z.infer<typeof taxInfoSchema>;

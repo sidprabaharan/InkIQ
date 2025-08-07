@@ -24,11 +24,12 @@ import {
 } from "@/components/ui/form";
 
 // Define the schema for the address form
+// Using non-optional or defaulted strings to match the Customer type in CustomersContext
 const addressSchema = z.object({
   address1: z.string().min(1, "Address is required"),
-  address2: z.string(),
+  address2: z.string().default(""),
   city: z.string().min(1, "City is required"),
-  stateProvince: z.string(),
+  stateProvince: z.string().default(""),
   zipCode: z.string().min(1, "ZIP/Postal code is required"),
   country: z.string().min(1, "Country is required"),
 });
