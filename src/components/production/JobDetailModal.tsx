@@ -144,87 +144,10 @@ export function JobDetailModal({
               </CardContent>
             </Card>
 
-            {/* Job Details Grid */}
+            {/* Job Dependencies and Related Jobs */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Left Column - This Job */}
+              {/* Left Column - Dependencies */}
               <div className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <span>Job {job.jobNumber}</span>
-                      {job.sequenceOrder && (
-                        <Badge variant="outline">Step {job.sequenceOrder}</Badge>
-                      )}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <p className="font-medium">{job.description}</p>
-                      <div className="flex flex-wrap gap-2">
-                        <Badge variant={job.status === "scheduled" ? "default" : "secondary"}>
-                          {job.status.replace("_", " ").toUpperCase()}
-                        </Badge>
-                        <Badge variant="outline">
-                          {job.decorationMethod.replace("_", " ").toUpperCase()}
-                        </Badge>
-                        <Badge variant="secondary">
-                          {job.currentStage?.replace("_", " ")}
-                        </Badge>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span>{job.placement}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span>{job.estimatedHours}h estimated</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Palette className="h-4 w-4 text-muted-foreground" />
-                        <span>{job.colours}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {job.artworkApproved ? (
-                          <FileCheck className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <AlertCircle className="h-4 w-4 text-yellow-600" />
-                        )}
-                        <span>{job.artworkApproved ? "Approved" : "Pending"}</span>
-                      </div>
-                    </div>
-
-                    {job.scheduledStart && (
-                      <>
-                        <Separator />
-                        <div className="bg-muted/50 rounded-lg p-3">
-                          <p className="text-sm font-medium">Scheduled</p>
-                          <p className="text-sm text-muted-foreground">
-                            {format(job.scheduledStart, "MMM d, h:mm a")} - {format(job.scheduledEnd!, "h:mm a")}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Equipment: {job.equipmentId}
-                          </p>
-                        </div>
-                      </>
-                    )}
-
-                    {job.specialInstructions && (
-                      <>
-                        <Separator />
-                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                          <p className="text-sm font-medium text-yellow-900">Special Instructions</p>
-                          <p className="text-sm text-yellow-800">{job.specialInstructions}</p>
-                        </div>
-                      </>
-                    )}
-                  </CardContent>
-                </Card>
-
                 {/* Dependencies */}
                 {(dependentJobs.length > 0 || blockingJobs.length > 0) && (
                   <Card>
@@ -318,23 +241,6 @@ export function JobDetailModal({
                     </CardContent>
                   </Card>
                 )}
-
-                {/* Production Notes */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Production Notes</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 text-sm">
-                      <p>• {job.decorationMethod === "embroidery" ? "Use high-quality thread for durability" : "Ensure proper ink coverage"}</p>
-                      <p>• Check garment positioning before starting</p>
-                      <p>• Quality control check after completion</p>
-                      {relatedJobs.length > 0 && (
-                        <p className="text-orange-600">• Coordinate with related jobs for timing</p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
             </div>
 
