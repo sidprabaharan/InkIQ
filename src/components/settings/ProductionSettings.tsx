@@ -48,6 +48,27 @@ interface Equipment {
   capacity: number;
   workingHours: WorkingHours;
   status: 'active' | 'maintenance' | 'offline';
+  constraints: EquipmentConstraints;
+}
+
+interface EquipmentConstraints {
+  maxColors?: number;
+  maxScreens?: number;
+  supportedSizes: string[];
+  maxImprintWidth: number;
+  maxImprintHeight: number;
+  minImprintWidth: number;
+  minImprintHeight: number;
+  supportedGarmentTypes: string[];
+  supportedPlacements: string[];
+  supportsMultiColorRegistration?: boolean;
+  supportsFourColorProcess?: boolean;
+  supportsMetallicInks?: boolean;
+  supportsWaterBased?: boolean;
+  minQuantityPerRun: number;
+  maxQuantityPerRun: number;
+  requiresSpecialSetup?: boolean;
+  setupNotes?: string;
 }
 
 interface WorkingHours {
@@ -188,6 +209,18 @@ export function ProductionSettings() {
     'bg-blue-500', 'bg-purple-500', 'bg-pink-500', 'bg-indigo-500'
   ];
 
+  const defaultConstraints: EquipmentConstraints = {
+    supportedSizes: ['S', 'M', 'L', 'XL'],
+    maxImprintWidth: 12,
+    maxImprintHeight: 14,
+    minImprintWidth: 1,
+    minImprintHeight: 1,
+    supportedGarmentTypes: ['tshirt', 'polo', 'hoodie'],
+    supportedPlacements: ['front_center', 'back_center'],
+    minQuantityPerRun: 1,
+    maxQuantityPerRun: 1000,
+  };
+
   const [equipment, setEquipment] = useState<Equipment[]>([
     {
       id: 'screen_press_1',
@@ -199,6 +232,7 @@ export function ProductionSettings() {
       capacity: 200,
       workingHours: defaultWorkingHours,
       status: 'active',
+      constraints: { ...defaultConstraints, maxColors: 6, maxScreens: 8 },
     },
     {
       id: 'embroidery_1',
@@ -210,6 +244,7 @@ export function ProductionSettings() {
       capacity: 150,
       workingHours: { ...defaultWorkingHours, saturday: { enabled: true, start: '09:00', end: '15:00' } },
       status: 'active',
+      constraints: { ...defaultConstraints, maxColors: 15, supportedGarmentTypes: ['tshirt', 'polo', 'hoodie', 'cap'] },
     },
     {
       id: 'dtf_printer_1',
@@ -221,6 +256,7 @@ export function ProductionSettings() {
       capacity: 100,
       workingHours: defaultWorkingHours,
       status: 'active',
+      constraints: defaultConstraints,
     },
   ]);
 
@@ -231,6 +267,7 @@ export function ProductionSettings() {
     capacity: 100,
     workingHours: defaultWorkingHours,
     status: 'active',
+    constraints: defaultConstraints,
   });
 
   const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
@@ -251,6 +288,7 @@ export function ProductionSettings() {
       capacity: newEquipment.capacity || 100,
       workingHours: newEquipment.workingHours || defaultWorkingHours,
       status: newEquipment.status || 'active',
+      constraints: newEquipment.constraints || defaultConstraints,
     };
     
     setEquipment(prev => [...prev, equipment]);
