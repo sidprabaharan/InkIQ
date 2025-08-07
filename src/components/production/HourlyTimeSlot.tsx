@@ -132,16 +132,14 @@ export function HourlyTimeSlot({
     const leftPercent = column * columnWidth;
     const widthPercent = columnWidth - 1; // Small gap between columns
     
-    // Fix "Continues..." logic: Only show if job actually spans beyond current hour
-    // Calculate the actual end time of the job
-    const jobEndTime = new Date(job.scheduledStart);
-    jobEndTime.setTime(jobEndTime.getTime() + (durationMinutes * 60 * 1000));
+    // Fix "Continues..." logic: Only show if job actually extends beyond current hour boundary
+    // Check if the job's visual representation extends beyond this hour slot
+    const jobStartsInThisHour = job.scheduledStart.getHours() === timeSlot.hour;
+    const jobDurationInThisHour = jobStartsInThisHour ? 
+      Math.min(durationMinutes, 60 - startMinutes) : 0;
     
-    // Check if job ends in a different hour than it starts
-    const currentHourEnd = new Date(job.scheduledStart);
-    currentHourEnd.setMinutes(59, 59, 999); // End of current hour
-    
-    const spansNextHour = jobEndTime > currentHourEnd;
+    // Only show "Continues..." if this job starts in this hour but extends beyond it
+    const spansNextHour = jobStartsInThisHour && (startMinutes + durationMinutes) > 60;
     
     return {
       job,
@@ -154,14 +152,16 @@ export function HourlyTimeSlot({
   });
 
   const hasJobs = jobs.length > 0;
-  const totalHours = jobs.reduce((sum, job) => sum + job.estimatedHours, 0);
-  const isOverUtilized = totalHours > 1; // More than 1 hour scheduled in this hour
+  
+  // Fix over-utilization logic: only mark as over-utilized if jobs actually overlap in time
+  const hasOverlappingJobs = maxColumns > 1;
+  const isOverUtilized = hasOverlappingJobs;
 
   return (
     <div 
       className={cn(
         "relative h-12 flex border-b border-border/50 transition-colors",
-        isOverUtilized && "bg-amber-50 border-l-2 border-amber-400",
+        isOverUtilized && "bg-warning/10 border-l-2 border-warning",
         hasJobs && "hover:bg-muted/5",
         isDragOver && "bg-primary/5"
       )}
@@ -175,8 +175,8 @@ export function HourlyTimeSlot({
           {timeSlot.label}
         </span>
         {isOverUtilized && (
-          <div className="text-xs text-amber-600">
-            Busy
+          <div className="text-xs text-warning-foreground">
+            Conflict
           </div>
         )}
       </div>
