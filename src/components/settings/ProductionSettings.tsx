@@ -237,7 +237,7 @@ export function ProductionSettings() {
       capacity: 100,
       workingHours: defaultWorkingHours,
       status: 'active',
-      constraints: defaultConstraints,
+      constraints: { ...defaultConstraints, unlimitedColors: true },
     },
   ]);
 

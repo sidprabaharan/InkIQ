@@ -22,6 +22,7 @@ export interface EquipmentConstraints {
   // Color/Screen limitations
   maxColors?: number;
   maxScreens?: number;
+  unlimitedColors?: boolean;
   
   // Size constraints
   supportedSizes: GarmentSize[];

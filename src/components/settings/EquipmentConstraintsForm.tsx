@@ -143,18 +143,41 @@ export function EquipmentConstraintsForm({ constraints, onChange, equipmentType 
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="maxColors" className="text-sm font-medium">
-                Max Colors {equipmentType.toLowerCase().includes('embroidery') ? '(Thread Colors)' : ''}
-              </Label>
-              <Input
-                id="maxColors"
-                type="number"
-                value={constraints.maxColors || ''}
-                onChange={(e) => updateConstraints({ maxColors: parseInt(e.target.value) || undefined })}
-                placeholder={equipmentType.toLowerCase().includes('embroidery') ? "9, 12, 15" : "6, 8, 12"}
-                className="font-medium"
-              />
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="unlimitedColors"
+                  checked={constraints.unlimitedColors || false}
+                  onCheckedChange={(checked) => 
+                    updateConstraints({ 
+                      unlimitedColors: !!checked,
+                      maxColors: checked ? undefined : constraints.maxColors
+                    })
+                  }
+                />
+                <Label htmlFor="unlimitedColors" className="text-sm font-medium">
+                  Unlimited Colors
+                </Label>
+              </div>
+              <p className="text-xs text-muted-foreground ml-6">
+                Check this for DTG, DTF, or other unlimited color printing methods
+              </p>
+              
+              {!constraints.unlimitedColors && (
+                <div>
+                  <Label htmlFor="maxColors" className="text-sm font-medium">
+                    Max Colors {equipmentType.toLowerCase().includes('embroidery') ? '(Thread Colors)' : ''}
+                  </Label>
+                  <Input
+                    id="maxColors"
+                    type="number"
+                    value={constraints.maxColors || ''}
+                    onChange={(e) => updateConstraints({ maxColors: parseInt(e.target.value) || undefined })}
+                    placeholder={equipmentType.toLowerCase().includes('embroidery') ? "9, 12, 15" : "6, 8, 12"}
+                    className="font-medium"
+                  />
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
