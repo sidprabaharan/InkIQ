@@ -160,7 +160,7 @@ export function JobDetailModal({
                 {relatedJobs.length > 0 && (
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-base">Related Jobs in This Order</CardTitle>
+                      <CardTitle className="text-base">Related Imprints</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {relatedJobs.map(relJob => (
