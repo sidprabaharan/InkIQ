@@ -133,43 +133,28 @@ export function EquipmentConstraintsForm({ constraints, onChange, equipmentType 
         <Card>
           <CardHeader>
             <CardTitle className="text-sm">
-              Color & Screen Limitations
+              Color Limitations
             </CardTitle>
             <p className="text-sm text-muted-foreground">
               {equipmentType.toLowerCase().includes('embroidery') 
                 ? 'Set maximum thread colors (typically 9, 12, or 15 colors)'
-                : 'Set maximum screens (typically 6, 12, or 20 screens)'
+                : 'Set maximum colors (typically 6, 12, or 20 colors). Each screen is considered a color.'
               }
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="maxColors" className="text-sm font-medium">
-                  Max Colors {equipmentType.toLowerCase().includes('embroidery') ? '(Thread Colors)' : ''}
-                </Label>
-                <Input
-                  id="maxColors"
-                  type="number"
-                  value={constraints.maxColors || ''}
-                  onChange={(e) => updateConstraints({ maxColors: parseInt(e.target.value) || undefined })}
-                  placeholder={equipmentType.toLowerCase().includes('embroidery') ? "9, 12, 15" : "6, 8, 12"}
-                  className="font-medium"
-                />
-              </div>
-              {equipmentType.toLowerCase().includes('screen') && (
-                <div>
-                  <Label htmlFor="maxScreens" className="text-sm font-medium">Max Screens</Label>
-                  <Input
-                    id="maxScreens"
-                    type="number"
-                    value={constraints.maxScreens || ''}
-                    onChange={(e) => updateConstraints({ maxScreens: parseInt(e.target.value) || undefined })}
-                    placeholder="6, 12, 20"
-                    className="font-medium"
-                  />
-                </div>
-              )}
+            <div>
+              <Label htmlFor="maxColors" className="text-sm font-medium">
+                Max Colors {equipmentType.toLowerCase().includes('embroidery') ? '(Thread Colors)' : ''}
+              </Label>
+              <Input
+                id="maxColors"
+                type="number"
+                value={constraints.maxColors || ''}
+                onChange={(e) => updateConstraints({ maxColors: parseInt(e.target.value) || undefined })}
+                placeholder={equipmentType.toLowerCase().includes('embroidery') ? "9, 12, 15" : "6, 8, 12"}
+                className="font-medium"
+              />
             </div>
           </CardContent>
         </Card>
