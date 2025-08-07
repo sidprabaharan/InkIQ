@@ -175,12 +175,6 @@ export function ImprintSettings() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Imprint Method Settings</h2>
-        <p className="text-muted-foreground">
-          Configure pricing, constraints, and capabilities for each imprint method
-        </p>
-      </div>
 
       {/* Add Method Button Grid */}
       {availableMethods.length > 0 && (
