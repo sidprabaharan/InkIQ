@@ -132,9 +132,10 @@ export function HourlyTimeSlot({
     const leftPercent = column * columnWidth;
     const widthPercent = columnWidth - 1; // Small gap between columns
     
-    // Check if job spans beyond current hour
-    const currentHourEndMinutes = 60;
-    const spansNextHour = endMinutes > currentHourEndMinutes;
+    // Check if job visually extends beyond the displayed area
+    // Only show "Continues..." if the job is visually cut off, not just because it's long
+    const maxDisplayHeight = Math.min(heightPercent, 100);
+    const spansNextHour = heightPercent > 100;
     
     return {
       job,
