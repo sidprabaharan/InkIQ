@@ -43,8 +43,8 @@ import { GarmentType, GarmentSize, ImprintPlacement } from '@/types/equipment';
 
 export function ImprintSettings() {
   const [configurations, setConfigurations] = useState<ImprintMethodConfiguration[]>([]);
-  const [selectedMethod, setSelectedMethod] = useState<string>('');
-  const [expandedSections, setExpandedSections] = useState<string[]>(['basic']);
+  const [activeTab, setActiveTab] = useState<string>('');
+  const [expandedSections, setExpandedSections] = useState<string[]>(['basic', 'pricing', 'constraints']);
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => 
@@ -133,7 +133,7 @@ export function ImprintSettings() {
     };
 
     setConfigurations(prev => [...prev, newConfig]);
-    setSelectedMethod(newConfig.id);
+    setActiveTab(newConfig.id);
   };
 
   const updateConfiguration = (id: string, updates: Partial<ImprintMethodConfiguration>) => {
@@ -146,87 +146,120 @@ export function ImprintSettings() {
     );
   };
 
-  const selectedConfig = configurations.find(c => c.id === selectedMethod);
+  const selectedConfig = configurations.find(c => c.id === activeTab);
+  const availableMethods = IMPRINT_METHODS.filter(method => 
+    !configurations.some(config => config.method === method.value)
+  );
+
+  const deleteConfiguration = (id: string) => {
+    setConfigurations(prev => prev.filter(config => config.id !== id));
+    if (activeTab === id) {
+      setActiveTab(configurations.length > 1 ? configurations[0].id : '');
+    }
+  };
+
+  const duplicateConfiguration = (id: string) => {
+    const configToDuplicate = configurations.find(c => c.id === id);
+    if (configToDuplicate) {
+      const newConfig = {
+        ...configToDuplicate,
+        id: Date.now().toString(),
+        label: `${configToDuplicate.label} (Copy)`,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      setConfigurations(prev => [...prev, newConfig]);
+      setActiveTab(newConfig.id);
+    }
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Imprint Method Settings</h2>
-          <p className="text-muted-foreground">
-            Configure pricing, constraints, and capabilities for each imprint method
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Select value={''} onValueChange={createNewConfiguration}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Add imprint method" />
-            </SelectTrigger>
-            <SelectContent>
-              {IMPRINT_METHODS.map(method => (
-                <SelectItem key={method.value} value={method.value}>
-                  {method.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <div>
+        <h2 className="text-2xl font-bold">Imprint Method Settings</h2>
+        <p className="text-muted-foreground">
+          Configure pricing, constraints, and capabilities for each imprint method
+        </p>
       </div>
 
-      <div className="grid grid-cols-12 gap-6">
-        {/* Configured Methods List */}
-        <div className="col-span-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Configured Methods</CardTitle>
-              <CardDescription>
-                {configurations.length} method(s) configured
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="space-y-2 p-4">
-                {configurations.map(config => (
-                  <div 
-                    key={config.id}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                      selectedMethod === config.id 
-                        ? 'bg-primary/10 border-primary' 
-                        : 'hover:bg-muted/50'
-                    }`}
-                    onClick={() => setSelectedMethod(config.id)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium">{config.label}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          {config.quantityConstraints.minimumQuantity}-{config.quantityConstraints.maximumQuantity} pcs
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={config.enabled ? 'default' : 'secondary'}>
-                          {config.enabled ? 'Active' : 'Inactive'}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                
-                {configurations.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Settings className="mx-auto h-12 w-12 mb-4 opacity-50" />
-                    <p>No imprint methods configured yet</p>
-                    <p className="text-sm">Add your first method above</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      {/* Add Method Button Grid */}
+      {availableMethods.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Add Imprint Method</CardTitle>
+            <CardDescription>
+              Choose from available imprint methods to configure
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {availableMethods.map(method => (
+                 <Button
+                   key={method.value}
+                   variant="outline"
+                   className="h-20 flex flex-col gap-2 hover:bg-primary/5 hover:border-primary/20"
+                   onClick={() => createNewConfiguration(method.value)}
+                 >
+                   <div className="text-sm font-medium">{method.label}</div>
+                   <div className="text-xs text-muted-foreground">
+                     {method.value.charAt(0).toUpperCase() + method.value.slice(1)}
+                   </div>
+                 </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
-        {/* Configuration Panel */}
-        <div className="col-span-8">
-          {selectedConfig ? (
-            <div className="space-y-6">
+      {/* Configured Methods Tabs */}
+      {configurations.length > 0 && (
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <div className="flex items-center justify-between">
+            <TabsList className="grid w-full grid-cols-4 max-w-2xl">
+              {configurations.slice(0, 4).map(config => (
+                <TabsTrigger key={config.id} value={config.id} className="relative">
+                  <div className="flex items-center gap-2">
+                    <span className="truncate">{config.label}</span>
+                    <Badge 
+                      variant={config.enabled ? 'default' : 'secondary'} 
+                      className="h-4 w-4 p-0 text-xs"
+                    >
+                      {config.enabled ? '●' : '○'}
+                    </Badge>
+                  </div>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            
+            {selectedConfig && (
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => duplicateConfiguration(selectedConfig.id)}
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Duplicate
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => deleteConfiguration(selectedConfig.id)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </Button>
+                <Button size="sm">
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Changes
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {configurations.map(config => (
+            <TabsContent key={config.id} value={config.id} className="space-y-6">
+              <div className="space-y-6">
               {/* Basic Settings */}
               <Collapsible 
                 open={expandedSections.includes('basic')}
@@ -250,23 +283,23 @@ export function ImprintSettings() {
                         <div className="space-y-2">
                           <Label>Method Name</Label>
                           <Input 
-                            value={selectedConfig.label}
-                            onChange={(e) => updateConfiguration(selectedConfig.id, { label: e.target.value })}
+                            value={config.label}
+                            onChange={(e) => updateConfiguration(config.id, { label: e.target.value })}
                           />
                         </div>
                         <div className="flex items-center space-x-2">
                           <Switch 
-                            checked={selectedConfig.enabled}
-                            onCheckedChange={(enabled) => updateConfiguration(selectedConfig.id, { enabled })}
+                            checked={config.enabled}
+                            onCheckedChange={(enabled) => updateConfiguration(config.id, { enabled })}
                           />
                           <Label>Method Enabled</Label>
                         </div>
                       </div>
-                      <div className="space-y-2">
+                        <div className="space-y-2">
                         <Label>Description</Label>
                         <Textarea 
-                          value={selectedConfig.description}
-                          onChange={(e) => updateConfiguration(selectedConfig.id, { description: e.target.value })}
+                          value={config.description}
+                          onChange={(e) => updateConfiguration(config.id, { description: e.target.value })}
                           placeholder="Brief description of this imprint method..."
                         />
                       </div>
@@ -302,36 +335,126 @@ export function ImprintSettings() {
                             Add Tier
                           </Button>
                         </div>
-                        <div className="overflow-x-auto">
-                          <table className="w-full border rounded-lg">
-                            <thead>
-                              <tr className="border-b bg-muted/50">
-                                <th className="text-left p-3">Quantity Range</th>
-                                <th className="text-left p-3">Base Price</th>
-                                <th className="text-left p-3">Setup Fee</th>
-                                <th className="text-left p-3">Additional Color</th>
-                                <th className="text-left p-3">Actions</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {selectedConfig.pricingTiers.map((tier, index) => (
-                                <tr key={index} className="border-b">
-                                  <td className="p-3">
-                                    {tier.minQuantity} - {tier.maxQuantity}
-                                  </td>
-                                  <td className="p-3">${tier.basePrice.toFixed(2)}</td>
-                                  <td className="p-3">${tier.setupFee.toFixed(2)}</td>
-                                  <td className="p-3">${tier.additionalColorPrice?.toFixed(2) || '0.00'}</td>
-                                  <td className="p-3">
-                                    <Button size="sm" variant="ghost">
-                                      <Edit className="h-4 w-4" />
-                                    </Button>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+                         <div className="overflow-x-auto">
+                           <table className="w-full border rounded-lg text-sm">
+                             <thead>
+                               <tr className="border-b bg-muted/50">
+                                 <th className="text-left p-4 w-32">Quantity Range</th>
+                                 <th className="text-left p-4 w-28">Base Price</th>
+                                 <th className="text-left p-4 w-28">Setup Fee</th>
+                                 <th className="text-left p-4 w-32">Additional Color</th>
+                                 <th className="text-left p-4 w-32">Rush Fee (%)</th>
+                                 <th className="text-left p-4 w-20">Actions</th>
+                               </tr>
+                             </thead>
+                             <tbody>
+                               {config.pricingTiers.map((tier, index) => (
+                                 <tr key={index} className="border-b hover:bg-muted/25">
+                                   <td className="p-4">
+                                     <div className="flex gap-2 items-center">
+                                       <Input 
+                                         className="w-16 h-8" 
+                                         type="number" 
+                                         value={tier.minQuantity}
+                                         onChange={(e) => {
+                                           const newTiers = [...config.pricingTiers];
+                                           newTiers[index].minQuantity = parseInt(e.target.value);
+                                           updateConfiguration(config.id, { pricingTiers: newTiers });
+                                         }}
+                                       />
+                                       <span className="text-muted-foreground">-</span>
+                                       <Input 
+                                         className="w-16 h-8" 
+                                         type="number" 
+                                         value={tier.maxQuantity}
+                                         onChange={(e) => {
+                                           const newTiers = [...config.pricingTiers];
+                                           newTiers[index].maxQuantity = parseInt(e.target.value);
+                                           updateConfiguration(config.id, { pricingTiers: newTiers });
+                                         }}
+                                       />
+                                     </div>
+                                   </td>
+                                   <td className="p-4">
+                                     <div className="flex items-center gap-1">
+                                       <span className="text-muted-foreground">$</span>
+                                       <Input 
+                                         className="w-20 h-8" 
+                                         type="number" 
+                                         step="0.01"
+                                         value={tier.basePrice}
+                                         onChange={(e) => {
+                                           const newTiers = [...config.pricingTiers];
+                                           newTiers[index].basePrice = parseFloat(e.target.value);
+                                           updateConfiguration(config.id, { pricingTiers: newTiers });
+                                         }}
+                                       />
+                                     </div>
+                                   </td>
+                                   <td className="p-4">
+                                     <div className="flex items-center gap-1">
+                                       <span className="text-muted-foreground">$</span>
+                                       <Input 
+                                         className="w-20 h-8" 
+                                         type="number" 
+                                         step="0.01"
+                                         value={tier.setupFee}
+                                         onChange={(e) => {
+                                           const newTiers = [...config.pricingTiers];
+                                           newTiers[index].setupFee = parseFloat(e.target.value);
+                                           updateConfiguration(config.id, { pricingTiers: newTiers });
+                                         }}
+                                       />
+                                     </div>
+                                   </td>
+                                   <td className="p-4">
+                                     <div className="flex items-center gap-1">
+                                       <span className="text-muted-foreground">$</span>
+                                       <Input 
+                                         className="w-20 h-8" 
+                                         type="number" 
+                                         step="0.01"
+                                         value={tier.additionalColorPrice || 0}
+                                         onChange={(e) => {
+                                           const newTiers = [...config.pricingTiers];
+                                           newTiers[index].additionalColorPrice = parseFloat(e.target.value);
+                                           updateConfiguration(config.id, { pricingTiers: newTiers });
+                                         }}
+                                       />
+                                     </div>
+                                   </td>
+                                   <td className="p-4">
+                                     <div className="flex items-center gap-1">
+                                       <Input 
+                                         className="w-16 h-8" 
+                                         type="number" 
+                                         value={tier.rushSurcharge || 0}
+                                         onChange={(e) => {
+                                           const newTiers = [...config.pricingTiers];
+                                           newTiers[index].rushSurcharge = parseFloat(e.target.value);
+                                           updateConfiguration(config.id, { pricingTiers: newTiers });
+                                         }}
+                                       />
+                                       <span className="text-muted-foreground">%</span>
+                                     </div>
+                                   </td>
+                                   <td className="p-4">
+                                     <Button 
+                                       size="sm" 
+                                       variant="ghost"
+                                       onClick={() => {
+                                         const newTiers = config.pricingTiers.filter((_, i) => i !== index);
+                                         updateConfiguration(config.id, { pricingTiers: newTiers });
+                                       }}
+                                     >
+                                       <Trash2 className="h-4 w-4" />
+                                     </Button>
+                                   </td>
+                                 </tr>
+                               ))}
+                             </tbody>
+                           </table>
+                         </div>
                       </div>
                     </CardContent>
                   </CollapsibleContent>
@@ -360,58 +483,58 @@ export function ImprintSettings() {
                       <div>
                         <h4 className="font-medium mb-3">Size Capabilities</h4>
                         <div className="grid grid-cols-4 gap-4">
-                          <div className="space-y-2">
-                            <Label>Max Width (inches)</Label>
-                            <Input 
-                              type="number"
-                              value={selectedConfig.sizeCapabilities.maxWidth}
-                              onChange={(e) => updateConfiguration(selectedConfig.id, {
-                                sizeCapabilities: {
-                                  ...selectedConfig.sizeCapabilities,
-                                  maxWidth: parseFloat(e.target.value)
-                                }
-                              })}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Max Height (inches)</Label>
-                            <Input 
-                              type="number"
-                              value={selectedConfig.sizeCapabilities.maxHeight}
-                              onChange={(e) => updateConfiguration(selectedConfig.id, {
-                                sizeCapabilities: {
-                                  ...selectedConfig.sizeCapabilities,
-                                  maxHeight: parseFloat(e.target.value)
-                                }
-                              })}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Min Width (inches)</Label>
-                            <Input 
-                              type="number"
-                              value={selectedConfig.sizeCapabilities.minWidth}
-                              onChange={(e) => updateConfiguration(selectedConfig.id, {
-                                sizeCapabilities: {
-                                  ...selectedConfig.sizeCapabilities,
-                                  minWidth: parseFloat(e.target.value)
-                                }
-                              })}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Min Height (inches)</Label>
-                            <Input 
-                              type="number"
-                              value={selectedConfig.sizeCapabilities.minHeight}
-                              onChange={(e) => updateConfiguration(selectedConfig.id, {
-                                sizeCapabilities: {
-                                  ...selectedConfig.sizeCapabilities,
-                                  minHeight: parseFloat(e.target.value)
-                                }
-                              })}
-                            />
-                          </div>
+                           <div className="space-y-2">
+                             <Label>Max Width (inches)</Label>
+                             <Input 
+                               type="number"
+                               value={config.sizeCapabilities.maxWidth}
+                               onChange={(e) => updateConfiguration(config.id, {
+                                 sizeCapabilities: {
+                                   ...config.sizeCapabilities,
+                                   maxWidth: parseFloat(e.target.value)
+                                 }
+                               })}
+                             />
+                           </div>
+                           <div className="space-y-2">
+                             <Label>Max Height (inches)</Label>
+                             <Input 
+                               type="number"
+                               value={config.sizeCapabilities.maxHeight}
+                               onChange={(e) => updateConfiguration(config.id, {
+                                 sizeCapabilities: {
+                                   ...config.sizeCapabilities,
+                                   maxHeight: parseFloat(e.target.value)
+                                 }
+                               })}
+                             />
+                           </div>
+                           <div className="space-y-2">
+                             <Label>Min Width (inches)</Label>
+                             <Input 
+                               type="number"
+                               value={config.sizeCapabilities.minWidth}
+                               onChange={(e) => updateConfiguration(config.id, {
+                                 sizeCapabilities: {
+                                   ...config.sizeCapabilities,
+                                   minWidth: parseFloat(e.target.value)
+                                 }
+                               })}
+                             />
+                           </div>
+                           <div className="space-y-2">
+                             <Label>Min Height (inches)</Label>
+                             <Input 
+                               type="number"
+                               value={config.sizeCapabilities.minHeight}
+                               onChange={(e) => updateConfiguration(config.id, {
+                                 sizeCapabilities: {
+                                   ...config.sizeCapabilities,
+                                   minHeight: parseFloat(e.target.value)
+                                 }
+                               })}
+                             />
+                           </div>
                         </div>
                       </div>
 
@@ -420,83 +543,86 @@ export function ImprintSettings() {
                       <div>
                         <h4 className="font-medium mb-3">Color Constraints</h4>
                         <div className="grid grid-cols-3 gap-4">
-                          <div className="space-y-2">
-                            <div className="flex items-center space-x-2">
-                              <Switch 
-                                checked={selectedConfig.colorConstraints.unlimitedColors}
-                                onCheckedChange={(unlimitedColors) => updateConfiguration(selectedConfig.id, {
-                                  colorConstraints: {
-                                    ...selectedConfig.colorConstraints,
-                                    unlimitedColors
-                                  }
-                                })}
-                              />
-                              <Label>Unlimited Colors</Label>
-                            </div>
-                          </div>
-                          {!selectedConfig.colorConstraints.unlimitedColors && (
-                            <div className="space-y-2">
-                              <Label>Max Colors</Label>
-                              <Input 
-                                type="number"
-                                value={selectedConfig.colorConstraints.maxColors}
-                                onChange={(e) => updateConfiguration(selectedConfig.id, {
-                                  colorConstraints: {
-                                    ...selectedConfig.colorConstraints,
-                                    maxColors: parseInt(e.target.value)
-                                  }
-                                })}
-                              />
-                            </div>
-                          )}
-                          <div className="space-y-2">
-                            <Label>Additional Color Fee</Label>
-                            <Input 
-                              type="number"
-                              step="0.01"
-                              value={selectedConfig.colorConstraints.additionalColorFee}
-                              onChange={(e) => updateConfiguration(selectedConfig.id, {
-                                colorConstraints: {
-                                  ...selectedConfig.colorConstraints,
-                                  additionalColorFee: parseFloat(e.target.value)
-                                }
-                              })}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </CollapsibleContent>
-                </Card>
-              </Collapsible>
+                           <div className="space-y-2">
+                             <div className="flex items-center space-x-2">
+                               <Switch 
+                                 checked={config.colorConstraints.unlimitedColors}
+                                 onCheckedChange={(unlimitedColors) => updateConfiguration(config.id, {
+                                   colorConstraints: {
+                                     ...config.colorConstraints,
+                                     unlimitedColors
+                                   }
+                                 })}
+                               />
+                               <Label>Unlimited Colors</Label>
+                             </div>
+                           </div>
+                           {!config.colorConstraints.unlimitedColors && (
+                             <div className="space-y-2">
+                               <Label>Max Colors</Label>
+                               <Input 
+                                 type="number"
+                                 value={config.colorConstraints.maxColors}
+                                 onChange={(e) => updateConfiguration(config.id, {
+                                   colorConstraints: {
+                                     ...config.colorConstraints,
+                                     maxColors: parseInt(e.target.value)
+                                   }
+                                 })}
+                               />
+                             </div>
+                           )}
+                           <div className="space-y-2">
+                             <Label>Additional Color Fee</Label>
+                             <Input 
+                               type="number"
+                               step="0.01"
+                               value={config.colorConstraints.additionalColorFee}
+                               onChange={(e) => updateConfiguration(config.id, {
+                                 colorConstraints: {
+                                   ...config.colorConstraints,
+                                   additionalColorFee: parseFloat(e.target.value)
+                                 }
+                               })}
+                             />
+                           </div>
+                         </div>
+                       </div>
+                     </CardContent>
+                   </CollapsibleContent>
+                 </Card>
+               </Collapsible>
 
-              {/* Save Button */}
-              <div className="flex justify-end gap-2">
-                <Button variant="outline">
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Reset to Defaults
-                </Button>
-                <Button>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Configuration
-                </Button>
-              </div>
+               {/* Save Button */}
+               <div className="flex justify-end gap-2">
+                 <Button variant="outline">
+                   <RefreshCw className="h-4 w-4 mr-2" />
+                   Reset to Defaults
+                 </Button>
+                 <Button>
+                   <Save className="h-4 w-4 mr-2" />
+                   Save Configuration
+                 </Button>
+               </div>
+               </div>
+            </TabsContent>
+          ))}
+        </Tabs>
+      )}
+
+      {configurations.length === 0 && (
+        <Card>
+          <CardContent className="py-16">
+            <div className="text-center">
+              <Settings className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">Get Started</h3>
+              <p className="text-muted-foreground">
+                Add your first imprint method using the buttons above
+              </p>
             </div>
-          ) : (
-            <Card>
-              <CardContent className="py-16">
-                <div className="text-center">
-                  <Settings className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Select an Imprint Method</h3>
-                  <p className="text-muted-foreground">
-                    Choose a method from the left to configure its settings
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
