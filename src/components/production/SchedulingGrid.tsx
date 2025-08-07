@@ -87,7 +87,7 @@ export function SchedulingGrid({
 
   return (
     <div className="flex-1 overflow-auto bg-background p-4">
-      <div className="space-y-4 max-w-6xl mx-auto">
+      <div className="space-y-4 w-full">
         {equipment.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             No equipment available for this stage
