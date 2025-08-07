@@ -8,6 +8,16 @@ import {
   determinePriority 
 } from "@/types/imprint-job";
 
+// Import sample images
+import tshirtWhite from "@/assets/mockups/tshirt-white.jpg";
+import poloNavy from "@/assets/mockups/polo-navy.jpg";
+import hoodieBlack from "@/assets/mockups/hoodie-black.jpg";
+import capGray from "@/assets/mockups/cap-gray.jpg";
+import companyLogo from "@/assets/logos/company-logo-1.jpg";
+import outdoorLogo from "@/assets/logos/outdoor-logo-2.jpg";
+import restaurantLogo from "@/assets/logos/restaurant-logo-3.jpg";
+import techLogo from "@/assets/logos/tech-logo-4.jpg";
+
 export function convertOrderBreakdownToImprintJobs(): ImprintJob[] {
   const imprintJobs: ImprintJob[] = [];
   let jobCounter = 1;
@@ -140,10 +150,10 @@ export function getScheduledJobs(jobs: ImprintJob[]): ImprintJob[] {
 function getMockupImageForProduct(itemNumber: string): string {
   // Return different mockup images based on item type
   const mockupImages = [
-    "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1583743814966-8936f37f4a70?w=400&h=400&fit=crop"
+    tshirtWhite,
+    poloNavy,
+    hoodieBlack,
+    capGray
   ];
   
   const index = itemNumber.length % mockupImages.length;
@@ -153,10 +163,10 @@ function getMockupImageForProduct(itemNumber: string): string {
 function getImprintLogoForMethod(method: string): string {
   // Return different logo examples based on decoration method
   const logoImages = [
-    "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=200&h=200&fit=crop",
-    "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=200&fit=crop",
-    "https://images.unsplash.com/photo-1614028674026-a65e31bfd27c?w=200&h=200&fit=crop",
-    "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop"
+    companyLogo,    // screen_printing
+    outdoorLogo,    // embroidery
+    restaurantLogo, // dtf
+    techLogo        // dtg
   ];
   
   const methodIndex = method === "screen_printing" ? 0 : method === "embroidery" ? 1 : method === "dtf" ? 2 : 3;
