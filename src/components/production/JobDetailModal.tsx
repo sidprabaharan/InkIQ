@@ -130,7 +130,6 @@ export function JobDetailModal({
                     <CardContent className="space-y-3">
                       {dependentJobs.length > 0 && (
                         <div>
-                          <p className="text-sm font-medium mb-2">Must complete first:</p>
                           {dependentJobs.map(depJob => (
                             <div key={depJob.id} className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-2">
                               <div className="flex items-center justify-between mb-2">
