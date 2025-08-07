@@ -68,6 +68,28 @@ export interface ImprintJob {
       [size: string]: number;
     };
   };
+  
+  // Routing instructions for job splitting and destination management
+  routingInstructions?: {
+    id: string;
+    type: "imprint_routing" | "shipping_routing" | "size_split" | "general_routing";
+    title: string;
+    description: string;
+    splits: {
+      id: string;
+      destinationType: "next_imprint" | "shipping_location" | "quality_check" | "storage";
+      destinationId?: string; // ID of next job, shipping location, etc.
+      destinationName: string; // Human readable name
+      criteria: {
+        sizes?: string[]; // e.g., ["S", "M"]
+        quantities?: { [size: string]: number }; // e.g., { "S": 50, "M": 75 }
+        productIds?: string[]; // specific products
+        conditions?: string; // additional conditions
+      };
+      instructions: string; // specific instructions for this split
+      priority?: number; // order of processing
+    }[];
+  }[];
 }
 
 export function getDecorationMethodFromType(type: string): DecorationMethod {

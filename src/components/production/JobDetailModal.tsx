@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ImprintJob } from "@/types/imprint-job";
-import { Calendar, Clock, Package, User, MapPin, FileCheck, AlertCircle, ChevronRight, XCircle, Palette, Shirt, Link, Image, FileText } from "lucide-react";
+import { Calendar, Clock, Package, User, MapPin, FileCheck, AlertCircle, ChevronRight, XCircle, Palette, Shirt, Link, Image, FileText, ArrowRight, Truck, Scissors, Route, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -370,6 +370,110 @@ export function JobDetailModal({
                 )}
               </div>
             </div>
+
+            {/* Routing Section */}
+            {job.routingInstructions && job.routingInstructions.length > 0 && (
+              <Card className="bg-background">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Route className="h-4 w-4" />
+                    Routing Instructions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {job.routingInstructions.map((routing) => (
+                    <div key={routing.id} className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
+                          {routing.type === 'imprint_routing' && <Scissors className="h-4 w-4 text-blue-500" />}
+                          {routing.type === 'shipping_routing' && <Truck className="h-4 w-4 text-green-500" />}
+                          {routing.type === 'size_split' && <Package className="h-4 w-4 text-orange-500" />}
+                          {routing.type === 'general_routing' && <MapPin className="h-4 w-4 text-purple-500" />}
+                          <h4 className="font-medium">{routing.title}</h4>
+                        </div>
+                        <Badge variant="outline" className="text-xs">
+                          {routing.type.replace('_', ' ').toUpperCase()}
+                        </Badge>
+                      </div>
+                      
+                      {routing.description && (
+                        <p className="text-sm text-muted-foreground">
+                          {routing.description}
+                        </p>
+                      )}
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {routing.splits
+                          .sort((a, b) => (a.priority || 0) - (b.priority || 0))
+                          .map((split) => (
+                          <div key={split.id} className="border rounded-lg p-4 space-y-3">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                {split.destinationType === 'next_imprint' && <ArrowRight className="h-4 w-4 text-blue-500" />}
+                                {split.destinationType === 'shipping_location' && <Truck className="h-4 w-4 text-green-500" />}
+                                {split.destinationType === 'quality_check' && <CheckCircle className="h-4 w-4 text-yellow-500" />}
+                                {split.destinationType === 'storage' && <Package className="h-4 w-4 text-gray-500" />}
+                                <span className="font-medium text-sm">
+                                  {split.destinationName}
+                                </span>
+                              </div>
+                              {split.priority && (
+                                <Badge variant="secondary" className="text-xs">
+                                  #{split.priority}
+                                </Badge>
+                              )}
+                            </div>
+
+                            {/* Criteria */}
+                            <div className="space-y-2">
+                              {split.criteria.sizes && split.criteria.sizes.length > 0 && (
+                                <div>
+                                  <p className="text-xs font-medium text-muted-foreground">Sizes:</p>
+                                  <div className="flex flex-wrap gap-1">
+                                    {split.criteria.sizes.map((size) => (
+                                      <Badge key={size} variant="outline" className="text-xs">
+                                        {size}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {split.criteria.quantities && (
+                                <div>
+                                  <p className="text-xs font-medium text-muted-foreground">Quantities:</p>
+                                  <div className="space-y-1">
+                                    {Object.entries(split.criteria.quantities).map(([size, qty]) => (
+                                      <div key={size} className="flex justify-between text-xs">
+                                        <span>{size}:</span>
+                                        <span className="font-medium">{qty}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {split.criteria.conditions && (
+                                <div>
+                                  <p className="text-xs font-medium text-muted-foreground">Conditions:</p>
+                                  <p className="text-xs">{split.criteria.conditions}</p>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Instructions */}
+                            <div className="pt-2 border-t">
+                              <p className="text-xs font-medium text-muted-foreground mb-1">Instructions:</p>
+                              <p className="text-xs">{split.instructions}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
 
             {/* Imprint Details */}
             <Card>
