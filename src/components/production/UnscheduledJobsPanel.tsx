@@ -34,15 +34,15 @@ export function UnscheduledJobsPanel({ jobs, onStageAdvance, onJobClick }: Unsch
         </span>
       </div>
       
-      <ScrollArea className="h-64">
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(256px,1fr))] gap-3 pr-4">
+      <ScrollArea className="h-80">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4 pr-4">
           {sortedJobs.map(job => (
             <JobCard
               key={job.id}
               job={job}
               variant="unscheduled"
               draggable={true}
-              className="w-64 flex-shrink-0"
+              className="min-w-[280px] max-w-[320px]"
               onStageAdvance={() => onStageAdvance(job.id)}
               onClick={onJobClick ? () => onJobClick(job) : undefined}
             />
