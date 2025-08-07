@@ -113,36 +113,6 @@ export function JobDetailModal({
               </CardContent>
             </Card>
 
-            {/* Order Overview */}
-            <Card className={job.orderGroupColor}>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Package className="h-5 w-5" />
-                  {job.orderId} - {job.customerName}
-                  {relatedJobs.length > 0 && (
-                    <Badge variant="secondary" className="ml-2">
-                      {relatedJobs.length + 1} jobs
-                    </Badge>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">Due: {format(job.dueDate, "MMM d, yyyy")}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Shirt className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{job.products?.map(p => p.description).join(", ")}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Package className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{job.totalQuantity} pieces</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Job Dependencies and Related Jobs */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
