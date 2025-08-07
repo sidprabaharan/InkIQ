@@ -91,7 +91,10 @@ export function convertOrderBreakdownToImprintJobs(): ImprintJob[] {
         proofMockup: imprintSection.files?.filter(f => f.type === 'proof' || f.type === 'mockup') || [],
         
         // Product size breakdown
-        sizeBreakdown: createSizeBreakdown(lineItemGroup.products)
+        sizeBreakdown: createSizeBreakdown(lineItemGroup.products),
+        
+        // Add sample routing instructions for demonstration
+        routingInstructions: createSampleRoutingInstructions(groupIndex, sectionIndex, lineItemGroup, orderDetail)
       };
 
       imprintJobs.push(imprintJob);
@@ -200,4 +203,113 @@ function createSizeBreakdown(products: any[]): { [productId: string]: { [size: s
   });
   
   return breakdown;
+}
+
+function createSampleRoutingInstructions(groupIndex: number, sectionIndex: number, lineItemGroup: any, orderDetail: any) {
+  // Only add routing instructions to certain jobs for variety
+  const shouldHaveRouting = (groupIndex + sectionIndex) % 3 === 0; // Every 3rd job gets routing
+  
+  if (!shouldHaveRouting) return undefined;
+  
+  const routingScenarios = [
+    // Multi-imprint routing scenario
+    {
+      id: `routing-${groupIndex}-${sectionIndex}-1`,
+      type: "imprint_routing" as const,
+      title: "Multi-Imprint Routing",
+      description: "After completion, route items to additional decoration stations",
+      splits: [
+        {
+          id: `split-${groupIndex}-${sectionIndex}-1a`,
+          destinationType: "next_imprint" as const,
+          destinationId: "embroidery-station-2",
+          destinationName: "Embroidery Station 2",
+          criteria: {
+            sizes: ["L", "XL", "XXL"],
+            quantities: { "L": 40, "XL": 15, "XXL": 5 }
+          },
+          instructions: "Route larger sizes to embroidery station for additional logo placement on sleeve",
+          priority: 1
+        },
+        {
+          id: `split-${groupIndex}-${sectionIndex}-1b`,
+          destinationType: "shipping_location" as const,
+          destinationName: "Main Shipping Bay",
+          criteria: {
+            sizes: ["S", "M"],
+            quantities: { "S": 10, "M": 30 }
+          },
+          instructions: "Route smaller sizes directly to shipping - no additional decoration needed",
+          priority: 2
+        }
+      ]
+    },
+    // Size-based shipping split
+    {
+      id: `routing-${groupIndex}-${sectionIndex}-2`,
+      type: "shipping_routing" as const,
+      title: "Regional Shipping Split",
+      description: "Split order based on size distribution for different shipping locations",
+      splits: [
+        {
+          id: `split-${groupIndex}-${sectionIndex}-2a`,
+          destinationType: "shipping_location" as const,
+          destinationName: "East Coast Distribution Center",
+          criteria: {
+            sizes: ["S", "M", "L"],
+            quantities: { "S": 5, "M": 15, "L": 20 },
+            conditions: "Pack in boxes of 20 max"
+          },
+          instructions: "Ship 40 units (S-L sizes) to East Coast center. Use priority shipping labels.",
+          priority: 1
+        },
+        {
+          id: `split-${groupIndex}-${sectionIndex}-2b`,
+          destinationType: "shipping_location" as const,
+          destinationName: "West Coast Distribution Center",
+          criteria: {
+            sizes: ["XL", "XXL"],
+            quantities: { "XL": 10, "XXL": 5 },
+            conditions: "Separate packaging required"
+          },
+          instructions: "Ship remaining 15 units (XL-XXL) to West Coast center. Standard shipping.",
+          priority: 2
+        }
+      ]
+    },
+    // Quality check routing
+    {
+      id: `routing-${groupIndex}-${sectionIndex}-3`,
+      type: "general_routing" as const,
+      title: "Quality Control Routing",
+      description: "Route samples for quality inspection before bulk processing",
+      splits: [
+        {
+          id: `split-${groupIndex}-${sectionIndex}-3a`,
+          destinationType: "quality_check" as const,
+          destinationName: "QC Station 1",
+          criteria: {
+            quantities: { "Sample": 3 },
+            conditions: "First 3 completed units"
+          },
+          instructions: "Send first 3 completed units to QC for approval before continuing with remaining quantity",
+          priority: 1
+        },
+        {
+          id: `split-${groupIndex}-${sectionIndex}-3b`,
+          destinationType: "storage" as const,
+          destinationName: "Production Hold Area",
+          criteria: {
+            conditions: "Remaining quantity pending QC approval"
+          },
+          instructions: "Hold remaining units in production area until QC approval received",
+          priority: 2
+        }
+      ]
+    }
+  ];
+  
+  // Return one scenario based on the job characteristics
+  const scenarioIndex = (groupIndex + sectionIndex) % routingScenarios.length;
+  return [routingScenarios[scenarioIndex]];
 }
