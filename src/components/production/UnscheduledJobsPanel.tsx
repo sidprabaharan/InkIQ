@@ -45,7 +45,7 @@ export function UnscheduledJobsPanel({ jobs, allJobs, onStageAdvance, onJobClick
       
       <CollapsibleContent>
         <div className="px-4 pb-4">
-          <ScrollArea className="h-64">
+          <ScrollArea className="h-48">
             <div className="space-y-2 pr-4">
               {sortedJobs.map(job => (
                 <HorizontalJobCard
