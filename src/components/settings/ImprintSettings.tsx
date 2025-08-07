@@ -14,6 +14,15 @@ import {
 } from '@/components/ui/collapsible';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { 
   ChevronDown, 
   Plus, 
@@ -45,6 +54,8 @@ export function ImprintSettings() {
   const [configurations, setConfigurations] = useState<ImprintMethodConfiguration[]>([]);
   const [activeTab, setActiveTab] = useState<string>('');
   const [expandedSections, setExpandedSections] = useState<string[]>(['basic', 'pricing', 'constraints']);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [selectedMethod, setSelectedMethod] = useState<string>('');
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => 
@@ -134,6 +145,128 @@ export function ImprintSettings() {
 
     setConfigurations(prev => [...prev, newConfig]);
     setActiveTab(newConfig.id);
+    setIsAddDialogOpen(false);
+    setSelectedMethod('');
+  };
+
+  const handleAddMethod = () => {
+    if (selectedMethod) {
+      createNewConfiguration(selectedMethod);
+    }
+  };
+
+  const getMethodSpecificFields = (methodValue: string) => {
+    switch (methodValue) {
+      case 'screen_printing':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Mesh Count Range</Label>
+                <Input placeholder="e.g., 110-305" />
+              </div>
+              <div className="space-y-2">
+                <Label>Squeegee Hardness</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select hardness" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="soft">Soft (60-70 durometer)</SelectItem>
+                    <SelectItem value="medium">Medium (70-80 durometer)</SelectItem>
+                    <SelectItem value="hard">Hard (80-90 durometer)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Ink Types</Label>
+              <Textarea placeholder="Water-based, plastisol, discharge..." />
+            </div>
+          </div>
+        );
+      case 'embroidery':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Thread Weight</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select weight" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="40wt">40wt (Standard)</SelectItem>
+                    <SelectItem value="60wt">60wt (Fine Detail)</SelectItem>
+                    <SelectItem value="12wt">12wt (Bold/Heavy)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Max Stitch Density</Label>
+                <Input placeholder="e.g., 4.5mm" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Hoop Sizes Available</Label>
+              <Textarea placeholder="4x4, 5x7, 6x10..." />
+            </div>
+          </div>
+        );
+      case 'dtg':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Pretreatment Required</Label>
+              <Switch />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Max Print Resolution</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select DPI" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1200">1200 DPI</SelectItem>
+                    <SelectItem value="1440">1440 DPI</SelectItem>
+                    <SelectItem value="2880">2880 DPI</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Fabric Limitations</Label>
+                <Textarea placeholder="100% cotton, cotton blends..." />
+              </div>
+            </div>
+          </div>
+        );
+      case 'heat_transfer':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Temperature (°F)</Label>
+                <Input placeholder="e.g., 350" />
+              </div>
+              <div className="space-y-2">
+                <Label>Pressure (PSI)</Label>
+                <Input placeholder="e.g., 40" />
+              </div>
+              <div className="space-y-2">
+                <Label>Time (seconds)</Label>
+                <Input placeholder="e.g., 15" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Material Types</Label>
+              <Textarea placeholder="Vinyl, flex, flock..." />
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
   };
 
   const updateConfiguration = (id: string, updates: Partial<ImprintMethodConfiguration>) => {
@@ -176,33 +309,67 @@ export function ImprintSettings() {
   return (
     <div className="space-y-6">
 
-      {/* Add Method Button Grid */}
+      {/* Add Method Button */}
       {availableMethods.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Add Imprint Method</CardTitle>
-            <CardDescription>
-              Choose from available imprint methods to configure
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {availableMethods.map(method => (
-                 <Button
-                   key={method.value}
-                   variant="outline"
-                   className="h-20 flex flex-col gap-2 hover:bg-primary/5 hover:border-primary/20"
-                   onClick={() => createNewConfiguration(method.value)}
-                 >
-                   <div className="text-sm font-medium">{method.label}</div>
-                   <div className="text-xs text-muted-foreground">
-                     {method.value.charAt(0).toUpperCase() + method.value.slice(1)}
-                   </div>
-                 </Button>
-              ))}
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Imprint Method
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Add New Imprint Method</DialogTitle>
+              <DialogDescription>
+                Select an imprint method and configure its specific settings.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label>Imprint Method</Label>
+                <Select value={selectedMethod} onValueChange={setSelectedMethod}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose an imprint method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableMethods.map(method => (
+                      <SelectItem key={method.value} value={method.value}>
+                        {method.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {selectedMethod && (
+                <div className="space-y-4">
+                  <Separator />
+                  <div>
+                    <h4 className="font-medium mb-4">Method-Specific Configuration</h4>
+                    {getMethodSpecificFields(selectedMethod)}
+                  </div>
+                </div>
+              )}
             </div>
-          </CardContent>
-        </Card>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => {
+                setIsAddDialogOpen(false);
+                setSelectedMethod('');
+              }}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleAddMethod}
+                disabled={!selectedMethod}
+              >
+                Add Method
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
 
       {/* Configured Methods Tabs */}
