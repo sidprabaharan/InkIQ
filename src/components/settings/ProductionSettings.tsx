@@ -254,6 +254,9 @@ export function ProductionSettings() {
   const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
   const [isEquipmentDialogOpen, setIsEquipmentDialogOpen] = useState(false);
   const [isEditingEquipment, setIsEditingEquipment] = useState(false);
+  
+  const [editingEquipmentHours, setEditingEquipmentHours] = useState<Equipment | null>(null);
+  const [isHoursDialogOpen, setIsHoursDialogOpen] = useState(false);
 
   const [globalWorkingHours, setGlobalWorkingHours] = useState<WorkingHours>(defaultWorkingHours);
 
@@ -364,6 +367,64 @@ export function ProductionSettings() {
   const getStagesForMethod = (methodId: string) => {
     const method = decorationMethods.find(m => m.id === methodId);
     return method?.stages || [];
+  };
+
+  // Working hours handlers
+  const handleEditEquipmentHours = (equipment: Equipment) => {
+    setEditingEquipmentHours({ ...equipment });
+    setIsHoursDialogOpen(true);
+  };
+
+  const handleSaveEquipmentHours = () => {
+    if (!editingEquipmentHours) return;
+    
+    setEquipment(prev => 
+      prev.map(eq => 
+        eq.id === editingEquipmentHours.id 
+          ? { ...eq, workingHours: editingEquipmentHours.workingHours }
+          : eq
+      )
+    );
+    setIsHoursDialogOpen(false);
+    setEditingEquipmentHours(null);
+  };
+
+  const handleUpdateEquipmentWorkingHours = (day: keyof WorkingHours, updates: Partial<WorkingHours[keyof WorkingHours]>) => {
+    if (!editingEquipmentHours) return;
+    
+    setEditingEquipmentHours({
+      ...editingEquipmentHours,
+      workingHours: {
+        ...editingEquipmentHours.workingHours,
+        [day]: {
+          ...editingEquipmentHours.workingHours[day],
+          ...updates
+        }
+      }
+    });
+  };
+
+  const formatWorkingHoursDisplay = (workingHours: WorkingHours): string => {
+    const enabledDays = Object.entries(workingHours)
+      .filter(([_, hours]) => hours.enabled)
+      .map(([day, hours]) => ({
+        day: day.charAt(0).toUpperCase() + day.slice(1, 3),
+        start: hours.start,
+        end: hours.end
+      }));
+    
+    if (enabledDays.length === 0) return 'No working hours set';
+    
+    const groupedHours = enabledDays.reduce((acc, { day, start, end }) => {
+      const timeRange = `${start}-${end}`;
+      if (!acc[timeRange]) acc[timeRange] = [];
+      acc[timeRange].push(day);
+      return acc;
+    }, {} as Record<string, string[]>);
+    
+    return Object.entries(groupedHours)
+      .map(([timeRange, days]) => `${days.join(', ')}: ${timeRange}`)
+      .join(' | ');
   };
 
   return (
@@ -992,13 +1053,17 @@ export function ProductionSettings() {
                   <div key={item.id} className="border rounded-lg p-4">
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="font-medium">{item.name}</h4>
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleEditEquipmentHours(item)}
+                      >
                         <Settings className="h-4 w-4 mr-2" />
                         Configure Hours
                       </Button>
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Using global working hours (Mon-Fri 9:00 AM - 5:00 PM)
+                      {formatWorkingHoursDisplay(item.workingHours)}
                     </div>
                   </div>
                 ))}
@@ -1060,6 +1125,72 @@ export function ProductionSettings() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Equipment Working Hours Dialog */}
+      <Dialog open={isHoursDialogOpen} onOpenChange={setIsHoursDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Configure Working Hours</DialogTitle>
+            <DialogDescription>
+              Set custom working hours for {editingEquipmentHours?.name}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {editingEquipmentHours && (
+            <div className="space-y-4">
+              {Object.entries(editingEquipmentHours.workingHours).map(([day, hours]) => (
+                <div key={day} className="flex items-center gap-4">
+                  <div className="w-24">
+                    <Label className="capitalize">{day}</Label>
+                  </div>
+                  <Switch 
+                    checked={hours.enabled}
+                    onCheckedChange={(enabled) => 
+                      handleUpdateEquipmentWorkingHours(day as keyof WorkingHours, { enabled })
+                    }
+                  />
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="time"
+                      value={hours.start}
+                      disabled={!hours.enabled}
+                      className="w-32"
+                      onChange={(e) => 
+                        handleUpdateEquipmentWorkingHours(day as keyof WorkingHours, { start: e.target.value })
+                      }
+                    />
+                    <span className="text-muted-foreground">to</span>
+                    <Input
+                      type="time"
+                      value={hours.end}
+                      disabled={!hours.enabled}
+                      className="w-32"
+                      onChange={(e) => 
+                        handleUpdateEquipmentWorkingHours(day as keyof WorkingHours, { end: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+              ))}
+              
+              <div className="flex justify-end gap-2 pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setIsHoursDialogOpen(false);
+                    setEditingEquipmentHours(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveEquipmentHours}>
+                  Save Hours
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
