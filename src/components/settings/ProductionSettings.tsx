@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Trash2, Edit, Settings, Clock, Factory, Palette, GripVertical } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Plus, Trash2, Edit, Settings, Clock, Factory, Palette, GripVertical, ChevronDown, ChevronRight, AlertCircle, DollarSign, Truck, Package, Bell } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -62,6 +63,90 @@ interface WorkingHours {
   friday: { enabled: boolean; start: string; end: string };
   saturday: { enabled: boolean; start: string; end: string };
   sunday: { enabled: boolean; start: string; end: string };
+}
+
+interface ProductionRules {
+  // Job Grouping & Batching
+  autoGrouping: {
+    enabled: boolean;
+    groupByDesign: boolean;
+    groupByColors: boolean;
+    groupByGarmentType: boolean;
+  };
+  batchingRules: {
+    [decorationMethod: string]: {
+      minBatchSize: number;
+      maxBatchSize: number;
+      bufferTime: number; // minutes
+    };
+  };
+  
+  // Quality Control
+  qualityControl: {
+    artApprovalRequired: boolean;
+    sampleApprovalThreshold: number;
+    qualityCheckpoints: {
+      [stageId: string]: {
+        enabled: boolean;
+        checklistItems: string[];
+      };
+    };
+  };
+  
+  // Material & Inventory
+  materialRules: {
+    checkStockBeforeScheduling: boolean;
+    reorderPointWarnings: boolean;
+    lowStockThreshold: number;
+  };
+  
+  // Notifications
+  notificationRules: {
+    dueDateWarnings: {
+      enabled: boolean;
+      warningHours: number[];
+    };
+    equipmentMaintenance: {
+      enabled: boolean;
+      maintenanceIntervalHours: number;
+    };
+    capacityOverload: {
+      enabled: boolean;
+      thresholdPercentage: number;
+    };
+  };
+  
+  // Cost Optimization
+  costOptimization: {
+    rushJobSurcharge: {
+      enabled: boolean;
+      surchargePercentage: number;
+      rushThresholdHours: number;
+    };
+    smallQuantityPenalty: {
+      enabled: boolean;
+      minimumQuantity: number;
+      penaltyPercentage: number;
+    };
+    equipmentUtilizationTarget: number;
+  };
+  
+  // Outsourcing
+  outsourcingRules: {
+    autoOutsourcing: {
+      enabled: boolean;
+      capacityThreshold: number;
+      leadTimeBuffer: number; // days
+    };
+    preferredVendors: {
+      [decorationMethod: string]: string[];
+    };
+  };
+  
+  // Legacy rules
+  autoScheduling: boolean;
+  setupTimeBuffer: number;
+  rushJobPriority: boolean;
 }
 
 const defaultWorkingHours: WorkingHours = {
@@ -260,6 +345,85 @@ export function ProductionSettings() {
 
   const [globalWorkingHours, setGlobalWorkingHours] = useState<WorkingHours>(defaultWorkingHours);
 
+  const [productionRules, setProductionRules] = useState<ProductionRules>({
+    autoGrouping: {
+      enabled: true,
+      groupByDesign: true,
+      groupByColors: true,
+      groupByGarmentType: false,
+    },
+    batchingRules: {
+      screenPrinting: { minBatchSize: 12, maxBatchSize: 144, bufferTime: 15 },
+      embroidery: { minBatchSize: 6, maxBatchSize: 72, bufferTime: 10 },
+      dtf: { minBatchSize: 1, maxBatchSize: 50, bufferTime: 5 },
+      dtg: { minBatchSize: 1, maxBatchSize: 25, bufferTime: 5 },
+    },
+    qualityControl: {
+      artApprovalRequired: true,
+      sampleApprovalThreshold: 50,
+      qualityCheckpoints: {
+        art_prep: { enabled: true, checklistItems: ['Colors match specifications', 'Artwork is print-ready'] },
+        printing: { enabled: true, checklistItems: ['Registration is correct', 'Colors are accurate'] },
+        finishing: { enabled: true, checklistItems: ['Quality check passed', 'Packaging complete'] },
+      },
+    },
+    materialRules: {
+      checkStockBeforeScheduling: true,
+      reorderPointWarnings: true,
+      lowStockThreshold: 20,
+    },
+    notificationRules: {
+      dueDateWarnings: {
+        enabled: true,
+        warningHours: [24, 48, 72],
+      },
+      equipmentMaintenance: {
+        enabled: true,
+        maintenanceIntervalHours: 200,
+      },
+      capacityOverload: {
+        enabled: true,
+        thresholdPercentage: 90,
+      },
+    },
+    costOptimization: {
+      rushJobSurcharge: {
+        enabled: true,
+        surchargePercentage: 25,
+        rushThresholdHours: 48,
+      },
+      smallQuantityPenalty: {
+        enabled: false,
+        minimumQuantity: 12,
+        penaltyPercentage: 15,
+      },
+      equipmentUtilizationTarget: 85,
+    },
+    outsourcingRules: {
+      autoOutsourcing: {
+        enabled: false,
+        capacityThreshold: 95,
+        leadTimeBuffer: 2,
+      },
+      preferredVendors: {
+        screenPrinting: ['Local Screen Shop', 'Quick Print Co.'],
+        embroidery: ['Stitch Masters', 'Thread Works'],
+      },
+    },
+    autoScheduling: true,
+    setupTimeBuffer: 15,
+    rushJobPriority: true,
+  });
+
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    jobGrouping: true,
+    qualityControl: false,
+    materialRules: false,
+    notifications: false,
+    costOptimization: false,
+    outsourcing: false,
+  });
+
   // Equipment handlers
   const handleAddEquipment = () => {
     if (!newEquipment.name || !newEquipment.type) return;
@@ -425,6 +589,29 @@ export function ProductionSettings() {
     return Object.entries(groupedHours)
       .map(([timeRange, days]) => `${days.join(', ')}: ${timeRange}`)
       .join(' | ');
+  };
+
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
+  const updateProductionRules = (path: string, value: any) => {
+    setProductionRules(prev => {
+      const pathArray = path.split('.');
+      const updatedRules = { ...prev };
+      let current = updatedRules as any;
+      
+      for (let i = 0; i < pathArray.length - 1; i++) {
+        current[pathArray[i]] = { ...current[pathArray[i]] };
+        current = current[pathArray[i]];
+      }
+      
+      current[pathArray[pathArray.length - 1]] = value;
+      return updatedRules;
+    });
   };
 
   return (
@@ -1073,53 +1260,566 @@ export function ProductionSettings() {
         </TabsContent>
 
         <TabsContent value="rules" className="space-y-6">
+          {/* Job Grouping & Batching */}
+          <Card>
+            <Collapsible 
+              open={expandedSections.jobGrouping} 
+              onOpenChange={() => toggleSection('jobGrouping')}
+            >
+              <CollapsibleTrigger className="w-full">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Package className="h-5 w-5" />
+                      <CardTitle>Job Grouping & Batching</CardTitle>
+                    </div>
+                    {expandedSections.jobGrouping ? 
+                      <ChevronDown className="h-4 w-4" /> : 
+                      <ChevronRight className="h-4 w-4" />
+                    }
+                  </div>
+                  <CardDescription className="text-left">
+                    Configure how jobs are grouped and batched for efficiency
+                  </CardDescription>
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="space-y-6">
+                  <div>
+                    <Label>Auto-Grouping</Label>
+                    <div className="space-y-3 mt-2">
+                      <div className="flex items-center gap-2">
+                        <Switch 
+                          checked={productionRules.autoGrouping.enabled}
+                          onCheckedChange={(checked) => updateProductionRules('autoGrouping.enabled', checked)}
+                        />
+                        <span className="text-sm">Enable automatic job grouping</span>
+                      </div>
+                      <div className="ml-6 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <Switch 
+                            checked={productionRules.autoGrouping.groupByDesign}
+                            onCheckedChange={(checked) => updateProductionRules('autoGrouping.groupByDesign', checked)}
+                            disabled={!productionRules.autoGrouping.enabled}
+                          />
+                          <span className="text-sm text-muted-foreground">Group by same design/artwork</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Switch 
+                            checked={productionRules.autoGrouping.groupByColors}
+                            onCheckedChange={(checked) => updateProductionRules('autoGrouping.groupByColors', checked)}
+                            disabled={!productionRules.autoGrouping.enabled}
+                          />
+                          <span className="text-sm text-muted-foreground">Group by same colors</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Switch 
+                            checked={productionRules.autoGrouping.groupByGarmentType}
+                            onCheckedChange={(checked) => updateProductionRules('autoGrouping.groupByGarmentType', checked)}
+                            disabled={!productionRules.autoGrouping.enabled}
+                          />
+                          <span className="text-sm text-muted-foreground">Group by garment type</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div>
+                    <Label>Batch Size Settings</Label>
+                    <div className="space-y-4 mt-2">
+                      {Object.entries(productionRules.batchingRules).map(([method, rules]) => (
+                        <div key={method} className="border rounded-lg p-3">
+                          <h4 className="font-medium mb-3 capitalize">{method.replace(/([A-Z])/g, ' $1').toLowerCase()}</h4>
+                          <div className="grid grid-cols-3 gap-3">
+                            <div>
+                              <Label className="text-xs">Min Batch</Label>
+                              <Input
+                                type="number"
+                                value={rules.minBatchSize}
+                                onChange={(e) => updateProductionRules(`batchingRules.${method}.minBatchSize`, parseInt(e.target.value))}
+                                className="h-8"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-xs">Max Batch</Label>
+                              <Input
+                                type="number"
+                                value={rules.maxBatchSize}
+                                onChange={(e) => updateProductionRules(`batchingRules.${method}.maxBatchSize`, parseInt(e.target.value))}
+                                className="h-8"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-xs">Buffer (min)</Label>
+                              <Input
+                                type="number"
+                                value={rules.bufferTime}
+                                onChange={(e) => updateProductionRules(`batchingRules.${method}.bufferTime`, parseInt(e.target.value))}
+                                className="h-8"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </CollapsibleContent>
+            </Collapsible>
+          </Card>
+
+          {/* Quality Control Points */}
+          <Card>
+            <Collapsible 
+              open={expandedSections.qualityControl} 
+              onOpenChange={() => toggleSection('qualityControl')}
+            >
+              <CollapsibleTrigger className="w-full">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="h-5 w-5" />
+                      <CardTitle>Quality Control Points</CardTitle>
+                    </div>
+                    {expandedSections.qualityControl ? 
+                      <ChevronDown className="h-4 w-4" /> : 
+                      <ChevronRight className="h-4 w-4" />
+                    }
+                  </div>
+                  <CardDescription className="text-left">
+                    Define quality checkpoints and approval requirements
+                  </CardDescription>
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="space-y-6">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Switch 
+                        checked={productionRules.qualityControl.artApprovalRequired}
+                        onCheckedChange={(checked) => updateProductionRules('qualityControl.artApprovalRequired', checked)}
+                      />
+                      <Label>Art approval required before production</Label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>Sample approval threshold</Label>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Input
+                        type="number"
+                        value={productionRules.qualityControl.sampleApprovalThreshold}
+                        onChange={(e) => updateProductionRules('qualityControl.sampleApprovalThreshold', parseInt(e.target.value))}
+                        className="w-20"
+                      />
+                      <span className="text-sm text-muted-foreground">pieces - require sample approval for orders above this quantity</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>Quality Checkpoints</Label>
+                    <div className="space-y-3 mt-2">
+                      {Object.entries(productionRules.qualityControl.qualityCheckpoints).map(([stageId, checkpoint]) => (
+                        <div key={stageId} className="border rounded-lg p-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <Label className="capitalize">{stageId.replace('_', ' ')}</Label>
+                            <Switch 
+                              checked={checkpoint.enabled}
+                              onCheckedChange={(checked) => updateProductionRules(`qualityControl.qualityCheckpoints.${stageId}.enabled`, checked)}
+                            />
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {checkpoint.checklistItems.join(' • ')}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </CollapsibleContent>
+            </Collapsible>
+          </Card>
+
+          {/* Material & Inventory Rules */}
+          <Card>
+            <Collapsible 
+              open={expandedSections.materialRules} 
+              onOpenChange={() => toggleSection('materialRules')}
+            >
+              <CollapsibleTrigger className="w-full">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Package className="h-5 w-5" />
+                      <CardTitle>Material & Inventory Rules</CardTitle>
+                    </div>
+                    {expandedSections.materialRules ? 
+                      <ChevronDown className="h-4 w-4" /> : 
+                      <ChevronRight className="h-4 w-4" />
+                    }
+                  </div>
+                  <CardDescription className="text-left">
+                    Configure stock checking and inventory management
+                  </CardDescription>
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="space-y-6">
+                  <div className="flex items-center gap-2">
+                    <Switch 
+                      checked={productionRules.materialRules.checkStockBeforeScheduling}
+                      onCheckedChange={(checked) => updateProductionRules('materialRules.checkStockBeforeScheduling', checked)}
+                    />
+                    <Label>Check material availability before scheduling</Label>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Switch 
+                      checked={productionRules.materialRules.reorderPointWarnings}
+                      onCheckedChange={(checked) => updateProductionRules('materialRules.reorderPointWarnings', checked)}
+                    />
+                    <Label>Show reorder point warnings</Label>
+                  </div>
+
+                  <div>
+                    <Label>Low stock threshold</Label>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Input
+                        type="number"
+                        value={productionRules.materialRules.lowStockThreshold}
+                        onChange={(e) => updateProductionRules('materialRules.lowStockThreshold', parseInt(e.target.value))}
+                        className="w-20"
+                      />
+                      <span className="text-sm text-muted-foreground">units remaining to trigger low stock warning</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </CollapsibleContent>
+            </Collapsible>
+          </Card>
+
+          {/* Notification Rules */}
+          <Card>
+            <Collapsible 
+              open={expandedSections.notifications} 
+              onOpenChange={() => toggleSection('notifications')}
+            >
+              <CollapsibleTrigger className="w-full">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Bell className="h-5 w-5" />
+                      <CardTitle>Notification Rules</CardTitle>
+                    </div>
+                    {expandedSections.notifications ? 
+                      <ChevronDown className="h-4 w-4" /> : 
+                      <ChevronRight className="h-4 w-4" />
+                    }
+                  </div>
+                  <CardDescription className="text-left">
+                    Configure alerts and notifications for production events
+                  </CardDescription>
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="space-y-6">
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Switch 
+                        checked={productionRules.notificationRules.dueDateWarnings.enabled}
+                        onCheckedChange={(checked) => updateProductionRules('notificationRules.dueDateWarnings.enabled', checked)}
+                      />
+                      <Label>Due date warnings</Label>
+                    </div>
+                    <div className="ml-6">
+                      <Label className="text-sm">Warning times (hours before due date)</Label>
+                      <div className="flex gap-2 mt-1">
+                        {productionRules.notificationRules.dueDateWarnings.warningHours.map((hours, index) => (
+                          <Badge key={index} variant="secondary">{hours}h</Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Switch 
+                        checked={productionRules.notificationRules.equipmentMaintenance.enabled}
+                        onCheckedChange={(checked) => updateProductionRules('notificationRules.equipmentMaintenance.enabled', checked)}
+                      />
+                      <Label>Equipment maintenance alerts</Label>
+                    </div>
+                    <div className="ml-6">
+                      <Label className="text-sm">Maintenance interval</Label>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Input
+                          type="number"
+                          value={productionRules.notificationRules.equipmentMaintenance.maintenanceIntervalHours}
+                          onChange={(e) => updateProductionRules('notificationRules.equipmentMaintenance.maintenanceIntervalHours', parseInt(e.target.value))}
+                          className="w-20 h-8"
+                        />
+                        <span className="text-sm text-muted-foreground">hours of operation</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Switch 
+                        checked={productionRules.notificationRules.capacityOverload.enabled}
+                        onCheckedChange={(checked) => updateProductionRules('notificationRules.capacityOverload.enabled', checked)}
+                      />
+                      <Label>Capacity overload alerts</Label>
+                    </div>
+                    <div className="ml-6">
+                      <Label className="text-sm">Alert threshold</Label>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Input
+                          type="number"
+                          value={productionRules.notificationRules.capacityOverload.thresholdPercentage}
+                          onChange={(e) => updateProductionRules('notificationRules.capacityOverload.thresholdPercentage', parseInt(e.target.value))}
+                          className="w-20 h-8"
+                        />
+                        <span className="text-sm text-muted-foreground">% capacity utilization</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </CollapsibleContent>
+            </Collapsible>
+          </Card>
+
+          {/* Cost Optimization Rules */}
+          <Card>
+            <Collapsible 
+              open={expandedSections.costOptimization} 
+              onOpenChange={() => toggleSection('costOptimization')}
+            >
+              <CollapsibleTrigger className="w-full">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-5 w-5" />
+                      <CardTitle>Cost Optimization Rules</CardTitle>
+                    </div>
+                    {expandedSections.costOptimization ? 
+                      <ChevronDown className="h-4 w-4" /> : 
+                      <ChevronRight className="h-4 w-4" />
+                    }
+                  </div>
+                  <CardDescription className="text-left">
+                    Configure pricing rules and cost optimization settings
+                  </CardDescription>
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="space-y-6">
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Switch 
+                        checked={productionRules.costOptimization.rushJobSurcharge.enabled}
+                        onCheckedChange={(checked) => updateProductionRules('costOptimization.rushJobSurcharge.enabled', checked)}
+                      />
+                      <Label>Rush job surcharge</Label>
+                    </div>
+                    <div className="ml-6 grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-sm">Surcharge %</Label>
+                        <Input
+                          type="number"
+                          value={productionRules.costOptimization.rushJobSurcharge.surchargePercentage}
+                          onChange={(e) => updateProductionRules('costOptimization.rushJobSurcharge.surchargePercentage', parseInt(e.target.value))}
+                          className="h-8"
+                          disabled={!productionRules.costOptimization.rushJobSurcharge.enabled}
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm">Rush threshold (hours)</Label>
+                        <Input
+                          type="number"
+                          value={productionRules.costOptimization.rushJobSurcharge.rushThresholdHours}
+                          onChange={(e) => updateProductionRules('costOptimization.rushJobSurcharge.rushThresholdHours', parseInt(e.target.value))}
+                          className="h-8"
+                          disabled={!productionRules.costOptimization.rushJobSurcharge.enabled}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Switch 
+                        checked={productionRules.costOptimization.smallQuantityPenalty.enabled}
+                        onCheckedChange={(checked) => updateProductionRules('costOptimization.smallQuantityPenalty.enabled', checked)}
+                      />
+                      <Label>Small quantity penalty</Label>
+                    </div>
+                    <div className="ml-6 grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-sm">Minimum quantity</Label>
+                        <Input
+                          type="number"
+                          value={productionRules.costOptimization.smallQuantityPenalty.minimumQuantity}
+                          onChange={(e) => updateProductionRules('costOptimization.smallQuantityPenalty.minimumQuantity', parseInt(e.target.value))}
+                          className="h-8"
+                          disabled={!productionRules.costOptimization.smallQuantityPenalty.enabled}
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm">Penalty %</Label>
+                        <Input
+                          type="number"
+                          value={productionRules.costOptimization.smallQuantityPenalty.penaltyPercentage}
+                          onChange={(e) => updateProductionRules('costOptimization.smallQuantityPenalty.penaltyPercentage', parseInt(e.target.value))}
+                          className="h-8"
+                          disabled={!productionRules.costOptimization.smallQuantityPenalty.enabled}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>Equipment utilization target</Label>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Input
+                        type="number"
+                        value={productionRules.costOptimization.equipmentUtilizationTarget}
+                        onChange={(e) => updateProductionRules('costOptimization.equipmentUtilizationTarget', parseInt(e.target.value))}
+                        className="w-20"
+                      />
+                      <span className="text-sm text-muted-foreground">% target utilization for optimal efficiency</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </CollapsibleContent>
+            </Collapsible>
+          </Card>
+
+          {/* Outsourcing Rules */}
+          <Card>
+            <Collapsible 
+              open={expandedSections.outsourcing} 
+              onOpenChange={() => toggleSection('outsourcing')}
+            >
+              <CollapsibleTrigger className="w-full">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Truck className="h-5 w-5" />
+                      <CardTitle>Outsourcing Rules</CardTitle>
+                    </div>
+                    {expandedSections.outsourcing ? 
+                      <ChevronDown className="h-4 w-4" /> : 
+                      <ChevronRight className="h-4 w-4" />
+                    }
+                  </div>
+                  <CardDescription className="text-left">
+                    Configure automatic outsourcing and vendor preferences
+                  </CardDescription>
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="space-y-6">
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Switch 
+                        checked={productionRules.outsourcingRules.autoOutsourcing.enabled}
+                        onCheckedChange={(checked) => updateProductionRules('outsourcingRules.autoOutsourcing.enabled', checked)}
+                      />
+                      <Label>Automatic outsourcing</Label>
+                    </div>
+                    <div className="ml-6 grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-sm">Capacity threshold (%)</Label>
+                        <Input
+                          type="number"
+                          value={productionRules.outsourcingRules.autoOutsourcing.capacityThreshold}
+                          onChange={(e) => updateProductionRules('outsourcingRules.autoOutsourcing.capacityThreshold', parseInt(e.target.value))}
+                          className="h-8"
+                          disabled={!productionRules.outsourcingRules.autoOutsourcing.enabled}
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm">Lead time buffer (days)</Label>
+                        <Input
+                          type="number"
+                          value={productionRules.outsourcingRules.autoOutsourcing.leadTimeBuffer}
+                          onChange={(e) => updateProductionRules('outsourcingRules.autoOutsourcing.leadTimeBuffer', parseInt(e.target.value))}
+                          className="h-8"
+                          disabled={!productionRules.outsourcingRules.autoOutsourcing.enabled}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>Preferred Vendors</Label>
+                    <div className="space-y-3 mt-2">
+                      {Object.entries(productionRules.outsourcingRules.preferredVendors).map(([method, vendors]) => (
+                        <div key={method} className="border rounded-lg p-3">
+                          <Label className="text-sm font-medium capitalize">{method.replace(/([A-Z])/g, ' $1').toLowerCase()}</Label>
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {vendors.map((vendor, index) => (
+                              <Badge key={index} variant="outline">{vendor}</Badge>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </CollapsibleContent>
+            </Collapsible>
+          </Card>
+
+          {/* Legacy Rules */}
           <Card>
             <CardHeader>
-              <CardTitle>Production Rules</CardTitle>
+              <CardTitle>Basic Scheduling Rules</CardTitle>
               <CardDescription>
-                Configure automation and scheduling rules
+                Core scheduling and automation settings
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div>
-                  <Label htmlFor="auto-schedule">Auto-scheduling</Label>
-                  <div className="flex items-center gap-2 mt-2">
-                    <Switch id="auto-schedule" />
-                    <span className="text-sm text-muted-foreground">
-                      Automatically schedule jobs based on due dates and capacity
-                    </span>
-                  </div>
+            <CardContent className="space-y-6">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Switch 
+                    checked={productionRules.autoScheduling}
+                    onCheckedChange={(checked) => updateProductionRules('autoScheduling', checked)}
+                  />
+                  <Label>Auto-scheduling</Label>
                 </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Automatically schedule jobs based on due dates and capacity
+                </p>
+              </div>
 
-                <Separator />
-
-                <div>
-                  <Label htmlFor="setup-buffer">Setup Time Buffer</Label>
-                  <div className="flex items-center gap-2 mt-2">
-                    <Input
-                      id="setup-buffer"
-                      type="number"
-                      placeholder="15"
-                      className="w-20"
-                    />
-                    <span className="text-sm text-muted-foreground">
-                      minutes buffer between jobs for setup
-                    </span>
-                  </div>
+              <div>
+                <Label>Setup time buffer</Label>
+                <div className="flex items-center gap-2 mt-2">
+                  <Input
+                    type="number"
+                    value={productionRules.setupTimeBuffer}
+                    onChange={(e) => updateProductionRules('setupTimeBuffer', parseInt(e.target.value))}
+                    className="w-20"
+                  />
+                  <span className="text-sm text-muted-foreground">minutes buffer between jobs for setup</span>
                 </div>
+              </div>
 
-                <Separator />
-
-                <div>
-                  <Label htmlFor="rush-priority">Rush Job Priority</Label>
-                  <div className="flex items-center gap-2 mt-2">
-                    <Switch id="rush-priority" />
-                    <span className="text-sm text-muted-foreground">
-                      Automatically prioritize rush jobs in scheduling
-                    </span>
-                  </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <Switch 
+                    checked={productionRules.rushJobPriority}
+                    onCheckedChange={(checked) => updateProductionRules('rushJobPriority', checked)}
+                  />
+                  <Label>Rush job priority</Label>
                 </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Automatically prioritize rush jobs in scheduling
+                </p>
               </div>
             </CardContent>
           </Card>
