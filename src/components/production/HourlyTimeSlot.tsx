@@ -83,11 +83,42 @@ export function HourlyTimeSlot({
     setDraggedOverQuarter(null);
   };
 
-  // Calculate job positions and heights based on their start time and duration
-  const positionedJobs = jobs.map(job => {
+  // Detect overlapping jobs and assign columns
+  const detectOverlaps = (jobs: { job: ImprintJob; startMinutes: number; endMinutes: number }[]) => {
+    const columns: { job: ImprintJob; startMinutes: number; endMinutes: number; column: number }[] = [];
+    
+    jobs.forEach(jobData => {
+      let column = 0;
+      // Find the first column where this job doesn't overlap with existing jobs
+      while (columns.some(existing => 
+        existing.column === column &&
+        jobData.startMinutes < existing.endMinutes &&
+        jobData.endMinutes > existing.startMinutes
+      )) {
+        column++;
+      }
+      columns.push({ ...jobData, column });
+    });
+    
+    const maxColumns = Math.max(...columns.map(c => c.column), 0) + 1;
+    return { columns, maxColumns };
+  };
+
+  // Calculate job positions and detect overlaps
+  const jobsWithTiming = jobs.map(job => {
     if (!job.scheduledStart) return null;
     
     const startMinutes = job.scheduledStart.getMinutes();
+    const durationMinutes = job.estimatedHours * 60;
+    const endMinutes = startMinutes + durationMinutes;
+    
+    return { job, startMinutes, endMinutes };
+  }).filter(Boolean);
+
+  const { columns, maxColumns } = detectOverlaps(jobsWithTiming);
+
+  // Calculate positioned jobs with column layout
+  const positionedJobs = columns.map(({ job, startMinutes, endMinutes, column }) => {
     const durationMinutes = job.estimatedHours * 60;
     
     // Position within the hour (0-100%)
@@ -96,13 +127,24 @@ export function HourlyTimeSlot({
     // Height based on full duration (allow spanning beyond current hour)
     const heightPercent = (durationMinutes / 60) * 100;
     
+    // Column positioning
+    const columnWidth = 100 / maxColumns;
+    const leftPercent = column * columnWidth;
+    const widthPercent = columnWidth - 1; // Small gap between columns
+    
+    // Check if job spans beyond current hour
+    const currentHourEndMinutes = 60;
+    const spansNextHour = endMinutes > currentHourEndMinutes;
+    
     return {
       job,
       topPercent,
       heightPercent,
-      spansNextHour: durationMinutes > (60 - startMinutes)
+      leftPercent,
+      widthPercent,
+      spansNextHour
     };
-  }).filter(Boolean);
+  });
 
   const hasJobs = jobs.length > 0;
   const totalHours = jobs.reduce((sum, job) => sum + job.estimatedHours, 0);
@@ -153,21 +195,22 @@ export function HourlyTimeSlot({
           </div>
         )}
         
-        {positionedJobs.map(({ job, topPercent, heightPercent, spansNextHour }) => (
+        {positionedJobs.map(({ job, topPercent, heightPercent, leftPercent, widthPercent, spansNextHour }) => (
           <div
             key={job.id}
-            className="absolute left-2 right-2 z-10"
+            className="absolute z-10"
             style={{
               top: `${topPercent}%`,
-              height: `${heightPercent}%`,
-              minHeight: '20px'
+              left: `calc(${leftPercent}% + 8px)`,
+              width: `calc(${widthPercent}% - 8px)`,
+              height: `${Math.max(heightPercent, 50)}%`,
+              minHeight: '48px'
             }}
           >
             <div 
               className={cn(
-                "bg-card border border-border rounded shadow-sm h-full flex items-center px-1 cursor-grab active:cursor-grabbing hover:shadow-md transition-all text-xs",
-                spansNextHour && "border-b-dashed border-b-primary",
-                onJobClick && "cursor-pointer"
+                "h-full transition-all",
+                spansNextHour && "border-b-2 border-b-dashed border-b-primary"
               )}
               draggable
               onDragStart={(e) => {
@@ -177,58 +220,21 @@ export function HourlyTimeSlot({
                 }));
                 e.dataTransfer.effectAllowed = "move";
               }}
-              onClick={(e) => {
-                if (onJobClick && !e.defaultPrevented) {
-                  e.stopPropagation();
-                  onJobClick(job);
-                }
-              }}
             >
-              <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-foreground truncate">
-                  {job.jobNumber} - {job.customerName}
-                </div>
-                {heightPercent > 30 && (
-                  <div className="text-xs text-muted-foreground truncate">
-                    {job.description}
-                  </div>
-                )}
-              </div>
-              
-              {/* Duration indicator */}
-              <div className="text-xs text-muted-foreground flex-shrink-0 ml-1">
-                {job.estimatedHours}h
-              </div>
-              
-              {/* Actions */}
-              <div className="flex items-center gap-0.5 flex-shrink-0 ml-1">
-                {onStageAdvance && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onStageAdvance(job.id);
-                    }}
-                    className="text-xs px-0.5 py-0.5 rounded bg-primary text-primary-foreground hover:bg-primary/80"
-                  >
-                    →
-                  </button>
-                )}
-                {onJobUnschedule && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onJobUnschedule(job.id);
-                    }}
-                    className="text-xs px-0.5 py-0.5 rounded text-muted-foreground hover:text-destructive"
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
+              <HorizontalJobCard
+                job={job}
+                allJobs={allJobs}
+                variant="scheduled"
+                draggable={false}
+                onStageAdvance={() => onStageAdvance(job.id)}
+                onClick={onJobClick ? () => onJobClick(job) : undefined}
+                onUnschedule={() => onJobUnschedule(job.id)}
+                className="h-full min-h-[48px] text-xs"
+              />
             </div>
             
             {spansNextHour && (
-              <div className="absolute -bottom-1 right-1 bg-primary text-primary-foreground text-xs px-1 py-0.5 rounded">
+              <div className="absolute -bottom-1 right-1 bg-primary text-primary-foreground text-xs px-1 py-0.5 rounded z-20">
                 Continues...
               </div>
             )}
