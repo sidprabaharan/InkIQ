@@ -168,7 +168,8 @@ export function JobDetailModal({
                           "border rounded-lg p-3 transition-colors",
                           relJob.orderGroupColor
                         )}>
-                          <div className="flex items-center justify-between mb-2">
+                          {/* Header with job number and status */}
+                          <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
                               <span className="font-medium text-sm">{relJob.jobNumber}</span>
                               {relJob.sequenceOrder && (
@@ -181,26 +182,57 @@ export function JobDetailModal({
                               {relJob.status.replace("_", " ")}
                             </Badge>
                           </div>
-                          <p className="text-sm mb-2">{relJob.description}</p>
-                          <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <MapPin className="h-3 w-3" />
-                              <span>{relJob.placement}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              <span>{relJob.estimatedHours}h</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Package className="h-3 w-3" />
-                              <span>{relJob.totalQuantity} pieces</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <span className="capitalize">{relJob.decorationMethod.replace("_", " ")}</span>
+
+                          {/* Visual mockup and logo */}
+                          <div className="flex gap-3 mb-3">
+                            {relJob.mockupImage && (
+                              <div className="w-16 h-16 rounded border overflow-hidden bg-muted flex-shrink-0">
+                                <img 
+                                  src={relJob.mockupImage} 
+                                  alt="Job mockup" 
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.currentTarget.src = '/placeholder.svg';
+                                  }}
+                                />
+                              </div>
+                            )}
+                            {relJob.imprintLogo && (
+                              <div className="w-16 h-16 rounded border overflow-hidden bg-muted flex-shrink-0">
+                                <img 
+                                  src={relJob.imprintLogo} 
+                                  alt="Imprint logo" 
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.currentTarget.src = '/placeholder.svg';
+                                  }}
+                                />
+                              </div>
+                            )}
+                            <div className="flex-1">
+                              <p className="text-sm font-medium mb-1">{relJob.description}</p>
+                              <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                                <div className="flex items-center gap-1">
+                                  <MapPin className="h-3 w-3" />
+                                  <span>{relJob.placement}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  <span>{relJob.estimatedHours}h</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Package className="h-3 w-3" />
+                                  <span>{relJob.totalQuantity} pieces</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <span className="capitalize">{relJob.decorationMethod.replace("_", " ")}</span>
+                                </div>
+                              </div>
                             </div>
                           </div>
+
                           {relJob.scheduledStart && (
-                            <div className="mt-2 pt-2 border-t border-border">
+                            <div className="pt-2 border-t border-border">
                               <p className="text-xs text-muted-foreground">
                                 Scheduled: {format(relJob.scheduledStart, "MMM d, h:mm a")}
                               </p>
