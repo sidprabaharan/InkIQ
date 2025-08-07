@@ -131,16 +131,23 @@ export function JobDetailModal({
                       {dependentJobs.length > 0 && (
                         <div>
                           {dependentJobs.map(depJob => (
-                            <div key={depJob.id} className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-2">
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="font-medium text-sm text-orange-900">{depJob.jobNumber}</span>
+                            <div key={depJob.id} className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3 transition-colors">
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium text-sm text-orange-900">{depJob.jobNumber}</span>
+                                  {depJob.sequenceOrder && (
+                                    <Badge variant="outline" className="text-xs">
+                                      Step {depJob.sequenceOrder}
+                                    </Badge>
+                                  )}
+                                </div>
                                 <Badge variant="outline" className="text-xs">
                                   {depJob.status.replace("_", " ")}
                                 </Badge>
                               </div>
-                              <div className="flex gap-3">
+                              <div className="flex gap-3 mb-3">
                                 {depJob.mockupImage && (
-                                  <div className="w-12 h-12 rounded border overflow-hidden bg-white flex-shrink-0">
+                                  <div className="w-16 h-16 rounded border overflow-hidden bg-white flex-shrink-0">
                                     <img 
                                       src={depJob.mockupImage} 
                                       alt="Job mockup" 
@@ -152,7 +159,7 @@ export function JobDetailModal({
                                   </div>
                                 )}
                                 {depJob.imprintLogo && (
-                                  <div className="w-12 h-12 rounded border overflow-hidden bg-white flex-shrink-0">
+                                  <div className="w-16 h-16 rounded border overflow-hidden bg-white flex-shrink-0">
                                     <img 
                                       src={depJob.imprintLogo} 
                                       alt="Imprint logo" 
@@ -164,8 +171,8 @@ export function JobDetailModal({
                                   </div>
                                 )}
                                 <div className="flex-1">
-                                  <p className="text-sm text-orange-900 mb-1">{depJob.description}</p>
-                                  <div className="grid grid-cols-2 gap-1 text-xs text-orange-700">
+                                  <p className="text-sm font-medium text-orange-900 mb-1">{depJob.description}</p>
+                                  <div className="grid grid-cols-2 gap-2 text-xs text-orange-700">
                                     <div className="flex items-center gap-1">
                                       <MapPin className="h-3 w-3" />
                                       <span>{depJob.placement}</span>
@@ -173,6 +180,13 @@ export function JobDetailModal({
                                     <div className="flex items-center gap-1">
                                       <Clock className="h-3 w-3" />
                                       <span>{depJob.estimatedHours}h</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <Package className="h-3 w-3" />
+                                      <span>{depJob.totalQuantity} pieces</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <span className="capitalize">{depJob.decorationMethod.replace("_", " ")}</span>
                                     </div>
                                   </div>
                                 </div>
@@ -185,16 +199,23 @@ export function JobDetailModal({
                         <div>
                           <p className="text-sm font-medium mb-2">Waiting for this job:</p>
                           {blockingJobs.map(blockJob => (
-                            <div key={blockJob.id} className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="font-medium text-sm text-blue-900">{blockJob.jobNumber}</span>
+                            <div key={blockJob.id} className="bg-blue-50 border border-blue-200 rounded-lg p-3 transition-colors">
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium text-sm text-blue-900">{blockJob.jobNumber}</span>
+                                  {blockJob.sequenceOrder && (
+                                    <Badge variant="outline" className="text-xs">
+                                      Step {blockJob.sequenceOrder}
+                                    </Badge>
+                                  )}
+                                </div>
                                 <Badge variant="outline" className="text-xs">
                                   {blockJob.status.replace("_", " ")}
                                 </Badge>
                               </div>
-                              <div className="flex gap-3">
+                              <div className="flex gap-3 mb-3">
                                 {blockJob.mockupImage && (
-                                  <div className="w-12 h-12 rounded border overflow-hidden bg-white flex-shrink-0">
+                                  <div className="w-16 h-16 rounded border overflow-hidden bg-white flex-shrink-0">
                                     <img 
                                       src={blockJob.mockupImage} 
                                       alt="Job mockup" 
@@ -206,7 +227,7 @@ export function JobDetailModal({
                                   </div>
                                 )}
                                 {blockJob.imprintLogo && (
-                                  <div className="w-12 h-12 rounded border overflow-hidden bg-white flex-shrink-0">
+                                  <div className="w-16 h-16 rounded border overflow-hidden bg-white flex-shrink-0">
                                     <img 
                                       src={blockJob.imprintLogo} 
                                       alt="Imprint logo" 
@@ -218,8 +239,8 @@ export function JobDetailModal({
                                   </div>
                                 )}
                                 <div className="flex-1">
-                                  <p className="text-sm text-blue-900 mb-1">{blockJob.description}</p>
-                                  <div className="grid grid-cols-2 gap-1 text-xs text-blue-700">
+                                  <p className="text-sm font-medium text-blue-900 mb-1">{blockJob.description}</p>
+                                  <div className="grid grid-cols-2 gap-2 text-xs text-blue-700">
                                     <div className="flex items-center gap-1">
                                       <MapPin className="h-3 w-3" />
                                       <span>{blockJob.placement}</span>
@@ -227,6 +248,13 @@ export function JobDetailModal({
                                     <div className="flex items-center gap-1">
                                       <Clock className="h-3 w-3" />
                                       <span>{blockJob.estimatedHours}h</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <Package className="h-3 w-3" />
+                                      <span>{blockJob.totalQuantity} pieces</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <span className="capitalize">{blockJob.decorationMethod.replace("_", " ")}</span>
                                     </div>
                                   </div>
                                 </div>
