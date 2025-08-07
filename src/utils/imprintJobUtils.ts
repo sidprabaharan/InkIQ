@@ -60,8 +60,6 @@ export function convertOrderBreakdownToImprintJobs(): ImprintJob[] {
       const isScreenPrint = decorationMethod === "screen_printing";
       const shouldBeAtPrintStage = isScreenPrint && (groupIndex < 8 || orderDetail.customerApprovalStatus === "approved");
       
-      // Determine dependencies and blocking relationships
-      const dependencies = createJobDependencies(jobId, groupIndex, sectionIndex, decorationMethod, orderDetail);
       const relatedImprints = createRelatedImprints(jobId, lineItemGroup, sectionIndex);
       
       const imprintJob: ImprintJob = {
@@ -96,11 +94,9 @@ export function convertOrderBreakdownToImprintJobs(): ImprintJob[] {
         orderGroupColor: getOrderGroupColor(groupIndex),
         currentStage: shouldBeAtPrintStage ? "print" : getInitialStage(decorationMethod),
         
-        // Enhanced job metadata (stored in notes for now since interface is limited)
+        // Enhanced job metadata  
         notes: createEnhancedNotes(imprintSection.notes, orderDetail, decorationMethod, totalQuantity) + 
-               `\n\nDEPENDENCIES: ${dependencies.dependsOn.join(', ')}\n` +
-               `BLOCKS: ${dependencies.blocks.join(', ')}\n` +
-               `RELATED: ${relatedImprints.join(', ')}\n` +
+               `\n\nRELATED: ${relatedImprints.join(', ')}\n` +
                `EQUIPMENT: ${getEquipmentRequirements(decorationMethod, totalQuantity).join(', ')}\n` +
                `QC CHECKPOINTS: ${createQualityCheckpoints(decorationMethod, totalQuantity).join(', ')}\n` +
                `SETUP: ${createSetupInstructions(decorationMethod, imprintSection, orderDetail).join('; ')}\n` +
@@ -133,21 +129,18 @@ export function convertOrderBreakdownToImprintJobs(): ImprintJob[] {
     });
   });
 
-  // Set up dependencies for jobs in the same order
-  imprintJobs.forEach(job => {
-    const relatedJobs = imprintJobs.filter(j => 
-      j.orderId === job.orderId && j.id !== job.id
-    );
+  // Set up proper dependencies and blocking relationships
+  imprintJobs.forEach((job, index) => {
+    const dependencies = createJobDependencies(job, imprintJobs, index);
+    job.dependsOnJobs = dependencies.dependsOnJobs;
+    job.blocksJobs = dependencies.blocksJobs;
     
-    if (relatedJobs.length > 0) {
-      // If this is a screen printing job, it might depend on digitization
-      if (job.decorationMethod === "screen_printing") {
-        const embroideryJob = relatedJobs.find(j => j.decorationMethod === "embroidery");
-        if (embroideryJob) {
-          job.dependsOnJobs = [embroideryJob.id];
-        }
-      }
-    }
+    // Clean up notes by removing dependency text and keeping only production info
+    job.notes = job.notes?.split('\n').filter(line => 
+      !line.includes('DEPENDENCIES:') && 
+      !line.includes('BLOCKS:') && 
+      !line.includes('RELATED:')
+    ).join('\n') || '';
   });
 
   return imprintJobs;
@@ -238,28 +231,130 @@ function createSizeBreakdown(products: any[]): { [productId: string]: { [size: s
 }
 
 // Enhanced helper functions for comprehensive job creation
-function createJobDependencies(jobId: string, groupIndex: number, sectionIndex: number, decorationMethod: string, orderDetail: any) {
-  const dependencies = { dependsOn: [] as string[], blocks: [] as string[] };
-  
-  // Create cross-method dependencies
-  if (decorationMethod === "screen_printing" && sectionIndex > 0) {
-    dependencies.dependsOn.push(`artwork-approval-${orderDetail.orderId}`);
-    if (groupIndex % 3 === 0) {
-      dependencies.dependsOn.push(`embroidery-digitization-${orderDetail.orderId}`);
+function createJobDependencies(job: ImprintJob, allJobs: ImprintJob[], jobIndex: number): {
+  dependsOnJobs: string[];
+  blocksJobs: string[];
+  notes: string;
+} {
+  const dependencies: string[] = [];
+  const blocks: string[] = [];
+  const noteItems: string[] = [];
+
+  // Get jobs from the same order (use index-based IDs since jobs are created in sequence)
+  const sameOrderJobs = allJobs.filter(j => 
+    j.orderId === job.orderId && j.id !== job.id
+  );
+
+  // Create realistic dependency chains within same order
+  if (job.decorationMethod === 'screen_printing') {
+    // Screen printing depends on embroidery if in same order
+    const embroideryJob = sameOrderJobs.find(j => j.decorationMethod === 'embroidery');
+    if (embroideryJob) {
+      dependencies.push(embroideryJob.id);
+      noteItems.push(`• Embroidery must complete first`);
+    }
+
+    // Create equipment conflicts with other screen printing jobs
+    const otherScreenJobs = allJobs.filter(j => 
+      j.decorationMethod === 'screen_printing' && 
+      j.id !== job.id &&
+      Math.abs(parseInt(j.id.split('-')[2]) - parseInt(job.id.split('-')[2])) <= 2
+    );
+    
+    if (otherScreenJobs.length > 0 && Math.random() > 0.6) {
+      const conflictJob = otherScreenJobs[0];
+      dependencies.push(conflictJob.id);
+      noteItems.push(`• Shared press equipment with Job #${conflictJob.jobNumber}`);
+    }
+
+    // Block DTF jobs that use same colors
+    const conflictingDTF = allJobs.find(j => 
+      j.decorationMethod === 'dtf' && 
+      j.colours?.includes(job.colours?.split(',')[0] || '') &&
+      j.id !== job.id
+    );
+    if (conflictingDTF) {
+      blocks.push(conflictingDTF.id);
+      noteItems.push(`• Color match required - blocks DTF Job #${conflictingDTF.jobNumber}`);
     }
   }
-  
-  // Create sequential dependencies within same order
-  if (sectionIndex > 0) {
-    dependencies.dependsOn.push(`imprint-job-${parseInt(jobId.split('-').pop()!) - 1}`);
+
+  if (job.decorationMethod === 'embroidery') {
+    // Embroidery blocks related screen printing
+    const relatedScreen = sameOrderJobs.find(j => j.decorationMethod === 'screen_printing');
+    if (relatedScreen) {
+      blocks.push(relatedScreen.id);
+      noteItems.push(`• Must complete before screen printing starts`);
+    }
+
+    // Embroidery equipment dependencies
+    const otherEmbroidery = allJobs.filter(j => 
+      j.decorationMethod === 'embroidery' && 
+      j.id !== job.id
+    ).slice(0, 2);
+
+    if (otherEmbroidery.length > 0 && Math.random() > 0.7) {
+      dependencies.push(otherEmbroidery[0].id);
+      noteItems.push(`• Machine setup dependent on Job #${otherEmbroidery[0].jobNumber}`);
+    }
   }
-  
-  // Some jobs block others
-  if (decorationMethod === "screen_printing" && sectionIndex === 0) {
-    dependencies.blocks.push(`quality-check-${orderDetail.orderId}`);
+
+  if (job.decorationMethod === 'dtf') {
+    // DTF depends on screen printing for color approval
+    const screenJob = allJobs.find(j => 
+      j.decorationMethod === 'screen_printing' && 
+      j.colours?.includes(job.colours?.split(',')[0] || '')
+    );
+    if (screenJob) {
+      dependencies.push(screenJob.id);
+      noteItems.push(`• Color approval from screen printing required`);
+    }
   }
-  
-  return dependencies;
+
+  if (job.decorationMethod === 'dtg') {
+    // DTG blocks other DTG jobs on same press
+    const otherDTG = allJobs.filter(j => 
+      j.decorationMethod === 'dtg' && 
+      j.id !== job.id
+    ).slice(0, 1);
+
+    if (otherDTG.length > 0 && Math.random() > 0.5) {
+      blocks.push(otherDTG[0].id);
+      noteItems.push(`• Press allocation conflict with Job #${otherDTG[0].jobNumber}`);
+    }
+  }
+
+  // Rush order dependencies
+  if (job.priority === 'high') {
+    const bumpedJobs = allJobs.filter(j => 
+      j.priority === 'medium' && 
+      j.decorationMethod === job.decorationMethod &&
+      j.id !== job.id
+    ).slice(0, 2);
+    
+    bumpedJobs.forEach(bumpedJob => {
+      blocks.push(bumpedJob.id);
+      noteItems.push(`• Rush priority bumps Job #${bumpedJob.jobNumber}`);
+    });
+  }
+
+  // Customer approval dependencies
+  if (!job.artworkApproved) {
+    noteItems.push(`• Pending customer artwork approval`);
+    
+    // If waiting on approval, might depend on related jobs completing first
+    const relatedApprovalJob = sameOrderJobs.find(j => j.artworkApproved);
+    if (relatedApprovalJob) {
+      dependencies.push(relatedApprovalJob.id);
+      noteItems.push(`• Approval sequence after Job #${relatedApprovalJob.jobNumber}`);
+    }
+  }
+
+  return {
+    dependsOnJobs: dependencies,
+    blocksJobs: blocks,
+    notes: noteItems.length > 0 ? noteItems.join('\n') : ''
+  };
 }
 
 function createRelatedImprints(jobId: string, lineItemGroup: any, sectionIndex: number) {
