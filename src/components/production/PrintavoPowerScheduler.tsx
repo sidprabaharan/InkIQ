@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { SchedulerHeader } from "./SchedulerHeader";
-import { DecorationMethodTabs } from "./DecorationMethodTabs";
-import { ProductionStageTabs } from "./ProductionStageTabs";
+import { DecorationMethodDropdown } from "./DecorationMethodDropdown";
+import { ProductionStageDropdown } from "./ProductionStageDropdown";
 import { UnscheduledJobsPanel } from "./UnscheduledJobsPanel";
 import { SchedulingGrid } from "./SchedulingGrid";
 import { JobDetailModal } from "./JobDetailModal";
@@ -127,17 +127,20 @@ export default function PrintavoPowerScheduler() {
         selectedMethod={selectedMethod}
       />
       
-      <DecorationMethodTabs 
-        selectedMethod={selectedMethod}
-        onMethodChange={handleMethodChange}
-      />
-      
-      <ProductionStageTabs
-        selectedMethod={selectedMethod}
-        selectedStage={selectedStage}
-        onStageChange={setSelectedStage}
-        stages={stagesByMethod[selectedMethod]}
-      />
+      <div className="border-b border-border bg-background px-6 py-4">
+        <div className="flex items-center gap-8">
+          <DecorationMethodDropdown 
+            selectedMethod={selectedMethod}
+            onMethodChange={handleMethodChange}
+          />
+          
+          <ProductionStageDropdown
+            selectedStage={selectedStage}
+            onStageChange={setSelectedStage}
+            stages={stagesByMethod[selectedMethod]}
+          />
+        </div>
+      </div>
       
       <UnscheduledJobsPanel 
         jobs={unscheduledJobs}
