@@ -44,7 +44,7 @@ export function UnscheduledJobsPanel({ jobs, onStageAdvance, onJobClick }: Unsch
       
       <CollapsibleContent>
         <div className="px-4 pb-4">
-          <ScrollArea className="h-40">
+          <ScrollArea className="h-48">
             <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4 pr-4">
               {sortedJobs.map(job => (
                 <JobCard
