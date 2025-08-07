@@ -111,7 +111,7 @@ export function HourlyTimeSlot({
   return (
     <div 
       className={cn(
-        "relative h-24 flex border-b border-border/50 transition-colors",
+        "relative h-12 flex border-b border-border/50 transition-colors",
         isOverUtilized && "bg-amber-50 border-l-2 border-amber-400",
         hasJobs && "hover:bg-muted/5"
       )}
@@ -120,19 +120,19 @@ export function HourlyTimeSlot({
       onDragLeave={handleDragLeave}
     >
       {/* Time label */}
-      <div className="w-20 flex-shrink-0 px-3 py-2 border-r border-border/30">
-        <span className="text-sm font-medium text-foreground">
+      <div className="w-16 flex-shrink-0 px-2 py-1 border-r border-border/30 flex flex-col justify-center">
+        <span className="text-xs font-medium text-foreground">
           {timeSlot.label}
         </span>
         {isOverUtilized && (
-          <div className="text-xs text-amber-600 mt-1">
+          <div className="text-xs text-amber-600">
             Busy
           </div>
         )}
       </div>
 
       {/* Drop zone quarters with visual feedback */}
-      <div className="absolute left-20 right-0 top-0 bottom-0 pointer-events-none">
+      <div className="absolute left-16 right-0 top-0 bottom-0 pointer-events-none">
         {[0, 1, 2, 3].map(quarter => (
           <div
             key={quarter}
@@ -148,7 +148,7 @@ export function HourlyTimeSlot({
       {/* Jobs container */}
       <div className="flex-1 relative">
         {!hasJobs && (
-          <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground/60 italic pointer-events-none">
+          <div className="absolute inset-0 flex items-center justify-center text-xs text-muted-foreground/60 italic pointer-events-none">
             Drop jobs here to schedule
           </div>
         )}
@@ -165,7 +165,7 @@ export function HourlyTimeSlot({
           >
             <div 
               className={cn(
-                "bg-card border border-border rounded-lg shadow-sm h-full flex items-center px-2 cursor-grab active:cursor-grabbing hover:shadow-md transition-all",
+                "bg-card border border-border rounded shadow-sm h-full flex items-center px-1 cursor-grab active:cursor-grabbing hover:shadow-md transition-all text-xs",
                 spansNextHour && "border-b-dashed border-b-primary"
               )}
               draggable
@@ -181,25 +181,27 @@ export function HourlyTimeSlot({
                 <div className="text-xs font-medium text-foreground truncate">
                   {job.jobNumber} - {job.customerName}
                 </div>
-                <div className="text-xs text-muted-foreground truncate">
-                  {job.description}
-                </div>
+                {heightPercent > 30 && (
+                  <div className="text-xs text-muted-foreground truncate">
+                    {job.description}
+                  </div>
+                )}
               </div>
               
               {/* Duration indicator */}
-              <div className="text-xs text-muted-foreground flex-shrink-0 ml-2">
+              <div className="text-xs text-muted-foreground flex-shrink-0 ml-1">
                 {job.estimatedHours}h
               </div>
               
               {/* Actions */}
-              <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+              <div className="flex items-center gap-0.5 flex-shrink-0 ml-1">
                 {onStageAdvance && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       onStageAdvance(job.id);
                     }}
-                    className="text-xs px-1 py-0.5 rounded bg-primary text-primary-foreground hover:bg-primary/80"
+                    className="text-xs px-0.5 py-0.5 rounded bg-primary text-primary-foreground hover:bg-primary/80"
                   >
                     →
                   </button>
@@ -210,7 +212,7 @@ export function HourlyTimeSlot({
                       e.stopPropagation();
                       onJobUnschedule(job.id);
                     }}
-                    className="text-xs px-1 py-0.5 rounded text-muted-foreground hover:text-destructive"
+                    className="text-xs px-0.5 py-0.5 rounded text-muted-foreground hover:text-destructive"
                   >
                     ×
                   </button>
