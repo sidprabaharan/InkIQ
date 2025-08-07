@@ -1,5 +1,5 @@
 import { JobCard } from "./JobCard";
-import { PrintavoJob } from "./PrintavoPowerScheduler";
+import { ImprintJob } from "@/types/imprint-job";
 import { cn } from "@/lib/utils";
 
 interface Equipment {
@@ -17,12 +17,12 @@ interface TimeSlot {
 interface TimeSlotRowProps {
   timeSlot: TimeSlot;
   equipment: Equipment[];
-  jobs: PrintavoJob[];
+  jobs: ImprintJob[];
   selectedDate: Date;
   onJobSchedule: (jobId: string, equipmentId: string, startTime: Date, endTime: Date) => void;
   onJobUnschedule: (jobId: string) => void;
   onStageAdvance: (jobId: string) => void;
-  onJobClick?: (job: PrintavoJob) => void;
+  onJobClick?: (job: ImprintJob) => void;
 }
 
 export function TimeSlotRow({ 
@@ -40,7 +40,7 @@ export function TimeSlotRow({
     e.preventDefault();
     const jobData = e.dataTransfer.getData("application/json");
     if (jobData) {
-      const job = JSON.parse(jobData) as PrintavoJob;
+      const job = JSON.parse(jobData) as ImprintJob;
       const startTime = new Date(selectedDate);
       startTime.setHours(timeSlot.hour, 0, 0, 0);
       const endTime = new Date(startTime);

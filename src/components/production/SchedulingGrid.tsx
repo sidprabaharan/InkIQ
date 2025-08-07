@@ -1,15 +1,16 @@
 import { TimeSlotRow } from "./TimeSlotRow";
-import { PrintavoJob, DecorationMethod, ProductionStage } from "./PrintavoPowerScheduler";
+import { ImprintJob } from "@/types/imprint-job";
+import { DecorationMethod, ProductionStage } from "./PrintavoPowerScheduler";
 
 interface SchedulingGridProps {
-  jobs: PrintavoJob[];
+  jobs: ImprintJob[];
   selectedDate: Date;
   selectedMethod: DecorationMethod;
   selectedStage: ProductionStage;
   onJobSchedule: (jobId: string, equipmentId: string, startTime: Date, endTime: Date) => void;
   onJobUnschedule: (jobId: string) => void;
   onStageAdvance: (jobId: string) => void;
-  onJobClick?: (job: PrintavoJob) => void;
+  onJobClick?: (job: ImprintJob) => void;
 }
 
 // Equipment configurations for different decoration methods and stages

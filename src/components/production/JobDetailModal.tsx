@@ -3,18 +3,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PrintavoJob } from "./PrintavoPowerScheduler";
+import { ImprintJob } from "@/types/imprint-job";
 import { Calendar, Clock, Package, User, MapPin, FileCheck, AlertCircle, ChevronRight, XCircle, Palette, Shirt, Link } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 interface JobDetailModalProps {
-  job: PrintavoJob | null;
+  job: ImprintJob | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onStageAdvance?: () => void;
   onUnschedule?: () => void;
-  allJobs?: PrintavoJob[]; // For showing related jobs
+  allJobs?: ImprintJob[]; // For showing related jobs
 }
 
 export function JobDetailModal({ 
@@ -32,7 +32,7 @@ export function JobDetailModal({
   
   // Get related jobs for this order
   const relatedJobs = job ? allJobs.filter(j => 
-    j.parentOrderId === job.parentOrderId && j.id !== job.id
+    j.orderId === job.orderId && j.id !== job.id
   ) : [];
   
   // Get dependent/blocking jobs
@@ -73,7 +73,7 @@ export function JobDetailModal({
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Package className="h-5 w-5" />
-                  Order #{job.parentOrderId.replace('order-', '')} - {job.customerName}
+                  {job.orderId} - {job.customerName}
                   {relatedJobs.length > 0 && (
                     <Badge variant="secondary" className="ml-2">
                       {relatedJobs.length + 1} jobs
@@ -89,11 +89,11 @@ export function JobDetailModal({
                   </div>
                   <div className="flex items-center gap-2">
                     <Shirt className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{job.garmentType} - {job.garmentColors.join(", ")}</span>
+                    <span className="text-sm">{job.products.map(p => p.description).join(", ")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Package className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{job.quantity} pieces</span>
+                    <span className="text-sm">{job.totalQuantity} pieces</span>
                   </div>
                 </div>
               </CardContent>
@@ -133,7 +133,7 @@ export function JobDetailModal({
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span>{job.imprintLocation}</span>
+                        <span>{job.placement}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
@@ -141,7 +141,7 @@ export function JobDetailModal({
                       </div>
                       <div className="flex items-center gap-2">
                         <Palette className="h-4 w-4 text-muted-foreground" />
-                        <span>{job.garmentColors.join(", ")}</span>
+                        <span>{job.colours}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         {job.artworkApproved ? (
@@ -247,7 +247,7 @@ export function JobDetailModal({
                           <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
                             <div className="flex items-center gap-1">
                               <MapPin className="h-3 w-3" />
-                              <span>{relJob.imprintLocation}</span>
+                              <span>{relJob.placement}</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
@@ -255,7 +255,7 @@ export function JobDetailModal({
                             </div>
                             <div className="flex items-center gap-1">
                               <Package className="h-3 w-3" />
-                              <span>{relJob.quantity} pieces</span>
+                              <span>{relJob.totalQuantity} pieces</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <span className="capitalize">{relJob.decorationMethod.replace("_", " ")}</span>
@@ -284,7 +284,7 @@ export function JobDetailModal({
                       <p>• {job.decorationMethod === "embroidery" ? "Use high-quality thread for durability" : "Ensure proper ink coverage"}</p>
                       <p>• Check garment positioning before starting</p>
                       <p>• Quality control check after completion</p>
-                      {job.relatedJobIds.length > 0 && (
+                      {relatedJobs.length > 0 && (
                         <p className="text-orange-600">• Coordinate with related jobs for timing</p>
                       )}
                     </div>

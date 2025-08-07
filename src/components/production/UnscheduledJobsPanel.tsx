@@ -1,15 +1,15 @@
 import { JobCard } from "./JobCard";
-import { PrintavoJob } from "./PrintavoPowerScheduler";
+import { ImprintJob } from "@/types/imprint-job";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 interface UnscheduledJobsPanelProps {
-  jobs: PrintavoJob[];
+  jobs: ImprintJob[];
   selectedDate: Date;
   onStageAdvance: (jobId: string) => void;
-  onJobClick?: (job: PrintavoJob) => void;
+  onJobClick?: (job: ImprintJob) => void;
 }
 
 export function UnscheduledJobsPanel({ jobs, onStageAdvance, onJobClick }: UnscheduledJobsPanelProps) {
@@ -21,9 +21,9 @@ export function UnscheduledJobsPanel({ jobs, onStageAdvance, onJobClick }: Unsch
     const dateCompare = new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
     if (dateCompare !== 0) return dateCompare;
     
-    // Then by parent order (to group related jobs)
-    if (a.parentOrderId !== b.parentOrderId) {
-      return a.parentOrderId.localeCompare(b.parentOrderId);
+    // Then by order ID (to group related jobs)
+    if (a.orderId !== b.orderId) {
+      return a.orderId.localeCompare(b.orderId);
     }
     
     // Finally by sequence order within the same parent order

@@ -1,12 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PrintavoJob } from "./PrintavoPowerScheduler";
+import { ImprintJob } from "@/types/imprint-job";
 import { Clock, Calendar, Package, FileCheck, AlertCircle, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
 interface JobCardProps {
-  job: PrintavoJob;
+  job: ImprintJob;
   variant: "unscheduled" | "scheduled";
   draggable?: boolean;
   className?: string;
@@ -70,21 +70,21 @@ export function JobCard({ job, variant, draggable = false, className, onStageAdv
       <div className="space-y-1">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span className="truncate">{job.customerName}</span>
-          {job.relatedJobIds.length > 0 && (
+          {job.products.length > 1 && (
             <Badge variant="secondary" className="text-xs px-1 py-0 h-4">
-              +{job.relatedJobIds.length}
+              {job.products.length} items
             </Badge>
           )}
         </div>
         
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Package className="h-3 w-3" />
-          <span>{job.quantity} {job.garmentType}</span>
+          <span>{job.totalQuantity} pcs • {job.decorationMethod}</span>
         </div>
         
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Clock className="h-3 w-3" />
-          <span>{job.estimatedHours}h • {job.imprintLocation}</span>
+          <span>{job.estimatedHours}h • {job.placement}</span>
         </div>
         
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
