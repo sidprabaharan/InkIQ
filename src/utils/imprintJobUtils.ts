@@ -240,9 +240,15 @@ function createJobDependencies(job: ImprintJob, allJobs: ImprintJob[], jobIndex:
   const blocks: string[] = [];
   const noteItems: string[] = [];
 
+  // Safety check - ensure allJobs is an array
+  if (!Array.isArray(allJobs)) {
+    console.error('createJobDependencies: allJobs is not an array:', allJobs);
+    return { dependsOnJobs: [], blocksJobs: [], notes: '' };
+  }
+
   // Get jobs from the same order (use index-based IDs since jobs are created in sequence)
   const sameOrderJobs = allJobs.filter(j => 
-    j.orderId === job.orderId && j.id !== job.id
+    j && j.orderId === job.orderId && j.id !== job.id
   );
 
   // Create realistic dependency chains within same order
@@ -256,9 +262,10 @@ function createJobDependencies(job: ImprintJob, allJobs: ImprintJob[], jobIndex:
 
     // Create equipment conflicts with other screen printing jobs
     const otherScreenJobs = allJobs.filter(j => 
-      j.decorationMethod === 'screen_printing' && 
+      j && j.decorationMethod === 'screen_printing' && 
       j.id !== job.id &&
-      Math.abs(parseInt(j.id.split('-')[2]) - parseInt(job.id.split('-')[2])) <= 2
+      j.id && j.id.includes('-') &&
+      Math.abs(parseInt(j.id.split('-')[2] || '0') - parseInt(job.id.split('-')[2] || '0')) <= 2
     );
     
     if (otherScreenJobs.length > 0 && Math.random() > 0.6) {
@@ -269,7 +276,7 @@ function createJobDependencies(job: ImprintJob, allJobs: ImprintJob[], jobIndex:
 
     // Block DTF jobs that use same colors
     const conflictingDTF = allJobs.find(j => 
-      j.decorationMethod === 'dtf' && 
+      j && j.decorationMethod === 'dtf' && 
       j.colours?.includes(job.colours?.split(',')[0] || '') &&
       j.id !== job.id
     );
@@ -281,7 +288,7 @@ function createJobDependencies(job: ImprintJob, allJobs: ImprintJob[], jobIndex:
 
   if (job.decorationMethod === 'embroidery') {
     // Embroidery blocks related screen printing
-    const relatedScreen = sameOrderJobs.find(j => j.decorationMethod === 'screen_printing');
+    const relatedScreen = sameOrderJobs.find(j => j && j.decorationMethod === 'screen_printing');
     if (relatedScreen) {
       blocks.push(relatedScreen.id);
       noteItems.push(`• Must complete before screen printing starts`);
@@ -289,7 +296,7 @@ function createJobDependencies(job: ImprintJob, allJobs: ImprintJob[], jobIndex:
 
     // Embroidery equipment dependencies
     const otherEmbroidery = allJobs.filter(j => 
-      j.decorationMethod === 'embroidery' && 
+      j && j.decorationMethod === 'embroidery' && 
       j.id !== job.id
     ).slice(0, 2);
 
@@ -302,7 +309,7 @@ function createJobDependencies(job: ImprintJob, allJobs: ImprintJob[], jobIndex:
   if (job.decorationMethod === 'dtf') {
     // DTF depends on screen printing for color approval
     const screenJob = allJobs.find(j => 
-      j.decorationMethod === 'screen_printing' && 
+      j && j.decorationMethod === 'screen_printing' && 
       j.colours?.includes(job.colours?.split(',')[0] || '')
     );
     if (screenJob) {
@@ -314,7 +321,7 @@ function createJobDependencies(job: ImprintJob, allJobs: ImprintJob[], jobIndex:
   if (job.decorationMethod === 'dtg') {
     // DTG blocks other DTG jobs on same press
     const otherDTG = allJobs.filter(j => 
-      j.decorationMethod === 'dtg' && 
+      j && j.decorationMethod === 'dtg' && 
       j.id !== job.id
     ).slice(0, 1);
 
@@ -327,7 +334,7 @@ function createJobDependencies(job: ImprintJob, allJobs: ImprintJob[], jobIndex:
   // Rush order dependencies
   if (job.priority === 'high') {
     const bumpedJobs = allJobs.filter(j => 
-      j.priority === 'medium' && 
+      j && j.priority === 'medium' && 
       j.decorationMethod === job.decorationMethod &&
       j.id !== job.id
     ).slice(0, 2);
