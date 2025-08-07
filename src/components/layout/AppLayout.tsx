@@ -16,11 +16,11 @@ export function AppLayout({ children }: AppLayoutProps) {
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-yellow-100">
+    <div className="flex h-screen w-full overflow-hidden">
       <Sidebar collapsed={sidebarCollapsed} toggleCollapse={toggleSidebar} />
-      <div className="flex flex-col flex-1 overflow-hidden bg-purple-100">
+      <div className="flex flex-col flex-1 overflow-hidden">
         <TopBar />
-        <main className="flex-1 overflow-auto bg-orange-100">
+        <main className="flex-1 overflow-auto">
           {children}
         </main>
       </div>
