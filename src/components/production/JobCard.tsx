@@ -70,7 +70,7 @@ export function JobCard({ job, variant, draggable = false, className, onStageAdv
       <div className="space-y-1">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span className="truncate">{job.customerName}</span>
-          {job.products.length > 1 && (
+          {job.products && job.products.length > 1 && (
             <Badge variant="secondary" className="text-xs px-1 py-0 h-4">
               {job.products.length} items
             </Badge>
