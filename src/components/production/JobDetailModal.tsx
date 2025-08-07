@@ -223,7 +223,7 @@ export function JobDetailModal({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                   <div>
                     <p className="text-muted-foreground">Method</p>
                     <p className="font-medium">{job.imprintMethod || job.decorationMethod.replace('_', ' ').toUpperCase()}</p>
@@ -239,6 +239,10 @@ export function JobDetailModal({
                   <div>
                     <p className="text-muted-foreground">Colors/Threads</p>
                     <p className="font-medium">{job.imprintColors || job.colours}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Estimated Time</p>
+                    <p className="font-medium">{job.estimatedHours}h</p>
                   </div>
                 </div>
                 
