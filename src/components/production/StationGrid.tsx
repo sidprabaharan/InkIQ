@@ -35,7 +35,7 @@ export function StationGrid({
   onStageAdvance,
   onJobClick
 }: StationGridProps) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   
   // Time slots for the day (8 AM to 6 PM)
   const timeSlots = Array.from({ length: 10 }, (_, i) => {
