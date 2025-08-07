@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { 
   Users, Building, ListChecks, CreditCard, Workflow, ClipboardList, 
   Mail, Upload, DownloadCloud, Truck, FileSpreadsheet, 
-  Zap, CreditCard as BillingIcon, Settings as SettingsIcon, Package2
+  Zap, CreditCard as BillingIcon, Settings as SettingsIcon, Package2, Factory
 } from 'lucide-react';
 
 import { UserManagement } from '@/components/settings/UserManagement';
@@ -25,6 +25,7 @@ import { Billing } from '@/components/settings/Billing';
 import { GeneralSettings } from '@/components/settings/GeneralSettings';
 import { SupplierIntegrations } from '@/components/settings/SupplierIntegrations';
 import { OutsourcingPreferences } from '@/components/settings/OutsourcingPreferences';
+import { ProductionSettings } from '@/components/settings/ProductionSettings';
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState('users');
@@ -32,6 +33,7 @@ export default function Settings() {
   const settingsSections = [
     { id: 'users', name: 'User Management', icon: Users, component: UserManagement },
     { id: 'company', name: 'Company Information', icon: Building, component: CompanyInfo },
+    { id: 'production', name: 'Production Settings', icon: Factory, component: ProductionSettings },
     { id: 'statuses', name: 'Order Statuses', icon: ListChecks, component: OrderStatuses },
     { id: 'payments', name: 'Payment Integration', icon: CreditCard, component: PaymentIntegration },
     { id: 'automations', name: 'Automations', icon: Workflow, component: Automations },
