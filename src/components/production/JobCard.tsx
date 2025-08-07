@@ -134,7 +134,10 @@ export function JobCard({ job, variant, draggable = false, className, onStageAdv
           <Button
             size="sm"
             variant="outline"
-            onClick={onStageAdvance}
+            onClick={(e) => {
+              e.stopPropagation();
+              onStageAdvance();
+            }}
             className="w-full text-xs"
           >
             <ChevronRight className="h-3 w-3 mr-1" />

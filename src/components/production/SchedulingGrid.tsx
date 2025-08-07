@@ -1,4 +1,4 @@
-import { TimeSlotRow } from "./TimeSlotRow";
+import { StationGrid } from "./StationGrid";
 import { ImprintJob } from "@/types/imprint-job";
 import { DecorationMethod, ProductionStage } from "./PrintavoPowerScheduler";
 
@@ -82,59 +82,28 @@ export function SchedulingGrid({
   onJobClick
 }: SchedulingGridProps) {
   const equipment = equipmentConfig[selectedMethod]?.[selectedStage] || [];
-  
-  // Time slots for the day (8 AM to 6 PM)
-  const timeSlots = Array.from({ length: 10 }, (_, i) => {
-    const hour = i + 8;
-    return {
-      hour,
-      label: `${hour > 12 ? hour - 12 : hour}:00 ${hour >= 12 ? 'PM' : 'AM'}`
-    };
-  });
 
   return (
-    <div className="flex-1 overflow-auto bg-background">
-      <div className="min-h-[600px]">
-        {/* Equipment header */}
-        <div className="sticky top-0 bg-background border-b border-border z-10">
-          <div className={`grid min-h-[60px]`} style={{ gridTemplateColumns: `80px repeat(${equipment.length}, 1fr)` }}>
-            <div className="border-r border-border p-4 bg-muted/30">
-              <span className="font-semibold text-foreground">Time</span>
-            </div>
-            {equipment.map(eq => (
-              <div key={eq.id} className="border-r border-border p-4 text-center bg-muted/30">
-                <div className="flex flex-col items-center gap-1">
-                  <span className="text-sm font-medium text-foreground">
-                    {eq.name}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {eq.type}
-                  </span>
-                </div>
-              </div>
-            ))}
+    <div className="flex-1 overflow-auto bg-background p-4">
+      <div className="space-y-4 max-w-6xl mx-auto">
+        {equipment.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            No equipment available for this stage
           </div>
-        </div>
-
-        {/* Time slot rows */}
-        <div className="divide-y divide-border">
-          {timeSlots.map(slot => (
-            <TimeSlotRow
-              key={slot.hour}
-              timeSlot={slot}
-              equipment={equipment}
-              jobs={jobs.filter(job => {
-                if (!job.scheduledStart) return false;
-                return job.scheduledStart.getHours() === slot.hour;
-              })}
+        ) : (
+          equipment.map(eq => (
+            <StationGrid
+              key={eq.id}
+              equipment={eq}
+              jobs={jobs}
               selectedDate={selectedDate}
               onJobSchedule={onJobSchedule}
               onJobUnschedule={onJobUnschedule}
               onStageAdvance={onStageAdvance}
               onJobClick={onJobClick}
             />
-          ))}
-        </div>
+          ))
+        )}
       </div>
     </div>
   );
