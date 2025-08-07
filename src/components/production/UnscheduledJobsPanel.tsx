@@ -1,4 +1,4 @@
-import { JobCard } from "./JobCard";
+import { HorizontalJobCard } from "./HorizontalJobCard";
 import { ImprintJob } from "@/types/imprint-job";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -44,15 +44,14 @@ export function UnscheduledJobsPanel({ jobs, onStageAdvance, onJobClick }: Unsch
       
       <CollapsibleContent>
         <div className="px-4 pb-4">
-          <ScrollArea className="h-44">
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4 pr-4">
+          <ScrollArea className="h-64">
+            <div className="space-y-2 pr-4">
               {sortedJobs.map(job => (
-                <JobCard
+                <HorizontalJobCard
                   key={job.id}
                   job={job}
                   variant="unscheduled"
                   draggable={true}
-                  className="min-w-[280px] max-w-[320px]"
                   onStageAdvance={() => onStageAdvance(job.id)}
                   onClick={onJobClick ? () => onJobClick(job) : undefined}
                 />
