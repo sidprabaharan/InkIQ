@@ -501,7 +501,7 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
         tax: true,
         total: 1933.75,
         mockupImages: ['/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'],
-        status: 'Inks Mixed'
+        status: 'Ready to Print'
       }
     ],
     imprintSections: [
@@ -509,20 +509,35 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
         type: 'Screen Print',
         placement: 'Front Center',
         size: '8" x 6"',
-        colours: 'Navy & Gold',
-        notes: 'School mascot logo - official colors only. PMS 282 (Navy) & PMS 123 (Gold)',
+        colours: 'Navy Blue & Gold',
+        notes: 'School mascot logo - high detail required, use premium inks for durability',
         files: [
           {
             id: 'file-school-1',
-            name: 'wildcat-mascot-logo.ai',
-            type: 'Adobe Illustrator',
+            name: 'wildcat-mascot-vector.eps',
+            type: 'EPS Vector',
             url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
           },
           {
             id: 'file-school-2',
-            name: 'pms-color-guide.pdf',
+            name: 'school-colors-spec.pdf',
             type: 'PDF Document',
             url: '/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'
+          }
+        ]
+      },
+      {
+        type: 'Screen Print',
+        placement: 'Back Center',
+        size: '6" x 2"',
+        colours: 'Navy Blue',
+        notes: 'School name text - bold lettering for visibility',
+        files: [
+          {
+            id: 'file-school-3',
+            name: 'school-name-text.ai',
+            type: 'Adobe Illustrator',
+            url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
           }
         ]
       }
@@ -535,22 +550,271 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
       {
         id: 'product-trade-1',
         category: 'Apparel',
-        itemNumber: 'G8800',
+        itemNumber: 'BC3001',
         color: 'White',
-        description: 'Ultra Cotton Long Sleeve Polo - Gildan 8800',
+        description: 'Unisex Jersey Short Sleeve Tee - Bella + Canvas 3001',
+        sizes: {
+          xs: 20,
+          s: 40,
+          m: 60,
+          l: 50,
+          xl: 25,
+          xxl: 5,
+          xxxl: 0
+        },
+        quantity: 200,
+        price: 18.50,
+        tax: true,
+        total: 3700.00,
+        mockupImages: ['/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'],
+        status: 'Ready to Print'
+      },
+      {
+        id: 'product-trade-2',
+        category: 'Accessories',
+        itemNumber: 'BAG001',
+        color: 'Black',
+        description: 'Cotton Canvas Tote Bag',
         sizes: {
           xs: 0,
-          s: 10,
+          s: 0,
+          m: 0,
+          l: 0,
+          xl: 0,
+          xxl: 0,
+          xxxl: 100
+        },
+        quantity: 100,
+        price: 12.75,
+        tax: true,
+        total: 1275.00,
+        mockupImages: ['/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'],
+        status: 'Ink Mixed'
+      }
+    ],
+    imprintSections: [
+      {
+        type: 'Screen Print',
+        placement: 'Front Center',
+        size: '10" x 8"',
+        colours: 'Black, Red, Blue',
+        notes: 'Trade show logo with event date - use vibrant colors for booth visibility',
+        files: [
+          {
+            id: 'file-trade-1',
+            name: 'tradeshow-logo-2024.ai',
+            type: 'Adobe Illustrator',
+            url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
+          },
+          {
+            id: 'file-trade-2',
+            name: 'booth-setup-photo.jpg',
+            type: 'JPEG Image',
+            url: '/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'
+          }
+        ]
+      },
+      {
+        type: 'Screen Print',
+        placement: 'Back Upper',
+        size: '12" x 4"',
+        colours: 'Black',
+        notes: 'Event hashtag and website - use readable font size',
+        files: [
+          {
+            id: 'file-trade-3',
+            name: 'hashtag-design.ai',
+            type: 'Adobe Illustrator',
+            url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'group-9',
+    title: 'Brewery Merchandise Collection - Screen Print',
+    products: [
+      {
+        id: 'product-brew-1',
+        category: 'Apparel',
+        itemNumber: 'BC3001',
+        color: 'Heather Forest',
+        description: 'Unisex Jersey Short Sleeve Tee - Bella + Canvas 3001',
+        sizes: {
+          xs: 8,
+          s: 25,
+          m: 35,
+          l: 40,
+          xl: 20,
+          xxl: 12,
+          xxxl: 0
+        },
+        quantity: 140,
+        price: 26.50,
+        tax: true,
+        total: 3710.00,
+        mockupImages: ['/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'],
+        status: 'Inks Mixed'
+      },
+      {
+        id: 'product-brew-2',
+        category: 'Apparel',
+        itemNumber: 'G18500',
+        color: 'Charcoal',
+        description: 'Unisex Heavy Cotton Hoodie - Gildan 18500',
+        sizes: {
+          xs: 5,
+          s: 15,
+          m: 25,
+          l: 30,
+          xl: 15,
+          xxl: 10,
+          xxxl: 0
+        },
+        quantity: 100,
+        price: 42.00,
+        tax: true,
+        total: 4200.00,
+        mockupImages: ['/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'],
+        status: 'Ready to Print'
+      }
+    ],
+    imprintSections: [
+      {
+        type: 'Screen Print',
+        placement: 'Front Center',
+        size: '6" x 4"',
+        colours: 'White & Copper',
+        notes: 'Brewery logo with metallic copper accent - use specialty ink for premium finish',
+        files: [
+          {
+            id: 'file-brew-1',
+            name: 'brewery-logo-metallic.ai',
+            type: 'Adobe Illustrator',
+            url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
+          },
+          {
+            id: 'file-brew-2',
+            name: 'copper-ink-spec.pdf',
+            type: 'PDF Document',
+            url: '/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'
+          }
+        ]
+      },
+      {
+        type: 'Screen Print',
+        placement: 'Back Center',
+        size: '8" x 3"',
+        colours: 'White',
+        notes: 'Brewery tagline and established date - vintage style lettering',
+        files: [
+          {
+            id: 'file-brew-3',
+            name: 'brewery-tagline.ai',
+            type: 'Adobe Illustrator',
+            url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'group-10',
+    title: 'Fitness Center Staff Uniforms - Screen Print',
+    products: [
+      {
+        id: 'product-fitness-1',
+        category: 'Apparel',
+        itemNumber: 'BC3001',
+        color: 'Black',
+        description: 'Unisex Jersey Short Sleeve Tee - Bella + Canvas 3001',
+        sizes: {
+          xs: 5,
+          s: 15,
           m: 20,
           l: 25,
           xl: 15,
           xxl: 5,
           xxxl: 0
         },
-        quantity: 75,
-        price: 35.99,
+        quantity: 85,
+        price: 24.99,
         tax: true,
-        total: 2699.25,
+        total: 2124.15,
+        mockupImages: ['/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'],
+        status: 'Screens Burned'
+      },
+      {
+        id: 'product-fitness-2',
+        category: 'Apparel',
+        itemNumber: 'TANK001',
+        color: 'Grey',
+        description: 'Performance Tank Top',
+        sizes: {
+          xs: 8,
+          s: 12,
+          m: 18,
+          l: 20,
+          xl: 12,
+          xxl: 5,
+          xxxl: 0
+        },
+        quantity: 75,
+        price: 19.50,
+        tax: true,
+        total: 1462.50,
+        mockupImages: ['/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'],
+        status: 'Ready to Print'
+      }
+    ],
+    imprintSections: [
+      {
+        type: 'Screen Print',
+        placement: 'Front Center',
+        size: '5" x 3"',
+        colours: 'Neon Green & White',
+        notes: 'Fitness center logo with energetic colors - use athletic-grade inks for moisture resistance',
+        files: [
+          {
+            id: 'file-fitness-1',
+            name: 'fitness-logo-athletic.ai',
+            type: 'Adobe Illustrator',
+            url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
+          },
+          {
+            id: 'file-fitness-2',
+            name: 'athletic-ink-spec.pdf',
+            type: 'PDF Document',
+            url: '/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'group-11',
+    title: 'Real Estate Team Polo Shirts - Screen Print',
+    products: [
+      {
+        id: 'product-realestate-1',
+        category: 'Apparel',
+        itemNumber: 'G8800',
+        color: 'Navy',
+        description: 'Ultra Cotton Long Sleeve Polo - Gildan 8800',
+        sizes: {
+          xs: 2,
+          s: 8,
+          m: 15,
+          l: 18,
+          xl: 10,
+          xxl: 4,
+          xxxl: 1
+        },
+        quantity: 58,
+        price: 34.50,
+        tax: true,
+        total: 2001.00,
         mockupImages: ['/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'],
         status: 'Ready to Print'
       }
@@ -559,28 +823,131 @@ export const mockOrderBreakdownData: LineItemGroupData[] = [
       {
         type: 'Screen Print',
         placement: 'Left Chest',
-        size: '4" x 3"',
-        colours: 'Navy & Silver',
-        notes: 'Corporate branding for trade show booth staff - professional appearance required',
+        size: '3.5" x 2.5"',
+        colours: 'White & Gold',
+        notes: 'Professional real estate team logo - premium appearance required for client meetings',
         files: [
           {
-            id: 'file-trade-1',
-            name: 'company-brand-guidelines.pdf',
-            type: 'PDF Document',
+            id: 'file-realestate-1',
+            name: 'realestate-logo-professional.ai',
+            type: 'Adobe Illustrator',
             url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
           },
           {
-            id: 'file-trade-2',
-            name: 'logo-silver-metallic.ai',
-            type: 'Adobe Illustrator',
+            id: 'file-realestate-2',
+            name: 'team-roster.xlsx',
+            type: 'Excel Spreadsheet',
             url: '/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'
+          }
+        ]
+      },
+      {
+        type: 'Screen Print',
+        placement: 'Back Center',
+        size: '4" x 2"',
+        colours: 'White',
+        notes: 'Team contact information and tagline',
+        files: [
+          {
+            id: 'file-realestate-3',
+            name: 'contact-info-design.ai',
+            type: 'Adobe Illustrator',
+            url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
           }
         ]
       }
     ]
   },
   {
-    id: 'group-9',
+    id: 'group-12',
+    title: 'Tech Startup Employee Swag - Screen Print',
+    products: [
+      {
+        id: 'product-tech-1',
+        category: 'Apparel',
+        itemNumber: 'BC3001',
+        color: 'Heather Grey',
+        description: 'Unisex Jersey Short Sleeve Tee - Bella + Canvas 3001',
+        sizes: {
+          xs: 15,
+          s: 30,
+          m: 45,
+          l: 50,
+          xl: 25,
+          xxl: 10,
+          xxxl: 0
+        },
+        quantity: 175,
+        price: 22.00,
+        tax: true,
+        total: 3850.00,
+        mockupImages: ['/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'],
+        status: 'Ready to Print'
+      },
+      {
+        id: 'product-tech-2',
+        category: 'Apparel',
+        itemNumber: 'G18500',
+        color: 'Black',
+        description: 'Unisex Heavy Cotton Hoodie - Gildan 18500',
+        sizes: {
+          xs: 8,
+          s: 20,
+          m: 30,
+          l: 35,
+          xl: 20,
+          xxl: 12,
+          xxxl: 0
+        },
+        quantity: 125,
+        price: 45.00,
+        tax: true,
+        total: 5625.00,
+        mockupImages: ['/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'],
+        status: 'Artwork Approved'
+      }
+    ],
+    imprintSections: [
+      {
+        type: 'Screen Print',
+        placement: 'Front Center',
+        size: '7" x 5"',
+        colours: 'Electric Blue, White, Orange',
+        notes: 'Modern tech company logo with gradient effect - use specialty inks for color blend',
+        files: [
+          {
+            id: 'file-tech-1',
+            name: 'tech-logo-gradient.ai',
+            type: 'Adobe Illustrator',
+            url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
+          },
+          {
+            id: 'file-tech-2',
+            name: 'gradient-print-guide.pdf',
+            type: 'PDF Document',
+            url: '/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png'
+          }
+        ]
+      },
+      {
+        type: 'Screen Print',
+        placement: 'Left Sleeve',
+        size: '2" x 1"',
+        colours: 'Electric Blue',
+        notes: 'Small company initials on sleeve',
+        files: [
+          {
+            id: 'file-tech-3',
+            name: 'company-initials.ai',
+            type: 'Adobe Illustrator',
+            url: '/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'group-99',
     title: 'Embroidery',
     products: [
       {
