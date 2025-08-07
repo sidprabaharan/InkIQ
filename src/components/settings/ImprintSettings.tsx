@@ -333,7 +333,7 @@ export function ImprintSettings() {
                   <SelectTrigger>
                     <SelectValue placeholder="Choose an imprint method" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-background border border-border shadow-lg z-50">
                     {availableMethods.map(method => (
                       <SelectItem key={method.value} value={method.value}>
                         {method.label}
