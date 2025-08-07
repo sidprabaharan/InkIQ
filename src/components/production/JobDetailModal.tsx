@@ -131,10 +131,13 @@ export function JobDetailModal({
                       {dependentJobs.length > 0 && (
                         <div>
                           {dependentJobs.map(depJob => (
-                            <div key={depJob.id} className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3 transition-colors">
+                            <div key={depJob.id} className={cn(
+                              "border rounded-lg p-3 mb-3 transition-colors",
+                              depJob.orderGroupColor
+                            )}>
                               <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-2">
-                                  <span className="font-medium text-sm text-orange-900">{depJob.jobNumber}</span>
+                                  <span className="font-medium text-sm">{depJob.jobNumber}</span>
                                   {depJob.sequenceOrder && (
                                     <Badge variant="outline" className="text-xs">
                                       Step {depJob.sequenceOrder}
@@ -171,8 +174,8 @@ export function JobDetailModal({
                                   </div>
                                 )}
                                 <div className="flex-1">
-                                  <p className="text-sm font-medium text-orange-900 mb-1">{depJob.description}</p>
-                                  <div className="grid grid-cols-2 gap-2 text-xs text-orange-700">
+                                  <p className="text-sm font-medium mb-1">{depJob.description}</p>
+                                  <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
                                     <div className="flex items-center gap-1">
                                       <MapPin className="h-3 w-3" />
                                       <span>{depJob.placement}</span>
@@ -197,25 +200,27 @@ export function JobDetailModal({
                       )}
                       {blockingJobs.length > 0 && (
                         <div>
-                          <p className="text-sm font-medium mb-2">Waiting for this job:</p>
                           {blockingJobs.map(blockJob => (
-                            <div key={blockJob.id} className="bg-blue-50 border border-blue-200 rounded-lg p-3 transition-colors">
+                            <div key={blockJob.id} className={cn(
+                              "border rounded-lg p-3 transition-colors",
+                              blockJob.orderGroupColor
+                            )}>
                               <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-2">
-                                  <span className="font-medium text-sm text-blue-900">{blockJob.jobNumber}</span>
+                                  <span className="font-medium text-sm">{blockJob.jobNumber}</span>
                                   {blockJob.sequenceOrder && (
                                     <Badge variant="outline" className="text-xs">
                                       Step {blockJob.sequenceOrder}
                                     </Badge>
                                   )}
                                 </div>
-                                <Badge variant="outline" className="text-xs">
+                                <Badge variant={blockJob.status === "scheduled" ? "default" : "secondary"} className="text-xs">
                                   {blockJob.status.replace("_", " ")}
                                 </Badge>
                               </div>
                               <div className="flex gap-3 mb-3">
                                 {blockJob.mockupImage && (
-                                  <div className="w-16 h-16 rounded border overflow-hidden bg-white flex-shrink-0">
+                                  <div className="w-16 h-16 rounded border overflow-hidden bg-muted flex-shrink-0">
                                     <img 
                                       src={blockJob.mockupImage} 
                                       alt="Job mockup" 
@@ -227,7 +232,7 @@ export function JobDetailModal({
                                   </div>
                                 )}
                                 {blockJob.imprintLogo && (
-                                  <div className="w-16 h-16 rounded border overflow-hidden bg-white flex-shrink-0">
+                                  <div className="w-16 h-16 rounded border overflow-hidden bg-muted flex-shrink-0">
                                     <img 
                                       src={blockJob.imprintLogo} 
                                       alt="Imprint logo" 
@@ -239,8 +244,8 @@ export function JobDetailModal({
                                   </div>
                                 )}
                                 <div className="flex-1">
-                                  <p className="text-sm font-medium text-blue-900 mb-1">{blockJob.description}</p>
-                                  <div className="grid grid-cols-2 gap-2 text-xs text-blue-700">
+                                  <p className="text-sm font-medium mb-1">{blockJob.description}</p>
+                                  <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
                                     <div className="flex items-center gap-1">
                                       <MapPin className="h-3 w-3" />
                                       <span>{blockJob.placement}</span>
@@ -259,6 +264,13 @@ export function JobDetailModal({
                                   </div>
                                 </div>
                               </div>
+                              {blockJob.scheduledStart && (
+                                <div className="pt-2 border-t border-border">
+                                  <p className="text-xs text-muted-foreground">
+                                    Scheduled: {format(blockJob.scheduledStart, "MMM d, h:mm a")}
+                                  </p>
+                                </div>
+                              )}
                             </div>
                           ))}
                         </div>
