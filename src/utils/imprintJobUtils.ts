@@ -27,7 +27,15 @@ export function convertOrderBreakdownToImprintJobs(): ImprintJob[] {
   const orderDetails = [
     { orderId: "ORD-24-1001", customerName: "TechCorp Solutions", dueDate: new Date(2024, 11, 20) },
     { orderId: "ORD-24-1002", customerName: "Creative Studios", dueDate: new Date(2024, 11, 18) },
-    { orderId: "ORD-24-1003", customerName: "Local Restaurant", dueDate: new Date(2024, 11, 25) }
+    { orderId: "ORD-24-1003", customerName: "Local Restaurant", dueDate: new Date(2024, 11, 25) },
+    { orderId: "ORD-24-1004", customerName: "Metro Sports Academy", dueDate: new Date(2024, 11, 15) },
+    { orderId: "ORD-24-1005", customerName: "Bistro & Grill Chain", dueDate: new Date(2024, 11, 22) },
+    { orderId: "ORD-24-1006", customerName: "SoundWave Festival", dueDate: new Date(2024, 11, 12) },
+    { orderId: "ORD-24-1007", customerName: "United Charity Foundation", dueDate: new Date(2024, 11, 28) },
+    { orderId: "ORD-24-1008", customerName: "Wildcat High School", dueDate: new Date(2024, 11, 19) },
+    { orderId: "ORD-24-1009", customerName: "Global Trade Expo", dueDate: new Date(2024, 11, 14) },
+    { orderId: "ORD-24-1010", customerName: "Premium Embroidery Co", dueDate: new Date(2024, 11, 30) },
+    { orderId: "ORD-24-1011", customerName: "Digital Design Studio", dueDate: new Date(2024, 11, 21) }
   ];
 
   mockOrderBreakdownData.forEach((lineItemGroup, groupIndex) => {
@@ -43,6 +51,10 @@ export function convertOrderBreakdownToImprintJobs(): ImprintJob[] {
       // Create job number with sequence
       const jobNumber = `${orderDetail.orderId.split('-').pop()}-${String.fromCharCode(65 + sectionIndex)}`;
 
+      // Determine if this should be a print-ready screen printing job
+      const isScreenPrint = decorationMethod === "screen_printing";
+      const shouldBeAtPrintStage = isScreenPrint && groupIndex < 7; // First 7 screen print groups
+      
       const imprintJob: ImprintJob = {
         id: `imprint-job-${jobCounter++}`,
         jobNumber,
@@ -74,7 +86,7 @@ export function convertOrderBreakdownToImprintJobs(): ImprintJob[] {
         setupRequired: true,
         sequenceOrder: sectionIndex,
         orderGroupColor: getOrderGroupColor(groupIndex),
-        currentStage: getInitialStage(decorationMethod),
+        currentStage: shouldBeAtPrintStage ? "print" : getInitialStage(decorationMethod),
         
         // Visual elements - placeholder images for now
         mockupImage: getMockupImageForProduct(lineItemGroup.products[0]?.itemNumber || ""),
