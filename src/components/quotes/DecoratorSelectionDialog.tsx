@@ -5,8 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Star, MapPin, Clock, DollarSign, Filter } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Star, MapPin, Clock, DollarSign, Filter, ChevronDown } from "lucide-react";
 import { Decorator } from "@/types/decorator";
 import { useToast } from "@/hooks/use-toast";
 
@@ -288,9 +289,7 @@ export function DecoratorSelectionDialog({
   const [selectedDecorator, setSelectedDecorator] = useState<string | null>(null);
   const [selectedState, setSelectedState] = useState<string>("all");
   const [selectedVerification, setSelectedVerification] = useState<string>("all");
-  const [selectedNetwork, setSelectedNetwork] = useState<string>("all");
-  const [minQualityRating, setMinQualityRating] = useState([4.0]);
-  const [minOnTimeRating, setMinOnTimeRating] = useState([4.0]);
+  const [selectedNetworks, setSelectedNetworks] = useState<string[]>([]);
   const { toast } = useToast();
 
   const filteredDecorators = mockDecorators.filter(decorator => {
@@ -300,16 +299,19 @@ export function DecoratorSelectionDialog({
     
     const matchesState = selectedState === "all" || decorator.address.state === selectedState;
     const matchesVerification = selectedVerification === "all" || decorator.verificationStatus === selectedVerification;
-    const matchesNetwork = selectedNetwork === "all" || 
-      (selectedNetwork === "none" && (!decorator.networks || decorator.networks.length === 0)) ||
-      (decorator.networks && decorator.networks.includes(selectedNetwork));
-    const matchesQuality = decorator.qualityRating >= minQualityRating[0];
-    const matchesOnTime = decorator.onTimeRating >= minOnTimeRating[0];
+    const matchesNetwork = selectedNetworks.length === 0 || 
+      (selectedNetworks.includes("none") && (!decorator.networks || decorator.networks.length === 0)) ||
+      (decorator.networks && selectedNetworks.some(network => decorator.networks!.includes(network)));
     
-    return matchesSearch && matchesState && matchesVerification && matchesNetwork && matchesQuality && matchesOnTime;
+    return matchesSearch && matchesState && matchesVerification && matchesNetwork;
   });
 
   const uniqueStates = Array.from(new Set(mockDecorators.map(d => d.address.state))).sort();
+  
+  const availableNetworks = [
+    "S&S Activewear Contract Decorator Network",
+    "Sanmar PSST Network"
+  ];
 
   const renderRating = (rating: number) => {
     return (
@@ -344,13 +346,13 @@ export function DecoratorSelectionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl h-[85vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>Select Decorator for Quote #{quoteId}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
+        <div className="flex-1 flex flex-col min-h-0 space-y-4">
+          <div className="flex-shrink-0 flex items-center justify-between">
             <Input
               placeholder="Search by name or location..."
               value={searchTerm}
@@ -363,7 +365,7 @@ export function DecoratorSelectionDialog({
           </div>
 
           {/* Filters */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-4 bg-muted/30 rounded-lg">
+          <div className="flex-shrink-0 grid grid-cols-3 gap-4 p-4 bg-muted/30 rounded-lg">
             <div className="space-y-2">
               <label className="text-xs font-medium text-muted-foreground">State</label>
               <Select value={selectedState} onValueChange={setSelectedState}>
@@ -394,46 +396,73 @@ export function DecoratorSelectionDialog({
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground">Network</label>
-              <Select value={selectedNetwork} onValueChange={setSelectedNetwork}>
-                <SelectTrigger className="h-8 bg-background border shadow-sm">
-                  <SelectValue placeholder="All Networks" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border shadow-lg z-50">
-                  <SelectItem value="all">All Networks</SelectItem>
-                  <SelectItem value="S&S Activewear Contract Decorator Network">S&S Activewear</SelectItem>
-                  <SelectItem value="Sanmar PSST Network">Sanmar PSST</SelectItem>
-                  <SelectItem value="none">Independent</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground">Min Quality Rating: {minQualityRating[0]}</label>
-              <Slider
-                value={minQualityRating}
-                onValueChange={setMinQualityRating}
-                max={5}
-                min={1}
-                step={0.1}
-                className="w-full"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground">Min On-Time Rating: {minOnTimeRating[0]}</label>
-              <Slider
-                value={minOnTimeRating}
-                onValueChange={setMinOnTimeRating}
-                max={5}
-                min={1}
-                step={0.1}
-                className="w-full"
-              />
+              <label className="text-xs font-medium text-muted-foreground">Networks</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="h-8 w-full justify-between text-left font-normal bg-background border shadow-sm"
+                  >
+                    <span className="truncate">
+                      {selectedNetworks.length === 0 
+                        ? "All Networks" 
+                        : selectedNetworks.length === 1 
+                          ? selectedNetworks[0] === "S&S Activewear Contract Decorator Network" ? "S&S Activewear" : 
+                            selectedNetworks[0] === "Sanmar PSST Network" ? "Sanmar PSST" : 
+                            selectedNetworks[0] === "none" ? "Independent" : selectedNetworks[0]
+                          : `${selectedNetworks.length} selected`
+                      }
+                    </span>
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0 bg-background border shadow-lg z-50" align="start">
+                  <div className="p-2 space-y-2">
+                    {availableNetworks.map((network) => (
+                      <div key={network} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={network}
+                          checked={selectedNetworks.includes(network)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedNetworks([...selectedNetworks, network]);
+                            } else {
+                              setSelectedNetworks(selectedNetworks.filter(n => n !== network));
+                            }
+                          }}
+                        />
+                        <label 
+                          htmlFor={network} 
+                          className="text-sm cursor-pointer"
+                        >
+                          {network === "S&S Activewear Contract Decorator Network" ? "S&S Activewear" : 
+                           network === "Sanmar PSST Network" ? "Sanmar PSST" : network}
+                        </label>
+                      </div>
+                    ))}
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="none"
+                        checked={selectedNetworks.includes("none")}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedNetworks([...selectedNetworks, "none"]);
+                          } else {
+                            setSelectedNetworks(selectedNetworks.filter(n => n !== "none"));
+                          }
+                        }}
+                      />
+                      <label htmlFor="none" className="text-sm cursor-pointer">
+                        Independent
+                      </label>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="flex-1 overflow-y-auto space-y-4">
             {filteredDecorators.map((decorator) => (
               <Card 
                 key={decorator.id} 
@@ -485,27 +514,12 @@ export function DecoratorSelectionDialog({
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Network badges */}
-                  {decorator.networks && decorator.networks.length > 0 && (
-                    <div className="mt-3">
-                      <div className="text-xs text-muted-foreground mb-1">Network Member</div>
-                      <div className="flex flex-wrap gap-1">
-                        {decorator.networks.map((network, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {network === "S&S Activewear Contract Decorator Network" ? "S&S Activewear" : 
-                             network === "Sanmar PSST Network" ? "Sanmar PSST" : network}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             ))}
           </div>
 
-          <div className="flex justify-end gap-2 pt-4 border-t">
+          <div className="flex-shrink-0 flex justify-end gap-2 pt-4 border-t bg-background">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
