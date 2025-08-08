@@ -117,7 +117,6 @@ export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           alt="InkIQ Logo" 
           className="h-8 w-auto"
         />
-        {!collapsed && <span className="font-semibold text-xl">InkIQ</span>}
       </div>
       
       <div className="relative">
