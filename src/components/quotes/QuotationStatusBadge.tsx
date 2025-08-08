@@ -6,7 +6,7 @@ interface QuotationStatusBadgeProps {
 }
 
 const statusVariants = cva(
-  "inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-normal",
+  "inline-flex items-center justify-center rounded-md px-3 py-1 text-sm font-medium",
   {
     variants: {
       variant: {

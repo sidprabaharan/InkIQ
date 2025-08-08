@@ -188,15 +188,17 @@ export function QuotationTable({ isInvoicesPage = false }: QuotationTableProps) 
   const [lineItemStatuses, setLineItemStatuses] = useState<{[key: string]: string}>({});
   
   // Filter data based on whether we're on the Quotes or Invoices page
-  const quotationsData = allQuotationsData.filter(quotation => {
-    if (isInvoicesPage) {
-      // For invoices page, show everything that's NOT a quote status
-      return !quoteStatuses.includes(quotation.status);
-    } else {
-      // For quotes page, only show quote statuses
-      return quoteStatuses.includes(quotation.status);
-    }
-  });
+  const quotationsData = allQuotationsData
+    .filter(quotation => {
+      if (isInvoicesPage) {
+        // For invoices page, show everything that's NOT a quote status
+        return !quoteStatuses.includes(quotation.status);
+      } else {
+        // For quotes page, only show quote statuses
+        return quoteStatuses.includes(quotation.status);
+      }
+    })
+    .sort((a, b) => parseInt(b.id) - parseInt(a.id)); // Sort by ID descending
   
   const handleRowClick = (quotationId: string) => {
     navigate(`/quotes/${quotationId}`);
