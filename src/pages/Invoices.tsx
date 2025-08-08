@@ -16,6 +16,7 @@ export default function Invoices() {
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [ownerFilter, setOwnerFilter] = useState<string>("all");
   
   // Mock function to calculate filtered totals based on date range and status
   const getFilteredTotals = () => {
@@ -28,7 +29,7 @@ export default function Invoices() {
     };
     
     // Apply mock filtering logic (in real app, filter actual data)
-    const filterMultiplier = (dateFrom || dateTo || statusFilter !== "all") ? 0.7 : 1;
+    const filterMultiplier = (dateFrom || dateTo || statusFilter !== "all" || ownerFilter !== "all") ? 0.7 : 1;
     
     return {
       total: Math.round(baseAmounts.total * filterMultiplier),
@@ -71,6 +72,7 @@ export default function Invoices() {
     setDateFrom(undefined);
     setDateTo(undefined);
     setStatusFilter("all");
+    setOwnerFilter("all");
   };
 
   return (
@@ -167,8 +169,34 @@ export default function Invoices() {
             </Select>
           </div>
 
+          {/* Owner Filter */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">Owner:</span>
+            <Select value={ownerFilter} onValueChange={setOwnerFilter}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Owners</SelectItem>
+                <SelectItem value="shahid">Shahid Raja</SelectItem>
+                <SelectItem value="kiri">Kiri</SelectItem>
+                <SelectItem value="jhon">Jhon</SelectItem>
+                <SelectItem value="kamelia">Kamelia</SelectItem>
+                <SelectItem value="picanto">Picanto</SelectItem>
+                <SelectItem value="helper">Helper</SelectItem>
+                <SelectItem value="jessica">Jessica</SelectItem>
+                <SelectItem value="michael">Michael</SelectItem>
+                <SelectItem value="emma">Emma</SelectItem>
+                <SelectItem value="tim">Tim</SelectItem>
+                <SelectItem value="sarah">Sarah</SelectItem>
+                <SelectItem value="kiriakos">Kiriakos</SelectItem>
+                <SelectItem value="noraiz">Noraiz shahid</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Clear Filters */}
-          {(dateFrom || dateTo || statusFilter !== "all") && (
+          {(dateFrom || dateTo || statusFilter !== "all" || ownerFilter !== "all") && (
             <Button variant="outline" size="sm" onClick={clearFilters}>
               Clear Filters
             </Button>
