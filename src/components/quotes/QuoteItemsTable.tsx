@@ -344,7 +344,7 @@ export function QuoteItemsTable({ itemGroups, quoteId }: QuoteItemsTableProps) {
                       <div className="text-sm">{item.sizes.xxl || 0}</div>
                     </TableCell>
                     <TableCell className="p-2 text-center border-r border-gray-200">
-                      <div className="text-sm font-medium">{item.category === 'Hats' ? totalQuantity : '0'}</div>
+                      <div className="text-sm">{item.category === 'Hats' ? totalQuantity : '0'}</div>
                     </TableCell>
                     <TableCell className="p-2 border-r border-gray-200">
                       <div className="text-sm">${typeof item.price === 'number' ? item.price.toFixed(2) : parseFloat(item.price.toString().replace(/[$,]/g, '')).toFixed(2)}</div>
