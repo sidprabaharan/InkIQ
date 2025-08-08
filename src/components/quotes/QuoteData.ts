@@ -328,8 +328,8 @@ export const quotationData: QuotationData = {
 
 // Additional sample quote data for different IDs
 export const sampleQuoteData: Record<string, QuotationData> = {
-  "quote-western-alliance-001": {
-    id: "quote-western-alliance-001",
+  "3046": {
+    id: "3046",
     nickname: "Western Alliance Transport Staff Merchandise",
     company: {
       name: "15493315 Canada Inc",

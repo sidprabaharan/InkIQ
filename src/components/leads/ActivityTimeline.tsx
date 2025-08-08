@@ -134,7 +134,7 @@ const mockActivities: LeadActivity[] = [
     description: 'Formal quote with mockups sent to customer',
     timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     metadata: {
-      quoteId: 'quote-western-alliance-001',
+      quoteId: '3046',
       totalAmount: 12000,
       products: ['T-Shirts (140 units)', 'Hoodies (140 units)', 'Hats (140 units)']
     }

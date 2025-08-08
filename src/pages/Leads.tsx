@@ -49,7 +49,7 @@ const initialLeads: Lead[] = [
     lastEnrichedAt: new Date().toISOString(),
     totalActivities: 6,
     lastActivityType: 'email',
-    quoteId: 'quote-western-alliance-001'
+    quoteId: '3046'
   },
   {
     id: '1',

@@ -40,7 +40,7 @@ const quoteStatuses = ["Quote", "Quote Approval Sent", "Quote Approved"];
 const allQuotationsData: Quotation[] = [
   // Quotes data - will show on Quotes page
   {
-    id: "quote-western-alliance-001",
+    id: "3046",
     customer: "Western Alliance Transport",
     dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-CA'),
     owner: "Kiriakos",
