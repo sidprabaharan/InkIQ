@@ -490,9 +490,9 @@ export const sampleQuoteData: Record<string, QuotationData> = {
         customerArt: [
           {
             id: "customer-art-wat-logo",
-            name: "western-alliance-main-logo.ai",
-            url: "/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png",
-            type: "application/postscript",
+            name: "western-alliance-main-logo.png",
+            url: "/lovable-uploads/4916f36f-5c0f-4f85-b192-02a45d68a412.png",
+            type: "image/png",
             category: "customerArt"
           }
         ],
@@ -525,9 +525,9 @@ export const sampleQuoteData: Record<string, QuotationData> = {
         customerArt: [
           {
             id: "customer-art-wat-slogan",
-            name: "western-alliance-slogan.ai",
-            url: "/public/lovable-uploads/d2507023-d2d7-428d-b225-4442856795ff.png",
-            type: "application/postscript",
+            name: "western-alliance-slogan.png",
+            url: "/lovable-uploads/4916f36f-5c0f-4f85-b192-02a45d68a412.png",
+            type: "image/png",
             category: "customerArt"
           }
         ],
@@ -560,9 +560,9 @@ export const sampleQuoteData: Record<string, QuotationData> = {
         customerArt: [
           {
             id: "customer-art-wat-logo-embroidery",
-            name: "western-alliance-logo-embroidery.dst",
-            url: "/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png",
-            type: "application/octet-stream",
+            name: "western-alliance-logo-embroidery.png",
+            url: "/lovable-uploads/4916f36f-5c0f-4f85-b192-02a45d68a412.png",
+            type: "image/png",
             category: "customerArt"
           }
         ],
