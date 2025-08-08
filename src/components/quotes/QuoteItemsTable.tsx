@@ -299,7 +299,7 @@ export function QuoteItemsTable({ itemGroups, quoteId }: QuoteItemsTableProps) {
               <TableHead className="py-2 text-xs uppercase text-center w-[4%]">L</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[4%]">XL</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[4%]">2XL</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[4%]">3XL</TableHead>
+              <TableHead className="py-2 text-xs uppercase text-center w-[4%]">QTY</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">Price</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">Taxed</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[6%]">Total</TableHead>
@@ -344,7 +344,7 @@ export function QuoteItemsTable({ itemGroups, quoteId }: QuoteItemsTableProps) {
                       <div className="text-sm">{item.sizes.xxl || 0}</div>
                     </TableCell>
                     <TableCell className="p-2 text-center border-r border-gray-200">
-                      <div className="text-sm">{item.sizes.xxxl || 0}</div>
+                      <div className="text-sm font-medium">{totalQuantity}</div>
                     </TableCell>
                     <TableCell className="p-2 border-r border-gray-200">
                       <div className="text-sm">${typeof item.price === 'number' ? item.price.toFixed(2) : parseFloat(item.price.toString().replace(/[$,]/g, '')).toFixed(2)}</div>
