@@ -95,6 +95,28 @@ export function ProductFilters({
   return (
     <div className="w-64 border-r p-0 overflow-hidden bg-white flex-shrink-0 flex flex-col h-full">
       <div className="flex flex-col h-full">
+        {/* View Options Checkboxes */}
+        <div className="border-b p-4">
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="hide-prices" 
+                checked={!showPrices} 
+                onCheckedChange={(checked) => setShowPrices(!checked)} 
+              />
+              <Label htmlFor="hide-prices" className="text-sm text-gray-700">Hide Prices</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="show-vendors" 
+                checked={showVendors} 
+                onCheckedChange={setShowVendors} 
+              />
+              <Label htmlFor="show-vendors" className="text-sm text-gray-700">Show Only Synced Vendors</Label>
+            </div>
+          </div>
+        </div>
+        
         <ScrollArea className="flex-1">
           {/* Brands Filter */}
           <div className="border-b">
@@ -217,28 +239,6 @@ export function ProductFilters({
             )}
           </div>
         </ScrollArea>
-        
-        {/* View Options Checkboxes */}
-        <div className="border-t p-4">
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="hide-prices" 
-                checked={!showPrices} 
-                onCheckedChange={(checked) => setShowPrices(!checked)} 
-              />
-              <Label htmlFor="hide-prices" className="text-sm text-gray-700">Hide Prices</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="show-vendors" 
-                checked={showVendors} 
-                onCheckedChange={setShowVendors} 
-              />
-              <Label htmlFor="show-vendors" className="text-sm text-gray-700">Show Only Synced Vendors</Label>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
