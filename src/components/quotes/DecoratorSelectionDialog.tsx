@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Star, MapPin, Clock, DollarSign } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Star, MapPin, Clock, DollarSign, Filter } from "lucide-react";
 import { Decorator } from "@/types/decorator";
 import { useToast } from "@/hooks/use-toast";
 
@@ -21,6 +23,7 @@ const mockDecorators: Decorator[] = [
       state: "GA",
       zipCode: "30309"
     },
+    networks: ["S&S Activewear Contract Decorator Network"],
     capabilities: [
       {
         method: "screen_printing",
@@ -72,6 +75,7 @@ const mockDecorators: Decorator[] = [
       state: "NC", 
       zipCode: "28202"
     },
+    networks: ["Sanmar PSST Network"],
     capabilities: [
       {
         method: "embroidery",
@@ -112,6 +116,7 @@ const mockDecorators: Decorator[] = [
       state: "TX",
       zipCode: "73301"
     },
+    networks: ["S&S Activewear Contract Decorator Network"],
     capabilities: [
       {
         method: "screen_printing",
@@ -152,6 +157,7 @@ const mockDecorators: Decorator[] = [
       state: "CA",
       zipCode: "92101"
     },
+    networks: [],
     capabilities: [
       {
         method: "screen_printing",
@@ -177,7 +183,7 @@ const mockDecorators: Decorator[] = [
     },
     qualityRating: 4.7,
     onTimeRating: 4.6,
-    verificationStatus: "verified",
+    verificationStatus: "pending",
     createdAt: new Date(),
     updatedAt: new Date()
   },
@@ -192,6 +198,7 @@ const mockDecorators: Decorator[] = [
       state: "IL",
       zipCode: "60607"
     },
+    networks: ["Sanmar PSST Network"],
     capabilities: [
       {
         method: "embroidery",
@@ -232,6 +239,7 @@ const mockDecorators: Decorator[] = [
       state: "CO",
       zipCode: "80202"
     },
+    networks: ["S&S Activewear Contract Decorator Network", "Sanmar PSST Network"],
     capabilities: [
       {
         method: "screen_printing",
@@ -278,13 +286,30 @@ export function DecoratorSelectionDialog({
 }: DecoratorSelectionDialogProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDecorator, setSelectedDecorator] = useState<string | null>(null);
+  const [selectedState, setSelectedState] = useState<string>("all");
+  const [selectedVerification, setSelectedVerification] = useState<string>("all");
+  const [selectedNetwork, setSelectedNetwork] = useState<string>("all");
+  const [minQualityRating, setMinQualityRating] = useState([4.0]);
+  const [minOnTimeRating, setMinOnTimeRating] = useState([4.0]);
   const { toast } = useToast();
 
-  const filteredDecorators = mockDecorators.filter(decorator =>
-    decorator.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    decorator.address.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    decorator.address.state.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredDecorators = mockDecorators.filter(decorator => {
+    const matchesSearch = decorator.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      decorator.address.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      decorator.address.state.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesState = selectedState === "all" || decorator.address.state === selectedState;
+    const matchesVerification = selectedVerification === "all" || decorator.verificationStatus === selectedVerification;
+    const matchesNetwork = selectedNetwork === "all" || 
+      (selectedNetwork === "none" && (!decorator.networks || decorator.networks.length === 0)) ||
+      (decorator.networks && decorator.networks.includes(selectedNetwork));
+    const matchesQuality = decorator.qualityRating >= minQualityRating[0];
+    const matchesOnTime = decorator.onTimeRating >= minOnTimeRating[0];
+    
+    return matchesSearch && matchesState && matchesVerification && matchesNetwork && matchesQuality && matchesOnTime;
+  });
+
+  const uniqueStates = Array.from(new Set(mockDecorators.map(d => d.address.state))).sort();
 
   const renderRating = (rating: number) => {
     return (
@@ -334,6 +359,77 @@ export function DecoratorSelectionDialog({
             />
             <div className="text-sm text-muted-foreground">
               <span className="font-medium text-primary">134 verified contract decorators</span> found who can deliver this job on time
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-4 bg-muted/30 rounded-lg">
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground">State</label>
+              <Select value={selectedState} onValueChange={setSelectedState}>
+                <SelectTrigger className="h-8 bg-background border shadow-sm">
+                  <SelectValue placeholder="All States" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border shadow-lg z-50">
+                  <SelectItem value="all">All States</SelectItem>
+                  {uniqueStates.map(state => (
+                    <SelectItem key={state} value={state}>{state}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground">Verification</label>
+              <Select value={selectedVerification} onValueChange={setSelectedVerification}>
+                <SelectTrigger className="h-8 bg-background border shadow-sm">
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border shadow-lg z-50">
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="verified">Verified</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground">Network</label>
+              <Select value={selectedNetwork} onValueChange={setSelectedNetwork}>
+                <SelectTrigger className="h-8 bg-background border shadow-sm">
+                  <SelectValue placeholder="All Networks" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border shadow-lg z-50">
+                  <SelectItem value="all">All Networks</SelectItem>
+                  <SelectItem value="S&S Activewear Contract Decorator Network">S&S Activewear</SelectItem>
+                  <SelectItem value="Sanmar PSST Network">Sanmar PSST</SelectItem>
+                  <SelectItem value="none">Independent</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground">Min Quality Rating: {minQualityRating[0]}</label>
+              <Slider
+                value={minQualityRating}
+                onValueChange={setMinQualityRating}
+                max={5}
+                min={1}
+                step={0.1}
+                className="w-full"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground">Min On-Time Rating: {minOnTimeRating[0]}</label>
+              <Slider
+                value={minOnTimeRating}
+                onValueChange={setMinOnTimeRating}
+                max={5}
+                min={1}
+                step={0.1}
+                className="w-full"
+              />
             </div>
           </div>
 
@@ -389,6 +485,21 @@ export function DecoratorSelectionDialog({
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Network badges */}
+                  {decorator.networks && decorator.networks.length > 0 && (
+                    <div className="mt-3">
+                      <div className="text-xs text-muted-foreground mb-1">Network Member</div>
+                      <div className="flex flex-wrap gap-1">
+                        {decorator.networks.map((network, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {network === "S&S Activewear Contract Decorator Network" ? "S&S Activewear" : 
+                             network === "Sanmar PSST Network" ? "Sanmar PSST" : network}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}

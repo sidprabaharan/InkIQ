@@ -9,6 +9,7 @@ export interface Decorator {
     state: string;
     zipCode: string;
   };
+  networks?: string[]; // Network memberships like S&S Activewear, Sanmar PSST
   capabilities: ImprintCapability[];
   pricing: DecoratorPricing;
   capacity: {
