@@ -208,10 +208,7 @@ export function HourlyTimeSlot({
             }}
           >
             <div 
-              className={cn(
-                "h-full transition-all",
-                spansNextHour && "border-b-2 border-b-dashed border-b-primary"
-              )}
+              className="h-full transition-all"
               draggable
               onDragStart={(e) => {
                 e.dataTransfer.setData("application/json", JSON.stringify({
@@ -232,12 +229,6 @@ export function HourlyTimeSlot({
                 className="h-full min-h-[48px] text-xs"
               />
             </div>
-            
-            {spansNextHour && (
-              <div className="absolute -bottom-1 right-1 bg-primary text-primary-foreground text-xs px-1 py-0.5 rounded z-20">
-                Continues...
-              </div>
-            )}
           </div>
         ))}
       </div>
