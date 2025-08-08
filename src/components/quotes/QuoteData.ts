@@ -381,7 +381,7 @@ export const sampleQuoteData: Record<string, QuotationData> = {
     items: [
       {
         category: "T-Shirts",
-        itemNumber: "Gildan-5000",
+        itemNumber: "5000",
         color: "Black",
         description: "Gildan 5000 - 100% cotton, boxy fit, durable",
         xs: "0",
@@ -413,7 +413,7 @@ export const sampleQuoteData: Record<string, QuotationData> = {
       },
       {
         category: "Hoodies",
-        itemNumber: "CC-1467",
+        itemNumber: "1467",
         color: "Black",
         description: "Comfort Colors 1467 - Lightweight, soft cotton hoodie",
         xs: "0",
@@ -445,7 +445,7 @@ export const sampleQuoteData: Record<string, QuotationData> = {
       },
       {
         category: "Hats",
-        itemNumber: "VC-300A",
+        itemNumber: "VC300A",
         color: "White",
         description: "Valucap VC300A - Unstructured, buckle closure",
         xs: "0",
