@@ -713,7 +713,9 @@ export function ShippingLabelDialog({
           </div>
           
           <div className="space-y-3">
-            {mockFreightQuotes.map((quote) => (
+            {mockFreightQuotes
+              .sort((a, b) => a.price - b.price)
+              .map((quote) => (
               <div 
                 key={quote.id}
                 className={`border rounded-lg p-4 cursor-pointer transition-all ${
