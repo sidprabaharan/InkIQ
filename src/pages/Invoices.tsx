@@ -16,13 +16,7 @@ export default function Invoices() {
       period: "last month"
     },
     {
-      title: "1-15 Days Past Due",
-      amount: "$287,442",
-      percentage: 15,
-      period: "last month"
-    },
-    {
-      title: "15-30 Days Past Due",
+      title: "1-30 Days Past Due",
       amount: "$421,392",
       percentage: 28,
       period: "last month"
@@ -53,7 +47,7 @@ export default function Invoices() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         {summaryCards.map((card, index) => (
           <QuoteSummaryCard
             key={index}
