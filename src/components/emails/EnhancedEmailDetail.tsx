@@ -66,6 +66,83 @@ export function EnhancedEmailDetail({
     document.body.removeChild(link);
   };
 
+  // Parse the threaded conversation from content
+  const parseConversation = (content: string) => {
+    const messages = [];
+    const parts = content.split('---').filter(part => part.trim());
+    
+    for (const part of parts) {
+      const trimmedPart = part.trim();
+      
+      // Check if it's an AI response (contains the AI badge)
+      if (trimmedPart.includes('AI-Generated Response')) {
+        const lines = trimmedPart.split('\n');
+        let fromLine = lines.find(line => line.startsWith('**From:'));
+        let dateLine = lines.find(line => line.startsWith('**Date:'));
+        
+        if (fromLine && dateLine) {
+          const fromMatch = fromLine.match(/\*\*From:\s*(.+?)\s*<(.+?)>\*\*/);
+          const dateMatch = dateLine.match(/\*\*Date:\s*(.+?)\*\*/);
+          
+          if (fromMatch && dateMatch) {
+            const messageContent = lines.slice(
+              lines.findIndex(line => line.startsWith('**Date:')) + 1
+            ).join('\n').trim();
+            
+            messages.push({
+              id: `msg-${messages.length + 1}`,
+              from: { name: fromMatch[1], email: fromMatch[2] },
+              content: messageContent,
+              date: dateMatch[1],
+              isAI: true,
+              aiType: trimmedPart.includes('Auto-sent') ? 'auto-reply' : 
+                     trimmedPart.includes('Auto-curated') ? 'product-options' : 'quote'
+            });
+          }
+        }
+      } 
+      // Check if it's a regular message (contains From: pattern)
+      else if (trimmedPart.includes('**From:')) {
+        const lines = trimmedPart.split('\n');
+        let fromLine = lines.find(line => line.startsWith('**From:'));
+        let dateLine = lines.find(line => line.startsWith('**Date:'));
+        
+        if (fromLine && dateLine) {
+          const fromMatch = fromLine.match(/\*\*From:\s*(.+?)\s*<(.+?)>\*\*/);
+          const dateMatch = dateLine.match(/\*\*Date:\s*(.+?)\*\*/);
+          
+          if (fromMatch && dateMatch) {
+            const messageContent = lines.slice(
+              lines.findIndex(line => line.startsWith('**Date:')) + 1
+            ).join('\n').trim();
+            
+            messages.push({
+              id: `msg-${messages.length + 1}`,
+              from: { name: fromMatch[1], email: fromMatch[2] },
+              content: messageContent,
+              date: dateMatch[1],
+              isAI: false
+            });
+          }
+        }
+      }
+      // Initial message (first part without From: pattern)
+      else if (messages.length === 0) {
+        messages.push({
+          id: 'msg-initial',
+          from: email.from,
+          content: trimmedPart,
+          date: format(new Date(email.date), 'MMMM do, yyyy \'at\' h:mm a'),
+          isAI: false
+        });
+      }
+    }
+    
+    return messages;
+  };
+
+  const conversationMessages = parseConversation(email.content);
+
   return (
     <div className="flex-1 flex flex-col h-full">
       {/* Header */}
@@ -117,112 +194,114 @@ export function EnhancedEmailDetail({
         </div>
       </div>
 
-      {/* Email Content */}
+      {/* iMessage-style Conversation */}
       <ScrollArea className="flex-1">
-        <div className="p-6 max-w-4xl mx-auto">
-          {/* Email Header */}
-          <div className="mb-6">
-            <div className="flex items-start gap-4 mb-4">
-              <Avatar className="h-12 w-12">
-                <AvatarImage src={email.from.avatar} />
-                <AvatarFallback>
-                  {email.from.name[0]?.toUpperCase() || email.from.email[0]?.toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold">{email.from.name || email.from.email}</span>
-                  {senderAccount && (
-                    <Badge variant="outline" className="text-xs">
-                      to {senderAccount.email}
-                    </Badge>
-                  )}
-                </div>
-                
-                <div className="text-sm text-muted-foreground mb-2">
-                  <span>to {email.to.map(recipient => recipient.email).join(', ')}</span>
-                  {email.cc && email.cc.length > 0 && (
-                    <span className="ml-2">
-                      cc {email.cc.map(recipient => recipient.email).join(', ')}
-                    </span>
-                  )}
-                </div>
-                
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span>{format(new Date(email.date), 'PPP p')}</span>
-                  <span>({formatDistanceToNow(new Date(email.date), { addSuffix: true })})</span>
-                </div>
-              </div>
+        <div className="p-4 max-w-4xl mx-auto space-y-4">
+          {/* Labels at top */}
+          {email.labels.length > 0 && (
+            <div className="flex gap-2 justify-center mb-6">
+              {email.labels.map((label) => (
+                <Badge key={label} variant="secondary">
+                  {label}
+                </Badge>
+              ))}
             </div>
+          )}
 
-            {/* Labels */}
-            {email.labels.length > 0 && (
-              <div className="flex gap-2 mb-4">
-                {email.labels.map((label) => (
-                  <Badge key={label} variant="secondary">
-                    {label}
-                  </Badge>
+          {/* Attachments at top */}
+          {email.attachments.length > 0 && (
+            <div className="mb-6 bg-muted/20 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Paperclip className="h-4 w-4" />
+                <span className="text-sm font-medium">
+                  {email.attachments.length} attachment{email.attachments.length > 1 ? 's' : ''}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {email.attachments.map((attachment) => (
+                  <div
+                    key={attachment.id}
+                    className="flex items-center gap-3 p-3 border rounded-lg hover:bg-background/50"
+                  >
+                    <div className="h-8 w-8 rounded bg-muted/20 flex items-center justify-center">
+                      <Paperclip className="h-4 w-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium truncate">{attachment.name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {(attachment.size / 1024 / 1024).toFixed(1)} MB
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDownloadAttachment(attachment)}
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </div>
                 ))}
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Attachments */}
-            {email.attachments.length > 0 && (
-              <div className="mb-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Paperclip className="h-4 w-4" />
-                  <span className="text-sm font-medium">
-                    {email.attachments.length} attachment{email.attachments.length > 1 ? 's' : ''}
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {email.attachments.map((attachment) => (
-                    <div
-                      key={attachment.id}
-                      className="flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/5"
-                    >
-                      <div className="h-8 w-8 rounded bg-muted/20 flex items-center justify-center">
-                        <Paperclip className="h-4 w-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">{attachment.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {(attachment.size / 1024 / 1024).toFixed(1)} MB
+          {/* Message Bubbles */}
+          {conversationMessages.map((message, index) => {
+            const isOutgoing = message.from.email?.includes('kiriakos') || message.from.email?.includes('merchradar');
+            
+            return (
+              <div key={message.id} className={`flex ${isOutgoing ? 'justify-end' : 'justify-start'} mb-4`}>
+                <div className={`max-w-[70%] ${isOutgoing ? 'order-2' : 'order-1'}`}>
+                  {/* AI Badge for outgoing AI messages */}
+                  {message.isAI && isOutgoing && (
+                    <div className="mb-2 flex justify-end">
+                      <div className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                        <div className="w-2 h-2 bg-white rounded-full flex items-center justify-center">
+                          <div className="w-1 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
                         </div>
+                        {message.aiType === 'auto-reply' ? 'Auto-sent in 8 seconds' :
+                         message.aiType === 'product-options' ? 'Auto-curated products' :
+                         'AI-generated quote'}
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDownloadAttachment(attachment)}
-                      >
-                        <Download className="h-4 w-4" />
-                      </Button>
                     </div>
-                  ))}
+                  )}
+                  
+                  {/* Message Bubble */}
+                  <div className={`rounded-2xl px-4 py-3 ${
+                    isOutgoing 
+                      ? 'bg-blue-500 text-white rounded-br-sm' 
+                      : 'bg-muted rounded-bl-sm'
+                  }`}>
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                      {message.content}
+                    </div>
+                  </div>
+                  
+                  {/* Timestamp and sender */}
+                  <div className={`mt-1 flex items-center gap-2 text-xs text-muted-foreground ${
+                    isOutgoing ? 'justify-end' : 'justify-start'
+                  }`}>
+                    <span className="font-medium">{message.from.name}</span>
+                    <span>•</span>
+                    <span>{message.date}</span>
+                  </div>
+                </div>
+                
+                {/* Avatar */}
+                <div className={`${isOutgoing ? 'order-1 mr-3' : 'order-2 ml-3'} flex-shrink-0`}>
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={message.from.avatar} />
+                    <AvatarFallback className="text-xs">
+                      {message.from.name?.[0]?.toUpperCase() || message.from.email?.[0]?.toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
               </div>
-            )}
-          </div>
-
-          <Separator className="mb-6" />
-
-          {/* Email Body */}
-          <div className="mb-8">
-            {email.htmlContent ? (
-              <div
-                className="prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: email.htmlContent }}
-              />
-            ) : (
-              <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                {email.content}
-              </div>
-            )}
-          </div>
+            );
+          })}
 
           {/* Action Buttons */}
-          <div className="flex gap-2 mb-6">
+          <div className="flex gap-2 justify-center pt-6">
             <Button onClick={() => handleReply('reply')} className="gap-2">
               <Reply className="h-4 w-4" />
               Reply
@@ -239,7 +318,7 @@ export function EnhancedEmailDetail({
 
           {/* Composer */}
           {showComposer && (
-            <div className="border rounded-lg p-4 bg-muted/5">
+            <div className="border rounded-lg p-4 bg-muted/5 mt-6">
               <MultiAccountComposer
                 accounts={accounts}
                 mode={composerMode}
