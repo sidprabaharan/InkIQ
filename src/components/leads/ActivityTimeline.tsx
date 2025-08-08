@@ -17,7 +17,8 @@ import {
   Filter,
   Quote,
   Package,
-  Image
+  Image,
+  FileText
 } from 'lucide-react';
 import EmailThreadDialog from './EmailThreadDialog';
 
@@ -233,6 +234,8 @@ export default function ActivityTimeline({ leadId, filterType }: ActivityTimelin
         return <Image className="h-4 w-4" />;
       case 'product_selection':
         return <Package className="h-4 w-4" />;
+      case 'form_submission':
+        return <FileText className="h-4 w-4" />;
       default:
         return <Activity className="h-4 w-4" />;
     }
@@ -259,6 +262,8 @@ export default function ActivityTimeline({ leadId, filterType }: ActivityTimelin
         return 'bg-violet-100 text-violet-600 border-violet-200';
       case 'product_selection':
         return 'bg-orange-100 text-orange-600 border-orange-200';
+      case 'form_submission':
+        return 'bg-sky-100 text-sky-600 border-sky-200';
       default:
         return 'bg-gray-100 text-gray-600 border-gray-200';
     }
@@ -270,8 +275,31 @@ export default function ActivityTimeline({ leadId, filterType }: ActivityTimelin
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  // Show all activities without filtering
-  const filteredActivities = activities;
+  // Filter by lead and include Emily Davis PO-to-Quote demo activities, then sort newest first
+  const additionalActivities: LeadActivity[] = [
+    {
+      id: 'emily-po-received',
+      leadId: '4',
+      type: 'form_submission',
+      title: 'Purchase Order received',
+      description: 'Emily sent a PO with line items and art files',
+      timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+      metadata: { fileName: 'PO_1183_Tech_Innovators.pdf', fileSize: '1.8 MB' }
+    },
+    {
+      id: 'emily-quote-generated',
+      leadId: '4',
+      type: 'quote',
+      title: 'inkIQ analyzed PO and created quote',
+      description: 'inkIQ automatically extracted line items and generated a quote',
+      timestamp: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+      metadata: { quoteId: 'Q-1183', totalAmount: 15240.00, products: ['T-Shirts (200) – Screen Print', 'Hoodies (50) – Screen Print', 'Hats (75) – Embroidery'] }
+    }
+  ];
+
+  const filteredActivities = [...activities, ...additionalActivities]
+    .filter(a => a.leadId === leadId)
+    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
   return (
     <div className="space-y-6">
@@ -370,6 +398,22 @@ export default function ActivityTimeline({ leadId, filterType }: ActivityTimelin
                               <Button variant="ghost" size="sm">
                                 View Quote
                               </Button>
+                            </div>
+                          </div>
+                        )}
+
+                        {activity.type === 'form_submission' && activity.metadata && (
+                          <div className="bg-muted/50 p-3 rounded-lg">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium">
+                                📄 {activity.metadata.fileName}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {activity.metadata.fileSize}
+                              </span>
+                            </div>
+                            <div className="flex justify-end mt-2">
+                              <Button variant="ghost" size="sm">View PO</Button>
                             </div>
                           </div>
                         )}
