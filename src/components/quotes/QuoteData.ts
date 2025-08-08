@@ -487,7 +487,7 @@ export const sampleQuoteData: Record<string, QuotationData> = {
         type: "Screen Print",
         placement: "Front Center",
         size: "8\" x 6\"",
-        colours: "White ink (inverted logo)",
+        colours: "White, 314C",
         notes: "Large front logo placement on t-shirts and hoodies. Invert black logo elements to white for visibility on black garments.",
         customerArt: [
           {
@@ -557,7 +557,7 @@ export const sampleQuoteData: Record<string, QuotationData> = {
         type: "Screen Print",
         placement: "Back Center",
         size: "10\" x 4\"",
-        colours: "White ink",
+        colours: "White",
         notes: "Large back slogan placement on t-shirts and hoodies only. Remove black background.",
         customerArt: [
           {
@@ -627,7 +627,7 @@ export const sampleQuoteData: Record<string, QuotationData> = {
         type: "Embroidery",
         placement: "Front Center",
         size: "3\" x 2\"",
-        colours: "Navy blue thread",
+        colours: "Madeira 1246",
         notes: "Embroidered logo on front of white hats only. Use original logo colors.",
         customerArt: [
           {
