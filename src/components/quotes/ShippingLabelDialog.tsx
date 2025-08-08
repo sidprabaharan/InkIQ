@@ -755,7 +755,7 @@ export function ShippingLabelDialog({
         </div>
         )}
         
-        <DialogFooter className="flex-shrink-0 p-6 pt-4 flex justify-between bg-background border-t">
+        <DialogFooter className="flex-shrink-0 px-6 pt-4 pb-8 flex justify-between bg-background border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
