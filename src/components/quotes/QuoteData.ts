@@ -573,6 +573,34 @@ export const sampleQuoteData: Record<string, QuotationData> = {
             url: "/public/lovable-uploads/a254e6c0-7bd5-4ee1-a1d3-124051d69585.png",
             type: "application/octet-stream",
             category: "productionFiles"
+          },
+          {
+            id: "production-file-embroidery-emb",
+            name: "wat-logo-embroidery.emb",
+            url: "/public/lovable-uploads/a254e6c0-7bd5-4ee1-a1d3-124051d69585.png",
+            type: "application/octet-stream",
+            category: "productionFiles"
+          },
+          {
+            id: "production-file-embroidery-pes",
+            name: "wat-logo-embroidery.pes",
+            url: "/public/lovable-uploads/a254e6c0-7bd5-4ee1-a1d3-124051d69585.png",
+            type: "application/octet-stream",
+            category: "productionFiles"
+          },
+          {
+            id: "production-file-embroidery-pdf",
+            name: "wat-logo-embroidery.pdf",
+            url: "/public/lovable-uploads/a254e6c0-7bd5-4ee1-a1d3-124051d69585.png",
+            type: "application/pdf",
+            category: "productionFiles"
+          },
+          {
+            id: "production-file-embroidery-jpeg",
+            name: "wat-logo-embroidery.jpeg",
+            url: "/public/lovable-uploads/a254e6c0-7bd5-4ee1-a1d3-124051d69585.png",
+            type: "image/jpeg",
+            category: "productionFiles"
           }
         ],
         proofMockup: [
