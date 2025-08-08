@@ -101,7 +101,7 @@ const allQuotationsData: Quotation[] = [
     owner: "Kiri",
     total: "$1292",
     outstanding: "$241",
-    status: "Achieved Quote",
+    status: "Production",
     isPaid: false,
   },
   {
