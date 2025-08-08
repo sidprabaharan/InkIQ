@@ -282,18 +282,27 @@ export default function ActivityTimeline({ leadId, filterType }: ActivityTimelin
       leadId: '4',
       type: 'form_submission',
       title: 'Purchase Order received',
-      description: 'Emily sent a PO with line items and art files',
+      description: 'Emily sent a PO with decoration requirements and art files',
       timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-      metadata: { fileName: 'PO_1183_Tech_Innovators.pdf', fileSize: '1.8 MB' }
+      metadata: { fileName: 'PO_1183_Merchly_Promotional.pdf', fileSize: '1.8 MB' }
     },
     {
       id: 'emily-quote-generated',
       leadId: '4',
       type: 'quote',
       title: 'inkIQ analyzed PO and created quote',
-      description: 'inkIQ automatically extracted line items and generated a quote',
+      description: 'inkIQ automatically extracted decoration requirements and generated a quote',
       timestamp: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-      metadata: { quoteId: 'Q-1183', totalAmount: 15240.00, products: ['T-Shirts (200) – Screen Print', 'Hoodies (50) – Screen Print', 'Hats (75) – Embroidery'] }
+      metadata: { quoteId: 'Q-1183', totalAmount: 3240.00, products: ['Screen Print Setup (3 colors)', 'Screen Print Run (200 shirts)', 'Embroidery Setup (2 positions)', 'Embroidery Run (75 hats)'] }
+    },
+    {
+      id: 'emily-quote-approved',
+      leadId: '4',
+      type: 'note',
+      title: 'Quote approved by Emily',
+      description: 'Emily approved the quote and confirmed production timeline',
+      timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+      metadata: { quoteId: 'Q-1183' }
     }
   ];
 
