@@ -752,6 +752,23 @@ export const sampleQuoteData: Record<string, QuotationData> = {
 
 // Function to get quote data by ID
 export const getQuoteById = (id: string): QuotationData | null => {
+  // Temporarily clear localStorage for quote 3046 to use fresh sample data
+  if (id === "3046") {
+    try {
+      const stored = localStorage.getItem("saved_quotes");
+      if (stored) {
+        const savedQuotes = JSON.parse(stored);
+        if (savedQuotes["3046"]) {
+          delete savedQuotes["3046"];
+          localStorage.setItem("saved_quotes", JSON.stringify(savedQuotes));
+          console.log("Cleared corrupted quote 3046 from localStorage");
+        }
+      }
+    } catch (error) {
+      console.error("Failed to clear quote from localStorage:", error);
+    }
+  }
+  
   // First check localStorage for saved/modified quotes
   try {
     const stored = localStorage.getItem("saved_quotes");
