@@ -214,14 +214,14 @@ export function ShippingLabelDialog({
   };
   
   const mockFreightQuotes: FreightQuote[] = [
-    { id: "ups-ground", carrier: "UPS", service: "Ground", transitTime: "3-5 business days", price: 24.99 },
-    { id: "ups-2day", carrier: "UPS", service: "2-Day Air", transitTime: "2 business days", price: 45.99 },
-    { id: "ups-overnight", carrier: "UPS", service: "Next Day Air", transitTime: "1 business day", price: 89.99 },
-    { id: "fedex-ground", carrier: "FedEx", service: "Ground", transitTime: "3-5 business days", price: 26.99 },
-    { id: "fedex-2day", carrier: "FedEx", service: "2-Day", transitTime: "2 business days", price: 48.99 },
-    { id: "fedex-overnight", carrier: "FedEx", service: "Overnight", transitTime: "1 business day", price: 92.99 },
-    { id: "usps-ground", carrier: "USPS", service: "Ground Advantage", transitTime: "3-5 business days", price: 18.99 },
-    { id: "usps-priority", carrier: "USPS", service: "Priority Mail", transitTime: "1-3 business days", price: 32.99 },
+    { id: "ups-ground", carrier: "UPS", service: "Ground", transitTime: "3-5 business days", price: 24.99, logo: "/lovable-uploads/4b14e34b-748e-45d1-9671-629495df105d.png" },
+    { id: "ups-2day", carrier: "UPS", service: "2-Day Air", transitTime: "2 business days", price: 45.99, logo: "/lovable-uploads/4b14e34b-748e-45d1-9671-629495df105d.png" },
+    { id: "ups-overnight", carrier: "UPS", service: "Next Day Air", transitTime: "1 business day", price: 89.99, logo: "/lovable-uploads/4b14e34b-748e-45d1-9671-629495df105d.png" },
+    { id: "fedex-ground", carrier: "FedEx", service: "Ground", transitTime: "3-5 business days", price: 26.99, logo: "/lovable-uploads/a3c6309c-2b25-460d-b162-012808bc9c81.png" },
+    { id: "fedex-2day", carrier: "FedEx", service: "2-Day", transitTime: "2 business days", price: 48.99, logo: "/lovable-uploads/a3c6309c-2b25-460d-b162-012808bc9c81.png" },
+    { id: "fedex-overnight", carrier: "FedEx", service: "Overnight", transitTime: "1 business day", price: 92.99, logo: "/lovable-uploads/a3c6309c-2b25-460d-b162-012808bc9c81.png" },
+    { id: "usps-ground", carrier: "USPS", service: "Ground Advantage", transitTime: "3-5 business days", price: 18.99, logo: "/lovable-uploads/b49b4dff-1d60-4969-be07-24a6281e29c1.png" },
+    { id: "dhl-express", carrier: "DHL", service: "Express", transitTime: "1-2 business days", price: 78.99, logo: "/lovable-uploads/9a2abfa2-77b1-4f22-b100-c9d9c1653a71.png" },
   ];
 
   const handleGetQuotes = () => {
@@ -724,9 +724,19 @@ export function ShippingLabelDialog({
                 onClick={() => handleSelectQuote(quote.id)}
               >
                 <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <div className="w-16 h-8 bg-muted rounded flex items-center justify-center text-xs font-medium">
-                      {quote.carrier}
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-10 flex items-center justify-center">
+                      {quote.logo ? (
+                        <img 
+                          src={quote.logo} 
+                          alt={quote.carrier} 
+                          className="max-w-full max-h-full object-contain"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-muted rounded flex items-center justify-center text-xs font-medium">
+                          {quote.carrier}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <div className="font-medium">{quote.service}</div>
