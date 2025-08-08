@@ -463,7 +463,51 @@ export function ImprintSettings() {
                 </thead>
                 <tbody>
                   <tr className="border-b">
-                    <td className="p-3">Screen Fee / Setup Fee</td>
+                    <td className="p-3">Vectorizing</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Set Up</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Screens</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Colour Separations</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Print Sample</td>
                     <td className="p-3">
                       <Input type="number" placeholder="$0.00" className="w-24" />
                     </td>
