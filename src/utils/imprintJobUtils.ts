@@ -68,10 +68,18 @@ export function convertOrderBreakdownToImprintJobs(): ImprintJob[] {
         orderId: orderDetail.orderId,
         lineItemGroupId: lineItemGroup.id,
         imprintSectionId: `${lineItemGroup.id}-section-${sectionIndex}`,
-        status: shouldBeAtPrintStage && jobCounter <= 6 ? "scheduled" : "unscheduled",
-        equipmentId: shouldBeAtPrintStage && jobCounter <= 6 ? `screen-press-${((jobCounter - 1) % 3) + 1}` : undefined,
-        scheduledStart: shouldBeAtPrintStage && jobCounter <= 6 ? new Date(Date.now() + ((jobCounter - 1) * 2 * 60 * 60 * 1000)) : undefined,
-        scheduledEnd: shouldBeAtPrintStage && jobCounter <= 6 ? new Date(Date.now() + (((jobCounter - 1) * 2 + estimatedHours) * 60 * 60 * 1000)) : undefined,
+        status: shouldBeAtPrintStage && jobCounter <= 8 ? "scheduled" : "unscheduled",
+        equipmentId: shouldBeAtPrintStage && jobCounter <= 8 ? `press-${((jobCounter - 1) % 3) + 1}` : undefined,
+        scheduledStart: shouldBeAtPrintStage && jobCounter <= 8 ? (() => {
+          const today = new Date();
+          today.setHours(8 + Math.floor((jobCounter - 1) * 2.5), (jobCounter - 1) * 30 % 60, 0, 0);
+          return today;
+        })() : undefined,
+        scheduledEnd: shouldBeAtPrintStage && jobCounter <= 8 ? (() => {
+          const today = new Date();
+          today.setHours(8 + Math.floor((jobCounter - 1) * 2.5) + estimatedHours, ((jobCounter - 1) * 30 % 60) + (estimatedHours * 60 % 60), 0, 0);
+          return today;
+        })() : undefined,
         customerName: orderDetail.customerName,
         description: `${imprintSection.type} - ${imprintSection.placement}`,
         decorationMethod,
