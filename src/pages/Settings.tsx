@@ -26,6 +26,7 @@ import { GeneralSettings } from '@/components/settings/GeneralSettings';
 import { SupplierIntegrations } from '@/components/settings/SupplierIntegrations';
 import { OutsourcingPreferences } from '@/components/settings/OutsourcingPreferences';
 import { ProductionSettings } from '@/components/settings/ProductionSettings';
+import { ImprintMethodsSettings } from '@/components/settings/ImprintMethodsSettings';
 
 
 export default function Settings() {
@@ -35,7 +36,7 @@ export default function Settings() {
     { id: 'users', name: 'User Management', icon: Users, component: UserManagement },
     { id: 'company', name: 'Company Information', icon: Building, component: CompanyInfo },
     { id: 'production', name: 'Production Settings', icon: Factory, component: ProductionSettings },
-    { id: 'imprints', name: 'Imprint Methods', icon: Palette, component: () => <div>Imprint Settings coming soon</div> },
+    { id: 'imprints', name: 'Imprint Methods', icon: Palette, component: ImprintMethodsSettings },
     { id: 'statuses', name: 'Order Statuses', icon: ListChecks, component: OrderStatuses },
     { id: 'payments', name: 'Payment Integration', icon: CreditCard, component: PaymentIntegration },
     { id: 'automations', name: 'Automations', icon: Workflow, component: Automations },
