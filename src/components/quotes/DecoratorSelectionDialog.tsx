@@ -466,10 +466,10 @@ export function DecoratorSelectionDialog({
             {filteredDecorators.map((decorator) => (
               <Card 
                 key={decorator.id} 
-                className={`cursor-pointer transition-all border-2 ${
+                className={`cursor-pointer transition-all ${
                   selectedDecorator === decorator.id 
-                    ? "border-primary ring-1 ring-primary shadow-md" 
-                    : "border-border hover:shadow-md hover:border-muted-foreground/20"
+                    ? "border-2 border-primary bg-primary/5" 
+                    : "border border-border hover:shadow-md hover:border-muted-foreground/30"
                 }`}
                 onClick={() => handleSelectDecorator(decorator.id)}
               >
