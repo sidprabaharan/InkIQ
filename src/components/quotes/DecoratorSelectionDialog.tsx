@@ -100,6 +100,166 @@ const mockDecorators: Decorator[] = [
     verificationStatus: "verified",
     createdAt: new Date(),
     updatedAt: new Date()
+  },
+  {
+    id: "dec-003",
+    name: "FlexPrint Solutions",
+    email: "orders@flexprintsolutions.com",
+    phone: "(555) 456-7890",
+    address: {
+      street: "789 Print Way",
+      city: "Austin",
+      state: "TX",
+      zipCode: "73301"
+    },
+    capabilities: [
+      {
+        method: "screen_printing",
+        minQuantity: 12,
+        maxQuantity: 8000,
+        maxColors: 6,
+        specializations: ["vinyl", "heat transfer"],
+        setupFee: 35,
+        pricePerPiece: 2.95,
+        rushAvailable: true,
+        rushFee: 40
+      }
+    ],
+    pricing: {
+      basePricing: {},
+      rushMultiplier: 1.3,
+      minimumOrder: 75
+    },
+    capacity: {
+      dailyCapacity: 400,
+      currentLoad: 45,
+      leadTime: 6
+    },
+    qualityRating: 4.6,
+    onTimeRating: 4.8,
+    verificationStatus: "verified",
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: "dec-004",
+    name: "Coastal Custom Apparel",
+    email: "production@coastalcustom.com",
+    phone: "(555) 321-0987",
+    address: {
+      street: "321 Harbor Blvd",
+      city: "San Diego",
+      state: "CA",
+      zipCode: "92101"
+    },
+    capabilities: [
+      {
+        method: "screen_printing",
+        minQuantity: 24,
+        maxQuantity: 12000,
+        maxColors: 10,
+        specializations: ["eco-friendly inks", "DTG backup"],
+        setupFee: 50,
+        pricePerPiece: 3.10,
+        rushAvailable: true,
+        rushFee: 55
+      }
+    ],
+    pricing: {
+      basePricing: {},
+      rushMultiplier: 1.4,
+      minimumOrder: 100
+    },
+    capacity: {
+      dailyCapacity: 600,
+      currentLoad: 70,
+      leadTime: 8
+    },
+    qualityRating: 4.7,
+    onTimeRating: 4.6,
+    verificationStatus: "verified",
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: "dec-005",
+    name: "Midwest Graphics Hub",
+    email: "sales@midwestgraphics.com",
+    phone: "(555) 654-3210",
+    address: {
+      street: "555 Industrial Park",
+      city: "Chicago",
+      state: "IL",
+      zipCode: "60607"
+    },
+    capabilities: [
+      {
+        method: "embroidery",
+        minQuantity: 12,
+        maxQuantity: 4000,
+        maxColors: 8,
+        specializations: ["logos", "monogramming"],
+        setupFee: 65,
+        pricePerPiece: 4.25,
+        rushAvailable: true,
+        rushFee: 70
+      }
+    ],
+    pricing: {
+      basePricing: {},
+      rushMultiplier: 1.5,
+      minimumOrder: 60
+    },
+    capacity: {
+      dailyCapacity: 300,
+      currentLoad: 55,
+      leadTime: 6
+    },
+    qualityRating: 4.5,
+    onTimeRating: 4.9,
+    verificationStatus: "verified",
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: "dec-006",
+    name: "Elite Decoration Co.",
+    email: "orders@elitedecoration.com",
+    phone: "(555) 789-0123",
+    address: {
+      street: "888 Creative Ave",
+      city: "Denver",
+      state: "CO",
+      zipCode: "80202"
+    },
+    capabilities: [
+      {
+        method: "screen_printing",
+        minQuantity: 48,
+        maxQuantity: 15000,
+        maxColors: 12,
+        specializations: ["specialty inks", "large format"],
+        setupFee: 40,
+        pricePerPiece: 3.50,
+        rushAvailable: true,
+        rushFee: 45
+      }
+    ],
+    pricing: {
+      basePricing: {},
+      rushMultiplier: 1.35,
+      minimumOrder: 150
+    },
+    capacity: {
+      dailyCapacity: 750,
+      currentLoad: 65,
+      leadTime: 7
+    },
+    qualityRating: 4.8,
+    onTimeRating: 4.5,
+    verificationStatus: "verified",
+    createdAt: new Date(),
+    updatedAt: new Date()
   }
 ];
 
@@ -165,13 +325,16 @@ export function DecoratorSelectionDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="flex gap-4">
+          <div className="flex items-center justify-between">
             <Input
               placeholder="Search by name or location..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1"
+              className="flex-1 max-w-md"
             />
+            <div className="text-sm text-muted-foreground">
+              <span className="font-medium text-primary">134 verified contract decorators</span> found who can deliver this job on time
+            </div>
           </div>
 
           <div className="space-y-4">
