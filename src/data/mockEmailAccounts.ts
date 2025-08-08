@@ -36,6 +36,49 @@ export const mockEmailAccounts: EmailAccount[] = [
 ];
 
 export const mockEmails: Email[] = [
+  // Pamela Hunt Email Thread
+  {
+    id: "pamela-1",
+    accountId: "account-1",
+    from: {
+      email: "pamela@westernalliancetransport.com",
+      name: "Pamela Hunt",
+      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b647?w=400&h=400&fit=crop&crop=face"
+    },
+    to: [{ email: "kiriakos@merchradar.com", name: "Kiriakos" }],
+    subject: "Staff Merchandise Order - Western Alliance Transport",
+    content: "Hello,\n\nWe'd like to order t-shirts, hoodies, and hats for our staff. We need them for an event next week. How much will this cost, and can you deliver?\n\nPamela Hunt\nWestern Alliance Transport\n514-512-9926",
+    date: "2024-02-01T14:30:00Z",
+    read: true,
+    starred: false,
+    folder: "inbox",
+    labels: ["new-inquiry", "urgent"],
+    attachments: [],
+    threadId: "thread-pamela",
+    messageId: "msg-pamela-1",
+    importance: "high"
+  },
+  {
+    id: "pamela-2",
+    accountId: "account-1",
+    from: {
+      email: "kiriakos@merchradar.com",
+      name: "Kiriakos (inkIQ)",
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face"
+    },
+    to: [{ email: "pamela@westernalliancetransport.com", name: "Pamela Hunt" }],
+    subject: "RE: Staff Merchandise Order - Western Alliance Transport",
+    content: "<div style=\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;\"><div style=\"display: flex; align-items: center; gap: 8px; color: white; font-size: 13px; font-weight: 600;\"><div style=\"width: 10px; height: 10px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;\"><div style=\"width: 4px; height: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%;\"></div></div>AI-Generated Response • Auto-sent in 8 seconds</div></div><p>Hi Pamela,</p><p>Thanks for reaching out—happy to help.</p><p>I just need a few quick details so I can put together a quote and some mockups for you:</p><ul><li>Do you know which t-shirt, hoodie, and hat models you're looking for?</li><li>Do you have a budget in mind?</li><li>What colors do you want for each item?</li><li>Can you send me a size/quantity breakdown?</li><li>Can you send your logo(s) and let me know where you want them placed and how large?</li><li>What exact date next week do you need delivery by?</li></ul><p>Looking forward to your reply.</p><p>Thanks,<br>Kiriakos<br>Merch Radar<br>kiriakos@merchradar.com<br>514-834-6659<br>mercradar.com</p>",
+    date: "2024-02-01T14:30:08Z",
+    read: true,
+    starred: true,
+    folder: "sent",
+    labels: ["ai-generated", "auto-reply"],
+    attachments: [],
+    threadId: "thread-pamela",
+    messageId: "msg-pamela-2",
+    importance: "normal"
+  },
   {
     id: "email-1",
     accountId: "account-1",
