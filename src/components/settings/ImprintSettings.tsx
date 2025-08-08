@@ -542,7 +542,161 @@ export function ImprintSettings() {
                     </td>
                     <td className="p-3">
                       <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Sleeve Print</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Print on Fleece</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Water Based Ink</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Discharge Ink</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Puff Ink</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">High Density</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Glitter</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Silicone</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Metallic</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Shimmer</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Foil</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Reflective</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Glow in the Dark</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Flocking</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </td>
                   </tr>
