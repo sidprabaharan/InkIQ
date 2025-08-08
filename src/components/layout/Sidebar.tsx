@@ -112,7 +112,11 @@ export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
   return (
     <aside className={`${collapsed ? 'w-[64px]' : 'w-[230px]'} border-r h-full flex flex-col bg-white transition-width duration-300`}>
       <div className={`p-4 flex items-center gap-2 border-b ${collapsed ? 'justify-center' : ''}`}>
-        <PlayCircle size={24} className="text-inkiq-primary fill-inkiq-primary" />
+        <img 
+          src="/lovable-uploads/a254e6c0-7bd5-4ee1-a1d3-124051d69585.png" 
+          alt="InkIQ Logo" 
+          className="h-8 w-auto"
+        />
         {!collapsed && <span className="font-semibold text-xl">InkIQ</span>}
       </div>
       

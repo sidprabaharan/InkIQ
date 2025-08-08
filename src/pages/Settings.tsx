@@ -26,7 +26,7 @@ import { GeneralSettings } from '@/components/settings/GeneralSettings';
 import { SupplierIntegrations } from '@/components/settings/SupplierIntegrations';
 import { OutsourcingPreferences } from '@/components/settings/OutsourcingPreferences';
 import { ProductionSettings } from '@/components/settings/ProductionSettings';
-import { ImprintSettings } from '@/components/settings/ImprintSettings';
+
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState('users');
@@ -35,7 +35,7 @@ export default function Settings() {
     { id: 'users', name: 'User Management', icon: Users, component: UserManagement },
     { id: 'company', name: 'Company Information', icon: Building, component: CompanyInfo },
     { id: 'production', name: 'Production Settings', icon: Factory, component: ProductionSettings },
-    { id: 'imprints', name: 'Imprint Methods', icon: Palette, component: ImprintSettings },
+    { id: 'imprints', name: 'Imprint Methods', icon: Palette, component: () => <div>Imprint Settings coming soon</div> },
     { id: 'statuses', name: 'Order Statuses', icon: ListChecks, component: OrderStatuses },
     { id: 'payments', name: 'Payment Integration', icon: CreditCard, component: PaymentIntegration },
     { id: 'automations', name: 'Automations', icon: Workflow, component: Automations },
