@@ -24,6 +24,285 @@ export interface Email {
 }
 
 export const mockEmails: Email[] = [
+  // Pamela Hunt Email Thread
+  {
+    id: "pamela-1",
+    from: {
+      name: "Pamela Hunt",
+      email: "pamela@westernalliancetransport.com"
+    },
+    to: [
+      {
+        name: "Kiriakos",
+        email: "kiriakos@merchradar.com"
+      }
+    ],
+    subject: "Staff Merchandise Order - Western Alliance Transport",
+    content: `
+      <p>Hello,</p>
+      <p>We'd like to order t-shirts, hoodies, and hats for our staff. We need them for an event next week. How much will this cost, and can you deliver?</p>
+      <p>Pamela Hunt<br>
+      Western Alliance Transport<br>
+      514-512-9926</p>
+    `,
+    date: "2024-02-01T14:30:00",
+    read: true,
+    starred: false,
+    attachments: [],
+    folder: "inbox",
+    labels: ["new-inquiry", "urgent"]
+  },
+  {
+    id: "pamela-2",
+    from: {
+      name: "Kiriakos (inkIQ)",
+      email: "kiriakos@merchradar.com"
+    },
+    to: [
+      {
+        name: "Pamela Hunt",
+        email: "pamela@westernalliancetransport.com"
+      }
+    ],
+    subject: "RE: Staff Merchandise Order - Western Alliance Transport",
+    content: `
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px; color: white; font-size: 13px; font-weight: 600;">
+          <div style="width: 10px; height: 10px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 4px; height: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%;"></div>
+          </div>
+          AI-Generated Response • Auto-sent in 8 seconds
+        </div>
+      </div>
+      
+      <p>Hi Pamela,</p>
+      <p>Thanks for reaching out—happy to help.</p>
+      <p>I just need a few quick details so I can put together a quote and some mockups for you:</p>
+      <ul>
+        <li>Do you know which t-shirt, hoodie, and hat models you're looking for?</li>
+        <li>Do you have a budget in mind?</li>
+        <li>What colors do you want for each item?</li>
+        <li>Can you send me a size/quantity breakdown?</li>
+        <li>Can you send your logo(s) and let me know where you want them placed and how large?</li>
+        <li>What exact date next week do you need delivery by?</li>
+      </ul>
+      <p>Looking forward to your reply.</p>
+      <p>Thanks,<br>
+      Kiriakos<br>
+      Merch Radar<br>
+      kiriakos@merchradar.com<br>
+      514-834-6659<br>
+      mercradar.com</p>
+    `,
+    date: "2024-02-01T14:30:08",
+    read: true,
+    starred: true,
+    attachments: [],
+    folder: "sent",
+    labels: ["ai-generated", "auto-reply"]
+  },
+  {
+    id: "pamela-3",
+    from: {
+      name: "Pamela Hunt",
+      email: "pamela@westernalliancetransport.com"
+    },
+    to: [
+      {
+        name: "Kiriakos",
+        email: "kiriakos@merchradar.com"
+      }
+    ],
+    subject: "RE: Staff Merchandise Order - Western Alliance Transport",
+    content: `
+      <p>Hi Kiriakos,</p>
+      <p>We need everything delivered no later than next Thursday.</p>
+      <p>Can you send me a few garment options? I'm not too picky—just something cotton for the tees and hoodies, and a hat with a buckle. Good quality but affordable.</p>
+      <p><strong>Colors:</strong></p>
+      <ul>
+        <li>Black t-shirts and hoodies</li>
+        <li>White hats</li>
+        <li>For the tees and hoodies, we want the black part of the logo to be white</li>
+      </ul>
+      <p><strong>Quantities:</strong></p>
+      <ul>
+        <li>Tees & Hoodies: 20 small, 50 medium, 50 large, 20 XL</li>
+        <li>Hats: 140 units</li>
+      </ul>
+      <p>I attached our logos.</p>
+      <ul>
+        <li>Print the full logo large on the front of the tees and hoodies</li>
+        <li>Print the slogan large on the back</li>
+        <li>Embroider just the logo on the front of the hats</li>
+      </ul>
+      <p>Let me know if you need anything else.</p>
+      <p>Pamela Hunt<br>
+      Western Alliance Transport<br>
+      514-512-9926</p>
+    `,
+    date: "2024-02-03T09:15:00",
+    read: true,
+    starred: false,
+    attachments: [
+      {
+        name: "western-alliance-logos.zip",
+        size: "2.4 MB",
+        type: "application/zip"
+      }
+    ],
+    folder: "inbox",
+    labels: ["requirements", "logos"]
+  },
+  {
+    id: "pamela-4",
+    from: {
+      name: "Kiriakos (inkIQ)",
+      email: "kiriakos@merchradar.com"
+    },
+    to: [
+      {
+        name: "Pamela Hunt",
+        email: "pamela@westernalliancetransport.com"
+      }
+    ],
+    subject: "RE: Staff Merchandise Order - Garment Options",
+    content: `
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px; color: white; font-size: 13px; font-weight: 600;">
+          <div style="width: 10px; height: 10px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 4px; height: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%;"></div>
+          </div>
+          AI-Generated Response • Auto-curated product options
+        </div>
+      </div>
+      
+      <p>Hi Pamela,</p>
+      <p>Thanks for the info—here are some great garment options with prices (includes decoration):</p>
+      
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <h3 style="margin: 0 0 12px 0; color: #1e293b;">T-Shirts</h3>
+        <ul>
+          <li><strong>Gildan 5000</strong> – 100% cotton, boxy fit, durable. <span style="color: #059669; font-weight: bold;">$7.52</span></li>
+          <li><strong>Gildan 64000</strong> – 100% cotton, slimmer fit, softer feel. <span style="color: #059669; font-weight: bold;">$8.36</span></li>
+          <li><strong>Bella Canvas 3001C</strong> – Premium fit/feel, still budget-friendly. <span style="color: #059669; font-weight: bold;">$9.40</span></li>
+        </ul>
+      </div>
+      
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <h3 style="margin: 0 0 12px 0; color: #1e293b;">Hoodies (100% cotton)</h3>
+        <p style="color: #6b7280; font-size: 14px; margin-bottom: 12px;">Hoodies are a bit tricky—cotton ones are harder to find at low prices. Let me know if you'd be open to blends for cheaper options.</p>
+        <ul>
+          <li><strong>Comfort Colors 1467</strong> – Lightweight, soft, <span style="color: #059669; font-weight: bold;">$30.44</span></li>
+          <li><strong>Allmade AL400</strong> – French terry, lightweight, <span style="color: #059669; font-weight: bold;">$36.58</span></li>
+          <li><strong>Stanley/Stella SXU028</strong> – Premium French terry, <span style="color: #059669; font-weight: bold;">$49.40</span></li>
+          <li><strong>LA Apparel HF-09</strong> – Made in USA, heavy, boxy fit. <span style="color: #059669; font-weight: bold;">$52.75</span></li>
+        </ul>
+      </div>
+      
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <h3 style="margin: 0 0 12px 0; color: #1e293b;">Hats</h3>
+        <ul>
+          <li><strong>Valucap VC300A</strong> – Unstructured, buckle closure. <span style="color: #059669; font-weight: bold;">$11.40</span></li>
+          <li><strong>Valucap 9910</strong> – Structured, buckle closure. <span style="color: #059669; font-weight: bold;">$12.33</span></li>
+        </ul>
+      </div>
+      
+      <p>Let me know which ones you want so I can send over the quote and mockups.</p>
+      <p>Thanks,<br>Kiriakos</p>
+    `,
+    date: "2024-02-04T11:22:00",
+    read: true,
+    starred: true,
+    attachments: [],
+    folder: "sent",
+    labels: ["ai-generated", "product-options"]
+  },
+  {
+    id: "pamela-5",
+    from: {
+      name: "Pamela Hunt",
+      email: "pamela@westernalliancetransport.com"
+    },
+    to: [
+      {
+        name: "Kiriakos",
+        email: "kiriakos@merchradar.com"
+      }
+    ],
+    subject: "RE: Staff Merchandise Order - Final Selection",
+    content: `
+      <p>Hey Kiriakos,</p>
+      <p>Let's go with:</p>
+      <ul>
+        <li>Gildan 5000 t-shirt</li>
+        <li>Comfort Colors 1467 hoodie</li>
+        <li>Valucap VC300A hat</li>
+      </ul>
+      <p>Please send over the quote and mockups, and let me know the next steps.</p>
+      <p>Pamela Hunt<br>
+      Western Alliance Transport<br>
+      514-512-9926</p>
+    `,
+    date: "2024-02-06T10:45:00",
+    read: true,
+    starred: false,
+    attachments: [],
+    folder: "inbox",
+    labels: ["selection-made"]
+  },
+  {
+    id: "pamela-6",
+    from: {
+      name: "Kiriakos (inkIQ)",
+      email: "kiriakos@merchradar.com"
+    },
+    to: [
+      {
+        name: "Pamela Hunt",
+        email: "pamela@westernalliancetransport.com"
+      }
+    ],
+    subject: "RE: Staff Merchandise Order - Quote & Mockups",
+    content: `
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px; color: white; font-size: 13px; font-weight: 600;">
+          <div style="width: 10px; height: 10px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 4px; height: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%;"></div>
+          </div>
+          AI-Generated Quote • Mockups created automatically
+        </div>
+      </div>
+      
+      <p>Hey Pamela,</p>
+      <p>Just sent over the formal quote with mockups and instructions to get started. Let me know if you have any questions!</p>
+      
+      <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <h3 style="margin: 0 0 8px 0; color: #065f46;">Quote Summary</h3>
+        <p style="margin: 0; color: #065f46;"><strong>Total: $12,000</strong> (420 items)</p>
+        <p style="margin: 4px 0 0 0; color: #059669; font-size: 14px;">Ready for production • 5-7 business days</p>
+      </div>
+      
+      <p>Thanks,<br>Kiriakos</p>
+    `,
+    date: "2024-02-07T09:18:00",
+    read: true,
+    starred: true,
+    attachments: [
+      {
+        name: "western-alliance-quote-3046.pdf",
+        size: "1.8 MB",
+        type: "application/pdf"
+      },
+      {
+        name: "mockup-previews.zip",
+        size: "4.2 MB",
+        type: "application/zip"
+      }
+    ],
+    folder: "sent",
+    labels: ["ai-generated", "quote-sent"]
+  },
+  // Sarah Johnson Business Cards Thread
   {
     id: "sarah-business-cards-1",
     from: {
