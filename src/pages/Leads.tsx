@@ -11,6 +11,47 @@ import { Lead, LeadColumn, LeadStatus } from '@/types/lead';
 
 const initialLeads: Lead[] = [
   {
+    id: 'pamela-hunt',
+    name: 'Pamela Hunt',
+    company: 'Western Alliance Transport',
+    email: 'pamela@westernalliancetransport.com',
+    phone: '514-512-9926',
+    status: 'quoted',
+    value: 12000,
+    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
+    lastContactedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+    notes: 'Urgent order for staff merchandise - needs delivery by next Thursday. Quantities: T-shirts & Hoodies (20 S, 50 M, 50 L, 20 XL), Hats (140 units). Selected: Gildan 5000 t-shirts, Comfort Colors 1467 hoodies, Valucap VC300A hats. Logo placement: front decoration on all items, back slogan on shirts/hoodies, embroidered logo on hats.',
+    customerType: 'new',
+    aiEnriched: true,
+    dataSource: 'email',
+    confidenceScore: 0.92,
+    jobTitle: 'Procurement Manager',
+    address: {
+      street: '2450 Boulevard Industriel',
+      city: 'Montreal',
+      state: 'QC',
+      zip: 'H1P 3K2',
+      country: 'Canada'
+    },
+    socialProfiles: {
+      linkedin: 'https://linkedin.com/in/pamelahunt'
+    },
+    companyInfo: {
+      size: '100-500 employees',
+      industry: 'Transportation & Logistics',
+      estimatedAnnualSpend: 20000,
+      website: 'https://westernalliancetransport.com',
+      socialProfiles: {
+        linkedin: 'https://linkedin.com/company/western-alliance-transport',
+        facebook: 'https://facebook.com/westernalliancetransport'
+      }
+    },
+    lastEnrichedAt: new Date().toISOString(),
+    totalActivities: 6,
+    lastActivityType: 'email',
+    quoteId: 'quote-western-alliance-001'
+  },
+  {
     id: '1',
     name: 'John Smith',
     company: 'Acme Corp',

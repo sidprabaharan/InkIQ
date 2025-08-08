@@ -28,6 +28,118 @@ interface ActivityTimelineProps {
 
 // Mock data for demonstration
 const mockActivities: LeadActivity[] = [
+  // Pamela Hunt activities
+  {
+    id: 'pamela-activity-1',
+    leadId: 'pamela-hunt',
+    type: 'email',
+    title: 'Initial inquiry received',
+    description: 'Customer reached out about t-shirts, hoodies, and hats for staff event',
+    timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    metadata: {
+      emailThread: {
+        id: 'pamela-thread-1',
+        subject: 'Staff Merchandise Order - Western Alliance Transport',
+        participants: ['pamela@westernalliancetransport.com', 'kiriakos@merchradar.com'],
+        messages: [
+          {
+            id: 'pamela-msg-1',
+            from: 'pamela@westernalliancetransport.com',
+            to: ['kiriakos@merchradar.com'],
+            subject: 'Staff Merchandise Order',
+            body: 'Hello,\n\nWe\'d like to order t-shirts, hoodies, and hats for our staff. We need them for an event next week. How much will this cost, and can you deliver?\n\nPamela Hunt\nWestern Alliance Transport\n514-512-9926',
+            timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+            isRead: true
+          },
+          {
+            id: 'pamela-msg-2',
+            from: 'kiriakos@merchradar.com',
+            to: ['pamela@westernalliancetransport.com'],
+            subject: 'Re: Staff Merchandise Order',
+            body: 'Hi Pamela,\n\nThanks for reaching out—happy to help.\n\nI just need a few quick details so I can put together a quote and some mockups for you:\n• Do you know which t-shirt, hoodie, and hat models you\'re looking for?\n• Do you have a budget in mind?\n• What colors do you want for each item?\n• Can you send me a size/quantity breakdown?\n• Can you send your logo(s) and let me know where you want them placed and how large?\n• What exact date next week do you need delivery by?\n\nLooking forward to your reply.\n\nThanks,\nKiriakos\nMerch Radar\nkiriakos@merchradar.com\n514-834-6659\nmercradar.com',
+            timestamp: new Date(Date.now() - 6.5 * 24 * 60 * 60 * 1000).toISOString(),
+            isRead: true
+          },
+          {
+            id: 'pamela-msg-3',
+            from: 'pamela@westernalliancetransport.com',
+            to: ['kiriakos@merchradar.com'],
+            subject: 'Re: Staff Merchandise Order',
+            body: 'Hi Kiriakos,\n\nWe need everything delivered no later than next Thursday.\n\nCan you send me a few garment options? I\'m not too picky—just something cotton for the tees and hoodies, and a hat with a buckle. Good quality but affordable.\n\nColors:\n• Black t-shirts and hoodies\n• White hats\n• For the tees and hoodies, we want the black part of the logo to be white\n\nQuantities:\n• Tees & Hoodies: 20 small, 50 medium, 50 large, 20 XL\n• Hats: 140 units\n\nI attached our logos.\n• Print the full logo large on the front of the tees and hoodies\n• Print the slogan large on the back\n• Embroider just the logo on the front of the hats\n\nLet me know if you need anything else.\n\nPamela Hunt\nWestern Alliance Transport\n514-512-9926',
+            timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+            isRead: true
+          },
+          {
+            id: 'pamela-msg-4',
+            from: 'kiriakos@merchradar.com',
+            to: ['pamela@westernalliancetransport.com'],
+            subject: 'Re: Staff Merchandise Order - Garment Options',
+            body: 'Hi Pamela,\n\nThanks for the info—here are some great garment options with prices (includes decoration):\n\nT-Shirts\n• Gildan 5000 – 100% cotton, boxy fit, durable. $7.52\n• Gildan 64000 – 100% cotton, slimmer fit, softer feel. $8.36\n• Bella Canvas 3001C – Premium fit/feel, still budget-friendly. $9.40\n\nHoodies (100% cotton)\nHoodies are a bit tricky—cotton ones are harder to find at low prices. Let me know if you\'d be open to blends for cheaper options.\n• Comfort Colors 1467 – Lightweight, soft, $30.44\n• Allmade AL400 – French terry, lightweight, $36.58\n• Stanley/Stella SXU028 – Premium French terry, $49.40\n• LA Apparel HF-09 – Made in USA, heavy, boxy fit. $52.75\n\nHats\n• Valucap VC300A – Unstructured, buckle closure. $11.40\n• Valucap 9910 – Structured, buckle closure. $12.33\n\nLet me know which ones you want so I can send over the quote and mockups.\n\nThanks,\nKiriakos',
+            timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+            isRead: true
+          },
+          {
+            id: 'pamela-msg-5',
+            from: 'pamela@westernalliancetransport.com',
+            to: ['kiriakos@merchradar.com'],
+            subject: 'Re: Staff Merchandise Order - Final Selection',
+            body: 'Hey Kiriakos,\n\nLet\'s go with:\n• Gildan 5000 t-shirt\n• Comfort Colors 1467 hoodie\n• Valucap VC300A hat\n\nPlease send over the quote and mockups, and let me know the next steps.\n\nPamela Hunt\nWestern Alliance Transport\n514-512-9926',
+            timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            isRead: true
+          },
+          {
+            id: 'pamela-msg-6',
+            from: 'kiriakos@merchradar.com',
+            to: ['pamela@westernalliancetransport.com'],
+            subject: 'Re: Staff Merchandise Order - Quote & Mockups',
+            body: 'Hey Pamela,\n\nJust sent over the formal quote with mockups and instructions to get started. Let me know if you have any questions!\n\nThanks,\nKiriakos',
+            timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+            isRead: true
+          }
+        ],
+        lastMessageAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
+      }
+    }
+  },
+  {
+    id: 'pamela-activity-2',
+    leadId: 'pamela-hunt',
+    type: 'logo_upload',
+    title: 'Logo files received',
+    description: 'Customer uploaded company logos for merchandise decoration',
+    timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    metadata: {
+      fileName: 'western-alliance-logos.zip',
+      fileSize: '2.4 MB'
+    }
+  },
+  {
+    id: 'pamela-activity-3',
+    leadId: 'pamela-hunt',
+    type: 'product_selection',
+    title: 'Products selected',
+    description: 'Final garment selection made: Gildan 5000, Comfort Colors 1467, Valucap VC300A',
+    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    metadata: {
+      products: ['Gildan 5000 T-Shirt', 'Comfort Colors 1467 Hoodie', 'Valucap VC300A Hat'],
+      totalAmount: 12000,
+      printMethod: 'Screen Print & Embroidery'
+    }
+  },
+  {
+    id: 'pamela-activity-4',
+    leadId: 'pamela-hunt',
+    type: 'quote',
+    title: 'Quote sent',
+    description: 'Formal quote with mockups sent to customer',
+    timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    metadata: {
+      quoteId: 'quote-western-alliance-001',
+      totalAmount: 12000,
+      products: ['T-Shirts (140 units)', 'Hoodies (140 units)', 'Hats (140 units)']
+    }
+  },
+  // Existing activities for other leads
   {
     id: '1',
     leadId: '1',
