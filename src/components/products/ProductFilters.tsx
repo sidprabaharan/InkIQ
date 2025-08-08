@@ -25,8 +25,10 @@ export function ProductFilters({
 }: ProductFiltersProps) {
   const [showBrands, setShowBrands] = useState(true);
   const [showCategories, setShowCategories] = useState(true);
+  const [showSuppliers, setShowSuppliers] = useState(true);
   const [brandSearch, setBrandSearch] = useState('');
   const [categorySearch, setCategorySearch] = useState('');
+  const [supplierSearch, setSupplierSearch] = useState('');
   
   // Mock data for filters
   const brands = [
@@ -63,12 +65,31 @@ export function ProductFilters({
     { name: 'Activewear', count: 119 },
   ];
 
+  const suppliers = [
+    { name: 'SanMar', count: 1254 },
+    { name: 'Alphabroder', count: 1187 },
+    { name: 'S&S Activewear', count: 1089 },
+    { name: 'TSC Apparel', count: 876 },
+    { name: 'Hit Promotional Products', count: 634 },
+    { name: 'PCNA', count: 567 },
+    { name: 'Prime Line', count: 489 },
+    { name: 'Gemline', count: 423 },
+    { name: 'AIA', count: 398 },
+    { name: 'BIC Graphic', count: 367 },
+    { name: 'ADG Promotional Products', count: 321 },
+    { name: 'Bullet Line', count: 289 },
+  ];
+
   const filteredBrands = brands.filter(brand => 
     brand.name.toLowerCase().includes(brandSearch.toLowerCase())
   );
 
   const filteredCategories = categories.filter(category => 
     category.name.toLowerCase().includes(categorySearch.toLowerCase())
+  );
+
+  const filteredSuppliers = suppliers.filter(supplier => 
+    supplier.name.toLowerCase().includes(supplierSearch.toLowerCase())
   );
   
   return (
@@ -174,6 +195,43 @@ export function ProductFilters({
                     >
                       <span>{category.name}</span>
                       <span className="text-gray-500 text-xs">({category.count})</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Suppliers Filter */}
+          <div className="border-b">
+            <div 
+              className="flex items-center justify-between p-4 cursor-pointer"
+              onClick={() => setShowSuppliers(!showSuppliers)}
+            >
+              <h3 className="font-medium text-gray-700">Suppliers</h3>
+              {showSuppliers ? (
+                <ChevronUp className="h-4 w-4 text-gray-500" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-gray-500" />
+              )}
+            </div>
+            
+            {showSuppliers && (
+              <div className="px-4 pb-4">
+                <div className="relative mb-2">
+                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input 
+                    placeholder="Search suppliers..." 
+                    className="pl-8 text-sm h-8"
+                    value={supplierSearch}
+                    onChange={(e) => setSupplierSearch(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
+                  {filteredSuppliers.map((supplier) => (
+                    <div key={supplier.name} className="flex items-center justify-between text-sm hover:bg-gray-50 p-1 rounded cursor-pointer">
+                      <span>{supplier.name}</span>
+                      <span className="text-gray-500 text-xs">({supplier.count})</span>
                     </div>
                   ))}
                 </div>
