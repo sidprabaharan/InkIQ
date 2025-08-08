@@ -25,6 +25,113 @@ export interface Email {
 
 export const mockEmails: Email[] = [
   {
+    id: "sarah-business-cards-1",
+    from: {
+      name: "Sarah Johnson",
+      email: "sarah@company.com"
+    },
+    to: [
+      {
+        name: "John",
+        email: "john@inkiq.com"
+      }
+    ],
+    subject: "Print Quote Request - 500 Business Cards",
+    content: `
+      <p>Hi John,</p>
+      <p>I need a quote for 500 business cards with the following specifications:</p>
+      <ul>
+        <li>Premium cardstock</li>
+        <li>Full color, double-sided</li>
+        <li>Matte finish</li>
+        <li>Standard business card size</li>
+      </ul>
+      <p>Could you please provide pricing and turnaround time?</p>
+      <p>Thanks,<br>Sarah</p>
+    `,
+    date: "2024-01-15T03:30:00",
+    read: true,
+    starred: false,
+    attachments: [
+      {
+        name: "business-card-design.pdf",
+        size: "2.0 MB",
+        type: "application/pdf"
+      }
+    ],
+    folder: "inbox",
+    labels: ["quote-request", "urgent"]
+  },
+  {
+    id: "sarah-business-cards-ai-reply",
+    from: {
+      name: "inkIQ AI Assistant",
+      email: "ai@inkiq.com"
+    },
+    to: [
+      {
+        name: "Sarah Johnson",
+        email: "sarah@company.com"
+      }
+    ],
+    subject: "RE: Print Quote Request - 500 Business Cards",
+    content: `
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 600;">
+          <div style="width: 12px; height: 12px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 6px; height: 6px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%;"></div>
+          </div>
+          AI-Generated Quote • Confidence: 98%
+        </div>
+      </div>
+      
+      <p>Hi Sarah,</p>
+      
+      <p>Thank you for your business card quote request! I've analyzed your requirements and attachment, and I'm happy to provide you with the following quote:</p>
+      
+      <div style="background: #f8f9ff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <h3 style="margin: 0 0 12px 0; color: #1e293b;">Quote Details</h3>
+        <p><strong>Quantity:</strong> 500 business cards</p>
+        <p><strong>Material:</strong> Premium 16pt cardstock</p>
+        <p><strong>Printing:</strong> Full color, double-sided (4/4)</p>
+        <p><strong>Finish:</strong> Matte coating</p>
+        <p><strong>Size:</strong> Standard 3.5" x 2"</p>
+        <br>
+        <p style="font-size: 18px; font-weight: bold; color: #059669;">Total Price: $89.50</p>
+        <p style="color: #6b7280; font-size: 14px;">Includes design review and proofing</p>
+      </div>
+      
+      <p><strong>Turnaround Time:</strong> 3-5 business days after artwork approval</p>
+      
+      <p>I've reviewed your design file and it looks great! The resolution and bleed are perfect for printing. We can proceed immediately once you approve this quote.</p>
+      
+      <p>To move forward:</p>
+      <ol>
+        <li>Reply to approve this quote</li>
+        <li>We'll send a digital proof within 24 hours</li>
+        <li>Once approved, production begins immediately</li>
+      </ol>
+      
+      <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 12px; margin: 16px 0;">
+        <p style="margin: 0; color: #065f46; font-size: 14px;">
+          <strong>⚡ Fast Track Option:</strong> Need them sooner? We can expedite for next-day delivery (+$25)
+        </p>
+      </div>
+      
+      <p>Let me know if you have any questions or would like to proceed!</p>
+      
+      <p>Best regards,<br>
+      inkIQ AI Assistant<br>
+      <span style="color: #6b7280; font-size: 12px;">This quote was automatically generated and reviewed by our AI system</span></p>
+    `,
+    date: "2024-01-15T03:32:00",
+    read: true,
+    starred: true,
+    attachments: [],
+    folder: "sent",
+    labels: ["ai-generated", "quote"]
+  },
+  {
     id: "1",
     from: {
       name: "John Doe",
