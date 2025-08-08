@@ -42,7 +42,7 @@ export default function WorkOrder() {
         l: parseInt(item.l) || 0,
         xl: parseInt(item.xl) || 0,
         xxl: parseInt(item.xxl) || 0,
-        xxxl: parseInt(item.xxxl) || 0,
+        qty: parseInt(item.qty) || 0,
       },
       price: parseFloat(item.price.replace('$', '')) || 0,
       taxed: item.taxed,
