@@ -45,6 +45,8 @@ export function ImprintSettings() {
   const [selectedMethod, setSelectedMethod] = useState<string>('');
   const [customInkSpecialties, setCustomInkSpecialties] = useState<string[]>([]);
   const [newInkSpecialty, setNewInkSpecialty] = useState('');
+  const [customThreadSpecialties, setCustomThreadSpecialties] = useState<string[]>([]);
+  const [newThreadSpecialty, setNewThreadSpecialty] = useState('');
   const [extraCharges, setExtraCharges] = useState<Array<{name: string, price: string}>>([
     { name: 'Oversized Print', price: '' },
     { name: 'Sleeve Print', price: '' },
@@ -198,6 +200,25 @@ export function ImprintSettings() {
 
   const removeCustomInkSpecialty = (specialty: string) => {
     setCustomInkSpecialties(prev => prev.filter(s => s !== specialty));
+  };
+
+  const addCustomThreadSpecialty = () => {
+    if (newThreadSpecialty.trim() && !customThreadSpecialties.includes(newThreadSpecialty.trim())) {
+      const specialty = newThreadSpecialty.trim();
+      setCustomThreadSpecialties(prev => [...prev, specialty]);
+      
+      // Automatically add to extra charges if not already there
+      const existsInExtraCharges = extraCharges.some(charge => charge.name.toLowerCase() === specialty.toLowerCase());
+      if (!existsInExtraCharges) {
+        setExtraCharges(prev => [...prev, { name: specialty, price: '' }]);
+      }
+      
+      setNewThreadSpecialty('');
+    }
+  };
+
+  const removeCustomThreadSpecialty = (specialty: string) => {
+    setCustomThreadSpecialties(prev => prev.filter(s => s !== specialty));
   };
 
   const handleAddMethod = () => {
@@ -688,6 +709,454 @@ export function ImprintSettings() {
     );
   };
 
+  const renderEmbroideryForm = (config: ImprintMethodConfiguration) => {
+    const standardThreadTypes = [
+      'Rayon',
+      'Cotton',
+      'Polyester',
+      'Metallic',
+      '3D Puff',
+      'Appliqué',
+      'Glow in the Dark Thread',
+      'Reflective Thread'
+    ];
+
+    return (
+      <div className="space-y-8">
+        {/* Embroidery Information */}
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-lg font-semibold">Embroidery Information</h3>
+            <p className="text-sm text-muted-foreground">Fill out this page if you offer embroidery. Skip if you don't.</p>
+          </div>
+          
+          <div className="space-y-3">
+            <Label className="text-base font-medium">Select the embroidery thread types / specialties you offer.</Label>
+            <div className="grid grid-cols-2 gap-3">
+              {standardThreadTypes.map((thread) => (
+                <div key={thread} className="flex items-center space-x-2">
+                  <Checkbox id={thread} />
+                  <Label htmlFor={thread} className="text-sm">{thread}</Label>
+                </div>
+              ))}
+              
+              {/* Custom thread specialties */}
+              {customThreadSpecialties.map((specialty) => (
+                <div key={specialty} className="flex items-center space-x-2">
+                  <Checkbox id={specialty} />
+                  <Label htmlFor={specialty} className="text-sm">{specialty}</Label>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeCustomThreadSpecialty(specialty)}
+                    className="h-6 w-6 p-0 ml-auto"
+                  >
+                    <Trash2 className="h-3 w-3 text-destructive" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+            
+            {/* Add custom thread specialty */}
+            <div className="flex items-center space-x-2 mt-3">
+              <Input
+                placeholder="Add custom thread specialty..."
+                value={newThreadSpecialty}
+                onChange={(e) => setNewThreadSpecialty(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addCustomThreadSpecialty();
+                  }
+                }}
+                className="flex-1"
+              />
+              <Button
+                onClick={addCustomThreadSpecialty}
+                variant="outline"
+                size="sm"
+                disabled={!newThreadSpecialty.trim()}
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Capability Questions */}
+        <div className="space-y-4">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Do you embroider individual sleeve names?</Label>
+              <RadioGroup defaultValue="no" className="flex space-x-4">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="sleeve-names-yes" />
+                  <Label htmlFor="sleeve-names-yes">Yes</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="sleeve-names-no" />
+                  <Label htmlFor="sleeve-names-no">No</Label>
+                </div>
+              </RadioGroup>
+            </div>
+          </div>
+        </div>
+
+        {/* Technical Specifications */}
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="maxLogoColors" className="text-sm font-medium">Maximum Logo Colors</Label>
+            <Input
+              id="maxLogoColors"
+              type="number"
+              placeholder="Enter maximum colors"
+              className="mt-1"
+            />
+            <p className="text-xs text-muted-foreground mt-1">What's the max number of colors you can embroider?</p>
+          </div>
+
+          <div>
+            <Label htmlFor="threadColorNotes" className="text-sm font-medium">Thread Colors Additional Notes</Label>
+            <Textarea
+              id="threadColorNotes"
+              placeholder="Any additional notes about thread colors..."
+              className="mt-1"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="maxEmbWidth" className="text-sm font-medium">Maximum Width in Inches</Label>
+              <Input
+                id="maxEmbWidth"
+                type="number"
+                placeholder="Width"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="maxEmbHeight" className="text-sm font-medium">Maximum Height in Inches</Label>
+              <Input
+                id="maxEmbHeight"
+                type="number"
+                placeholder="Height"
+                className="mt-1"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="maxEmbSleeveWidth" className="text-sm font-medium">Maximum Sleeve Width</Label>
+              <Input
+                id="maxEmbSleeveWidth"
+                type="number"
+                placeholder="Sleeve Width"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="maxEmbSleeveHeight" className="text-sm font-medium">Maximum Sleeve Height</Label>
+              <Input
+                id="maxEmbSleeveHeight"
+                type="number"
+                placeholder="Sleeve Height"
+                className="mt-1"
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="embLogoSizeNotes" className="text-sm font-medium">Logo size additional notes</Label>
+            <Textarea
+              id="embLogoSizeNotes"
+              placeholder="Any additional notes about logo sizing..."
+              className="mt-1"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="embMinOrderQty" className="text-sm font-medium">Minimum Order Quantity</Label>
+              <Input
+                id="embMinOrderQty"
+                type="number"
+                placeholder="Min quantity"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="embMaxOrderQty" className="text-sm font-medium">Maximum Order Quantity</Label>
+              <Input
+                id="embMaxOrderQty"
+                type="number"
+                placeholder="Max quantity"
+                className="mt-1"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="embDailyCapacity" className="text-sm font-medium">Daily Capacity</Label>
+              <Input
+                id="embDailyCapacity"
+                type="number"
+                placeholder="Daily capacity"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="embDamageRate" className="text-sm font-medium">Damage Rate %</Label>
+              <Input
+                id="embDamageRate"
+                type="number"
+                placeholder="Damage rate"
+                className="mt-1"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Turnaround Times */}
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-lg font-semibold">Embroidery Production Turnaround Times</h3>
+            <p className="text-sm text-muted-foreground">
+              How many business days does it take you to produce embroidery orders? Don't include shipping time here - 
+              that's handled elsewhere. If you don't offer rush, you can delete those rows.
+            </p>
+          </div>
+          
+          <div className="border rounded-lg">
+            <table className="w-full">
+              <thead className="bg-muted/50 border-b">
+                <tr>
+                  <th className="text-left p-3 font-medium">Type</th>
+                  <th className="text-left p-3 font-medium">Days</th>
+                  <th className="text-left p-3 font-medium">Extra Charge %</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b">
+                  <td className="p-3">Standard</td>
+                  <td className="p-3">
+                    <Input type="number" placeholder="Days" className="w-20" />
+                  </td>
+                  <td className="p-3">0%</td>
+                </tr>
+                {['Rush 1', 'Rush 2', 'Rush 3'].map((type) => (
+                  <tr key={type} className="border-b last:border-b-0">
+                    <td className="p-3">{type}</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="Days" className="w-20" />
+                    </td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="%" className="w-20" />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Embroidery Pricing Grid */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Embroidery Pricing Grid</h3>
+          
+          <div className="border rounded-lg p-4 space-y-4">
+            <div className="flex space-x-2">
+              <Button variant="outline" size="sm">Add Quantity Range</Button>
+              <Button variant="outline" size="sm">Add Stitch Range</Button>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full border">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="border p-2 text-left">Stitch Count</th>
+                    <th className="border p-2 text-center">0-7000</th>
+                    <th className="border p-2 text-center">7001-8000</th>
+                    <th className="border p-2 text-center">8001-9000</th>
+                    <th className="border p-2 text-center">9001-10000</th>
+                    <th className="border p-2 text-center">10001+</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {['12-24', '25-50', '51-100', '101-250', '251-500', '501+'].map((stitches) => (
+                    <tr key={stitches}>
+                      <td className="border p-2 font-medium">{stitches}</td>
+                      {['0-7000', '7001-8000', '8001-9000', '9001-10000', '10001+'].map((qty) => (
+                        <td key={qty} className="border p-1">
+                          <Input type="number" placeholder="$0.00" className="text-center" />
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* Fees and Extra Charges */}
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-lg font-semibold">Fees</h3>
+            <div className="border rounded-lg">
+              <table className="w-full">
+                <thead className="bg-muted/50 border-b">
+                  <tr>
+                    <th className="text-left p-3 font-medium">Name</th>
+                    <th className="text-left p-3 font-medium">Price</th>
+                    <th className="text-left p-3 font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b">
+                    <td className="p-3">Digitizing</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Sew Out Sample</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Artwork Adjustments</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3">Names</td>
+                    <td className="p-3">
+                      <Input type="number" placeholder="$0.00" className="w-24" />
+                    </td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <Button variant="outline" size="sm" className="mt-2">Add Fee</Button>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold">Extra Charges</h3>
+            <div className="border rounded-lg">
+              <table className="w-full">
+                <thead className="bg-muted/50 border-b">
+                  <tr>
+                    <th className="text-left p-3 font-medium">Name</th>
+                    <th className="text-left p-3 font-medium">Price</th>
+                    <th className="text-left p-3 font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* Default embroidery-specific extra charges */}
+                  {[
+                    'Metallic Thread',
+                    '3D Puff', 
+                    'Appliqué',
+                    'Glow in the Dark Thread',
+                    'Rayon Thread',
+                    'Reflective Thread'
+                  ].map((charge) => (
+                    <tr key={charge} className="border-b">
+                      <td className="p-3">{charge}</td>
+                      <td className="p-3">
+                        <Input type="number" placeholder="$0.00" className="w-24" />
+                      </td>
+                      <td className="p-3">
+                        <Button variant="ghost" size="sm">
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                  
+                  {/* Custom thread specialties that were added */}
+                  {customThreadSpecialties.map((specialty) => (
+                    <tr key={specialty} className="border-b">
+                      <td className="p-3">{specialty}</td>
+                      <td className="p-3">
+                        <Input type="number" placeholder="$0.00" className="w-24" />
+                      </td>
+                      <td className="p-3">
+                        <Button variant="ghost" size="sm">
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="mt-2"
+              onClick={() => {
+                const chargeName = prompt('Enter charge name:');
+                if (chargeName && chargeName.trim()) {
+                  setExtraCharges(prev => [...prev, { name: chargeName.trim(), price: '' }]);
+                }
+              }}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Add Charge
+            </Button>
+          </div>
+
+          <div>
+            <Label htmlFor="embExtraNotes" className="text-sm font-medium">Extra Notes</Label>
+            <Textarea
+              id="embExtraNotes"
+              placeholder="Any additional notes or special considerations..."
+              className="mt-1"
+            />
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-between pt-6 border-t">
+          <Button variant="outline">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Reset to Defaults
+          </Button>
+          <Button>
+            <Save className="mr-2 h-4 w-4" />
+            Save Changes
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
   const selectedConfig = configurations.find(config => config.id === activeTab);
   const availableMethods = IMPRINT_METHODS.filter(
     method => !configurations.find(config => config.method === method.value)
@@ -827,7 +1296,8 @@ export function ImprintSettings() {
               <Card>
                 <CardContent className="p-6">
                   {config.method === 'screenPrinting' && renderScreenPrintingForm(config)}
-                  {config.method !== 'screenPrinting' && (
+                  {config.method === 'embroidery' && renderEmbroideryForm(config)}
+                  {config.method !== 'screenPrinting' && config.method !== 'embroidery' && (
                     <div className="text-center py-12">
                       <Cog className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                       <h3 className="text-lg font-semibold mb-2">Configuration Form Coming Soon</h3>
