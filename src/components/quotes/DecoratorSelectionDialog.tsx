@@ -212,8 +212,10 @@ export function DecoratorSelectionDialog({
                     <div className="flex items-center gap-1">
                       <Clock className="w-3 h-3 text-muted-foreground" />
                       <div>
-                        <div className="text-xs text-muted-foreground">Turnaround Time</div>
-                        <div className="text-sm font-medium">{decorator.capacity.leadTime} days</div>
+                        <div className="text-xs text-muted-foreground">Estimated Completion</div>
+                        <div className="text-sm font-medium">
+                          {new Date(Date.now() + decorator.capacity.leadTime * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
@@ -222,17 +224,6 @@ export function DecoratorSelectionDialog({
                         <div className="text-xs text-muted-foreground">Total Cost</div>
                         <div className="text-sm font-medium">$3,240.00</div>
                       </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-2">Capabilities</div>
-                    <div className="flex flex-wrap gap-1">
-                      {decorator.capabilities.map((cap, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {cap.method.replace('_', ' ')} (${cap.pricePerPiece}/pc)
-                        </Badge>
-                      ))}
                     </div>
                   </div>
                 </CardContent>
