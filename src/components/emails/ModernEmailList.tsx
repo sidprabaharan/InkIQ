@@ -164,12 +164,6 @@ export function ModernEmailList({
                 </div>
                 
                 <div className="flex items-center justify-between">
-                  <span className={`text-xs truncate flex-1 ${
-                    selectedEmailId === email.id ? 'text-white/70' : 'text-gray-500'
-                  }`}>
-                    {email.content.substring(0, 80)}...
-                  </span>
-                  
                   <div className="flex items-center gap-2 ml-3">
                     {email.attachments.length > 0 && (
                       <Paperclip className={`h-3 w-3 ${
