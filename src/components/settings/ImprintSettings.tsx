@@ -236,12 +236,12 @@ export function ImprintSettings() {
 
   const renderDTGForm = (config: ImprintMethodConfiguration) => {
     return (
-      <div className="space-y-8">
-        {/* Basic Information */}
+      <div className="space-y-6">
+        {/* Basic Configuration */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold flex items-center">
             <Settings className="mr-2 h-5 w-5" />
-            Basic Information
+            Basic Configuration
           </h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -250,22 +250,19 @@ export function ImprintSettings() {
                 id="dtg-description"
                 value={config.description}
                 onChange={(e) => updateConfiguration(config.id, { description: e.target.value })}
-                placeholder="Brief description of your DTG capabilities..."
+                placeholder="Brief description of this imprint method..."
                 rows={3}
               />
             </div>
             <div>
-              <Label>Status</Label>
+              <Label>Enabled</Label>
               <div className="flex items-center space-x-2 mt-2">
                 <Switch
                   checked={config.enabled}
                   onCheckedChange={(enabled) => updateConfiguration(config.id, { enabled })}
                 />
-                <span className="text-sm font-medium">{config.enabled ? 'Active' : 'Inactive'}</span>
+                <span className="text-sm">{config.enabled ? 'Active' : 'Inactive'}</span>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Control whether this method is available for quotes
-              </p>
             </div>
           </div>
         </div>
@@ -273,14 +270,11 @@ export function ImprintSettings() {
         {/* Size Limits */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Size Limits</h3>
-          <p className="text-sm text-muted-foreground">
-            Configure maximum print dimensions for DTG printing.
-          </p>
           
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="dtg-max-width" className="text-sm font-medium">Maximum Width in Inches</Label>
+                <Label htmlFor="dtg-max-width">Maximum Width in Inches</Label>
                 <Input
                   id="dtg-max-width"
                   type="number"
@@ -294,10 +288,9 @@ export function ImprintSettings() {
                   })}
                   placeholder="e.g., 12"
                 />
-                <p className="text-xs text-muted-foreground mt-1">Maximum print width</p>
               </div>
               <div>
-                <Label htmlFor="dtg-max-height" className="text-sm font-medium">Maximum Height in Inches</Label>
+                <Label htmlFor="dtg-max-height">Maximum Height in Inches</Label>
                 <Input
                   id="dtg-max-height"
                   type="number"
@@ -311,13 +304,12 @@ export function ImprintSettings() {
                   })}
                   placeholder="e.g., 16"
                 />
-                <p className="text-xs text-muted-foreground mt-1">Maximum print height</p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="dtg-max-sleeve-width" className="text-sm font-medium">Maximum Sleeve Width in Inches</Label>
+                <Label htmlFor="dtg-max-sleeve-width">Maximum Sleeve Width in Inches</Label>
                 <Input
                   id="dtg-max-sleeve-width"
                   type="number"
@@ -331,10 +323,9 @@ export function ImprintSettings() {
                   })}
                   placeholder="e.g., 3"
                 />
-                <p className="text-xs text-muted-foreground mt-1">Maximum width for sleeve prints</p>
               </div>
               <div>
-                <Label htmlFor="dtg-max-sleeve-height" className="text-sm font-medium">Maximum Sleeve Height in Inches</Label>
+                <Label htmlFor="dtg-max-sleeve-height">Maximum Sleeve Height in Inches</Label>
                 <Input
                   id="dtg-max-sleeve-height"
                   type="number"
@@ -348,12 +339,11 @@ export function ImprintSettings() {
                   })}
                   placeholder="e.g., 5"
                 />
-                <p className="text-xs text-muted-foreground mt-1">Maximum height for sleeve prints</p>
               </div>
             </div>
 
             <div>
-              <Label htmlFor="dtg-logo-size-notes" className="text-sm font-medium">Logo size additional notes</Label>
+              <Label htmlFor="dtg-logo-size-notes">Logo size additional notes</Label>
               <Textarea
                 id="dtg-logo-size-notes"
                 value={config.sizeCapabilities?.notes || ''}
@@ -373,14 +363,11 @@ export function ImprintSettings() {
         {/* Order Quantities & Capacity */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Order Quantities & Capacity</h3>
-          <p className="text-sm text-muted-foreground">
-            Configure minimum and maximum order quantities and daily production capacity.
-          </p>
           
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="dtg-min-order-qty" className="text-sm font-medium">Min Order Quantity</Label>
+                <Label htmlFor="dtg-min-order-qty">Min Order Quantity</Label>
                 <Input
                   id="dtg-min-order-qty"
                   type="number"
@@ -395,7 +382,7 @@ export function ImprintSettings() {
                 />
               </div>
               <div>
-                <Label htmlFor="dtg-max-order-qty" className="text-sm font-medium">Max Order Quantity</Label>
+                <Label htmlFor="dtg-max-order-qty">Max Order Quantity</Label>
                 <Input
                   id="dtg-max-order-qty"
                   type="number"
@@ -413,7 +400,7 @@ export function ImprintSettings() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="dtg-daily-capacity" className="text-sm font-medium">Daily Capacity (Average Logo)</Label>
+                <Label htmlFor="dtg-daily-capacity">Daily Capacity (Average Logo)</Label>
                 <Input
                   id="dtg-daily-capacity"
                   type="number"
@@ -431,7 +418,7 @@ export function ImprintSettings() {
                 />
               </div>
               <div>
-                <Label htmlFor="dtg-damage-rate" className="text-sm font-medium">Damage Rate (%)</Label>
+                <Label htmlFor="dtg-damage-rate">Damage Rate (%)</Label>
                 <Input
                   id="dtg-damage-rate"
                   type="number"
@@ -461,9 +448,6 @@ export function ImprintSettings() {
         {/* Production Times */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">DTG Production Turnaround Times</h3>
-          <p className="text-sm text-muted-foreground">
-            Configure standard and rush turnaround times for DTG printing.
-          </p>
           
           <div className="border rounded-lg overflow-hidden">
             <Table>
@@ -591,16 +575,11 @@ export function ImprintSettings() {
           </div>
         </div>
 
-        {/* Pricing Tables for White and Colored Garments */}
-        <div className="space-y-8">
-          {/* White Garment Pricing */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">White Garment Pricing (Based on Size)</h3>
-            <p className="text-sm text-muted-foreground">
-              Set your pricing for DTG printing on white garments based on size.
-            </p>
-            
-            <div className="border rounded-lg overflow-auto">
+        {/* White Garment Pricing */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">White Garment Pricing (Based on Size)</h3>
+          
+          <div className="border rounded-lg overflow-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -699,16 +678,13 @@ export function ImprintSettings() {
               <Plus className="h-4 w-4 mr-2" />
               Add Pricing Tier
             </Button>
-          </div>
+        </div>
 
-          {/* Colored Garment Pricing */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Colored Garment Pricing (Based on Size)</h3>
-            <p className="text-sm text-muted-foreground">
-              Set your pricing for DTG printing on colored garments based on size.
-            </p>
-            
-            <div className="border rounded-lg overflow-auto">
+        {/* Colored Garment Pricing */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Colored Garment Pricing (Based on Size)</h3>
+          
+          <div className="border rounded-lg overflow-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -777,15 +753,11 @@ export function ImprintSettings() {
                 </TableBody>
               </Table>
             </div>
-          </div>
         </div>
 
         {/* Fees */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Fees</h3>
-          <p className="text-sm text-muted-foreground">
-            Configure additional fees for DTG printing services.
-          </p>
           
           <div className="space-y-4">
             <div className="mt-4">
@@ -895,9 +867,6 @@ export function ImprintSettings() {
         {/* Extra Charges */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Extra Charges</h3>
-          <p className="text-sm text-muted-foreground">
-            Configure additional charges for special DTG printing requirements.
-          </p>
           
           <div className="space-y-2">
             {(['Sleeves', 'Fleece', 'Over Zipper', 'Over Pocket', 'Neck Label', 'Kids Shirts']).map((chargeName, index) => (
