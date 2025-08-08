@@ -1325,11 +1325,11 @@ export function ImprintSettings() {
         </div>
 
         {/* Size Limits */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-2">
-            <Ruler className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold">Size Limits</h3>
-          </div>
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Size Limits</h3>
+          <p className="text-sm text-muted-foreground">
+            Set the maximum and minimum dimensions for DTG printing.
+          </p>
           
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -1425,11 +1425,11 @@ export function ImprintSettings() {
         </div>
 
         {/* Order Quantities & Capacity */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-2">
-            <Package className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold">Order Quantities & Capacity</h3>
-          </div>
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Order Quantities & Capacity</h3>
+          <p className="text-sm text-muted-foreground">
+            Configure minimum and maximum order quantities and daily production capacity.
+          </p>
           
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -1497,10 +1497,10 @@ export function ImprintSettings() {
 
         {/* Production Times */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold">DTG Production Turnaround Times</h3>
-          </div>
+          <h3 className="text-lg font-semibold">DTG Production Turnaround Times</h3>
+          <p className="text-sm text-muted-foreground">
+            Configure standard and rush turnaround times for DTG printing.
+          </p>
           
           <div className="border rounded-lg overflow-hidden">
             <Table>
@@ -1614,10 +1614,10 @@ export function ImprintSettings() {
 
         {/* White Garment Pricing */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold">White Garment Pricing (Based on Size)</h3>
-          </div>
+          <h3 className="text-lg font-semibold">White Garment Pricing (Based on Size)</h3>
+          <p className="text-sm text-muted-foreground">
+            Set your pricing for DTG printing on white garments based on size.
+          </p>
           
           <div className="border rounded-lg overflow-auto">
             <Table>
@@ -1743,10 +1743,10 @@ export function ImprintSettings() {
 
         {/* Colored Garment Pricing */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold">Colored Garment Pricing (Based on Size)</h3>
-          </div>
+          <h3 className="text-lg font-semibold">Colored Garment Pricing (Based on Size)</h3>
+          <p className="text-sm text-muted-foreground">
+            Set your pricing for DTG printing on colored garments based on size.
+          </p>
           
           <div className="border rounded-lg overflow-auto">
             <Table>
@@ -1812,10 +1812,10 @@ export function ImprintSettings() {
 
         {/* Fees */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Receipt className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold">Fees</h3>
-          </div>
+          <h3 className="text-lg font-semibold">Fees</h3>
+          <p className="text-sm text-muted-foreground">
+            Configure standard fees for DTG printing services.
+          </p>
           
           <div className="space-y-2">
             {(config.fees || [{ name: 'Setup', amount: 0 }]).map((fee, index) => (
@@ -1872,10 +1872,10 @@ export function ImprintSettings() {
 
         {/* Extra Charges */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Plus className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold">Extra Charges</h3>
-          </div>
+          <h3 className="text-lg font-semibold">Extra Charges</h3>
+          <p className="text-sm text-muted-foreground">
+            Configure additional charges for special DTG printing requirements.
+          </p>
           
           <div className="space-y-2">
             {(config.extraCharges || [
