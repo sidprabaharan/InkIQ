@@ -558,7 +558,7 @@ export const sampleQuoteData: Record<string, QuotationData> = {
         placement: "Back Center",
         size: "10\" x 4\"",
         colours: "White ink",
-        notes: "Large back slogan placement on t-shirts and hoodies only.",
+        notes: "Large back slogan placement on t-shirts and hoodies only. Remove black background.",
         customerArt: [
           {
             id: "customer-art-wat-slogan",
