@@ -121,7 +121,7 @@ export default function NewQuote() {
           l: item.sizes.l.toString(),
           xl: item.sizes.xl.toString(),
           xxl: item.sizes.xxl.toString(),
-          xxxl: item.sizes.xxxl.toString(),
+          qty: item.quantity.toString(),
           quantity: item.quantity.toString(),
           price: item.price.toString(),
           taxed: item.taxed,
