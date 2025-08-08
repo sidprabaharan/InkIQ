@@ -525,8 +525,8 @@ export const sampleQuoteData: Record<string, QuotationData> = {
         customerArt: [
           {
             id: "customer-art-wat-slogan",
-            name: "western-alliance-slogan.png",
-            url: "/lovable-uploads/4916f36f-5c0f-4f85-b192-02a45d68a412.png",
+            name: "delivering-solutions-connecting-communities.png",
+            url: "/lovable-uploads/8cf66bdd-1e7e-4d5b-a28e-3f4f87171935.png",
             type: "image/png",
             category: "customerArt"
           }
