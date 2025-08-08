@@ -189,28 +189,58 @@ export default function Emails() {
   };
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="border-b p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold">Emails</h1>
-          <Button onClick={() => setShowComposer(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Compose
-          </Button>
+    <div className="h-full flex">
+      {/* Sidebar */}
+      <div className="w-80 border-r flex flex-col bg-gray-50">
+        {/* Header */}
+        <div className="p-4 border-b bg-white">
+          <div className="flex items-center justify-between mb-3">
+            <h1 className="text-xl font-semibold">Messages</h1>
+            <Button 
+              onClick={() => setShowComposer(true)} 
+              size="sm"
+              className="rounded-full w-8 h-8 p-0"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          <AccountSwitcher
+            accounts={accounts}
+            selectedAccountId={selectedAccountId}
+            onAccountSelect={handleAccountSelect}
+            onAddAccount={handleAddAccount}
+          />
         </div>
-        
-        <AccountSwitcher
-          accounts={accounts}
-          selectedAccountId={selectedAccountId}
-          onAccountSelect={handleAccountSelect}
-          onAddAccount={handleAddAccount}
+
+        {/* Search */}
+        <div className="p-3 border-b bg-white">
+          <EmailSearchHeader
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            filterBy={filterBy}
+            onFilterChange={setFilterBy}
+          />
+        </div>
+
+        {/* Conversations List */}
+        <ModernEmailList
+          emails={filteredEmails}
+          selectedEmailId={selectedEmailId}
+          onEmailSelect={handleEmailSelect}
+          selectedEmails={selectedEmails}
+          onEmailsSelect={setSelectedEmails}
+          onStarToggle={handleStarToggle}
+          onArchive={handleArchive}
+          onDelete={handleDelete}
         />
       </div>
 
-      <div className="flex-1 flex overflow-hidden">
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
         {selectedEmail ? (
-          /* Email Detail View */
           <EnhancedEmailDetail
             email={selectedEmail}
             accounts={accounts}
@@ -221,27 +251,16 @@ export default function Emails() {
             onSendEmail={handleSendEmail}
           />
         ) : (
-          /* Email List View */
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <EmailSearchHeader
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              sortBy={sortBy}
-              onSortChange={setSortBy}
-              filterBy={filterBy}
-              onFilterChange={setFilterBy}
-            />
-            
-            <ModernEmailList
-              emails={filteredEmails}
-              selectedEmailId={selectedEmailId}
-              onEmailSelect={handleEmailSelect}
-              selectedEmails={selectedEmails}
-              onEmailsSelect={setSelectedEmails}
-              onStarToggle={handleStarToggle}
-              onArchive={handleArchive}
-              onDelete={handleDelete}
-            />
+          <div className="flex-1 flex items-center justify-center bg-gray-50/50">
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">💬</span>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Select a conversation</h3>
+              <p className="text-gray-500 text-sm">
+                Choose a message from the list to start reading.
+              </p>
+            </div>
           </div>
         )}
       </div>

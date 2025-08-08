@@ -72,138 +72,132 @@ export function ModernEmailList({
 
   return (
     <div className="flex-1 flex flex-col">
-      {/* Toolbar */}
+      {/* Bulk Actions */}
       {selectedEmails.length > 0 && (
-        <div className="border-b px-4 py-2 bg-muted/5">
-          <div className="flex items-center gap-2">
-            <Checkbox
-              checked={selectedEmails.length === emails.length}
-              onCheckedChange={handleSelectAll}
-            />
-            <span className="text-sm text-muted-foreground">
+        <div className="px-4 py-2 bg-blue-50 border-b">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-blue-700">
               {selectedEmails.length} selected
             </span>
-            <div className="flex items-center gap-1 ml-4">
+            <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => onArchive(selectedEmails)}
+                className="text-blue-700 hover:bg-blue-100"
               >
-                <Archive className="h-4 w-4" />
+                <Archive className="h-4 w-4 mr-1" />
+                Archive
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => onDelete(selectedEmails)}
+                className="text-blue-700 hover:bg-blue-100"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-4 w-4 mr-1" />
+                Delete
               </Button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Email List */}
+      {/* Conversations */}
       <ScrollArea className="flex-1">
-        <div className="divide-y">
+        <div className="p-1">
           {emails.map((email) => (
             <div
               key={email.id}
-              className={`group flex items-center gap-3 p-4 hover:bg-muted/5 cursor-pointer transition-colors ${
-                selectedEmailId === email.id ? 'bg-muted/10' : ''
-              } ${!email.read ? 'bg-primary/5' : ''}`}
-              onMouseEnter={() => setHoveredEmail(email.id)}
-              onMouseLeave={() => setHoveredEmail(null)}
+              className={`group flex items-start gap-3 p-3 mx-2 mb-1 rounded-xl cursor-pointer transition-all hover:bg-white/80 ${
+                selectedEmailId === email.id 
+                  ? 'bg-blue-500 text-white shadow-lg' 
+                  : !email.read 
+                    ? 'bg-white shadow-sm' 
+                    : 'bg-gray-50/50'
+              }`}
               onClick={() => onEmailSelect(email.id)}
             >
-              {/* Selection Checkbox */}
-              <Checkbox
-                checked={selectedEmails.includes(email.id)}
-                onCheckedChange={() => handleEmailSelect(email.id)}
-                onClick={(e) => e.stopPropagation()}
-              />
-
-              {/* Star */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onStarToggle(email.id);
-                }}
-                className="text-muted-foreground hover:text-yellow-500"
-              >
-                <Star
-                  className={`h-4 w-4 ${
-                    email.starred ? 'fill-yellow-500 text-yellow-500' : ''
-                  }`}
-                />
-              </button>
-
               {/* Avatar */}
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={email.from.avatar} />
-                <AvatarFallback>
-                  {email.from.name[0]?.toUpperCase() || email.from.email[0]?.toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar className="h-12 w-12 ring-2 ring-white/20">
+                  <AvatarImage 
+                    src={`https://images.unsplash.com/photo-${Math.floor(Math.random() * 10) + 1600000000000}-${Math.floor(Math.random() * 1000000)}?w=80&h=80&fit=crop&crop=face`} 
+                  />
+                  <AvatarFallback className="bg-gradient-to-br from-blue-400 to-purple-500 text-white font-semibold">
+                    {email.from.name[0]?.toUpperCase() || email.from.email[0]?.toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                {!email.read && selectedEmailId !== email.id && (
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full"></div>
+                )}
+              </div>
 
-              {/* Email Content */}
+              {/* Content */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`text-sm truncate ${!email.read ? 'font-semibold' : 'font-medium'}`}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className={`text-sm font-semibold truncate ${
+                    selectedEmailId === email.id ? 'text-white' : 'text-gray-900'
+                  }`}>
                     {email.from.name || email.from.email}
                   </span>
-                  {email.labels.map((label) => (
-                    <Badge key={label} variant="secondary" className="text-xs">
-                      {label}
-                    </Badge>
-                  ))}
+                  <span className={`text-xs ${
+                    selectedEmailId === email.id ? 'text-white/80' : 'text-gray-500'
+                  }`}>
+                    {formatDistanceToNow(new Date(email.date), { addSuffix: true }).replace(' ago', '')}
+                  </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-sm truncate flex-1 ${!email.read ? 'font-medium' : ''}`}>
+                
+                <div className="mb-1">
+                  <span className={`text-sm font-medium block truncate ${
+                    selectedEmailId === email.id ? 'text-white/90' : 'text-gray-700'
+                  }`}>
                     {email.subject}
                   </span>
-                  <span className="text-sm text-muted-foreground">
-                    - {email.content.substring(0, 100)}...
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className={`text-xs truncate flex-1 ${
+                    selectedEmailId === email.id ? 'text-white/70' : 'text-gray-500'
+                  }`}>
+                    {email.content.substring(0, 60)}...
                   </span>
-                </div>
-              </div>
-
-              {/* Metadata */}
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                {email.attachments.length > 0 && (
-                  <Paperclip className="h-4 w-4" />
-                )}
-                <span className="whitespace-nowrap">
-                  {formatDistanceToNow(new Date(email.date), { addSuffix: true })}
-                </span>
-              </div>
-
-              {/* Actions (on hover) */}
-              {hoveredEmail === email.id && (
-                <div className="flex items-center gap-1 opacity-100 group-hover:opacity-100">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
+                  
+                  <div className="flex items-center gap-1 ml-2">
+                    {email.attachments.length > 0 && (
+                      <Paperclip className={`h-3 w-3 ${
+                        selectedEmailId === email.id ? 'text-white/70' : 'text-gray-400'
+                      }`} />
+                    )}
+                    
+                    {/* Selection and Actions */}
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Checkbox
+                        checked={selectedEmails.includes(email.id)}
+                        onCheckedChange={() => handleEmailSelect(email.id)}
                         onClick={(e) => e.stopPropagation()}
+                        className="w-4 h-4"
+                      />
+                      
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onStarToggle(email.id);
+                        }}
+                        className={`${
+                          selectedEmailId === email.id ? 'text-white/70 hover:text-white' : 'text-gray-400 hover:text-yellow-500'
+                        }`}
                       >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => onArchive([email.id])}>
-                        <Archive className="h-4 w-4 mr-2" />
-                        Archive
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onDelete([email.id])}>
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                        <Star
+                          className={`h-4 w-4 ${
+                            email.starred ? 'fill-yellow-400 text-yellow-400' : ''
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              )}
+              </div>
             </div>
           ))}
         </div>
