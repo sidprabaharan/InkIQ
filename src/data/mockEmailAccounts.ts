@@ -36,9 +36,9 @@ export const mockEmailAccounts: EmailAccount[] = [
 ];
 
 export const mockEmails: Email[] = [
-  // Pamela Hunt Email Thread
+  // Pamela Hunt Email Thread - Initial Message
   {
-    id: "pamela-1",
+    id: "pamela-thread-1",
     accountId: "account-1",
     from: {
       email: "pamela@westernalliancetransport.com",
@@ -47,37 +47,185 @@ export const mockEmails: Email[] = [
     },
     to: [{ email: "kiriakos@merchradar.com", name: "Kiriakos" }],
     subject: "Staff Merchandise Order - Western Alliance Transport",
-    content: "Hello,\n\nWe'd like to order t-shirts, hoodies, and hats for our staff. We need them for an event next week. How much will this cost, and can you deliver?\n\nPamela Hunt\nWestern Alliance Transport\n514-512-9926",
-    date: "2024-02-01T14:30:00Z",
-    read: true,
-    starred: false,
-    folder: "inbox",
-    labels: ["new-inquiry", "urgent"],
-    attachments: [],
-    threadId: "thread-pamela",
-    messageId: "msg-pamela-1",
-    importance: "high"
-  },
-  {
-    id: "pamela-2",
-    accountId: "account-1",
-    from: {
-      email: "kiriakos@merchradar.com",
-      name: "Kiriakos (inkIQ)",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face"
-    },
-    to: [{ email: "pamela@westernalliancetransport.com", name: "Pamela Hunt" }],
-    subject: "RE: Staff Merchandise Order - Western Alliance Transport",
-    content: "<div style=\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;\"><div style=\"display: flex; align-items: center; gap: 8px; color: white; font-size: 13px; font-weight: 600;\"><div style=\"width: 10px; height: 10px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;\"><div style=\"width: 4px; height: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%;\"></div></div>AI-Generated Response • Auto-sent in 8 seconds</div></div><p>Hi Pamela,</p><p>Thanks for reaching out—happy to help.</p><p>I just need a few quick details so I can put together a quote and some mockups for you:</p><ul><li>Do you know which t-shirt, hoodie, and hat models you're looking for?</li><li>Do you have a budget in mind?</li><li>What colors do you want for each item?</li><li>Can you send me a size/quantity breakdown?</li><li>Can you send your logo(s) and let me know where you want them placed and how large?</li><li>What exact date next week do you need delivery by?</li></ul><p>Looking forward to your reply.</p><p>Thanks,<br>Kiriakos<br>Merch Radar<br>kiriakos@merchradar.com<br>514-834-6659<br>mercradar.com</p>",
-    date: "2024-02-01T14:30:08Z",
-    read: true,
+    content: `Hello,
+
+We'd like to order t-shirts, hoodies, and hats for our staff. We need them for an event next week. How much will this cost, and can you deliver?
+
+Pamela Hunt
+Western Alliance Transport
+514-512-9926
+
+---
+
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 16px; border-radius: 8px; margin: 16px 0;">
+  <div style="display: flex; align-items: center; gap: 8px; color: white; font-size: 13px; font-weight: 600;">
+    <div style="width: 10px; height: 10px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+      <div style="width: 4px; height: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%;"></div>
+    </div>
+    AI-Generated Response • Auto-sent in 8 seconds
+  </div>
+</div>
+
+**From: Kiriakos (inkIQ) <kiriakos@merchradar.com>**
+**Date: February 1st, 2024 at 9:30:08 AM**
+
+Hi Pamela,
+
+Thanks for reaching out—happy to help.
+
+I just need a few quick details so I can put together a quote and some mockups for you:
+• Do you know which t-shirt, hoodie, and hat models you're looking for?
+• Do you have a budget in mind?
+• What colors do you want for each item?
+• Can you send me a size/quantity breakdown?
+• Can you send your logo(s) and let me know where you want them placed and how large?
+• What exact date next week do you need delivery by?
+
+Looking forward to your reply.
+
+Thanks,
+Kiriakos
+Merch Radar
+kiriakos@merchradar.com
+514-834-6659
+mercradar.com
+
+---
+
+**From: Pamela Hunt <pamela@westernalliancetransport.com>**
+**Date: February 3rd, 2024 at 2:15 PM**
+
+Hi Kiriakos,
+
+We need everything delivered no later than next Thursday.
+
+Can you send me a few garment options? I'm not too picky—just something cotton for the tees and hoodies, and a hat with a buckle. Good quality but affordable.
+
+**Colors:**
+• Black t-shirts and hoodies
+• White hats
+• For the tees and hoodies, we want the black part of the logo to be white
+
+**Quantities:**
+• Tees & Hoodies: 20 small, 50 medium, 50 large, 20 XL
+• Hats: 140 units
+
+I attached our logos.
+• Print the full logo large on the front of the tees and hoodies
+• Print the slogan large on the back
+• Embroider just the logo on the front of the hats
+
+Let me know if you need anything else.
+
+Pamela Hunt
+Western Alliance Transport
+514-512-9926
+
+---
+
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 16px; border-radius: 8px; margin: 16px 0;">
+  <div style="display: flex; align-items: center; gap: 8px; color: white; font-size: 13px; font-weight: 600;">
+    <div style="width: 10px; height: 10px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+      <div style="width: 4px; height: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%;"></div>
+    </div>
+    AI-Generated Response • Auto-curated product options
+  </div>
+</div>
+
+**From: Kiriakos (inkIQ) <kiriakos@merchradar.com>**
+**Date: February 4th, 2024 at 11:22 AM**
+
+Hi Pamela,
+
+Thanks for the info—here are some great garment options with prices (includes decoration):
+
+**T-Shirts**
+• **Gildan 5000** – 100% cotton, boxy fit, durable. **$7.52**
+• **Gildan 64000** – 100% cotton, slimmer fit, softer feel. **$8.36**
+• **Bella Canvas 3001C** – Premium fit/feel, still budget-friendly. **$9.40**
+
+**Hoodies (100% cotton)**
+Hoodies are a bit tricky—cotton ones are harder to find at low prices. Let me know if you'd be open to blends for cheaper options.
+• **Comfort Colors 1467** – Lightweight, soft, **$30.44**
+• **Allmade AL400** – French terry, lightweight, **$36.58**
+• **Stanley/Stella SXU028** – Premium French terry, **$49.40**
+• **LA Apparel HF-09** – Made in USA, heavy, boxy fit. **$52.75**
+
+**Hats**
+• **Valucap VC300A** – Unstructured, buckle closure. **$11.40**
+• **Valucap 9910** – Structured, buckle closure. **$12.33**
+
+Let me know which ones you want so I can send over the quote and mockups.
+
+Thanks,
+Kiriakos
+
+---
+
+**From: Pamela Hunt <pamela@westernalliancetransport.com>**
+**Date: February 6th, 2024 at 10:45 AM**
+
+Hey Kiriakos,
+
+Let's go with:
+• Gildan 5000 t-shirt
+• Comfort Colors 1467 hoodie
+• Valucap VC300A hat
+
+Please send over the quote and mockups, and let me know the next steps.
+
+Pamela Hunt
+Western Alliance Transport
+514-512-9926
+
+---
+
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 16px; border-radius: 8px; margin: 16px 0;">
+  <div style="display: flex; align-items: center; gap: 8px; color: white; font-size: 13px; font-weight: 600;">
+    <div style="width: 10px; height: 10px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+      <div style="width: 4px; height: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%;"></div>
+    </div>
+    AI-Generated Quote • Mockups created automatically
+  </div>
+</div>
+
+**From: Kiriakos (inkIQ) <kiriakos@merchradar.com>**
+**Date: February 7th, 2024 at 9:18 AM**
+
+Hey Pamela,
+
+Just sent over the formal quote with mockups and instructions to get started. Let me know if you have any questions!
+
+**Quote Summary**
+**Total: $12,000** (420 items)
+Ready for production • 5-7 business days
+
+Thanks,
+Kiriakos`,
+    date: "2024-02-07T09:18:00Z",
+    read: false,
     starred: true,
-    folder: "sent",
-    labels: ["ai-generated", "auto-reply"],
-    attachments: [],
+    folder: "inbox",
+    labels: ["new-inquiry", "urgent", "ai-generated"],
+    attachments: [
+      {
+        id: "att-logos",
+        name: "western-alliance-logos.zip",
+        size: 2400000,
+        type: "application/zip",
+        url: "/attachments/western-alliance-logos.zip"
+      },
+      {
+        id: "att-quote",
+        name: "western-alliance-quote-3046.pdf",
+        size: 1800000,
+        type: "application/pdf",
+        url: "/attachments/western-alliance-quote-3046.pdf"
+      }
+    ],
     threadId: "thread-pamela",
-    messageId: "msg-pamela-2",
-    importance: "normal"
+    messageId: "msg-pamela-thread",
+    importance: "high"
   },
   {
     id: "email-1",
