@@ -92,10 +92,6 @@ export default function Invoices() {
       {/* Filter Controls */}
       <div className="mb-6 p-4 bg-white rounded-lg border">
         <div className="flex items-center gap-4 flex-wrap">
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Filters:</span>
-          </div>
           
           {/* Date From */}
           <div className="flex items-center gap-2">
