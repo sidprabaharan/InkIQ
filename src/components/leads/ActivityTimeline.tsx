@@ -131,13 +131,15 @@ const mockActivities: LeadActivity[] = [
     id: 'pamela-activity-4',
     leadId: 'pamela-hunt',
     type: 'quote',
-    title: 'Quote sent',
-    description: 'Formal quote with mockups sent to customer',
+    title: 'inkIQ auto-replied with quote',
+    description: 'AI automatically analyzed conversation and generated formal quote with mockups',
     timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     metadata: {
       quoteId: '3046',
       totalAmount: 12000,
-      products: ['T-Shirts (140 units)', 'Hoodies (140 units)', 'Hats (140 units)']
+      products: ['T-Shirts (140 units)', 'Hoodies (140 units)', 'Hats (140 units)'],
+      isAiGenerated: true,
+      aiConfidence: 95
     }
   },
   // Existing activities for other leads
@@ -389,15 +391,36 @@ export default function ActivityTimeline({ leadId, filterType }: ActivityTimelin
                         )}
 
                         {activity.type === 'quote' && activity.metadata && (
-                          <div className="bg-muted/50 p-3 rounded-lg">
+                          <div className={`p-3 rounded-lg ${activity.metadata.isAiGenerated ? 'bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200' : 'bg-muted/50'}`}>
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium">
-                                💰 Quote #{activity.metadata.quoteId}
-                              </span>
+                              <div className="flex items-center space-x-2">
+                                {activity.metadata.isAiGenerated && (
+                                  <div className="flex items-center space-x-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                                    <span className="w-3 h-3 bg-white rounded-full flex items-center justify-center">
+                                      <span className="w-1.5 h-1.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></span>
+                                    </span>
+                                    AI Generated
+                                  </div>
+                                )}
+                                <span className="text-sm font-medium">
+                                  💰 Quote #{activity.metadata.quoteId}
+                                </span>
+                              </div>
                               <span className="text-sm font-semibold">
                                 ${activity.metadata.totalAmount}
                               </span>
                             </div>
+                            {activity.metadata.isAiGenerated && (
+                              <div className="flex items-center space-x-4 mb-2 text-xs">
+                                <div className="flex items-center space-x-1">
+                                  <span className="text-blue-600">🎯 Confidence:</span>
+                                  <span className="font-medium">{activity.metadata.aiConfidence}%</span>
+                                </div>
+                                <div className="flex items-center space-x-1">
+                                  <span className="text-purple-600">⚡ Auto-sent to customer</span>
+                                </div>
+                              </div>
+                            )}
                             {activity.metadata.products && (
                               <div className="text-xs text-muted-foreground">
                                 Products: {activity.metadata.products.join(', ')}
