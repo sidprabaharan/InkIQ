@@ -599,7 +599,7 @@ export const sampleQuoteData: Record<string, QuotationData> = {
             id: "production-file-embroidery-jpeg",
             name: "wat-logo-embroidery.jpeg",
             url: "/public/lovable-uploads/a254e6c0-7bd5-4ee1-a1d3-124051d69585.png",
-            type: "image/jpeg",
+            type: "application/octet-stream",
             category: "productionFiles"
           }
         ],
