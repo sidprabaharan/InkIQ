@@ -509,9 +509,16 @@ export const sampleQuoteData: Record<string, QuotationData> = {
         ],
         proofMockup: [
           {
-            id: "proof-mockup-front",
-            name: "wat-front-logo-proof.png",
-            url: "/public/lovable-uploads/a254e6c0-7bd5-4ee1-a1d3-124051d69585.png",
+            id: "proof-mockup-front-tshirt",
+            name: "wat-front-tshirt-proof.png",
+            url: "/lovable-uploads/e91fc045-78a0-474c-87ba-e13b18f676db.png",
+            type: "image/png",
+            category: "proofMockup"
+          },
+          {
+            id: "proof-mockup-front-hoodie",
+            name: "wat-front-hoodie-proof.png",
+            url: "/lovable-uploads/f0049266-3c6f-4cb2-a1c3-d23bc446559f.png",
             type: "image/png",
             category: "proofMockup"
           }
