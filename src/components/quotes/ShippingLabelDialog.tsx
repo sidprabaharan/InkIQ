@@ -256,8 +256,8 @@ export function ShippingLabelDialog({
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0">
-        <DialogHeader className="p-6 pb-2">
+      <DialogContent className="sm:max-w-[900px] h-[85vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0 p-6 pb-2">
           <DialogTitle className="text-xl flex items-center gap-2">
             {step === "quotes" && (
               <Button variant="ghost" size="sm" onClick={handleBackToForm} className="mr-2 p-2">
@@ -270,7 +270,7 @@ export function ShippingLabelDialog({
         </DialogHeader>
         
         {step === "form" ? (
-        <div className="p-6 pt-2 space-y-6">
+        <div className="flex-1 overflow-y-auto p-6 pt-2 space-y-6">
           {/* Measurement System Selection */}
           <div className="flex items-center gap-6">
             <span className="font-medium">Measurement System:</span>
@@ -707,7 +707,7 @@ export function ShippingLabelDialog({
           <p className="text-gray-500 text-sm">This will create a shipping label using UPS shipping services.</p>
         </div>
         ) : (
-        <div className="p-6 pt-2 space-y-4">
+        <div className="flex-1 overflow-y-auto p-6 pt-2 space-y-4">
           <div className="text-sm text-muted-foreground mb-4">
             Select your preferred shipping option from the quotes below:
           </div>
@@ -753,7 +753,7 @@ export function ShippingLabelDialog({
         </div>
         )}
         
-        <DialogFooter className="p-6 pt-0 flex justify-between">
+        <DialogFooter className="flex-shrink-0 p-6 pt-0 flex justify-between bg-background border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
