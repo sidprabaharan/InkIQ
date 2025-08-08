@@ -56,13 +56,6 @@ export default function Products() {
           </div>
         </div>
         
-        {/* Secondary Navigation */}
-        <div className="bg-gray-50 border-b flex items-center justify-between px-4 py-1">
-          <div className="flex gap-6">
-            <Button variant="ghost" className="text-foreground text-sm font-medium">Brands</Button>
-            <Button variant="ghost" className="text-foreground text-sm font-medium">Categories</Button>
-          </div>
-        </div>
         
         {/* Main Content Area with Filters and Products */}
         <div className="flex flex-1 overflow-hidden">
