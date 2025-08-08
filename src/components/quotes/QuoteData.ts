@@ -328,6 +328,265 @@ export const quotationData: QuotationData = {
 
 // Additional sample quote data for different IDs
 export const sampleQuoteData: Record<string, QuotationData> = {
+  "quote-western-alliance-001": {
+    id: "quote-western-alliance-001",
+    nickname: "Western Alliance Transport Staff Merchandise",
+    company: {
+      name: "15493315 Canada Inc",
+      logo: "/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png",
+      address: "226 Rue du Domaine",
+      city: "Laval",
+      region: "Quebec",
+      postalCode: "H7X 3R9",
+      phone: "5148346659",
+      website: "https://www.stitchandink.ca",
+      email: "kiriakos@merchradar.com",
+      taxNumbers: {
+        gst: "123456789 RT0001",
+        qst: "1234567890 TQ0001"
+      }
+    },
+    customer: {
+      billing: {
+        name: "Pamela Hunt",
+        company: "Western Alliance Transport",
+        contact: "Pamela Hunt",
+        address: "2450 Boulevard Industriel",
+        city: "Montreal",
+        region: "Quebec",
+        postalCode: "H1P 3K2",
+        phone: "514-512-9926",
+        email: "pamela@westernalliancetransport.com"
+      },
+      shipping: {
+        company: "Western Alliance Transport",
+        contact: "Pamela Hunt",
+        address: "2450 Boulevard Industriel",
+        city: "Montreal",
+        region: "H1P 3K2"
+      }
+    },
+    details: {
+      owner: "Kiriakos",
+      deliveryMethod: "Express Delivery",
+      productionDueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Next Thursday
+      paymentDueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 2 weeks
+      invoiceDate: new Date().toISOString().split('T')[0],
+      poNumber: "WAT-2024-001"
+    },
+    notes: {
+      customer: "Urgent order for staff event next Thursday. Customer needs delivery no later than next Thursday. Logo colors need to be inverted for dark garments (black logo parts become white).",
+      production: "Rush order - prioritize for next Thursday delivery. Screen print front logo and back slogan on tees/hoodies. Embroider logo only on hats. Use white ink/thread for dark garments."
+    },
+    items: [
+      {
+        category: "T-Shirts",
+        itemNumber: "Gildan-5000",
+        color: "Black",
+        description: "Gildan 5000 - 100% cotton, boxy fit, durable",
+        xs: "0",
+        s: "20",
+        m: "50", 
+        l: "50",
+        xl: "20",
+        xxl: "0",
+        xxxl: "0",
+        quantity: "140",
+        price: "$7.52",
+        taxed: true,
+        total: "$1,052.80",
+        status: "Quoted",
+        mockups: [
+          {
+            id: "mockup-tshirt-black-1",
+            name: "gildan-5000-black-front.jpg",
+            url: "/src/assets/mockups/tshirt-white.jpg",
+            type: "image/jpeg"
+          },
+          {
+            id: "mockup-tshirt-black-2", 
+            name: "gildan-5000-black-back.jpg",
+            url: "/src/assets/mockups/tshirt-white.jpg",
+            type: "image/jpeg"
+          }
+        ]
+      },
+      {
+        category: "Hoodies",
+        itemNumber: "CC-1467",
+        color: "Black",
+        description: "Comfort Colors 1467 - Lightweight, soft cotton hoodie",
+        xs: "0",
+        s: "20",
+        m: "50",
+        l: "50", 
+        xl: "20",
+        xxl: "0",
+        xxxl: "0",
+        quantity: "140",
+        price: "$30.44",
+        taxed: true,
+        total: "$4,261.60",
+        status: "Quoted",
+        mockups: [
+          {
+            id: "mockup-hoodie-black-1",
+            name: "comfort-colors-1467-black-front.jpg",
+            url: "/src/assets/mockups/hoodie-black.jpg",
+            type: "image/jpeg"
+          },
+          {
+            id: "mockup-hoodie-black-2",
+            name: "comfort-colors-1467-black-back.jpg", 
+            url: "/src/assets/mockups/hoodie-black.jpg",
+            type: "image/jpeg"
+          }
+        ]
+      },
+      {
+        category: "Hats",
+        itemNumber: "VC-300A",
+        color: "White",
+        description: "Valucap VC300A - Unstructured, buckle closure",
+        xs: "0",
+        s: "0",
+        m: "0",
+        l: "0",
+        xl: "0",
+        xxl: "0",
+        xxxl: "0",
+        quantity: "140",
+        price: "$11.40",
+        taxed: true,
+        total: "$1,596.00",
+        status: "Quoted",
+        mockups: [
+          {
+            id: "mockup-hat-white-1",
+            name: "valucap-vc300a-white-front.jpg",
+            url: "/src/assets/mockups/cap-gray.jpg",
+            type: "image/jpeg"
+          }
+        ]
+      }
+    ],
+    summary: {
+      itemTotal: "$6,910.40",
+      feesTotal: "$345.52",
+      subTotal: "$7,255.92",
+      discount: "$0.00",
+      salesTax: "$1,088.39",
+      totalDue: "$8,344.31"
+    },
+    status: "Quote",
+    imprints: [
+      {
+        id: "imprint-screen-print-front",
+        type: "Screen Print",
+        placement: "Front Center",
+        size: "8\" x 6\"",
+        colours: "White ink (inverted logo)",
+        notes: "Large front logo placement on t-shirts and hoodies. Invert black logo elements to white for visibility on black garments.",
+        customerArt: [
+          {
+            id: "customer-art-wat-logo",
+            name: "western-alliance-main-logo.ai",
+            url: "/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png",
+            type: "application/postscript",
+            category: "customerArt"
+          }
+        ],
+        productionFiles: [
+          {
+            id: "production-file-front-logo",
+            name: "wat-front-logo-white.eps",
+            url: "/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png",
+            type: "application/postscript",
+            category: "productionFiles"
+          }
+        ],
+        proofMockup: [
+          {
+            id: "proof-mockup-front",
+            name: "wat-front-logo-proof.png",
+            url: "/public/lovable-uploads/a254e6c0-7bd5-4ee1-a1d3-124051d69585.png",
+            type: "image/png",
+            category: "proofMockup"
+          }
+        ]
+      },
+      {
+        id: "imprint-screen-print-back",
+        type: "Screen Print",
+        placement: "Back Center",
+        size: "10\" x 4\"",
+        colours: "White ink",
+        notes: "Large back slogan placement on t-shirts and hoodies only.",
+        customerArt: [
+          {
+            id: "customer-art-wat-slogan",
+            name: "western-alliance-slogan.ai",
+            url: "/public/lovable-uploads/d2507023-d2d7-428d-b225-4442856795ff.png",
+            type: "application/postscript",
+            category: "customerArt"
+          }
+        ],
+        productionFiles: [
+          {
+            id: "production-file-back-slogan",
+            name: "wat-back-slogan-white.eps",
+            url: "/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png",
+            type: "application/postscript",
+            category: "productionFiles"
+          }
+        ],
+        proofMockup: [
+          {
+            id: "proof-mockup-back",
+            name: "wat-back-slogan-proof.png",
+            url: "/public/lovable-uploads/d2507023-d2d7-428d-b225-4442856795ff.png",
+            type: "image/png",
+            category: "proofMockup"
+          }
+        ]
+      },
+      {
+        id: "imprint-embroidery-hat",
+        type: "Embroidery",
+        placement: "Front Center",
+        size: "3\" x 2\"",
+        colours: "Navy blue thread",
+        notes: "Embroidered logo on front of white hats only. Use original logo colors.",
+        customerArt: [
+          {
+            id: "customer-art-wat-logo-embroidery",
+            name: "western-alliance-logo-embroidery.dst",
+            url: "/public/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png",
+            type: "application/octet-stream",
+            category: "customerArt"
+          }
+        ],
+        productionFiles: [
+          {
+            id: "production-file-embroidery",
+            name: "wat-logo-embroidery.dst",
+            url: "/public/lovable-uploads/a254e6c0-7bd5-4ee1-a1d3-124051d69585.png",
+            type: "application/octet-stream",
+            category: "productionFiles"
+          }
+        ],
+        proofMockup: [
+          {
+            id: "proof-mockup-embroidery",
+            name: "wat-hat-embroidery-proof.jpg",
+            url: "/public/lovable-uploads/d2507023-d2d7-428d-b225-4442856795ff.png",
+            type: "image/jpeg",
+            category: "proofMockup"
+          }
+        ]
+      }
+    ]
+  },
   "3032": quotationData,
   "3033": {
     id: "3033",
