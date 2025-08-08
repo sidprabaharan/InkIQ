@@ -27,8 +27,26 @@ import {
   Save, 
   RefreshCw,
   Cog,
-  Palette
+  Palette,
+  Printer,
+  Ruler,
+  Package,
+  Clock,
+  DollarSign,
+  Receipt,
+  Settings,
+  HelpCircle,
+  Minus,
+  Trash
 } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { IMPRINT_METHODS } from '@/types/imprint';
 import { 
   ImprintMethodConfiguration, 
@@ -1157,6 +1175,768 @@ export function ImprintSettings() {
     );
   };
 
+  const renderDTGForm = (config: ImprintMethodConfiguration) => {
+    const currentMethod = IMPRINT_METHODS.find(method => method.value === config.method);
+    if (!currentMethod) return null;
+
+    return (
+      <div className="space-y-8">
+        {/* DTG Information Section */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-2">
+            <Printer className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-semibold">DTG Information</h3>
+          </div>
+          
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm font-medium mb-3 block">Do you print over zippers?</Label>
+              <RadioGroup
+                value={config.capabilities?.printOverZippers ? 'yes' : 'no'}
+                onValueChange={(value) => updateConfiguration(config.id!, {
+                  capabilities: { ...config.capabilities, printOverZippers: value === 'yes' }
+                })}
+                className="flex gap-6"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="zippers-yes" />
+                  <Label htmlFor="zippers-yes">Yes</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="zippers-no" />
+                  <Label htmlFor="zippers-no">No</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium mb-3 block">Do you print over hoodie pockets?</Label>
+              <RadioGroup
+                value={config.capabilities?.printOverPockets ? 'yes' : 'no'}
+                onValueChange={(value) => updateConfiguration(config.id!, {
+                  capabilities: { ...config.capabilities, printOverPockets: value === 'yes' }
+                })}
+                className="flex gap-6"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="pockets-yes" />
+                  <Label htmlFor="pockets-yes">Yes</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="pockets-no" />
+                  <Label htmlFor="pockets-no">No</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium mb-3 block">Do you print on sleeves?</Label>
+              <RadioGroup
+                value={config.capabilities?.printOnSleeves ? 'yes' : 'no'}
+                onValueChange={(value) => updateConfiguration(config.id!, {
+                  capabilities: { ...config.capabilities, printOnSleeves: value === 'yes' }
+                })}
+                className="flex gap-6"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="sleeves-yes" />
+                  <Label htmlFor="sleeves-yes">Yes</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="sleeves-no" />
+                  <Label htmlFor="sleeves-no">No</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium mb-3 block">Do you print neck labels?</Label>
+              <RadioGroup
+                value={config.capabilities?.printNeckLabels ? 'yes' : 'no'}
+                onValueChange={(value) => updateConfiguration(config.id!, {
+                  capabilities: { ...config.capabilities, printNeckLabels: value === 'yes' }
+                })}
+                className="flex gap-6"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="neck-labels-yes" />
+                  <Label htmlFor="neck-labels-yes">Yes</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="neck-labels-no" />
+                  <Label htmlFor="neck-labels-no">No</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium mb-3 block">Do you print on infant / kids shirts?</Label>
+              <RadioGroup
+                value={config.capabilities?.printKidsShirts ? 'yes' : 'no'}
+                onValueChange={(value) => updateConfiguration(config.id!, {
+                  capabilities: { ...config.capabilities, printKidsShirts: value === 'yes' }
+                })}
+                className="flex gap-6"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="kids-yes" />
+                  <Label htmlFor="kids-yes">Yes</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="kids-no" />
+                  <Label htmlFor="kids-no">No</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium mb-3 block">Do you print on 50% Cotton 50% Polyester OR only 100% Cotton?</Label>
+              <RadioGroup
+                value={config.capabilities?.cottonPolyBlend || 'both'}
+                onValueChange={(value) => updateConfiguration(config.id!, {
+                  capabilities: { ...config.capabilities, cottonPolyBlend: value }
+                })}
+                className="flex gap-6"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="both" id="cotton-both" />
+                  <Label htmlFor="cotton-both">Both</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="cotton-only" id="cotton-only" />
+                  <Label htmlFor="cotton-only">Only 100% Cotton</Label>
+                </div>
+              </RadioGroup>
+            </div>
+          </div>
+        </div>
+
+        {/* Size Limits */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-2">
+            <Ruler className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-semibold">Size Limits</h3>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="dtg-max-width" className="text-sm font-medium">Maximum Width in Inches</Label>
+                <Input
+                  id="dtg-max-width"
+                  type="number"
+                  step="0.1"
+                  value={config.constraints?.dimensions?.maxWidth || ''}
+                  onChange={(e) => updateConfiguration(config.id!, {
+                    constraints: {
+                      ...config.constraints,
+                      dimensions: { ...config.constraints?.dimensions, maxWidth: parseFloat(e.target.value) || 0 }
+                    }
+                  })}
+                  placeholder="e.g., 12"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Maximum printable width for main chest/back prints</p>
+              </div>
+              <div>
+                <Label htmlFor="dtg-max-height" className="text-sm font-medium">Maximum Height in Inches</Label>
+                <Input
+                  id="dtg-max-height"
+                  type="number"
+                  step="0.1"
+                  value={config.constraints?.dimensions?.maxHeight || ''}
+                  onChange={(e) => updateConfiguration(config.id!, {
+                    constraints: {
+                      ...config.constraints,
+                      dimensions: { ...config.constraints?.dimensions, maxHeight: parseFloat(e.target.value) || 0 }
+                    }
+                  })}
+                  placeholder="e.g., 16"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Maximum printable height for main chest/back prints</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="dtg-max-sleeve-width" className="text-sm font-medium">Maximum Sleeve Width in Inches</Label>
+                <Input
+                  id="dtg-max-sleeve-width"
+                  type="number"
+                  step="0.1"
+                  value={config.constraints?.dimensions?.maxSleeveWidth || ''}
+                  onChange={(e) => updateConfiguration(config.id!, {
+                    constraints: {
+                      ...config.constraints,
+                      dimensions: { ...config.constraints?.dimensions, maxSleeveWidth: parseFloat(e.target.value) || 0 }
+                    }
+                  })}
+                  placeholder="e.g., 3"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Maximum width for sleeve prints</p>
+              </div>
+              <div>
+                <Label htmlFor="dtg-max-sleeve-height" className="text-sm font-medium">Maximum Sleeve Height in Inches</Label>
+                <Input
+                  id="dtg-max-sleeve-height"
+                  type="number"
+                  step="0.1"
+                  value={config.constraints?.dimensions?.maxSleeveHeight || ''}
+                  onChange={(e) => updateConfiguration(config.id!, {
+                    constraints: {
+                      ...config.constraints,
+                      dimensions: { ...config.constraints?.dimensions, maxSleeveHeight: parseFloat(e.target.value) || 0 }
+                    }
+                  })}
+                  placeholder="e.g., 5"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Maximum height for sleeve prints</p>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="dtg-logo-size-notes" className="text-sm font-medium">Logo size additional notes</Label>
+              <Textarea
+                id="dtg-logo-size-notes"
+                value={config.constraints?.dimensions?.notes || ''}
+                onChange={(e) => updateConfiguration(config.id!, {
+                  constraints: {
+                    ...config.constraints,
+                    dimensions: { ...config.constraints?.dimensions, notes: e.target.value }
+                  }
+                })}
+                placeholder="Any additional notes about DTG sizing constraints..."
+                rows={3}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Order Quantities & Capacity */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-2">
+            <Package className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-semibold">Order Quantities & Capacity</h3>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="dtg-min-order-qty" className="text-sm font-medium">Min Order Quantity</Label>
+                <Input
+                  id="dtg-min-order-qty"
+                  type="number"
+                  value={config.constraints?.quantity?.min || ''}
+                  onChange={(e) => updateConfiguration(config.id!, {
+                    constraints: {
+                      ...config.constraints,
+                      quantity: { ...config.constraints?.quantity, min: parseInt(e.target.value) || 0 }
+                    }
+                  })}
+                  placeholder="e.g., 1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="dtg-max-order-qty" className="text-sm font-medium">Max Order Quantity</Label>
+                <Input
+                  id="dtg-max-order-qty"
+                  type="number"
+                  value={config.constraints?.quantity?.max || ''}
+                  onChange={(e) => updateConfiguration(config.id!, {
+                    constraints: {
+                      ...config.constraints,
+                      quantity: { ...config.constraints?.quantity, max: parseInt(e.target.value) || 0 }
+                    }
+                  })}
+                  placeholder="e.g., 1000"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="dtg-daily-capacity" className="text-sm font-medium">Daily Capacity (Average Logo)</Label>
+                <Input
+                  id="dtg-daily-capacity"
+                  type="number"
+                  value={config.equipment?.dailyCapacity || ''}
+                  onChange={(e) => updateConfiguration(config.id!, {
+                    equipment: { ...config.equipment, dailyCapacity: parseInt(e.target.value) || 0 }
+                  })}
+                  placeholder="e.g., 150"
+                />
+              </div>
+              <div>
+                <Label htmlFor="dtg-damage-rate" className="text-sm font-medium">Damage Rate (%)</Label>
+                <Input
+                  id="dtg-damage-rate"
+                  type="number"
+                  step="0.1"
+                  value={config.quality?.damageRate || ''}
+                  onChange={(e) => updateConfiguration(config.id!, {
+                    quality: { ...config.quality, damageRate: parseFloat(e.target.value) || 0 }
+                  })}
+                  placeholder="e.g., 1.5"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Production Times */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Clock className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-semibold">DTG Production Turnaround Times</h3>
+          </div>
+          
+          <div className="border rounded-lg overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-48">Service Type</TableHead>
+                  <TableHead className="text-center">Days</TableHead>
+                  <TableHead className="text-center">Extra Charge (%)</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="font-medium">Standard</TableCell>
+                  <TableCell className="text-center">
+                    <Input
+                      type="number"
+                      value={config.turnaroundTimes?.standard?.days || ''}
+                      onChange={(e) => updateConfiguration(config.id!, {
+                        turnaroundTimes: {
+                          ...config.turnaroundTimes,
+                          standard: { 
+                            ...config.turnaroundTimes?.standard, 
+                            days: parseInt(e.target.value) || 0 
+                          }
+                        }
+                      })}
+                      placeholder="5"
+                      className="w-20 text-center"
+                    />
+                  </TableCell>
+                  <TableCell className="text-center">0%</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Rush (3-4 days)</TableCell>
+                  <TableCell className="text-center">
+                    <Input
+                      type="number"
+                      value={config.turnaroundTimes?.rush?.days || ''}
+                      onChange={(e) => updateConfiguration(config.id!, {
+                        turnaroundTimes: {
+                          ...config.turnaroundTimes,
+                          rush: { 
+                            ...config.turnaroundTimes?.rush, 
+                            days: parseInt(e.target.value) || 0 
+                          }
+                        }
+                      })}
+                      placeholder="3"
+                      className="w-20 text-center"
+                    />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Input
+                      type="number"
+                      value={config.turnaroundTimes?.rush?.extraChargePercent || ''}
+                      onChange={(e) => updateConfiguration(config.id!, {
+                        turnaroundTimes: {
+                          ...config.turnaroundTimes,
+                          rush: { 
+                            ...config.turnaroundTimes?.rush, 
+                            extraChargePercent: parseFloat(e.target.value) || 0 
+                          }
+                        }
+                      })}
+                      placeholder="25"
+                      className="w-20 text-center"
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Rush (1-2 days)</TableCell>
+                  <TableCell className="text-center">
+                    <Input
+                      type="number"
+                      value={config.turnaroundTimes?.superRush?.days || ''}
+                      onChange={(e) => updateConfiguration(config.id!, {
+                        turnaroundTimes: {
+                          ...config.turnaroundTimes,
+                          superRush: { 
+                            ...config.turnaroundTimes?.superRush, 
+                            days: parseInt(e.target.value) || 0 
+                          }
+                        }
+                      })}
+                      placeholder="1"
+                      className="w-20 text-center"
+                    />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Input
+                      type="number"
+                      value={config.turnaroundTimes?.superRush?.extraChargePercent || ''}
+                      onChange={(e) => updateConfiguration(config.id!, {
+                        turnaroundTimes: {
+                          ...config.turnaroundTimes,
+                          superRush: { 
+                            ...config.turnaroundTimes?.superRush, 
+                            extraChargePercent: parseFloat(e.target.value) || 0 
+                          }
+                        }
+                      })}
+                      placeholder="50"
+                      className="w-20 text-center"
+                    />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
+        {/* White Garment Pricing */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <DollarSign className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-semibold">White Garment Pricing (Based on Size)</h3>
+          </div>
+          
+          <div className="border rounded-lg overflow-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="min-w-32">Quantity</TableHead>
+                  {config.pricing?.sizeRanges?.map((size, index) => (
+                    <TableHead key={index} className="text-center min-w-24">
+                      {size.name}
+                    </TableHead>
+                  )) || [
+                    <TableHead key="4x4" className="text-center min-w-24">4"x4"</TableHead>,
+                    <TableHead key="10x10" className="text-center min-w-24">10"x10"</TableHead>,
+                    <TableHead key="15x15" className="text-center min-w-24">15"x15"</TableHead>
+                  ]}
+                  <TableHead className="w-10"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(config.pricing?.quantityRanges || [
+                  { min: 12, max: 24 },
+                  { min: 25, max: 50 },
+                  { min: 51, max: 100 },
+                  { min: 101, max: 500 }
+                ]).map((qtyRange, qtyIndex) => (
+                  <TableRow key={qtyIndex}>
+                    <TableCell className="font-medium">
+                      {qtyRange.min}-{qtyRange.max}
+                    </TableCell>
+                    {(config.pricing?.sizeRanges || [
+                      { name: '4"x4"' },
+                      { name: '10"x10"' },
+                      { name: '15"x15"' }
+                    ]).map((_, sizeIndex) => (
+                      <TableCell key={sizeIndex} className="text-center">
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={qtyRange.whitePrices?.[sizeIndex] || ''}
+                          onChange={(e) => {
+                            const newQuantityRanges = [...(config.pricing?.quantityRanges || [])];
+                            if (!newQuantityRanges[qtyIndex]) {
+                              newQuantityRanges[qtyIndex] = { min: qtyRange.min, max: qtyRange.max };
+                            }
+                            if (!newQuantityRanges[qtyIndex].whitePrices) {
+                              newQuantityRanges[qtyIndex].whitePrices = [];
+                            }
+                            newQuantityRanges[qtyIndex].whitePrices![sizeIndex] = parseFloat(e.target.value) || 0;
+                            updateConfiguration(config.id!, {
+                              pricing: { ...config.pricing, quantityRanges: newQuantityRanges }
+                            });
+                          }}
+                          placeholder="0.00"
+                          className="w-20 text-center"
+                        />
+                      </TableCell>
+                    ))}
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const newQuantityRanges = config.pricing?.quantityRanges?.filter((_, index) => index !== qtyIndex) || [];
+                          updateConfiguration(config.id!, {
+                            pricing: { ...config.pricing, quantityRanges: newQuantityRanges }
+                          });
+                        }}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                const newSizeRanges = [...(config.pricing?.sizeRanges || [])];
+                newSizeRanges.push({ name: 'Custom Size' });
+                
+                // Add new price column to all quantity ranges
+                const newQuantityRanges = config.pricing?.quantityRanges?.map(range => ({
+                  ...range,
+                  whitePrices: [...(range.whitePrices || []), 0]
+                })) || [];
+                
+                updateConfiguration(config.id!, {
+                  pricing: { ...config.pricing, sizeRanges: newSizeRanges, quantityRanges: newQuantityRanges }
+                });
+              }}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Size Range
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={() => {
+                const newQuantityRanges = [...(config.pricing?.quantityRanges || [])];
+                const lastRange = newQuantityRanges[newQuantityRanges.length - 1];
+                const newMin = lastRange ? lastRange.max + 1 : 1;
+                newQuantityRanges.push({ 
+                  min: newMin, 
+                  max: newMin + 999,
+                  whitePrices: new Array((config.pricing?.sizeRanges || []).length || 3).fill(0),
+                  coloredPrices: new Array((config.pricing?.sizeRanges || []).length || 3).fill(0)
+                });
+                
+                updateConfiguration(config.id!, {
+                  pricing: { ...config.pricing, quantityRanges: newQuantityRanges }
+                });
+              }}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Quantity Range
+            </Button>
+          </div>
+        </div>
+
+        {/* Colored Garment Pricing */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <DollarSign className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-semibold">Colored Garment Pricing (Based on Size)</h3>
+          </div>
+          
+          <div className="border rounded-lg overflow-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="min-w-32">Quantity</TableHead>
+                  {(config.pricing?.sizeRanges || [
+                    { name: '4"x4"' },
+                    { name: '10"x10"' },
+                    { name: '15"x15"' }
+                  ]).map((size, index) => (
+                    <TableHead key={index} className="text-center min-w-24">
+                      {size.name}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(config.pricing?.quantityRanges || [
+                  { min: 12, max: 24 },
+                  { min: 25, max: 50 },
+                  { min: 51, max: 100 },
+                  { min: 101, max: 500 }
+                ]).map((qtyRange, qtyIndex) => (
+                  <TableRow key={qtyIndex}>
+                    <TableCell className="font-medium">
+                      {qtyRange.min}-{qtyRange.max}
+                    </TableCell>
+                    {(config.pricing?.sizeRanges || [
+                      { name: '4"x4"' },
+                      { name: '10"x10"' },
+                      { name: '15"x15"' }
+                    ]).map((_, sizeIndex) => (
+                      <TableCell key={sizeIndex} className="text-center">
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={qtyRange.coloredPrices?.[sizeIndex] || ''}
+                          onChange={(e) => {
+                            const newQuantityRanges = [...(config.pricing?.quantityRanges || [])];
+                            if (!newQuantityRanges[qtyIndex]) {
+                              newQuantityRanges[qtyIndex] = { min: qtyRange.min, max: qtyRange.max };
+                            }
+                            if (!newQuantityRanges[qtyIndex].coloredPrices) {
+                              newQuantityRanges[qtyIndex].coloredPrices = [];
+                            }
+                            newQuantityRanges[qtyIndex].coloredPrices![sizeIndex] = parseFloat(e.target.value) || 0;
+                            updateConfiguration(config.id!, {
+                              pricing: { ...config.pricing, quantityRanges: newQuantityRanges }
+                            });
+                          }}
+                          placeholder="0.00"
+                          className="w-20 text-center"
+                        />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
+        {/* Fees */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Receipt className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-semibold">Fees</h3>
+          </div>
+          
+          <div className="space-y-2">
+            {(config.fees || [{ name: 'Setup', amount: 0 }]).map((fee, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Input
+                  value={fee.name}
+                  onChange={(e) => {
+                    const newFees = [...(config.fees || [])];
+                    newFees[index] = { ...fee, name: e.target.value };
+                    updateConfiguration(config.id!, { fees: newFees });
+                  }}
+                  placeholder="Fee name"
+                  className="flex-1"
+                />
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={fee.amount}
+                  onChange={(e) => {
+                    const newFees = [...(config.fees || [])];
+                    newFees[index] = { ...fee, amount: parseFloat(e.target.value) || 0 };
+                    updateConfiguration(config.id!, { fees: newFees });
+                  }}
+                  placeholder="0.00"
+                  className="w-24"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newFees = config.fees?.filter((_, i) => i !== index) || [];
+                    updateConfiguration(config.id!, { fees: newFees });
+                  }}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const newFees = [...(config.fees || [])];
+                newFees.push({ name: '', amount: 0 });
+                updateConfiguration(config.id!, { fees: newFees });
+              }}
+              className="w-full"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Fee
+            </Button>
+          </div>
+        </div>
+
+        {/* Extra Charges */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Plus className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-semibold">Extra Charges</h3>
+          </div>
+          
+          <div className="space-y-2">
+            {(config.extraCharges || [
+              { name: 'Sleeves', amount: 0 },
+              { name: 'Fleece', amount: 0 },
+              { name: 'Over Zipper', amount: 0 },
+              { name: 'Over Pocket', amount: 0 },
+              { name: 'Neck Label', amount: 0 },
+              { name: 'Kids Shirts', amount: 0 }
+            ]).map((charge, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Input
+                  value={charge.name}
+                  onChange={(e) => {
+                    const newCharges = [...(config.extraCharges || [])];
+                    newCharges[index] = { ...charge, name: e.target.value };
+                    updateConfiguration(config.id!, { extraCharges: newCharges });
+                  }}
+                  placeholder="Charge name"
+                  className="flex-1"
+                />
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={charge.amount}
+                  onChange={(e) => {
+                    const newCharges = [...(config.extraCharges || [])];
+                    newCharges[index] = { ...charge, amount: parseFloat(e.target.value) || 0 };
+                    updateConfiguration(config.id!, { extraCharges: newCharges });
+                  }}
+                  placeholder="0.00"
+                  className="w-24"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newCharges = config.extraCharges?.filter((_, i) => i !== index) || [];
+                    updateConfiguration(config.id!, { extraCharges: newCharges });
+                  }}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const newCharges = [...(config.extraCharges || [])];
+                newCharges.push({ name: '', amount: 0 });
+                updateConfiguration(config.id!, { extraCharges: newCharges });
+              }}
+              className="w-full"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Extra Charge
+            </Button>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-2 pt-6 border-t">
+          <Button variant="outline" onClick={() => {/* Reset to defaults logic */}}>
+            Reset to Defaults
+          </Button>
+          <Button onClick={() => {/* Save changes logic */}}>
+            Save Changes
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
   const selectedConfig = configurations.find(config => config.id === activeTab);
   const availableMethods = IMPRINT_METHODS.filter(
     method => !configurations.find(config => config.method === method.value)
@@ -1295,9 +2075,10 @@ export function ImprintSettings() {
               
               <Card>
                 <CardContent className="p-6">
-                  {config.method === 'screenPrinting' && renderScreenPrintingForm(config)}
-                  {config.method === 'embroidery' && renderEmbroideryForm(config)}
-                  {config.method !== 'screenPrinting' && config.method !== 'embroidery' && (
+                {config.method === 'screenPrinting' && renderScreenPrintingForm(config)}
+                {config.method === 'embroidery' && renderEmbroideryForm(config)}
+                {config.method === 'dtg' && renderDTGForm(config)}
+                {config.method !== 'screenPrinting' && config.method !== 'embroidery' && config.method !== 'dtg' && (
                     <div className="text-center py-12">
                       <Cog className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                       <h3 className="text-lg font-semibold mb-2">Configuration Form Coming Soon</h3>
