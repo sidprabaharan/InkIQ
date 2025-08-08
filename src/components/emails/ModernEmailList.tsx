@@ -136,19 +136,26 @@ export function ModernEmailList({
               {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
-                  <span className={`text-sm font-semibold truncate ${
-                    selectedEmailId === email.id ? 'text-white' : 'text-gray-900'
-                  }`}>
-                    {email.from.name || email.from.email}
-                  </span>
-                  <span className={`text-xs ${
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className={`text-sm font-semibold truncate ${
+                      selectedEmailId === email.id ? 'text-white' : 'text-gray-900'
+                    }`}>
+                      {email.from.name || email.from.email}
+                    </span>
+                    <span className={`text-xs ${
+                      selectedEmailId === email.id ? 'text-white/60' : 'text-gray-400'
+                    }`}>
+                      &lt;{email.from.email}&gt;
+                    </span>
+                  </div>
+                  <span className={`text-xs whitespace-nowrap ml-3 ${
                     selectedEmailId === email.id ? 'text-white/80' : 'text-gray-500'
                   }`}>
                     {formatDistanceToNow(new Date(email.date), { addSuffix: true }).replace(' ago', '')}
                   </span>
                 </div>
                 
-                <div className="mb-1">
+                <div className="mb-2">
                   <span className={`text-sm font-medium block truncate ${
                     selectedEmailId === email.id ? 'text-white/90' : 'text-gray-700'
                   }`}>
@@ -160,10 +167,10 @@ export function ModernEmailList({
                   <span className={`text-xs truncate flex-1 ${
                     selectedEmailId === email.id ? 'text-white/70' : 'text-gray-500'
                   }`}>
-                    {email.content.substring(0, 60)}...
+                    {email.content.substring(0, 80)}...
                   </span>
                   
-                  <div className="flex items-center gap-1 ml-2">
+                  <div className="flex items-center gap-2 ml-3">
                     {email.attachments.length > 0 && (
                       <Paperclip className={`h-3 w-3 ${
                         selectedEmailId === email.id ? 'text-white/70' : 'text-gray-400'
@@ -172,13 +179,6 @@ export function ModernEmailList({
                     
                     {/* Selection and Actions */}
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Checkbox
-                        checked={selectedEmails.includes(email.id)}
-                        onCheckedChange={() => handleEmailSelect(email.id)}
-                        onClick={(e) => e.stopPropagation()}
-                        className="w-4 h-4"
-                      />
-                      
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
