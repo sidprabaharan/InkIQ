@@ -45,7 +45,7 @@ export const mockEmails: Email[] = [
       name: "Pamela Hunt",
       avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b647?w=400&h=400&fit=crop&crop=face"
     },
-    to: [{ email: "steve@inkiq.com", name: "Steve Balboni" }],
+    to: [{ email: "steve@theprintcompany.com", name: "Steve Balboni" }],
     subject: "Staff Merchandise Order - Western Alliance Transport",
     content: `Hello,
 
@@ -66,7 +66,7 @@ Western Alliance Transport
   </div>
 </div>
 
-**From: Steve Balboni (inkIQ) <steve@inkiq.com>**
+**From: Steve Balboni (The Print Company) <steve@theprintcompany.com>**
 **Date: February 1st, 2024 at 9:30:08 AM**
 
 Hi Pamela,
@@ -85,10 +85,10 @@ Looking forward to your reply.
 
 Thanks,
 Steve Balboni
-inkIQ
-steve@inkiq.com
+The Print Company
+steve@theprintcompany.com
 514-834-6659
-inkiq.com
+theprintcompany.com
 
 ---
 
@@ -132,7 +132,7 @@ Western Alliance Transport
   </div>
 </div>
 
-**From: Steve Balboni (inkIQ) <steve@inkiq.com>**
+**From: Steve Balboni (The Print Company) <steve@theprintcompany.com>**
 **Date: February 4th, 2024 at 11:22 AM**
 
 Hi Pamela,
@@ -189,7 +189,7 @@ Western Alliance Transport
   </div>
 </div>
 
-**From: Steve Balboni (inkIQ) <steve@inkiq.com>**
+**From: Steve Balboni (The Print Company) <steve@theprintcompany.com>**
 **Date: February 7th, 2024 at 9:18 AM**
 
 Hey Pamela,
