@@ -29,10 +29,10 @@ export function SchedulerHeader({ selectedDate, onDateChange, selectedMethod }: 
   };
 
   const methodTitles = {
-    screen_printing: "Screen Printing Power Scheduler",
-    embroidery: "Embroidery Power Scheduler", 
-    dtf: "DTF Power Scheduler",
-    dtg: "DTG Power Scheduler"
+    screen_printing: "Production Schedule",
+    embroidery: "Production Schedule", 
+    dtf: "Production Schedule",
+    dtg: "Production Schedule"
   };
 
   return (
