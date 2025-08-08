@@ -142,18 +142,31 @@ export function EnhancedEmailDetail({
   };
 
   const conversationMessages = parseConversation(email.content);
+  const [expandedMessages, setExpandedMessages] = useState<Set<string>>(
+    new Set([conversationMessages[conversationMessages.length - 1]?.id])
+  );
+
+  const toggleMessage = (messageId: string) => {
+    const newExpanded = new Set(expandedMessages);
+    if (newExpanded.has(messageId)) {
+      newExpanded.delete(messageId);
+    } else {
+      newExpanded.add(messageId);
+    }
+    setExpandedMessages(newExpanded);
+  };
 
   return (
     <div className="flex-1 flex flex-col h-full">
       {/* Header */}
-      <div className="border-b px-4 py-3">
-        <div className="flex items-center gap-3">
+      <div className="border-b px-6 py-4 bg-white">
+        <div className="flex items-center gap-3 mb-3">
           <Button variant="ghost" size="sm" onClick={onBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           
           <div className="flex-1">
-            <h1 className="text-lg font-semibold truncate">{email.subject}</h1>
+            <h1 className="text-xl font-medium">{email.subject}</h1>
           </div>
 
           <div className="flex items-center gap-1">
@@ -192,43 +205,137 @@ export function EnhancedEmailDetail({
             </DropdownMenu>
           </div>
         </div>
+
+        {/* Labels */}
+        {email.labels.length > 0 && (
+          <div className="flex gap-2">
+            {email.labels.map((label) => (
+              <Badge key={label} variant="secondary" className="text-xs">
+                {label}
+              </Badge>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* iMessage-style Conversation */}
+      {/* Gmail-style Thread Messages */}
       <ScrollArea className="flex-1">
-        <div className="p-4 max-w-4xl mx-auto space-y-4">
-          {/* Labels at top */}
-          {email.labels.length > 0 && (
-            <div className="flex gap-2 justify-center mb-6">
-              {email.labels.map((label) => (
-                <Badge key={label} variant="secondary">
-                  {label}
-                </Badge>
-              ))}
-            </div>
-          )}
+        <div className="max-w-5xl mx-auto">
+          {conversationMessages.map((message, index) => {
+            const isExpanded = expandedMessages.has(message.id);
+            const isLast = index === conversationMessages.length - 1;
+            
+            return (
+              <div key={message.id} className="border-b border-gray-100 last:border-b-0">
+                {/* Message Header - Always Visible */}
+                <div 
+                  className="flex items-center px-6 py-4 hover:bg-gray-50 cursor-pointer"
+                  onClick={() => toggleMessage(message.id)}
+                >
+                  <Avatar className="h-10 w-10 mr-4">
+                    <AvatarImage src={message.from.avatar} />
+                    <AvatarFallback>
+                      {message.from.name?.[0]?.toUpperCase() || message.from.email?.[0]?.toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3">
+                      <span className="font-medium text-sm">{message.from.name}</span>
+                      <span className="text-gray-500 text-sm">&lt;{message.from.email}&gt;</span>
+                      {message.isAI && (
+                        <div className="flex items-center gap-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-2 py-0.5 rounded-full text-xs font-medium">
+                          <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                          AI
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="text-xs text-gray-500">to me</span>
+                      <span className="text-xs text-gray-500">{message.date}</span>
+                      {message.isAI && message.aiType === 'auto-reply' && (
+                        <span className="text-xs text-blue-600 font-medium">Auto-sent in 8 seconds</span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    {!isExpanded && (
+                      <div className="text-xs text-gray-500 mr-4 max-w-xs truncate">
+                        {message.content.substring(0, 100)}...
+                      </div>
+                    )}
+                    <Button variant="ghost" size="sm">
+                      <Star className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm">
+                      <Reply className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
 
-          {/* Attachments at top */}
+                {/* Message Content - Expandable */}
+                {isExpanded && (
+                  <div className="px-6 pb-6">
+                    {/* AI Badge for expanded messages */}
+                    {message.isAI && (
+                      <div className="mb-4">
+                        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium">
+                          <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+                          {message.aiType === 'auto-reply' ? 'AI Auto-Reply' :
+                           message.aiType === 'product-options' ? 'AI Product Recommendations' :
+                           'AI-Generated Quote'}
+                          <span className="text-blue-600">• 95% confidence</span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="prose max-w-none text-sm leading-relaxed whitespace-pre-wrap">
+                      {message.content}
+                    </div>
+                    
+                    {/* Message Actions */}
+                    <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+                      <Button variant="outline" size="sm" onClick={() => handleReply('reply')}>
+                        <Reply className="h-4 w-4 mr-1" />
+                        Reply
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => handleReply('forward')}>
+                        <Forward className="h-4 w-4 mr-1" />
+                        Forward
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {/* Attachments Section */}
           {email.attachments.length > 0 && (
-            <div className="mb-6 bg-muted/20 rounded-lg p-4">
+            <div className="px-6 py-4 bg-gray-50 border-t">
               <div className="flex items-center gap-2 mb-3">
                 <Paperclip className="h-4 w-4" />
                 <span className="text-sm font-medium">
                   {email.attachments.length} attachment{email.attachments.length > 1 ? 's' : ''}
                 </span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {email.attachments.map((attachment) => (
                   <div
                     key={attachment.id}
-                    className="flex items-center gap-3 p-3 border rounded-lg hover:bg-background/50"
+                    className="flex items-center gap-3 p-3 bg-white border rounded-lg hover:bg-gray-50"
                   >
-                    <div className="h-8 w-8 rounded bg-muted/20 flex items-center justify-center">
+                    <div className="h-8 w-8 rounded bg-gray-100 flex items-center justify-center">
                       <Paperclip className="h-4 w-4" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium truncate">{attachment.name}</div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-xs text-gray-500">
                         {(attachment.size / 1024 / 1024).toFixed(1)} MB
                       </div>
                     </div>
@@ -245,89 +352,36 @@ export function EnhancedEmailDetail({
             </div>
           )}
 
-          {/* Message Bubbles */}
-          {conversationMessages.map((message, index) => {
-            const isOutgoing = message.from.email?.includes('kiriakos') || message.from.email?.includes('merchradar');
-            
-            return (
-              <div key={message.id} className={`flex ${isOutgoing ? 'justify-end' : 'justify-start'} mb-4`}>
-                <div className={`max-w-[70%] ${isOutgoing ? 'order-2' : 'order-1'}`}>
-                  {/* AI Badge for outgoing AI messages */}
-                  {message.isAI && isOutgoing && (
-                    <div className="mb-2 flex justify-end">
-                      <div className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                        <div className="w-2 h-2 bg-white rounded-full flex items-center justify-center">
-                          <div className="w-1 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
-                        </div>
-                        {message.aiType === 'auto-reply' ? 'Auto-sent in 8 seconds' :
-                         message.aiType === 'product-options' ? 'Auto-curated products' :
-                         'AI-generated quote'}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Message Bubble */}
-                  <div className={`rounded-2xl px-4 py-3 ${
-                    isOutgoing 
-                      ? 'bg-blue-500 text-white rounded-br-sm' 
-                      : 'bg-muted rounded-bl-sm'
-                  }`}>
-                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                      {message.content}
-                    </div>
-                  </div>
-                  
-                  {/* Timestamp and sender */}
-                  <div className={`mt-1 flex items-center gap-2 text-xs text-muted-foreground ${
-                    isOutgoing ? 'justify-end' : 'justify-start'
-                  }`}>
-                    <span className="font-medium">{message.from.name}</span>
-                    <span>•</span>
-                    <span>{message.date}</span>
-                  </div>
-                </div>
-                
-                {/* Avatar */}
-                <div className={`${isOutgoing ? 'order-1 mr-3' : 'order-2 ml-3'} flex-shrink-0`}>
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={message.from.avatar} />
-                    <AvatarFallback className="text-xs">
-                      {message.from.name?.[0]?.toUpperCase() || message.from.email?.[0]?.toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-              </div>
-            );
-          })}
-
-          {/* Action Buttons */}
-          <div className="flex gap-2 justify-center pt-6">
-            <Button onClick={() => handleReply('reply')} className="gap-2">
-              <Reply className="h-4 w-4" />
-              Reply
-            </Button>
-            <Button variant="outline" onClick={() => handleReply('replyAll')} className="gap-2">
-              <ReplyAll className="h-4 w-4" />
-              Reply All
-            </Button>
-            <Button variant="outline" onClick={() => handleReply('forward')} className="gap-2">
-              <Forward className="h-4 w-4" />
-              Forward
-            </Button>
-          </div>
-
-          {/* Composer */}
-          {showComposer && (
-            <div className="border rounded-lg p-4 bg-muted/5 mt-6">
-              <MultiAccountComposer
-                accounts={accounts}
-                mode={composerMode}
-                originalEmail={email}
-                onSend={onSendEmail}
-                onCancel={() => setShowComposer(false)}
-              />
+          {/* Bottom Actions */}
+          <div className="px-6 py-4 border-t bg-white">
+            <div className="flex gap-2">
+              <Button onClick={() => handleReply('reply')} className="gap-2">
+                <Reply className="h-4 w-4" />
+                Reply
+              </Button>
+              <Button variant="outline" onClick={() => handleReply('replyAll')} className="gap-2">
+                <ReplyAll className="h-4 w-4" />
+                Reply All
+              </Button>
+              <Button variant="outline" onClick={() => handleReply('forward')} className="gap-2">
+                <Forward className="h-4 w-4" />
+                Forward
+              </Button>
             </div>
-          )}
+
+            {/* Composer */}
+            {showComposer && (
+              <div className="border rounded-lg p-4 bg-gray-50 mt-4">
+                <MultiAccountComposer
+                  accounts={accounts}
+                  mode={composerMode}
+                  originalEmail={email}
+                  onSend={onSendEmail}
+                  onCancel={() => setShowComposer(false)}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </ScrollArea>
     </div>
