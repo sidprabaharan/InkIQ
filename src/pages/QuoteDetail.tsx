@@ -54,61 +54,136 @@ export default function QuoteDetail() {
   const outstandingValue = parseFloat(amountOutstanding.replace(/[$,]/g, ''));
   const amountPaid = `$${(totalValue - outstandingValue).toFixed(2)}`;
   
-  // Transform quote items to match QuoteItemsTable expectations
-  const itemGroups = [{
-    id: "1",
-    name: "Product Group",
-    items: quote.items.map((item, index) => ({
-      id: `item-${index}`,
-      category: item.category,
-      itemNumber: item.itemNumber,
-      color: item.color,
-      description: item.description,
-      sizes: {
-        xs: parseInt(item.xs) || 0,
-        s: parseInt(item.s) || 0,
-        m: parseInt(item.m) || 0,
-        l: parseInt(item.l) || 0,
-        xl: parseInt(item.xl) || 0,
-        xxl: parseInt(item.xxl) || 0,
-        xxxl: parseInt(item.xxxl) || 0,
-      },
-      quantity: parseInt(item.quantity) || 0,
-      price: parseFloat(item.price.replace(/[$,]/g, '')) || 0,
-      taxed: item.taxed,
-      total: parseFloat(item.total.replace(/[$,]/g, '')) || 0,
-      status: item.status,
-      mockups: item.mockups || []
-    })),
-    imprints: quote.imprints?.map(imprint => {
-      // Parse dimensions from size field (e.g., "4\" x 3\"")
-      const sizeMatch = imprint.size?.match(/(\d+(?:\.\d+)?)"?\s*x\s*(\d+(?:\.\d+)?)"?/);
-      const width = sizeMatch ? parseFloat(sizeMatch[1]) : 0;
-      const height = sizeMatch ? parseFloat(sizeMatch[2]) : 0;
-      
-      return {
-        id: imprint.id,
-        method: imprint.type || "",
-        location: imprint.placement || "",
-        width,
-        height,
-        colorsOrThreads: imprint.colours || "",
-        notes: imprint.notes || "",
-        customerArt: (imprint.customerArt || []).map(file => ({
-          ...file,
-          category: 'customerArt' as const
-        })),
-        productionFiles: (imprint.productionFiles || []).map(file => ({
-          ...file,
-          category: 'productionFiles' as const
-        })),
-        proofMockup: (imprint.proofMockup || []).map(file => ({
-          ...file,
-          category: 'proofMockup' as const
-        }))
-      };
-    }) || []
-  }];
+  // Transform quote items into proper groups based on decoration method
+  const itemGroups = [];
+  
+  // Group 1: Screen Print Items (T-shirts and Hoodies)
+  const screenPrintItems = quote.items.filter(item => 
+    item.category === "T-Shirts" || item.category === "Hoodies"
+  );
+  
+  if (screenPrintItems.length > 0) {
+    itemGroups.push({
+      id: "screen-print-group",
+      name: "Screen Print Group",
+      items: screenPrintItems.map((item, index) => ({
+        id: `screen-print-item-${index}`,
+        category: item.category,
+        itemNumber: item.itemNumber,
+        color: item.color,
+        description: item.description,
+        sizes: {
+          xs: parseInt(item.xs) || 0,
+          s: parseInt(item.s) || 0,
+          m: parseInt(item.m) || 0,
+          l: parseInt(item.l) || 0,
+          xl: parseInt(item.xl) || 0,
+          xxl: parseInt(item.xxl) || 0,
+          xxxl: parseInt(item.xxxl) || 0,
+        },
+        quantity: parseInt(item.quantity) || 0,
+        price: parseFloat(item.price.replace(/[$,]/g, '')) || 0,
+        taxed: item.taxed,
+        total: parseFloat(item.total.replace(/[$,]/g, '')) || 0,
+        status: item.status,
+        mockups: item.mockups || []
+      })),
+      imprints: quote.imprints?.filter(imprint => 
+        imprint.type === "Screen Print"
+      ).map(imprint => {
+        // Parse dimensions from size field (e.g., "4\" x 3\"")
+        const sizeMatch = imprint.size?.match(/(\d+(?:\.\d+)?)"?\s*x\s*(\d+(?:\.\d+)?)"?/);
+        const width = sizeMatch ? parseFloat(sizeMatch[1]) : 0;
+        const height = sizeMatch ? parseFloat(sizeMatch[2]) : 0;
+        
+        return {
+          id: imprint.id,
+          method: imprint.type || "",
+          location: imprint.placement || "",
+          width,
+          height,
+          colorsOrThreads: imprint.colours || "",
+          notes: imprint.notes || "",
+          customerArt: (imprint.customerArt || []).map(file => ({
+            ...file,
+            category: 'customerArt' as const
+          })),
+          productionFiles: (imprint.productionFiles || []).map(file => ({
+            ...file,
+            category: 'productionFiles' as const
+          })),
+          proofMockup: (imprint.proofMockup || []).map(file => ({
+            ...file,
+            category: 'proofMockup' as const
+          }))
+        };
+      }) || []
+    });
+  }
+  
+  // Group 2: Embroidery Items (Hats)
+  const embroideryItems = quote.items.filter(item => 
+    item.category === "Hats"
+  );
+  
+  if (embroideryItems.length > 0) {
+    itemGroups.push({
+      id: "embroidery-group",
+      name: "Embroidery Group",
+      items: embroideryItems.map((item, index) => ({
+        id: `embroidery-item-${index}`,
+        category: item.category,
+        itemNumber: item.itemNumber,
+        color: item.color,
+        description: item.description,
+        sizes: {
+          xs: parseInt(item.xs) || 0,
+          s: parseInt(item.s) || 0,
+          m: parseInt(item.m) || 0,
+          l: parseInt(item.l) || 0,
+          xl: parseInt(item.xl) || 0,
+          xxl: parseInt(item.xxl) || 0,
+          xxxl: parseInt(item.xxxl) || 0,
+        },
+        quantity: parseInt(item.quantity) || 0,
+        price: parseFloat(item.price.replace(/[$,]/g, '')) || 0,
+        taxed: item.taxed,
+        total: parseFloat(item.total.replace(/[$,]/g, '')) || 0,
+        status: item.status,
+        mockups: item.mockups || []
+      })),
+      imprints: quote.imprints?.filter(imprint => 
+        imprint.type === "Embroidery"
+      ).map(imprint => {
+        // Parse dimensions from size field (e.g., "4\" x 3\"")
+        const sizeMatch = imprint.size?.match(/(\d+(?:\.\d+)?)"?\s*x\s*(\d+(?:\.\d+)?)"?/);
+        const width = sizeMatch ? parseFloat(sizeMatch[1]) : 0;
+        const height = sizeMatch ? parseFloat(sizeMatch[2]) : 0;
+        
+        return {
+          id: imprint.id,
+          method: imprint.type || "",
+          location: imprint.placement || "",
+          width,
+          height,
+          colorsOrThreads: imprint.colours || "",
+          notes: imprint.notes || "",
+          customerArt: (imprint.customerArt || []).map(file => ({
+            ...file,
+            category: 'customerArt' as const
+          })),
+          productionFiles: (imprint.productionFiles || []).map(file => ({
+            ...file,
+            category: 'productionFiles' as const
+          })),
+          proofMockup: (imprint.proofMockup || []).map(file => ({
+            ...file,
+            category: 'proofMockup' as const
+          }))
+        };
+      }) || []
+    });
+  }
   
   return (
     <div className="p-0 bg-gray-50 min-h-full">
