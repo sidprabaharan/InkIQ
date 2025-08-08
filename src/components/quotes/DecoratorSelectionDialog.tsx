@@ -212,15 +212,15 @@ export function DecoratorSelectionDialog({
                     <div className="flex items-center gap-1">
                       <Clock className="w-3 h-3 text-muted-foreground" />
                       <div>
-                        <div className="text-xs text-muted-foreground">Lead Time</div>
+                        <div className="text-xs text-muted-foreground">Turnaround Time</div>
                         <div className="text-sm font-medium">{decorator.capacity.leadTime} days</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
                       <DollarSign className="w-3 h-3 text-muted-foreground" />
                       <div>
-                        <div className="text-xs text-muted-foreground">Capacity</div>
-                        <div className="text-sm font-medium">{decorator.capacity.currentLoad}% used</div>
+                        <div className="text-xs text-muted-foreground">Total Cost</div>
+                        <div className="text-sm font-medium">$3,240.00</div>
                       </div>
                     </div>
                   </div>
@@ -243,6 +243,12 @@ export function DecoratorSelectionDialog({
           <div className="flex justify-end gap-2 pt-4 border-t">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
+            </Button>
+            <Button 
+              variant="outline"
+              disabled={!selectedDecorator}
+            >
+              Add Line Items to PO
             </Button>
             <Button 
               onClick={handleOutsource}
