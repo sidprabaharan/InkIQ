@@ -400,14 +400,14 @@ export const sampleQuoteData: Record<string, QuotationData> = {
           {
             id: "mockup-tshirt-black-1",
             name: "gildan-5000-black-front.jpg",
-            url: "/src/assets/mockups/tshirt-white.jpg",
-            type: "image/jpeg"
+            url: "/lovable-uploads/e91fc045-78a0-474c-87ba-e13b18f676db.png",
+            type: "image/png"
           },
           {
             id: "mockup-tshirt-black-2", 
             name: "gildan-5000-black-back.jpg",
-            url: "/src/assets/mockups/tshirt-white.jpg",
-            type: "image/jpeg"
+            url: "/lovable-uploads/b9f2bdf8-8297-4a2d-874c-32a75fa82bac.png",
+            type: "image/png"
           }
         ]
       },
@@ -432,14 +432,14 @@ export const sampleQuoteData: Record<string, QuotationData> = {
           {
             id: "mockup-hoodie-black-1",
             name: "comfort-colors-1467-black-front.jpg",
-            url: "/src/assets/mockups/hoodie-black.jpg",
-            type: "image/jpeg"
+            url: "/lovable-uploads/f0049266-3c6f-4cb2-a1c3-d23bc446559f.png",
+            type: "image/png"
           },
           {
             id: "mockup-hoodie-black-2",
             name: "comfort-colors-1467-black-back.jpg", 
-            url: "/src/assets/mockups/hoodie-black.jpg",
-            type: "image/jpeg"
+            url: "/lovable-uploads/77e97aa8-3c5c-4ff6-8bcd-c7423ad1ba9c.png",
+            type: "image/png"
           }
         ]
       },
