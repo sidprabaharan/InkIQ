@@ -10,8 +10,8 @@ export function TopBar() {
           <span className="text-sm text-gray-500">Super Admin</span>
         </div>
         <Avatar className="h-9 w-9">
-          <AvatarImage src="https://github.com/shadcn.png" alt="User" />
-          <AvatarFallback>NS</AvatarFallback>
+          <AvatarImage src="/lovable-uploads/d2507023-d2d7-428d-b225-4442856795ff.png" alt="Steve Balboni" />
+          <AvatarFallback>SB</AvatarFallback>
         </Avatar>
       </div>
     </header>
