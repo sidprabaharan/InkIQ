@@ -1339,11 +1339,11 @@ export function ImprintSettings() {
                   id="dtg-max-width"
                   type="number"
                   step="0.1"
-                  value={config.constraints?.dimensions?.maxWidth || ''}
+                  value={config.sizeCapabilities?.maxWidth || ''}
                   onChange={(e) => updateConfiguration(config.id!, {
-                    constraints: {
-                      ...config.constraints,
-                      dimensions: { ...config.constraints?.dimensions, maxWidth: parseFloat(e.target.value) || 0 }
+                    sizeCapabilities: {
+                      ...config.sizeCapabilities,
+                      maxWidth: parseFloat(e.target.value) || 0
                     }
                   })}
                   placeholder="e.g., 12"
@@ -1356,11 +1356,11 @@ export function ImprintSettings() {
                   id="dtg-max-height"
                   type="number"
                   step="0.1"
-                  value={config.constraints?.dimensions?.maxHeight || ''}
+                  value={config.sizeCapabilities?.maxHeight || ''}
                   onChange={(e) => updateConfiguration(config.id!, {
-                    constraints: {
-                      ...config.constraints,
-                      dimensions: { ...config.constraints?.dimensions, maxHeight: parseFloat(e.target.value) || 0 }
+                    sizeCapabilities: {
+                      ...config.sizeCapabilities,
+                      maxHeight: parseFloat(e.target.value) || 0
                     }
                   })}
                   placeholder="e.g., 16"
@@ -1376,11 +1376,11 @@ export function ImprintSettings() {
                   id="dtg-max-sleeve-width"
                   type="number"
                   step="0.1"
-                  value={config.constraints?.dimensions?.maxSleeveWidth || ''}
+                  value={config.sizeCapabilities?.minWidth || ''}
                   onChange={(e) => updateConfiguration(config.id!, {
-                    constraints: {
-                      ...config.constraints,
-                      dimensions: { ...config.constraints?.dimensions, maxSleeveWidth: parseFloat(e.target.value) || 0 }
+                    sizeCapabilities: {
+                      ...config.sizeCapabilities,
+                      minWidth: parseFloat(e.target.value) || 0
                     }
                   })}
                   placeholder="e.g., 3"
