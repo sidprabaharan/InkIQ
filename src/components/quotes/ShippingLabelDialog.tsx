@@ -256,7 +256,7 @@ export function ShippingLabelDialog({
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[900px] h-[85vh] flex flex-col">
+      <DialogContent className="sm:max-w-[900px] h-[75vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 p-6 pb-2">
           <DialogTitle className="text-xl flex items-center gap-2">
             {step === "quotes" && (
@@ -755,7 +755,7 @@ export function ShippingLabelDialog({
         </div>
         )}
         
-        <DialogFooter className="flex-shrink-0 px-6 pt-4 pb-8 flex justify-between bg-background border-t">
+        <DialogFooter className="flex-shrink-0 px-6 py-4 flex justify-between bg-background border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
