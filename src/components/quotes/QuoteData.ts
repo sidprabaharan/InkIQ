@@ -463,9 +463,9 @@ export const sampleQuoteData: Record<string, QuotationData> = {
         mockups: [
           {
             id: "mockup-hat-white-1",
-            name: "valucap-vc300a-white-front.jpg",
-            url: "/src/assets/mockups/cap-gray.jpg",
-            type: "image/jpeg"
+            name: "western-alliance-hat-mockup.png",
+            url: "/lovable-uploads/a161c439-2876-46ac-9b46-df360f319a37.png",
+            type: "image/png"
           }
         ]
       }
@@ -578,9 +578,9 @@ export const sampleQuoteData: Record<string, QuotationData> = {
         proofMockup: [
           {
             id: "proof-mockup-embroidery",
-            name: "wat-hat-embroidery-proof.jpg",
-            url: "/public/lovable-uploads/d2507023-d2d7-428d-b225-4442856795ff.png",
-            type: "image/jpeg",
+            name: "western-alliance-hat-proof.png",
+            url: "/lovable-uploads/a161c439-2876-46ac-9b46-df360f319a37.png",
+            type: "image/png",
             category: "proofMockup"
           }
         ]
