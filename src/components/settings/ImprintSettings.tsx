@@ -1180,21 +1180,23 @@ export function ImprintSettings() {
     if (!currentMethod) return null;
 
     return (
-      <div className="space-y-8">
+      <div className="space-y-4">
         {/* DTG Information Section */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-2">
-            <Printer className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold">DTG Information</h3>
-          </div>
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">DTG Information</h3>
+          <p className="text-sm text-muted-foreground">
+            Configure your DTG printing capabilities and options.
+          </p>
           
           <div className="space-y-4">
             <div>
               <Label className="text-sm font-medium mb-3 block">Do you print over zippers?</Label>
               <RadioGroup
-                value={config.capabilities?.printOverZippers ? 'yes' : 'no'}
+                value={config.technicalRequirements?.includes('print_over_zippers') ? 'yes' : 'no'}
                 onValueChange={(value) => updateConfiguration(config.id!, {
-                  capabilities: { ...config.capabilities, printOverZippers: value === 'yes' }
+                  technicalRequirements: value === 'yes' ? 
+                    [...(config.technicalRequirements || []), 'print_over_zippers'] :
+                    config.technicalRequirements?.filter(req => req !== 'print_over_zippers') || []
                 })}
                 className="flex gap-6"
               >
@@ -1212,9 +1214,11 @@ export function ImprintSettings() {
             <div>
               <Label className="text-sm font-medium mb-3 block">Do you print over hoodie pockets?</Label>
               <RadioGroup
-                value={config.capabilities?.printOverPockets ? 'yes' : 'no'}
+                value={config.technicalRequirements?.includes('pockets') ? 'yes' : 'no'}
                 onValueChange={(value) => updateConfiguration(config.id!, {
-                  capabilities: { ...config.capabilities, printOverPockets: value === 'yes' }
+                  technicalRequirements: value === 'yes' ? 
+                    [...(config.technicalRequirements || []), 'pockets'] :
+                    config.technicalRequirements?.filter(req => req !== 'pockets') || []
                 })}
                 className="flex gap-6"
               >
@@ -1232,9 +1236,11 @@ export function ImprintSettings() {
             <div>
               <Label className="text-sm font-medium mb-3 block">Do you print on sleeves?</Label>
               <RadioGroup
-                value={config.capabilities?.printOnSleeves ? 'yes' : 'no'}
+                value={config.technicalRequirements?.includes('sleeves') ? 'yes' : 'no'}
                 onValueChange={(value) => updateConfiguration(config.id!, {
-                  capabilities: { ...config.capabilities, printOnSleeves: value === 'yes' }
+                  technicalRequirements: value === 'yes' ? 
+                    [...(config.technicalRequirements || []), 'sleeves'] :
+                    config.technicalRequirements?.filter(req => req !== 'sleeves') || []
                 })}
                 className="flex gap-6"
               >
@@ -1252,9 +1258,11 @@ export function ImprintSettings() {
             <div>
               <Label className="text-sm font-medium mb-3 block">Do you print neck labels?</Label>
               <RadioGroup
-                value={config.capabilities?.printNeckLabels ? 'yes' : 'no'}
+                value={config.technicalRequirements?.includes('neck_labels') ? 'yes' : 'no'}
                 onValueChange={(value) => updateConfiguration(config.id!, {
-                  capabilities: { ...config.capabilities, printNeckLabels: value === 'yes' }
+                  technicalRequirements: value === 'yes' ? 
+                    [...(config.technicalRequirements || []), 'neck_labels'] :
+                    config.technicalRequirements?.filter(req => req !== 'neck_labels') || []
                 })}
                 className="flex gap-6"
               >
@@ -1272,9 +1280,11 @@ export function ImprintSettings() {
             <div>
               <Label className="text-sm font-medium mb-3 block">Do you print on infant / kids shirts?</Label>
               <RadioGroup
-                value={config.capabilities?.printKidsShirts ? 'yes' : 'no'}
+                value={config.technicalRequirements?.includes('kids_shirts') ? 'yes' : 'no'}
                 onValueChange={(value) => updateConfiguration(config.id!, {
-                  capabilities: { ...config.capabilities, printKidsShirts: value === 'yes' }
+                  technicalRequirements: value === 'yes' ? 
+                    [...(config.technicalRequirements || []), 'kids_shirts'] :
+                    config.technicalRequirements?.filter(req => req !== 'kids_shirts') || []
                 })}
                 className="flex gap-6"
               >
@@ -1292,9 +1302,12 @@ export function ImprintSettings() {
             <div>
               <Label className="text-sm font-medium mb-3 block">Do you print on 50% Cotton 50% Polyester OR only 100% Cotton?</Label>
               <RadioGroup
-                value={config.capabilities?.cottonPolyBlend || 'both'}
+                value={config.garmentCompatibility?.materialRestrictions?.includes('100_cotton_only') ? 'cotton-only' : 'both'}
                 onValueChange={(value) => updateConfiguration(config.id!, {
-                  capabilities: { ...config.capabilities, cottonPolyBlend: value }
+                  garmentCompatibility: {
+                    ...config.garmentCompatibility,
+                    materialRestrictions: value === 'cotton-only' ? ['100_cotton_only'] : []
+                  }
                 })}
                 className="flex gap-6"
               >
