@@ -33,7 +33,7 @@ export const mockProducts = [
   },
   {
     id: 3,
-    sku: 'BC3001',
+    sku: '3001',
     name: 'Bella+Canvas Unisex Jersey T-Shirt',
     category: 'T-Shirts',
     suppliers: [
@@ -48,7 +48,7 @@ export const mockProducts = [
   },
   {
     id: 4,
-    sku: 'NL3600',
+    sku: '3600',
     name: 'Next Level Cotton T-Shirt',
     category: 'T-Shirts',
     suppliers: [
@@ -63,7 +63,7 @@ export const mockProducts = [
   },
   {
     id: 5,
-    sku: 'G200',
+    sku: '2000',
     name: 'Gildan Ultra Cotton T-Shirt',
     category: 'T-Shirts',
     suppliers: [
@@ -74,7 +74,7 @@ export const mockProducts = [
     ],
     lowestPrice: 3.10,
     colors: ['#FFFFFF', '#000000', '#D22B2B', '#1F6357', '#1560BD', '#FFC72C'],
-    image: '/lovable-uploads/481e360f-8b8c-48ae-ae53-d635899c4dd5.png'
+    image: '/lovable-uploads/c67f3c35-f254-4d8a-8de3-9e877d37d2d6.png'
   },
   {
     id: 6,
