@@ -505,6 +505,34 @@ export const sampleQuoteData: Record<string, QuotationData> = {
             url: "/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png",
             type: "application/postscript",
             category: "productionFiles"
+          },
+          {
+            id: "production-file-front-pdf",
+            name: "wat-front-logo-white.pdf",
+            url: "/public/lovable-uploads/a254e6c0-7bd5-4ee1-a1d3-124051d69585.png",
+            type: "application/pdf",
+            category: "productionFiles"
+          },
+          {
+            id: "production-file-front-psd",
+            name: "wat-front-logo-white.psd",
+            url: "/public/lovable-uploads/a254e6c0-7bd5-4ee1-a1d3-124051d69585.png",
+            type: "application/octet-stream",
+            category: "productionFiles"
+          },
+          {
+            id: "production-file-front-ai",
+            name: "wat-front-logo-white.ai",
+            url: "/public/lovable-uploads/a254e6c0-7bd5-4ee1-a1d3-124051d69585.png",
+            type: "application/octet-stream",
+            category: "productionFiles"
+          },
+          {
+            id: "production-file-front-png",
+            name: "wat-front-logo-white.png",
+            url: "/public/lovable-uploads/a254e6c0-7bd5-4ee1-a1d3-124051d69585.png",
+            type: "application/octet-stream",
+            category: "productionFiles"
           }
         ],
         proofMockup: [
@@ -546,6 +574,34 @@ export const sampleQuoteData: Record<string, QuotationData> = {
             name: "wat-back-slogan-white.eps",
             url: "/public/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png",
             type: "application/postscript",
+            category: "productionFiles"
+          },
+          {
+            id: "production-file-back-pdf",
+            name: "wat-back-slogan-white.pdf",
+            url: "/public/lovable-uploads/d2507023-d2d7-428d-b225-4442856795ff.png",
+            type: "application/pdf",
+            category: "productionFiles"
+          },
+          {
+            id: "production-file-back-psd",
+            name: "wat-back-slogan-white.psd",
+            url: "/public/lovable-uploads/d2507023-d2d7-428d-b225-4442856795ff.png",
+            type: "application/octet-stream",
+            category: "productionFiles"
+          },
+          {
+            id: "production-file-back-ai",
+            name: "wat-back-slogan-white.ai",
+            url: "/public/lovable-uploads/d2507023-d2d7-428d-b225-4442856795ff.png",
+            type: "application/octet-stream",
+            category: "productionFiles"
+          },
+          {
+            id: "production-file-back-png",
+            name: "wat-back-slogan-white.png",
+            url: "/public/lovable-uploads/d2507023-d2d7-428d-b225-4442856795ff.png",
+            type: "application/octet-stream",
             category: "productionFiles"
           }
         ],
