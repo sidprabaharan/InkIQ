@@ -111,7 +111,7 @@ const allQuotationsData: Quotation[] = [
     owner: "Jhon",
     total: "$777.28",
     outstanding: "$0.000",
-    status: "Miscellaneous",
+    status: "Production",
     isPaid: true,
   },
   {
@@ -122,7 +122,7 @@ const allQuotationsData: Quotation[] = [
     owner: "Kamelia",
     total: "$939.92",
     outstanding: "$424.92",
-    status: "Short Collections",
+    status: "Artwork",
     isPaid: false,
   },
   {
