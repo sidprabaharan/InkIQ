@@ -45,7 +45,7 @@ export const mockEmails: Email[] = [
       name: "Pamela Hunt",
       avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b647?w=400&h=400&fit=crop&crop=face"
     },
-    to: [{ email: "kiriakos@merchradar.com", name: "Kiriakos" }],
+    to: [{ email: "steve@inkiq.com", name: "Steve Balboni" }],
     subject: "Staff Merchandise Order - Western Alliance Transport",
     content: `Hello,
 
@@ -66,7 +66,7 @@ Western Alliance Transport
   </div>
 </div>
 
-**From: Kiriakos (inkIQ) <kiriakos@merchradar.com>**
+**From: Steve Balboni (inkIQ) <steve@inkiq.com>**
 **Date: February 1st, 2024 at 9:30:08 AM**
 
 Hi Pamela,
@@ -84,18 +84,18 @@ I just need a few quick details so I can put together a quote and some mockups f
 Looking forward to your reply.
 
 Thanks,
-Kiriakos
-Merch Radar
-kiriakos@merchradar.com
+Steve Balboni
+inkIQ
+steve@inkiq.com
 514-834-6659
-mercradar.com
+inkiq.com
 
 ---
 
 **From: Pamela Hunt <pamela@westernalliancetransport.com>**
 **Date: February 3rd, 2024 at 2:15 PM**
 
-Hi Kiriakos,
+Hi Steve,
 
 We need everything delivered no later than next Thursday.
 
@@ -132,7 +132,7 @@ Western Alliance Transport
   </div>
 </div>
 
-**From: Kiriakos (inkIQ) <kiriakos@merchradar.com>**
+**From: Steve Balboni (inkIQ) <steve@inkiq.com>**
 **Date: February 4th, 2024 at 11:22 AM**
 
 Hi Pamela,
@@ -158,14 +158,14 @@ Hoodies are a bit tricky—cotton ones are harder to find at low prices. Let me 
 Let me know which ones you want so I can send over the quote and mockups.
 
 Thanks,
-Kiriakos
+Steve Balboni
 
 ---
 
 **From: Pamela Hunt <pamela@westernalliancetransport.com>**
 **Date: February 6th, 2024 at 10:45 AM**
 
-Hey Kiriakos,
+Hey Steve,
 
 Let's go with:
 • Gildan 5000 t-shirt
@@ -189,7 +189,7 @@ Western Alliance Transport
   </div>
 </div>
 
-**From: Kiriakos (inkIQ) <kiriakos@merchradar.com>**
+**From: Steve Balboni (inkIQ) <steve@inkiq.com>**
 **Date: February 7th, 2024 at 9:18 AM**
 
 Hey Pamela,
@@ -201,7 +201,7 @@ Just sent over the formal quote with mockups and instructions to get started. Le
 Ready for production • 5-7 business days
 
 Thanks,
-Kiriakos`,
+Steve Balboni`,
     date: "2024-02-07T09:18:00Z",
     read: false,
     starred: true,
