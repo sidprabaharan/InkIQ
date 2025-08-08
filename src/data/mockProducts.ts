@@ -59,7 +59,7 @@ export const mockProducts = [
     ],
     lowestPrice: 4.35,
     colors: ['#FFFFFF', '#000000', '#D22B2B', '#1F6357', '#808080'],
-    image: '/lovable-uploads/481e360f-8b8c-48ae-ae53-d635899c4dd5.png'
+    image: '/lovable-uploads/0f2f963a-be07-440e-a674-9411a7a65c92.png'
   },
   {
     id: 5,
