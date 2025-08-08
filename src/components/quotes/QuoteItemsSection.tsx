@@ -113,29 +113,137 @@ export const QuoteItemsSection = forwardRef<QuoteItemsSectionRef, QuoteItemsSect
         };
       }) : [];
 
-      return [{
+      // Group items by decoration method like we do in QuoteDetail
+      const screenPrintItems = quoteData.items.filter((item: any) => 
+        item.category?.toLowerCase() === 'shirts' || item.category?.toLowerCase() === 'hoody'
+      );
+      const embroideryItems = quoteData.items.filter((item: any) => 
+        item.category?.toLowerCase() === 'hats'
+      );
+      const otherItems = quoteData.items.filter((item: any) => 
+        !['shirts', 'hoody', 'hats'].includes(item.category?.toLowerCase())
+      );
+
+      // Screen print imprints (front and back)
+      const screenPrintImprints = transformedImprints.filter((imprint: any) => 
+        imprint.method?.toLowerCase() === 'screen print'
+      );
+      
+      // Embroidery imprints
+      const embroideryImprints = transformedImprints.filter((imprint: any) => 
+        imprint.method?.toLowerCase() === 'embroidery'
+      );
+
+      // Create item groups based on decoration methods
+      const groups = [];
+
+      // Screen print group (t-shirts and hoodies)
+      if (screenPrintItems.length > 0) {
+        groups.push({
+          id: "group-screen-print",
+          items: screenPrintItems.map((item: any) => ({
+            category: item.category || "",
+            itemNumber: item.itemNumber || "",
+            color: item.color || "",
+            description: item.description || "",
+            sizes: {
+              xs: parseNumber(item.xs),
+              s: parseNumber(item.s),
+              m: parseNumber(item.m),
+              l: parseNumber(item.l),
+              xl: parseNumber(item.xl),
+              xxl: parseNumber(item.xxl),
+              xxxl: parseNumber(item.xxxl)
+            },
+            quantity: parseNumber(item.quantity),
+            price: parseNumber(item.price.toString().replace('$', '')),
+            taxed: item.taxed || false,
+            total: parseNumber(item.total.toString().replace('$', '')),
+            mockups: item.mockups || []
+          })),
+          imprints: screenPrintImprints
+        });
+      }
+
+      // Embroidery group (hats)
+      if (embroideryItems.length > 0) {
+        groups.push({
+          id: "group-embroidery",
+          items: embroideryItems.map((item: any) => ({
+            category: item.category || "",
+            itemNumber: item.itemNumber || "",
+            color: item.color || "",
+            description: item.description || "",
+            sizes: {
+              xs: parseNumber(item.xs),
+              s: parseNumber(item.s),
+              m: parseNumber(item.m),
+              l: parseNumber(item.l),
+              xl: parseNumber(item.xl),
+              xxl: parseNumber(item.xxl),
+              xxxl: parseNumber(item.xxxl)
+            },
+            quantity: parseNumber(item.quantity),
+            price: parseNumber(item.price.toString().replace('$', '')),
+            taxed: item.taxed || false,
+            total: parseNumber(item.total.toString().replace('$', '')),
+            mockups: item.mockups || []
+          })),
+          imprints: embroideryImprints
+        });
+      }
+
+      // Other items group (if any)
+      if (otherItems.length > 0) {
+        groups.push({
+          id: "group-other",
+          items: otherItems.map((item: any) => ({
+            category: item.category || "",
+            itemNumber: item.itemNumber || "",
+            color: item.color || "",
+            description: item.description || "",
+            sizes: {
+              xs: parseNumber(item.xs),
+              s: parseNumber(item.s),
+              m: parseNumber(item.m),
+              l: parseNumber(item.l),
+              xl: parseNumber(item.xl),
+              xxl: parseNumber(item.xxl),
+              xxxl: parseNumber(item.xxxl)
+            },
+            quantity: parseNumber(item.quantity),
+            price: parseNumber(item.price.toString().replace('$', '')),
+            taxed: item.taxed || false,
+            total: parseNumber(item.total.toString().replace('$', '')),
+            mockups: item.mockups || []
+          })),
+          imprints: []
+        });
+      }
+
+      return groups.length > 0 ? groups : [{
         id: "group-" + Math.random().toString(36).substring(2, 9),
-        items: quoteData.items.map((item: any) => ({
-          category: item.category || "",
-          itemNumber: item.itemNumber || "",
-          color: item.color || "",
-          description: item.description || "",
+        items: [{
+          category: "",
+          itemNumber: "",
+          color: "",
+          description: "",
           sizes: {
-            xs: parseNumber(item.xs),
-            s: parseNumber(item.s),
-            m: parseNumber(item.m),
-            l: parseNumber(item.l),
-            xl: parseNumber(item.xl),
-            xxl: parseNumber(item.xxl),
-            xxxl: parseNumber(item.xxxl)
+            xs: 0,
+            s: 0,
+            m: 0,
+            l: 0,
+            xl: 0,
+            xxl: 0,
+            xxxl: 0
           },
-          quantity: parseNumber(item.quantity),
-          price: parseNumber(item.price.replace('$', '')),
-          taxed: item.taxed || false,
-          total: parseNumber(item.total.replace('$', '')),
-          mockups: item.mockups || []
-        })),
-        imprints: transformedImprints
+          quantity: 0,
+          price: 0,
+          taxed: false,
+          total: 0,
+          mockups: []
+        }],
+        imprints: []
       }];
     }
     
