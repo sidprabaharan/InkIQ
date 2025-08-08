@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, Calendar, ChevronDown, Truck } from "lucide-react";
+import { X, Calendar, ChevronDown, Truck, ArrowLeft } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -57,6 +57,15 @@ interface PackageDetails {
   specialHandling: boolean;
 }
 
+interface FreightQuote {
+  id: string;
+  carrier: string;
+  service: string;
+  transitTime: string;
+  price: number;
+  logo?: string;
+}
+
 export function ShippingLabelDialog({
   open,
   onOpenChange,
@@ -64,6 +73,8 @@ export function ShippingLabelDialog({
   customerInfo
 }: ShippingLabelDialogProps) {
   const { toast } = useToast();
+  const [step, setStep] = useState<"form" | "quotes">("form");
+  const [selectedQuote, setSelectedQuote] = useState<string | null>(null);
   const [measurementSystem, setMeasurementSystem] = useState<"imperial" | "metric">("imperial");
   const [pickupOption, setPickupOption] = useState<"now" | "later" | "drop">("now");
   const [pickupDate, setPickupDate] = useState<Date | undefined>(undefined);
@@ -202,12 +213,45 @@ export function ShippingLabelDialog({
     }
   };
   
-  const handleCreateLabel = () => {
+  const mockFreightQuotes: FreightQuote[] = [
+    { id: "ups-ground", carrier: "UPS", service: "Ground", transitTime: "3-5 business days", price: 24.99 },
+    { id: "ups-2day", carrier: "UPS", service: "2-Day Air", transitTime: "2 business days", price: 45.99 },
+    { id: "ups-overnight", carrier: "UPS", service: "Next Day Air", transitTime: "1 business day", price: 89.99 },
+    { id: "fedex-ground", carrier: "FedEx", service: "Ground", transitTime: "3-5 business days", price: 26.99 },
+    { id: "fedex-2day", carrier: "FedEx", service: "2-Day", transitTime: "2 business days", price: 48.99 },
+    { id: "fedex-overnight", carrier: "FedEx", service: "Overnight", transitTime: "1 business day", price: 92.99 },
+    { id: "usps-ground", carrier: "USPS", service: "Ground Advantage", transitTime: "3-5 business days", price: 18.99 },
+    { id: "usps-priority", carrier: "USPS", service: "Priority Mail", transitTime: "1-3 business days", price: 32.99 },
+  ];
+
+  const handleGetQuotes = () => {
+    setStep("quotes");
     toast({
-      title: "Shipping Label Created",
-      description: `A shipping label has been created for Quote #${quoteId}`,
+      title: "Freight Quotes Retrieved",
+      description: "Found 8 shipping options from multiple carriers",
     });
-    onOpenChange(false);
+  };
+  
+  const handleSelectQuote = (quoteId: string) => {
+    setSelectedQuote(quoteId);
+  };
+
+  const handleCreateLabel = () => {
+    const quote = mockFreightQuotes.find(q => q.id === selectedQuote);
+    if (quote) {
+      toast({
+        title: "Shipping Label Created",
+        description: `Created ${quote.carrier} ${quote.service} label for $${quote.price.toFixed(2)}`,
+      });
+      onOpenChange(false);
+      setStep("form");
+      setSelectedQuote(null);
+    }
+  };
+
+  const handleBackToForm = () => {
+    setStep("form");
+    setSelectedQuote(null);
   };
   
   return (
@@ -215,11 +259,17 @@ export function ShippingLabelDialog({
       <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0">
         <DialogHeader className="p-6 pb-2">
           <DialogTitle className="text-xl flex items-center gap-2">
+            {step === "quotes" && (
+              <Button variant="ghost" size="sm" onClick={handleBackToForm} className="mr-2 p-2">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            )}
             <Truck className="h-5 w-5" />
-            Create Shipping Label - Order #{quoteId}
+            {step === "form" ? `Get Shipping Quotes - Order #${quoteId}` : `Select Shipping Option - Order #${quoteId}`}
           </DialogTitle>
         </DialogHeader>
         
+        {step === "form" ? (
         <div className="p-6 pt-2 space-y-6">
           {/* Measurement System Selection */}
           <div className="flex items-center gap-6">
@@ -656,15 +706,62 @@ export function ShippingLabelDialog({
           
           <p className="text-gray-500 text-sm">This will create a shipping label using UPS shipping services.</p>
         </div>
+        ) : (
+        <div className="p-6 pt-2 space-y-4">
+          <div className="text-sm text-muted-foreground mb-4">
+            Select your preferred shipping option from the quotes below:
+          </div>
+          
+          <div className="space-y-3">
+            {mockFreightQuotes.map((quote) => (
+              <div 
+                key={quote.id}
+                className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                  selectedQuote === quote.id 
+                    ? "border-2 border-primary bg-primary/5" 
+                    : "border border-border hover:shadow-md hover:border-muted-foreground/30"
+                }`}
+                onClick={() => handleSelectQuote(quote.id)}
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-8 bg-muted rounded flex items-center justify-center text-xs font-medium">
+                      {quote.carrier}
+                    </div>
+                    <div>
+                      <div className="font-medium">{quote.service}</div>
+                      <div className="text-sm text-muted-foreground">{quote.transitTime}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-lg font-bold">${quote.price.toFixed(2)}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        )}
         
         <DialogFooter className="p-6 pt-0 flex justify-between">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleCreateLabel} className="gap-2">
-            <Truck className="h-4 w-4" />
-            Create Shipping Label
-          </Button>
+          {step === "form" ? (
+            <Button onClick={handleGetQuotes} className="gap-2">
+              <Truck className="h-4 w-4" />
+              Get Shipping Prices
+            </Button>
+          ) : (
+            <Button 
+              onClick={handleCreateLabel} 
+              disabled={!selectedQuote}
+              className="gap-2"
+            >
+              <Truck className="h-4 w-4" />
+              Create Shipping Label
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
