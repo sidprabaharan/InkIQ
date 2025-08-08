@@ -359,8 +359,9 @@ export function DecoratorSelectionDialog({
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1 max-w-md"
             />
-            <div className="text-sm text-muted-foreground">
-              <span className="font-medium text-primary">134 verified contract decorators</span> found who can deliver this job on time
+            <div className="text-sm text-muted-foreground text-right">
+              <div className="font-medium text-primary">134 verified contract decorators</div>
+              <div>found who can deliver this job on time</div>
             </div>
           </div>
 
