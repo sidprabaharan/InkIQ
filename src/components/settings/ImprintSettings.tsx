@@ -43,6 +43,25 @@ export function ImprintSettings() {
   const [activeTab, setActiveTab] = useState<string>('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState<string>('');
+  const [customInkSpecialties, setCustomInkSpecialties] = useState<string[]>([]);
+  const [newInkSpecialty, setNewInkSpecialty] = useState('');
+  const [extraCharges, setExtraCharges] = useState<Array<{name: string, price: string}>>([
+    { name: 'Oversized Print', price: '' },
+    { name: 'Sleeve Print', price: '' },
+    { name: 'Print on Fleece', price: '' },
+    { name: 'Water Based Ink', price: '' },
+    { name: 'Discharge Ink', price: '' },
+    { name: 'Puff Ink', price: '' },
+    { name: 'High Density', price: '' },
+    { name: 'Glitter', price: '' },
+    { name: 'Silicone', price: '' },
+    { name: 'Metallic', price: '' },
+    { name: 'Shimmer', price: '' },
+    { name: 'Foil', price: '' },
+    { name: 'Reflective', price: '' },
+    { name: 'Glow in the Dark', price: '' },
+    { name: 'Flocking', price: '' }
+  ]);
 
   const createNewConfiguration = (methodValue: string) => {
     const method = IMPRINT_METHODS.find(m => m.value === methodValue);
@@ -162,6 +181,25 @@ export function ImprintSettings() {
     setActiveTab(duplicatedConfig.id);
   };
 
+  const addCustomInkSpecialty = () => {
+    if (newInkSpecialty.trim() && !customInkSpecialties.includes(newInkSpecialty.trim())) {
+      const specialty = newInkSpecialty.trim();
+      setCustomInkSpecialties(prev => [...prev, specialty]);
+      
+      // Automatically add to extra charges if not already there
+      const existsInExtraCharges = extraCharges.some(charge => charge.name.toLowerCase() === specialty.toLowerCase());
+      if (!existsInExtraCharges) {
+        setExtraCharges(prev => [...prev, { name: specialty, price: '' }]);
+      }
+      
+      setNewInkSpecialty('');
+    }
+  };
+
+  const removeCustomInkSpecialty = (specialty: string) => {
+    setCustomInkSpecialties(prev => prev.filter(s => s !== specialty));
+  };
+
   const handleAddMethod = () => {
     if (selectedMethod) {
       createNewConfiguration(selectedMethod);
@@ -169,6 +207,22 @@ export function ImprintSettings() {
   };
 
   const renderScreenPrintingForm = (config: ImprintMethodConfiguration) => {
+    const standardInkTypes = [
+      'Plastisol (Industry Standard)',
+      'Water Based',
+      'Discharge',
+      'Puff Ink',
+      'High Density',
+      'Glitter',
+      'Silicone',
+      'Metallic',
+      'Shimmer',
+      'Foil',
+      'Reflective',
+      'Glow in the Dark',
+      'Flocking'
+    ];
+
     return (
       <div className="space-y-8">
         {/* Screen Printing Information */}
@@ -181,27 +235,53 @@ export function ImprintSettings() {
           <div className="space-y-3">
             <Label className="text-base font-medium">Select the screen printing inks / specialties you offer.</Label>
             <div className="grid grid-cols-2 gap-3">
-              {[
-                'Plastisol (Industry Standard)',
-                'Water Based',
-                'Discharge',
-                'Puff Ink',
-                'High Density',
-                'Glitter',
-                'Silicone',
-                'Metallic',
-                'Shimmer',
-                'Foil',
-                'Reflective',
-                'Glow in the Dark',
-                'Flocking',
-                'Other'
-              ].map((ink) => (
+              {standardInkTypes.map((ink) => (
                 <div key={ink} className="flex items-center space-x-2">
                   <Checkbox id={ink} />
                   <Label htmlFor={ink} className="text-sm">{ink}</Label>
                 </div>
               ))}
+              
+              {/* Custom ink specialties */}
+              {customInkSpecialties.map((specialty) => (
+                <div key={specialty} className="flex items-center space-x-2">
+                  <Checkbox id={specialty} />
+                  <Label htmlFor={specialty} className="text-sm">{specialty}</Label>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeCustomInkSpecialty(specialty)}
+                    className="h-6 w-6 p-0 ml-auto"
+                  >
+                    <Trash2 className="h-3 w-3 text-destructive" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+            
+            {/* Add custom ink specialty */}
+            <div className="flex items-center space-x-2 mt-3">
+              <Input
+                placeholder="Add custom ink specialty..."
+                value={newInkSpecialty}
+                onChange={(e) => setNewInkSpecialty(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addCustomInkSpecialty();
+                  }
+                }}
+                className="flex-1"
+              />
+              <Button
+                onClick={addCustomInkSpecialty}
+                variant="outline"
+                size="sm"
+                disabled={!newInkSpecialty.trim()}
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add
+              </Button>
             </div>
           </div>
         </div>
@@ -535,175 +615,52 @@ export function ImprintSettings() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b">
-                    <td className="p-3">Oversized Print</td>
-                    <td className="p-3">
-                      <Input type="number" placeholder="$0.00" className="w-24" />
-                    </td>
-                    <td className="p-3">
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-3">Sleeve Print</td>
-                    <td className="p-3">
-                      <Input type="number" placeholder="$0.00" className="w-24" />
-                    </td>
-                    <td className="p-3">
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-3">Print on Fleece</td>
-                    <td className="p-3">
-                      <Input type="number" placeholder="$0.00" className="w-24" />
-                    </td>
-                    <td className="p-3">
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-3">Water Based Ink</td>
-                    <td className="p-3">
-                      <Input type="number" placeholder="$0.00" className="w-24" />
-                    </td>
-                    <td className="p-3">
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-3">Discharge Ink</td>
-                    <td className="p-3">
-                      <Input type="number" placeholder="$0.00" className="w-24" />
-                    </td>
-                    <td className="p-3">
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-3">Puff Ink</td>
-                    <td className="p-3">
-                      <Input type="number" placeholder="$0.00" className="w-24" />
-                    </td>
-                    <td className="p-3">
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-3">High Density</td>
-                    <td className="p-3">
-                      <Input type="number" placeholder="$0.00" className="w-24" />
-                    </td>
-                    <td className="p-3">
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-3">Glitter</td>
-                    <td className="p-3">
-                      <Input type="number" placeholder="$0.00" className="w-24" />
-                    </td>
-                    <td className="p-3">
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-3">Silicone</td>
-                    <td className="p-3">
-                      <Input type="number" placeholder="$0.00" className="w-24" />
-                    </td>
-                    <td className="p-3">
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-3">Metallic</td>
-                    <td className="p-3">
-                      <Input type="number" placeholder="$0.00" className="w-24" />
-                    </td>
-                    <td className="p-3">
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-3">Shimmer</td>
-                    <td className="p-3">
-                      <Input type="number" placeholder="$0.00" className="w-24" />
-                    </td>
-                    <td className="p-3">
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-3">Foil</td>
-                    <td className="p-3">
-                      <Input type="number" placeholder="$0.00" className="w-24" />
-                    </td>
-                    <td className="p-3">
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-3">Reflective</td>
-                    <td className="p-3">
-                      <Input type="number" placeholder="$0.00" className="w-24" />
-                    </td>
-                    <td className="p-3">
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-3">Glow in the Dark</td>
-                    <td className="p-3">
-                      <Input type="number" placeholder="$0.00" className="w-24" />
-                    </td>
-                    <td className="p-3">
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-3">Flocking</td>
-                    <td className="p-3">
-                      <Input type="number" placeholder="$0.00" className="w-24" />
-                    </td>
-                    <td className="p-3">
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </td>
-                  </tr>
+                  {extraCharges.map((charge, index) => (
+                    <tr key={charge.name} className="border-b">
+                      <td className="p-3">{charge.name}</td>
+                      <td className="p-3">
+                        <Input 
+                          type="number" 
+                          placeholder="$0.00" 
+                          className="w-24"
+                          value={charge.price}
+                          onChange={(e) => {
+                            const newCharges = [...extraCharges];
+                            newCharges[index].price = e.target.value;
+                            setExtraCharges(newCharges);
+                          }}
+                        />
+                      </td>
+                      <td className="p-3">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            setExtraCharges(prev => prev.filter((_, i) => i !== index));
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
-            <Button variant="outline" size="sm" className="mt-2">Add Extra Charge</Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="mt-2"
+              onClick={() => {
+                const chargeName = prompt('Enter charge name:');
+                if (chargeName && chargeName.trim()) {
+                  setExtraCharges(prev => [...prev, { name: chargeName.trim(), price: '' }]);
+                }
+              }}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Add Charge
+            </Button>
           </div>
 
           <div>
