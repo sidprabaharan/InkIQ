@@ -66,7 +66,7 @@ export interface QuoteItem {
   l: string;
   xl: string;
   xxl: string;
-  xxxl: string;
+  xxxl?: string;
   quantity: string;
   price: string;
   taxed: boolean;
@@ -390,7 +390,6 @@ export const sampleQuoteData: Record<string, QuotationData> = {
         l: "50",
         xl: "20",
         xxl: "0",
-        xxxl: "0",
         quantity: "140",
         price: "$7.52",
         taxed: true,
@@ -422,7 +421,6 @@ export const sampleQuoteData: Record<string, QuotationData> = {
         l: "50", 
         xl: "20",
         xxl: "0",
-        xxxl: "0",
         quantity: "140",
         price: "$30.44",
         taxed: true,
@@ -454,7 +452,6 @@ export const sampleQuoteData: Record<string, QuotationData> = {
         l: "0",
         xl: "0",
         xxl: "0",
-        xxxl: "0",
         quantity: "140",
         price: "$11.40",
         taxed: true,
