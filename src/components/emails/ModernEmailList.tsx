@@ -163,8 +163,8 @@ export function ModernEmailList({
                   </span>
                 </div>
                 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 ml-3">
+                <div className="flex items-center justify-end">
+                  <div className="flex items-center gap-2">
                     {email.attachments.length > 0 && (
                       <Paperclip className={`h-3 w-3 ${
                         selectedEmailId === email.id ? 'text-white/70' : 'text-gray-400'
