@@ -334,15 +334,15 @@ export const sampleQuoteData: Record<string, QuotationData> = {
     id: "3046",
     nickname: "Western Alliance Transport Staff Merchandise",
     company: {
-      name: "15493315 Canada Inc",
-      logo: "/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png",
+      name: "The Print Company Inc",
+      logo: "/lovable-uploads/d47eb830-4c11-4e85-8cea-353ba800670e.png",
       address: "226 Rue du Domaine",
       city: "Laval",
       region: "Quebec",
       postalCode: "H7X 3R9",
       phone: "5148346659",
-      website: "https://www.stitchandink.ca",
-      email: "kiriakos@merchradar.com",
+      website: "https://www.theprintcompany.com",
+      email: "steve@theprintcompany.com",
       taxNumbers: {
         gst: "123456789 RT0001",
         qst: "1234567890 TQ0001"
