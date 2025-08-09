@@ -60,29 +60,171 @@ const mockEvents: CalendarEvent[] = [
     end: new Date(new Date().setHours(11, 30, 0, 0)),
     allDay: false,
     category: "order",
-    color: "#4285F4", // Google blue
+    color: "#4285F4",
     location: "Main Office"
   },
   {
     id: "2",
-    title: "Design Review",
+    title: "Design Review Meeting",
     description: "Review mockups with design team",
     start: new Date(new Date().setDate(new Date().getDate() + 1)),
     end: new Date(new Date().setDate(new Date().getDate() + 1)),
     allDay: true,
     category: "work",
-    color: "#0F9D58" // Google green
+    color: "#0F9D58"
   },
   {
     id: "3",
-    title: "Call with Client",
+    title: "Client Call - Order #145",
     description: "Discuss revisions for Order #145",
     start: new Date(new Date().setHours(14, 0, 0, 0)),
     end: new Date(new Date().setHours(15, 0, 0, 0)),
     allDay: false,
-    category: "task",
-    color: "#DB4437", // Google red
-    location: "Conference Room B"
+    category: "customer_call",
+    color: "#DB4437",
+    location: "Conference Room B",
+    meetingProvider: "zoom",
+    meetingLink: "https://zoom.us/j/123456789",
+    attendees: ["client@company.com", "sales@ourcompany.com"]
+  },
+  // Weekly recurring meetings
+  {
+    id: "4",
+    title: "Production Planning Meeting",
+    description: "Weekly production capacity review",
+    start: new Date(new Date().setDate(new Date().getDate() + 2)),
+    end: new Date(new Date().setDate(new Date().getDate() + 2)),
+    allDay: false,
+    category: "meeting",
+    color: "#9C27B0",
+    meetingProvider: "teams",
+    meetingLink: "https://teams.microsoft.com/l/meetup-join/abc123"
+  },
+  // Customer meetings throughout the week
+  {
+    id: "5",
+    title: "TechCorp Artwork Review",
+    description: "Final approval for promotional materials",
+    start: new Date(new Date().setDate(new Date().getDate() + 3)),
+    end: new Date(new Date().setDate(new Date().getDate() + 3)),
+    allDay: false,
+    category: "artwork_approval",
+    color: "#FF9800",
+    customerName: "TechCorp Solutions"
+  },
+  {
+    id: "6",
+    title: "Metro Sports Quote Discussion",
+    description: "Review uniform requirements",
+    start: new Date(new Date().setDate(new Date().getDate() + 4)),
+    end: new Date(new Date().setDate(new Date().getDate() + 4)),
+    allDay: false,
+    category: "customer_call",
+    color: "#E91E63",
+    meetingProvider: "google_meet",
+    attendees: ["coach@metrosports.com"]
+  },
+  // Follow-up tasks
+  {
+    id: "7",
+    title: "Follow-up: Restaurant Chain Order",
+    description: "Check on additional locations interested",
+    start: new Date(new Date().setDate(new Date().getDate() + 5)),
+    end: new Date(new Date().setDate(new Date().getDate() + 5)),
+    allDay: true,
+    category: "follow_up",
+    color: "#FF5722"
+  },
+  // Next week events
+  {
+    id: "8",
+    title: "Vendor Meeting - New Equipment",
+    description: "Discuss DTF printer upgrade options",
+    start: new Date(new Date().setDate(new Date().getDate() + 7)),
+    end: new Date(new Date().setDate(new Date().getDate() + 7)),
+    allDay: false,
+    category: "meeting",
+    color: "#607D8B",
+    location: "Showroom"
+  },
+  {
+    id: "9",
+    title: "Staff Training - New Embroidery Software",
+    description: "Training session for design software update",
+    start: new Date(new Date().setDate(new Date().getDate() + 8)),
+    end: new Date(new Date().setDate(new Date().getDate() + 8)),
+    allDay: false,
+    category: "work",
+    color: "#795548"
+  },
+  {
+    id: "10",
+    title: "Quality Control Review",
+    description: "Weekly QC meeting for production standards",
+    start: new Date(new Date().setDate(new Date().getDate() + 9)),
+    end: new Date(new Date().setDate(new Date().getDate() + 9)),
+    allDay: false,
+    category: "meeting",
+    color: "#3F51B5"
+  },
+  // More customer interactions
+  {
+    id: "11",
+    title: "Charity Foundation Logo Approval",
+    description: "Final logo placement review",
+    start: new Date(new Date().setDate(new Date().getDate() + 10)),
+    end: new Date(new Date().setDate(new Date().getDate() + 10)),
+    allDay: false,
+    category: "artwork_approval",
+    color: "#FF9800",
+    customerName: "United Charity Foundation"
+  },
+  {
+    id: "12",
+    title: "Trade Show Planning Call",
+    description: "Coordinate promotional materials for Global Trade Expo",
+    start: new Date(new Date().setDate(new Date().getDate() + 11)),
+    end: new Date(new Date().setDate(new Date().getDate() + 11)),
+    allDay: false,
+    category: "customer_call",
+    color: "#8BC34A",
+    meetingProvider: "zoom",
+    attendees: ["events@globaltrade.com", "marketing@globaltrade.com"]
+  },
+  // Personal events
+  {
+    id: "13",
+    title: "Lunch with Supplier Rep",
+    description: "Quarterly check-in with fabric supplier",
+    start: new Date(new Date().setDate(new Date().getDate() + 12)),
+    end: new Date(new Date().setDate(new Date().getDate() + 12)),
+    allDay: false,
+    category: "personal",
+    color: "#E91E63",
+    location: "Downtown Restaurant"
+  },
+  // Equipment maintenance
+  {
+    id: "14",
+    title: "Press Maintenance Schedule",
+    description: "Scheduled maintenance for Press 2",
+    start: new Date(new Date().setDate(new Date().getDate() + 14)),
+    end: new Date(new Date().setDate(new Date().getDate() + 14)),
+    allDay: true,
+    category: "work",
+    color: "#FF5722"
+  },
+  // Urgent follow-ups
+  {
+    id: "15",
+    title: "Rush Order Follow-up: SoundWave Festival",
+    description: "Confirm delivery timeline for festival merchandise",
+    start: new Date(new Date().setDate(new Date().getDate() + 15)),
+    end: new Date(new Date().setDate(new Date().getDate() + 15)),
+    allDay: false,
+    category: "follow_up",
+    color: "#FF9800",
+    customerName: "SoundWave Festival"
   }
 ];
 
