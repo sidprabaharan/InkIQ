@@ -369,7 +369,7 @@ export const sampleQuoteData: Record<string, QuotationData> = {
       }
     },
     details: {
-      owner: "Kiriakos",
+      owner: "Steve Balboni",
       deliveryMethod: "Express Delivery",
       productionDueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Next Thursday
       paymentDueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 2 weeks
