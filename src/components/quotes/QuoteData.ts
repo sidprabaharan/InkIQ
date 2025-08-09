@@ -15,7 +15,7 @@ export interface CompanyInfo {
 }
 
 export interface CustomerBilling {
-  name: string;
+  name?: string;
   company: string;
   contact: string;
   address: string;
@@ -353,7 +353,6 @@ export const sampleQuoteData: Record<string, QuotationData> = {
     },
     customer: {
       billing: {
-        name: "Pamela Hunt",
         company: "Western Alliance Transport",
         contact: "Pamela Hunt",
         address: "2450 Boulevard Industriel",
