@@ -374,7 +374,7 @@ export const sampleQuoteData: Record<string, QuotationData> = {
       deliveryMethod: "Express Delivery",
       productionDueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Next Thursday
       paymentDueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 2 weeks
-      customerDueDate: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Day before production
+      customerDueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 3 days after production for delivery
       invoiceDate: new Date().toISOString().split('T')[0],
       poNumber: "WAT-2024-001"
     },
