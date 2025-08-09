@@ -93,32 +93,18 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
     });
   };
   
-  // Calculate event lanes for proper stacking without weird widths
-  const getEventLane = (event: CalendarEvent, day: Date, events: CalendarEvent[]): { lane: number; totalLanes: number } => {
+  // Calculate event stacking for clean row display like month view
+  const getEventRowPosition = (event: CalendarEvent, day: Date, events: CalendarEvent[]): number => {
     const eventsOnSameDay = events.filter(e => {
       const eventStart = new Date(e.start);
       const eventEnd = new Date(e.end);
-      const eStart = new Date(event.start);
-      const eEnd = new Date(event.end);
-      
-      // Check if events overlap in time
       return (
-        (isSameDay(eventStart, day) || isSameDay(eventEnd, day)) &&
-        (eventStart < eEnd && eventEnd > eStart)
+        isSameDay(eventStart, day) || isSameDay(eventEnd, day) ||
+        (eventStart < day && eventEnd > day)
       );
     }).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
     
-    if (eventsOnSameDay.length <= 1) {
-      return { lane: 0, totalLanes: 1 };
-    }
-    
-    // Find which lane this event should be in
-    const eventIndex = eventsOnSameDay.findIndex(e => e.id === event.id);
-    
-    return { 
-      lane: eventIndex,
-      totalLanes: eventsOnSameDay.length
-    };
+    return eventsOnSameDay.findIndex(e => e.id === event.id);
   };
   
   return (
@@ -180,63 +166,48 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
                   </div>
                 ))}
                 
-                {/* Events for this day */}
+                {/* Events for this day - displayed as clean rows like month view */}
                 {dayEvents.map(event => {
                   const position = getEventPositionForDay(event, day);
-                  const { lane, totalLanes } = getEventLane(event, day, dayEvents);
+                  const rowPosition = getEventRowPosition(event, day, dayEvents);
                   
                   if (!position) return null;
                   
-                  // All-day events get special treatment
+                  // All-day events get special treatment at the top
                   if (event.allDay) {
                     return (
                       <div
                         key={event.id}
-                        className="absolute top-1 left-1 right-1 h-5 px-2 text-xs font-medium truncate z-10 rounded border-l-4 bg-card"
+                        className="absolute left-1 right-1 h-5 text-xs px-1 py-0.5 rounded cursor-pointer hover:opacity-80 truncate z-10"
                         style={{
-                          borderLeftColor: event.color,
-                          backgroundColor: `${event.color}15`,
-                          color: event.color
+                          top: `${rowPosition * 22}px`,
+                          backgroundColor: `${event.color || "#3b82f6"}33`,
+                          color: event.color || "#3b82f6",
+                          borderLeft: `3px solid ${event.color || "#3b82f6"}`
                         }}
+                        title={`${event.title}${event.location ? ` - ${event.location}` : ''}`}
                       >
                         {event.title}
                       </div>
                     );
                   }
                   
-                  // Calculate width and position based on lanes - ensure readability
-                  const eventWidth = totalLanes > 1 ? `${Math.max(30, 88 / totalLanes)}%` : '92%';
-                  const eventLeft = totalLanes > 1 ? `${4 + lane * (88 / totalLanes)}%` : '4%';
-                  
+                  // Regular timed events - positioned based on time but displayed as clean rows
                   return (
                     <div
                       key={event.id}
-                      className="absolute rounded-md border-l-4 overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-[1.02] bg-card"
+                      className="absolute left-1 right-1 text-xs px-1 py-0.5 rounded cursor-pointer hover:opacity-80 truncate z-10"
                       style={{
-                        top: `${position.top * (64/60)}px`, // Scale for 64px hour height
-                        height: `${Math.max(24, position.height * (64/60))}px`,
-                        width: eventWidth,
-                        left: eventLeft,
-                        borderLeftColor: event.color,
-                        backgroundColor: `${event.color}15`,
-                        zIndex: 10 + lane,
+                        top: `${position.top * (64/60) + rowPosition * 20}px`, // Stack events that start at same time
+                        height: `${Math.max(18, Math.min(position.height * (64/60), 40))}px`, // Limit height for readability
+                        backgroundColor: `${event.color || "#3b82f6"}33`,
+                        color: event.color || "#3b82f6",
+                        borderLeft: `3px solid ${event.color || "#3b82f6"}`
                       }}
+                      title={`${event.title}${event.location ? ` - ${event.location}` : ''} (${format(new Date(event.start), "h:mm a")})`}
                     >
-                      <div className="p-2 h-full">
-                        <div className="font-medium text-sm text-foreground leading-tight line-clamp-1">
-                          {event.title}
-                        </div>
-                        {position.height > 40 && (
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {format(new Date(event.start), 'h:mm a')}
-                          </div>
-                        )}
-                        {position.height > 60 && event.location && (
-                          <div className="text-xs text-muted-foreground mt-1 line-clamp-1">
-                            📍 {event.location}
-                          </div>
-                        )}
-                      </div>
+                      <span className="mr-1">{format(new Date(event.start), "h:mm")}</span>
+                      {event.title}
                     </div>
                   );
                 })}
