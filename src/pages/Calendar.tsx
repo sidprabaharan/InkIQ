@@ -8,6 +8,7 @@ import { CalendarAgenda } from "@/components/calendar/CalendarAgenda";
 import { EnhancedCreateEventDialog } from "@/components/calendar/EnhancedCreateEventDialog";
 import { CalendarFilters, CalendarFilters as CalendarFiltersType } from "@/components/calendar/CalendarFilters";
 import { convertImprintJobsToCalendarEvents } from "@/utils/productionJobsToEvents";
+import { getEventColor } from "@/utils/eventColors";
 import { useToast } from "@/hooks/use-toast";
 
 export type CalendarView = "month" | "week" | "day" | "agenda";
@@ -61,7 +62,6 @@ const mockEvents: CalendarEvent[] = [
     end: new Date(new Date().setHours(11, 30, 0, 0)),
     allDay: false,
     category: "order",
-    color: "#4285F4",
     location: "Main Office"
   },
   {
@@ -71,8 +71,7 @@ const mockEvents: CalendarEvent[] = [
     start: new Date(new Date().setDate(new Date().getDate() + 1)),
     end: new Date(new Date().setDate(new Date().getDate() + 1)),
     allDay: true,
-    category: "work",
-    color: "#0F9D58"
+    category: "work"
   },
   {
     id: "3",
@@ -82,13 +81,11 @@ const mockEvents: CalendarEvent[] = [
     end: new Date(new Date().setHours(15, 0, 0, 0)),
     allDay: false,
     category: "customer_call",
-    color: "#DB4437",
     location: "Conference Room B",
     meetingProvider: "zoom",
     meetingLink: "https://zoom.us/j/123456789",
     attendees: ["client@company.com", "sales@ourcompany.com"]
   },
-  // Weekly recurring meetings
   {
     id: "4",
     title: "Production Planning Meeting",
@@ -97,11 +94,9 @@ const mockEvents: CalendarEvent[] = [
     end: new Date(new Date().setDate(new Date().getDate() + 2)),
     allDay: false,
     category: "meeting",
-    color: "#9C27B0",
     meetingProvider: "teams",
     meetingLink: "https://teams.microsoft.com/l/meetup-join/abc123"
   },
-  // Customer meetings throughout the week
   {
     id: "5",
     title: "TechCorp Artwork Review",
@@ -110,7 +105,6 @@ const mockEvents: CalendarEvent[] = [
     end: new Date(new Date().setDate(new Date().getDate() + 3)),
     allDay: false,
     category: "artwork_approval",
-    color: "#FF9800",
     customerName: "TechCorp Solutions"
   },
   {
@@ -121,11 +115,9 @@ const mockEvents: CalendarEvent[] = [
     end: new Date(new Date().setDate(new Date().getDate() + 4)),
     allDay: false,
     category: "customer_call",
-    color: "#E91E63",
     meetingProvider: "google_meet",
     attendees: ["coach@metrosports.com"]
   },
-  // Follow-up tasks
   {
     id: "7",
     title: "Follow-up: Restaurant Chain Order",
@@ -133,10 +125,8 @@ const mockEvents: CalendarEvent[] = [
     start: new Date(new Date().setDate(new Date().getDate() + 5)),
     end: new Date(new Date().setDate(new Date().getDate() + 5)),
     allDay: true,
-    category: "follow_up",
-    color: "#FF5722"
+    category: "follow_up"
   },
-  // Next week events
   {
     id: "8",
     title: "Vendor Meeting - New Equipment",
@@ -145,7 +135,6 @@ const mockEvents: CalendarEvent[] = [
     end: new Date(new Date().setDate(new Date().getDate() + 7)),
     allDay: false,
     category: "meeting",
-    color: "#607D8B",
     location: "Showroom"
   },
   {
@@ -155,8 +144,7 @@ const mockEvents: CalendarEvent[] = [
     start: new Date(new Date().setDate(new Date().getDate() + 8)),
     end: new Date(new Date().setDate(new Date().getDate() + 8)),
     allDay: false,
-    category: "work",
-    color: "#795548"
+    category: "work"
   },
   {
     id: "10",
@@ -165,10 +153,8 @@ const mockEvents: CalendarEvent[] = [
     start: new Date(new Date().setDate(new Date().getDate() + 9)),
     end: new Date(new Date().setDate(new Date().getDate() + 9)),
     allDay: false,
-    category: "meeting",
-    color: "#3F51B5"
+    category: "meeting"
   },
-  // More customer interactions
   {
     id: "11",
     title: "Charity Foundation Logo Approval",
@@ -177,7 +163,6 @@ const mockEvents: CalendarEvent[] = [
     end: new Date(new Date().setDate(new Date().getDate() + 10)),
     allDay: false,
     category: "artwork_approval",
-    color: "#FF9800",
     customerName: "United Charity Foundation"
   },
   {
@@ -188,11 +173,9 @@ const mockEvents: CalendarEvent[] = [
     end: new Date(new Date().setDate(new Date().getDate() + 11)),
     allDay: false,
     category: "customer_call",
-    color: "#8BC34A",
     meetingProvider: "zoom",
     attendees: ["events@globaltrade.com", "marketing@globaltrade.com"]
   },
-  // Personal events
   {
     id: "13",
     title: "Lunch with Supplier Rep",
@@ -201,10 +184,8 @@ const mockEvents: CalendarEvent[] = [
     end: new Date(new Date().setDate(new Date().getDate() + 12)),
     allDay: false,
     category: "personal",
-    color: "#E91E63",
     location: "Downtown Restaurant"
   },
-  // Equipment maintenance
   {
     id: "14",
     title: "Press Maintenance Schedule",
@@ -212,10 +193,8 @@ const mockEvents: CalendarEvent[] = [
     start: new Date(new Date().setDate(new Date().getDate() + 14)),
     end: new Date(new Date().setDate(new Date().getDate() + 14)),
     allDay: true,
-    category: "work",
-    color: "#FF5722"
+    category: "work"
   },
-  // Urgent follow-ups
   {
     id: "15",
     title: "Rush Order Follow-up: SoundWave Festival",
@@ -224,10 +203,13 @@ const mockEvents: CalendarEvent[] = [
     end: new Date(new Date().setDate(new Date().getDate() + 15)),
     allDay: false,
     category: "follow_up",
-    color: "#FF9800",
+    priority: "high",
     customerName: "SoundWave Festival"
   }
-];
+].map(event => ({
+  ...event,
+  color: getEventColor(event.category as CalendarEventCategory, event.priority as "low" | "medium" | "high" | undefined)
+})) as CalendarEvent[];
 
 export default function Calendar() {
   const [view, setView] = useState<CalendarView>("month");
@@ -308,7 +290,8 @@ export default function Calendar() {
   const handleAddEvent = (newEvent: Omit<CalendarEvent, "id">) => {
     const event = {
       ...newEvent,
-      id: Math.random().toString(36).substring(2, 9)
+      id: Math.random().toString(36).substring(2, 9),
+      color: getEventColor(newEvent.category, newEvent.priority)
     };
     setBaseEvents([...baseEvents, event]);
     toast({
