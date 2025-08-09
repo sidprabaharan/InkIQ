@@ -72,11 +72,17 @@ export function CalendarMonth({ currentDate, events }: CalendarMonthProps) {
               
               <div className="flex-1 overflow-y-auto space-y-0.5">
                 {dayEvents.map((event) => (
-                  <EventCard 
+                  <div 
                     key={event.id}
-                    event={event}
-                    className="border-none shadow-none text-xs py-0.5 px-1 min-h-[18px]"
-                  />
+                    className="text-xs px-1 py-0.5 rounded text-white truncate cursor-pointer hover:opacity-80"
+                    style={{ backgroundColor: event.color || "#3b82f6" }}
+                    title={`${event.title}${event.location ? ` - ${event.location}` : ''}${!event.allDay ? ` (${format(new Date(event.start), "h:mm a")})` : ''}`}
+                  >
+                    {!event.allDay && (
+                      <span className="mr-1">{format(new Date(event.start), "h:mm")}</span>
+                    )}
+                    {event.title}
+                  </div>
                 ))}
               </div>
             </div>
