@@ -50,7 +50,7 @@ export const mockEmails: Email[] = [
     starred: false,
     attachments: [],
     folder: "inbox",
-    labels: ["new-inquiry", "urgent"]
+    labels: []
   },
   {
     id: "pamela-2",
@@ -99,7 +99,7 @@ export const mockEmails: Email[] = [
     starred: true,
     attachments: [],
     folder: "sent",
-    labels: ["ai-generated", "auto-reply"]
+    labels: ["auto-reply"]
   },
   {
     id: "pamela-3",
@@ -215,7 +215,7 @@ export const mockEmails: Email[] = [
     starred: true,
     attachments: [],
     folder: "sent",
-    labels: ["ai-generated", "product-options"]
+    labels: ["product-options"]
   },
   {
     id: "pamela-5",
@@ -300,7 +300,7 @@ export const mockEmails: Email[] = [
       }
     ],
     folder: "sent",
-    labels: ["ai-generated", "quote-sent"]
+    labels: ["quote-sent"]
   },
   // Sarah Johnson Business Cards Thread
   {
@@ -339,7 +339,7 @@ export const mockEmails: Email[] = [
       }
     ],
     folder: "inbox",
-    labels: ["quote-request", "urgent"]
+    labels: ["quote-request"]
   },
   {
     id: "sarah-business-cards-ai-reply",
@@ -408,7 +408,7 @@ export const mockEmails: Email[] = [
     starred: true,
     attachments: [],
     folder: "sent",
-    labels: ["ai-generated", "quote"]
+    labels: ["quote"]
   },
   {
     id: "1",

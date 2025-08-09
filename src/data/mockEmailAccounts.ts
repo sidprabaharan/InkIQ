@@ -206,7 +206,7 @@ Steve Balboni`,
     read: false,
     starred: true,
     folder: "inbox",
-    labels: ["new-inquiry", "urgent", "ai-generated"],
+    labels: [],
     attachments: [
       {
         id: "att-logos",
@@ -242,7 +242,7 @@ Steve Balboni`,
     read: false,
     starred: false,
     folder: "inbox",
-    labels: ["urgent", "quote-request"],
+    labels: ["quote-request"],
     attachments: [
       {
         id: "att-1",
