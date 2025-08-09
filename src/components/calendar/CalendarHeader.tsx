@@ -1,7 +1,8 @@
 
 import { format, addMonths, addWeeks, addDays, startOfMonth, startOfWeek, startOfDay } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { CalendarView } from "@/pages/Calendar";
 
@@ -11,14 +12,18 @@ interface CalendarHeaderProps {
   currentDate: Date;
   onDateChange: (date: Date) => void;
   onCreateEvent: () => void;
+  onToggleFilters: () => void;
+  activeFilterCount: number;
 }
 
-export function CalendarHeader({
-  view,
-  onViewChange,
-  currentDate,
-  onDateChange,
-  onCreateEvent
+export function CalendarHeader({ 
+  view, 
+  onViewChange, 
+  currentDate, 
+  onDateChange, 
+  onCreateEvent,
+  onToggleFilters,
+  activeFilterCount
 }: CalendarHeaderProps) {
   const navigateToday = () => {
     onDateChange(new Date());
@@ -79,6 +84,21 @@ export function CalendarHeader({
           onClick={navigateToday}
         >
           Today
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onToggleFilters}
+          className="gap-2"
+        >
+          <Filter className="h-4 w-4" />
+          Filters
+          {activeFilterCount > 0 && (
+            <Badge variant="secondary" className="ml-1">
+              {activeFilterCount}
+            </Badge>
+          )}
         </Button>
         
         <div className="flex items-center space-x-1">

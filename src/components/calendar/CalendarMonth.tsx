@@ -13,6 +13,7 @@ import {
   getDate
 } from "date-fns";
 import { CalendarEvent } from "@/pages/Calendar";
+import { EventCard } from "./EventCard";
 import { cn } from "@/lib/utils";
 
 interface CalendarMonthProps {
@@ -70,24 +71,18 @@ export function CalendarMonth({ currentDate, events }: CalendarMonthProps) {
               </div>
               
               <div className="mt-1 overflow-y-auto max-h-[80px] space-y-1">
-                {dayEvents.map((event) => (
-                  <div 
+                {dayEvents.slice(0, 3).map((event) => (
+                  <EventCard 
                     key={event.id}
-                    className="text-xs p-1 rounded truncate"
-                    style={{ 
-                      backgroundColor: `${event.color}33`, // Add transparency
-                      color: event.color,
-                      borderLeft: `3px solid ${event.color}`
-                    }}
-                  >
-                    {!event.allDay && (
-                      <span className="mr-1 font-medium">
-                        {format(new Date(event.start), 'h:mm a')}
-                      </span>
-                    )}
-                    {event.title}
-                  </div>
+                    event={event}
+                    className="border-none shadow-none"
+                  />
                 ))}
+                {dayEvents.length > 3 && (
+                  <div className="text-xs text-gray-500 p-1">
+                    +{dayEvents.length - 3} more
+                  </div>
+                )}
               </div>
             </div>
           );
