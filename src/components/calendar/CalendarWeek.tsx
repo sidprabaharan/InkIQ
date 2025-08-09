@@ -93,67 +93,53 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
     });
   };
   
-  // Calculate width and left position for overlapping events
-  const getEventWidthAndLeft = (event: CalendarEvent, day: Date, events: CalendarEvent[]) => {
+  // Calculate event lanes for proper stacking without weird widths
+  const getEventLane = (event: CalendarEvent, day: Date, events: CalendarEvent[]): { lane: number; totalLanes: number } => {
     const eventsOnSameDay = events.filter(e => {
-      if (e.id === event.id) return false;
+      const eventStart = new Date(e.start);
+      const eventEnd = new Date(e.end);
+      const eStart = new Date(event.start);
+      const eEnd = new Date(event.end);
       
-      const eventStart = new Date(event.start);
-      const eventEnd = new Date(event.end);
-      const eStart = new Date(e.start);
-      const eEnd = new Date(e.end);
-      
-      // Check for time overlap
+      // Check if events overlap in time
       return (
-        isWithinInterval(eStart, { start: eventStart, end: eventEnd }) ||
-        isWithinInterval(eEnd, { start: eventStart, end: eventEnd }) ||
-        isWithinInterval(eventStart, { start: eStart, end: eEnd })
+        (isSameDay(eventStart, day) || isSameDay(eventEnd, day)) &&
+        (eventStart < eEnd && eventEnd > eStart)
       );
-    });
+    }).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
     
-    if (eventsOnSameDay.length === 0) {
-      return { width: '98%', left: '1%' };
+    if (eventsOnSameDay.length <= 1) {
+      return { lane: 0, totalLanes: 1 };
     }
     
-    // Find position in overlapping group
-    const totalEvents = eventsOnSameDay.length + 1;
-    let position = 0;
-    
-    eventsOnSameDay.forEach(e => {
-      if (new Date(e.start) < new Date(event.start)) position++;
-    });
-    
-    const width = 98 / totalEvents;
-    const left = 1 + position * width;
+    // Find which lane this event should be in
+    const eventIndex = eventsOnSameDay.findIndex(e => e.id === event.id);
     
     return { 
-      width: `${width}%`, 
-      left: `${left}%` 
+      lane: eventIndex,
+      totalLanes: eventsOnSameDay.length
     };
   };
   
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* Week header */}
-      <div className="grid grid-cols-8 border-b sticky top-0 bg-background z-10">
-        <div className="p-3 border-r text-center text-sm font-medium text-muted-foreground w-20">
+      {/* Week header - using CSS grid for perfect alignment */}
+      <div className="grid border-b sticky top-0 bg-background z-10" style={{ gridTemplateColumns: '80px repeat(7, 1fr)' }}>
+        <div className="p-3 border-r text-center text-sm font-medium text-muted-foreground bg-muted/20">
           GMT-5
         </div>
         {days.map((day, i) => {
           const isToday = isSameDay(day, new Date());
-          
           return (
-            <div 
-              key={i} 
-              className={cn(
-                "p-2 text-center",
-                isToday && "bg-blue-50"
-              )}
-            >
-              <div className="text-xs font-medium">{format(day, 'EEE')}</div>
+            <div key={i} className="p-3 text-center border-r last:border-r-0">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                {format(day, 'EEE')}
+              </div>
               <div className={cn(
-                "text-lg inline-flex h-10 w-10 items-center justify-center rounded-full",
-                isToday && "bg-blue-600 text-white font-medium"
+                "text-lg font-semibold mt-1",
+                isToday 
+                  ? "text-primary bg-primary/10 rounded-full w-8 h-8 flex items-center justify-center mx-auto" 
+                  : "text-foreground"
               )}>
                 {format(day, 'd')}
               </div>
@@ -161,55 +147,56 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
           );
         })}
       </div>
-      
-      {/* Week grid */}
-      <div className="flex flex-1 overflow-auto">
-        {/* Time column */}
-        <div className="w-20 flex-shrink-0 border-r text-right bg-muted/30">
-          {hours.map(hour => (
-            <div key={hour} className="h-[60px] relative">
-              <div className="absolute -top-[9px] right-3 text-xs text-muted-foreground">
-                {hour === 0 ? null : (
-                  <div className="font-medium">
-                    {hour % 12 === 0 ? '12' : hour % 12}:00 {hour >= 12 ? 'PM' : 'AM'}
-                  </div>
-                )}
+
+      {/* Main calendar grid - single grid container for perfect alignment */}
+      <div className="flex-1 overflow-auto">
+        <div className="grid h-full" style={{ gridTemplateColumns: '80px repeat(7, 1fr)' }}>
+          {/* Time column */}
+          <div className="border-r bg-muted/10">
+            {hours.map(hour => (
+              <div key={hour} className="h-16 relative border-t border-border/30 first:border-t-0">
+                <div className="absolute -top-2 right-3 text-xs text-muted-foreground font-medium">
+                  {hour === 0 ? null : (
+                    <>
+                      {hour % 12 === 0 ? '12' : hour % 12}:00 {hour >= 12 ? 'PM' : 'AM'}
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-        
-        {/* Days columns with events */}
-        <div className="flex-1 grid grid-cols-7">
+            ))}
+          </div>
+
+          {/* Day columns */}
           {days.map((day, dayIndex) => {
             const dayEvents = getEventsForDay(day);
             
             return (
-              <div key={dayIndex} className="relative border-r">
-                {/* Hour divisions */}
+              <div key={dayIndex} className="relative border-r last:border-r-0">
+                {/* Hour grid lines */}
                 {hours.map(hour => (
-                  <div key={hour} className="h-[60px] border-t border-border/50 relative">
-                    {/* No additional inner divider needed as we're using border-t */}
+                  <div key={hour} className="h-16 border-t border-border/30 first:border-t-0 relative">
+                    {/* 30-minute line */}
+                    <div className="absolute top-8 left-0 right-0 h-px bg-border/20"></div>
                   </div>
                 ))}
                 
-                {/* Events */}
-                {dayEvents.map((event, eventIndex) => {
+                {/* Events for this day */}
+                {dayEvents.map(event => {
                   const position = getEventPositionForDay(event, day);
+                  const { lane, totalLanes } = getEventLane(event, day, dayEvents);
+                  
                   if (!position) return null;
                   
-                  const { width, left } = getEventWidthAndLeft(event, day, dayEvents);
-                  const isAllDay = event.allDay;
-                  
-                  if (isAllDay) {
+                  // All-day events get special treatment
+                  if (event.allDay) {
                     return (
                       <div
                         key={event.id}
-                        className="absolute top-0 left-0 right-0 h-6 px-1 text-xs truncate z-10"
+                        className="absolute top-1 left-1 right-1 h-5 px-2 text-xs font-medium truncate z-10 rounded border-l-4 bg-card"
                         style={{
-                          backgroundColor: `${event.color}33`,
-                          color: event.color,
-                          borderLeft: `3px solid ${event.color}`
+                          borderLeftColor: event.color,
+                          backgroundColor: `${event.color}15`,
+                          color: event.color
                         }}
                       >
                         {event.title}
@@ -217,28 +204,39 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
                     );
                   }
                   
+                  // Calculate width and position based on lanes - ensure readability
+                  const eventWidth = totalLanes > 1 ? `${Math.max(30, 88 / totalLanes)}%` : '92%';
+                  const eventLeft = totalLanes > 1 ? `${4 + lane * (88 / totalLanes)}%` : '4%';
+                  
                   return (
                     <div
                       key={event.id}
-                      className="absolute px-1 rounded-sm truncate text-xs hover:z-20"
+                      className="absolute rounded-md border-l-4 overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-[1.02] bg-card"
                       style={{
-                        top: `${position.top}px`,
-                        height: `${position.height}px`,
-                        width,
-                        left,
-                        backgroundColor: `${event.color}33`,
-                        color: event.color,
-                        borderLeft: `3px solid ${event.color}`,
-                        overflow: 'hidden'
+                        top: `${position.top * (64/60)}px`, // Scale for 64px hour height
+                        height: `${Math.max(24, position.height * (64/60))}px`,
+                        width: eventWidth,
+                        left: eventLeft,
+                        borderLeftColor: event.color,
+                        backgroundColor: `${event.color}15`,
+                        zIndex: 10 + lane,
                       }}
                     >
-                      <div className="text-xs font-medium">
-                        {format(new Date(event.start), 'h:mm')}
+                      <div className="p-2 h-full">
+                        <div className="font-medium text-sm text-foreground leading-tight line-clamp-1">
+                          {event.title}
+                        </div>
+                        {position.height > 40 && (
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {format(new Date(event.start), 'h:mm a')}
+                          </div>
+                        )}
+                        {position.height > 60 && event.location && (
+                          <div className="text-xs text-muted-foreground mt-1 line-clamp-1">
+                            📍 {event.location}
+                          </div>
+                        )}
                       </div>
-                      <div className="truncate">{event.title}</div>
-                      {event.location && (
-                        <div className="text-xs opacity-75 truncate">{event.location}</div>
-                      )}
                     </div>
                   );
                 })}
