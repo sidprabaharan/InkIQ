@@ -44,7 +44,7 @@ export default function QuoteDetail() {
     date: quote.details.invoiceDate,
     expiryDate: quote.details.paymentDueDate,
     productionDueDate: quote.details.productionDueDate,
-    customerDueDate: "2024-10-10", // Using fallback date since field doesn't exist in data structure
+    customerDueDate: quote.details.customerDueDate || new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     salesRep: quote.details.owner,
     terms: quote.details.deliveryMethod
   };
