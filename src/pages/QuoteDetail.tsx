@@ -186,14 +186,7 @@ export default function QuoteDetail() {
   }
   
   return (
-    <div className="p-0 bg-gray-50 min-h-full">
-      <QuoteHeader
-        quoteId={quoteId}
-        isNewQuote={false}
-        status={status}
-      />
-      
-      <div className="p-6">
+    <div className="p-6 bg-gray-50 min-h-full">
         <QuoteDetailHeader 
           quoteId={quoteId} 
           status={status} 
@@ -246,7 +239,6 @@ export default function QuoteDetail() {
             <InvoiceSummaryCard summary={quote.summary} />
           </div>
         </div>
-      </div>
     </div>
   );
 }
