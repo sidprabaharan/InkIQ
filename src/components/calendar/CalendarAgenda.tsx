@@ -62,10 +62,10 @@ export function CalendarAgenda({ currentDate, events }: CalendarAgendaProps) {
             </div>
             
             {dayEvents.length > 0 && (
-              <div className="ml-[75px] space-y-2">
+              <div className="ml-[75px] space-y-1">
                 {dayEvents.map((event) => (
-                  <div key={event.id} className="flex items-start gap-3">
-                    <div className="min-w-[80px] text-sm text-muted-foreground pt-1">
+                  <div key={event.id} className="flex items-center gap-3 py-2 px-3 hover:bg-accent rounded-sm group cursor-pointer">
+                    <div className="min-w-[80px] text-sm text-muted-foreground">
                       {event.allDay ? (
                         "All day"
                       ) : (
@@ -80,11 +80,61 @@ export function CalendarAgenda({ currentDate, events }: CalendarAgendaProps) {
                         </>
                       )}
                     </div>
-                    <div className="flex-1">
-                      <EventCard 
-                        event={event}
-                        className="border shadow-sm hover:shadow-md transition-shadow"
-                      />
+                    
+                    <div 
+                      className="w-1 h-8 rounded-full mr-2"
+                      style={{ backgroundColor: event.color || "#3b82f6" }}
+                    />
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-medium text-sm truncate">{event.title}</h4>
+                        <span className={cn(
+                          "px-2 py-0.5 text-xs rounded-full uppercase font-medium",
+                          event.category === "production_job" && "bg-blue-100 text-blue-800",
+                          event.category === "meeting" && "bg-green-100 text-green-800",
+                          event.category === "customer_call" && "bg-purple-100 text-purple-800",
+                          event.category === "follow_up" && "bg-orange-100 text-orange-800",
+                          event.category === "artwork_approval" && "bg-yellow-100 text-yellow-800"
+                        )}>
+                          {event.category.replace("_", " ")}
+                        </span>
+                        {event.priority === "high" && (
+                          <span className="px-2 py-0.5 text-xs rounded bg-red-100 text-red-800 font-medium uppercase">
+                            HIGH
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        {event.location && (
+                          <span className="flex items-center gap-1">
+                            📍 {event.location}
+                          </span>
+                        )}
+                        {event.customerName && (
+                          <span className="flex items-center gap-1">
+                            👤 {event.customerName}
+                          </span>
+                        )}
+                        {event.estimatedHours && (
+                          <span>Est: {event.estimatedHours}h</span>
+                        )}
+                        {event.meetingProvider && event.meetingProvider !== "none" && (
+                          <span className="flex items-center gap-1 text-blue-600">
+                            📹 {event.meetingProvider.toUpperCase()}
+                          </span>
+                        )}
+                        {event.attendees && event.attendees.length > 0 && (
+                          <span>{event.attendees.length} attendees</span>
+                        )}
+                      </div>
+                      
+                      {event.description && (
+                        <p className="text-xs text-muted-foreground mt-1 truncate">
+                          {event.description}
+                        </p>
+                      )}
                     </div>
                   </div>
                 ))}
