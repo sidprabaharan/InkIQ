@@ -112,7 +112,7 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
     });
     
     if (eventsOnSameDay.length === 0) {
-      return { width: '95%', left: '2%' };
+      return { width: '98%', left: '1%' };
     }
     
     // Find position in overlapping group
@@ -123,8 +123,8 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
       if (new Date(e.start) < new Date(event.start)) position++;
     });
     
-    const width = 95 / totalEvents;
-    const left = 2 + position * width;
+    const width = 98 / totalEvents;
+    const left = 1 + position * width;
     
     return { 
       width: `${width}%`, 
@@ -133,10 +133,10 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
   };
   
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Week header */}
-      <div className="grid grid-cols-8 border-b sticky top-0 bg-white z-10">
-        <div className="p-2 border-r text-center text-xs font-medium text-gray-500">
+      <div className="grid grid-cols-8 border-b sticky top-0 bg-background z-10">
+        <div className="p-3 border-r text-center text-sm font-medium text-muted-foreground w-20">
           GMT-5
         </div>
         {days.map((day, i) => {
@@ -165,12 +165,12 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
       {/* Week grid */}
       <div className="flex flex-1 overflow-auto">
         {/* Time column */}
-        <div className="w-16 flex-shrink-0 border-r text-right">
+        <div className="w-20 flex-shrink-0 border-r text-right bg-muted/30">
           {hours.map(hour => (
             <div key={hour} className="h-[60px] relative">
-              <div className="absolute -top-[9px] right-2 text-xs text-gray-500">
+              <div className="absolute -top-[9px] right-3 text-xs text-muted-foreground">
                 {hour === 0 ? null : (
-                  <div>
+                  <div className="font-medium">
                     {hour % 12 === 0 ? '12' : hour % 12}:00 {hour >= 12 ? 'PM' : 'AM'}
                   </div>
                 )}
@@ -188,7 +188,7 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
               <div key={dayIndex} className="relative border-r">
                 {/* Hour divisions */}
                 {hours.map(hour => (
-                  <div key={hour} className="h-[60px] border-t border-gray-200 relative">
+                  <div key={hour} className="h-[60px] border-t border-border/50 relative">
                     {/* No additional inner divider needed as we're using border-t */}
                   </div>
                 ))}

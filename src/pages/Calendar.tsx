@@ -593,42 +593,42 @@ export default function Calendar() {
         onToggleFilters={() => setShowFilters(!showFilters)}
         activeFilterCount={getActiveFilterCount()}
       />
-      <div className="flex-1 overflow-auto">
-        <div className="p-4">
-          {showFilters && (
-            <CalendarFilters
-              filters={filters}
-              onFiltersChange={setFilters}
-              isOpen={showFilters}
-              onToggle={() => setShowFilters(!showFilters)}
-            />
-          )}
-          
-          {view === "month" && (
-            <CalendarMonth 
-              currentDate={currentDate} 
-              events={filteredEvents} 
-            />
-          )}
-          {view === "week" && (
-            <CalendarWeek 
-              currentDate={currentDate} 
-              events={filteredEvents} 
-            />
-          )}
-          {view === "day" && (
-            <CalendarDay 
-              currentDate={currentDate} 
-              events={filteredEvents} 
-            />
-          )}
-          {view === "agenda" && (
-            <CalendarAgenda 
-              currentDate={currentDate} 
-              events={filteredEvents} 
-            />
-          )}
+      {showFilters && (
+        <div className="border-b bg-background p-4">
+          <CalendarFilters
+            filters={filters}
+            onFiltersChange={setFilters}
+            isOpen={showFilters}
+            onToggle={() => setShowFilters(!showFilters)}
+          />
         </div>
+      )}
+      
+      <div className="flex-1 overflow-hidden">
+        {view === "month" && (
+          <CalendarMonth 
+            currentDate={currentDate} 
+            events={filteredEvents} 
+          />
+        )}
+        {view === "week" && (
+          <CalendarWeek 
+            currentDate={currentDate} 
+            events={filteredEvents} 
+          />
+        )}
+        {view === "day" && (
+          <CalendarDay 
+            currentDate={currentDate} 
+            events={filteredEvents} 
+          />
+        )}
+        {view === "agenda" && (
+          <CalendarAgenda 
+            currentDate={currentDate} 
+            events={filteredEvents} 
+          />
+        )}
       </div>
 
       <EnhancedCreateEventDialog 
