@@ -61,81 +61,46 @@ export function CalendarDay({ currentDate, events }: CalendarDayProps) {
         </h2>
       </div>
       
-      <div className="flex flex-1 overflow-auto">
-        {/* Time column */}
-        <div className="w-20 flex-shrink-0 border-r bg-muted/10">
-          {hours.map(hour => (
-            <div key={hour} className="h-16 relative border-t border-border/30 first:border-t-0">
-              <div className="absolute -top-2 right-3 text-xs text-muted-foreground font-medium">
-                {hour === 0 ? null : (
-                  <>
-                    {hour % 12 === 0 ? '12' : hour % 12}:00 {hour >= 12 ? 'PM' : 'AM'}
-                  </>
-                )}
+      <div className="flex-1 overflow-auto p-4">
+        {/* Events stacked with no spacing */}
+        <div className="space-y-0">
+          {/* All-day events first */}
+          {filteredEvents
+            .filter(e => e.allDay)
+            .map((event) => (
+              <div
+                key={event.id}
+                className="text-xs px-1 py-0.5 rounded cursor-pointer hover:opacity-80 truncate"
+                style={{
+                  backgroundColor: `${event.color || "#3b82f6"}33`,
+                  color: event.color || "#3b82f6",
+                  borderLeft: `3px solid ${event.color || "#3b82f6"}`
+                }}
+                title={`${event.title}${event.location ? ` - ${event.location}` : ''}`}
+              >
+                {event.title}
               </div>
-            </div>
-          ))}
-        </div>
-        
-        {/* Events column */}
-        <div className="flex-1 relative">
-          {/* Hour divisions */}
-          {hours.map(hour => (
-            <div key={hour} className="h-16 border-t border-border/30 first:border-t-0 relative">
-              {/* 30-minute line */}
-              <div className="absolute top-8 left-0 right-0 h-px bg-border/20"></div>
-            </div>
-          ))}
+            ))}
           
-          {/* All-day events - styled like month view */}
-          {filteredEvents.filter(e => e.allDay).length > 0 && (
-            <div className="absolute top-0 left-0 right-0 bg-muted/20 border-b p-2">
-              <div className="space-y-0.5">
-                {filteredEvents
-                  .filter(e => e.allDay)
-                  .map((event, index) => (
-                    <div
-                      key={event.id}
-                      className="text-xs px-1 py-0.5 rounded cursor-pointer hover:opacity-80 truncate"
-                      style={{
-                        backgroundColor: `${event.color || "#3b82f6"}33`,
-                        color: event.color || "#3b82f6",
-                        borderLeft: `3px solid ${event.color || "#3b82f6"}`
-                      }}
-                      title={`${event.title}${event.location ? ` - ${event.location}` : ''}`}
-                    >
-                      {event.title}
-                    </div>
-                  ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Timed events - styled exactly like month view rows */}
+          {/* Timed events sorted by start time */}
           {filteredEvents
             .filter(e => !e.allDay)
-            .map((event, index) => {
-              const { top, height } = getEventPosition(event);
-              const rowPosition = getEventRowPosition(event);
-              
-              return (
-                <div
-                  key={event.id}
-                  className="absolute left-2 right-2 text-xs px-1 py-0.5 rounded cursor-pointer hover:opacity-80 truncate z-10"
-                  style={{
-                    top: `${parseInt(top) + rowPosition * 20}px`, // Stack events that start at same time
-                    height: `${Math.max(18, Math.min(parseInt(height), 40))}px`, // Limit height for readability
-                    backgroundColor: `${event.color || "#3b82f6"}33`,
-                    color: event.color || "#3b82f6",
-                    borderLeft: `3px solid ${event.color || "#3b82f6"}`
-                  }}
-                  title={`${event.title}${event.location ? ` - ${event.location}` : ''} (${format(new Date(event.start), "h:mm a")})`}
-                >
-                  <span className="mr-1">{format(new Date(event.start), "h:mm")}</span>
-                  {event.title}
-                </div>
-              );
-            })}
+            .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
+            .map((event) => (
+              <div
+                key={event.id}
+                className="text-xs px-1 py-0.5 rounded cursor-pointer hover:opacity-80 truncate"
+                style={{
+                  backgroundColor: `${event.color || "#3b82f6"}33`,
+                  color: event.color || "#3b82f6",
+                  borderLeft: `3px solid ${event.color || "#3b82f6"}`
+                }}
+                title={`${event.title}${event.location ? ` - ${event.location}` : ''} (${format(new Date(event.start), "h:mm a")})`}
+              >
+                <span className="mr-1">{format(new Date(event.start), "h:mm")}</span>
+                {event.title}
+              </div>
+            ))}
         </div>
       </div>
     </div>
