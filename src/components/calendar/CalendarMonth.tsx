@@ -58,31 +58,26 @@ export function CalendarMonth({ currentDate, events }: CalendarMonthProps) {
             <div 
               key={i} 
               className={cn(
-                "min-h-[120px] p-1 relative",
+                "min-h-[140px] p-1 relative flex flex-col",
                 !isCurrentMonth && "bg-gray-50 text-gray-400",
                 isToday(day) && "bg-blue-50"
               )}
             >
               <div className={cn(
-                "h-6 w-6 flex items-center justify-center text-sm rounded-full",
+                "h-6 w-6 flex items-center justify-center text-sm rounded-full mb-1",
                 isToday(day) && "bg-blue-600 text-white font-medium"
               )}>
                 {getDate(day)}
               </div>
               
-              <div className="mt-1 overflow-y-auto max-h-[80px] space-y-1">
-                {dayEvents.slice(0, 3).map((event) => (
+              <div className="flex-1 overflow-y-auto space-y-0.5">
+                {dayEvents.map((event) => (
                   <EventCard 
                     key={event.id}
                     event={event}
-                    className="border-none shadow-none"
+                    className="border-none shadow-none text-xs py-0.5 px-1 min-h-[18px]"
                   />
                 ))}
-                {dayEvents.length > 3 && (
-                  <div className="text-xs text-gray-500 p-1">
-                    +{dayEvents.length - 3} more
-                  </div>
-                )}
               </div>
             </div>
           );
