@@ -314,12 +314,14 @@ export default function Calendar() {
       />
       <div className="flex-1 overflow-auto">
         <div className="p-4">
-          <CalendarFilters
-            filters={filters}
-            onFiltersChange={setFilters}
-            isOpen={showFilters}
-            onToggle={() => setShowFilters(!showFilters)}
-          />
+          {showFilters && (
+            <CalendarFilters
+              filters={filters}
+              onFiltersChange={setFilters}
+              isOpen={showFilters}
+              onToggle={() => setShowFilters(!showFilters)}
+            />
+          )}
           
           {view === "month" && (
             <CalendarMonth 
