@@ -33,6 +33,8 @@ export interface CustomerShipping {
   unit?: string;
   city: string;
   region: string;
+  phone?: string;
+  email?: string;
 }
 
 export interface Customer {
@@ -366,7 +368,9 @@ export const sampleQuoteData: Record<string, QuotationData> = {
         contact: "Pamela Hunt",
         address: "2450 Boulevard Industriel",
         city: "Montreal",
-        region: "H1P 3K2"
+        region: "H1P 3K2",
+        phone: "514-512-9926",
+        email: "pamela@westernalliancetransport.com"
       }
     },
     details: {
