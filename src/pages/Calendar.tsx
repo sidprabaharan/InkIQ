@@ -4,12 +4,13 @@ import { CalendarHeader } from "@/components/calendar/CalendarHeader";
 import { CalendarMonth } from "@/components/calendar/CalendarMonth";
 import { CalendarWeek } from "@/components/calendar/CalendarWeek";
 import { CalendarDay } from "@/components/calendar/CalendarDay";
+import { CalendarAgenda } from "@/components/calendar/CalendarAgenda";
 import { EnhancedCreateEventDialog } from "@/components/calendar/EnhancedCreateEventDialog";
 import { CalendarFilters, CalendarFilters as CalendarFiltersType } from "@/components/calendar/CalendarFilters";
 import { convertImprintJobsToCalendarEvents } from "@/utils/productionJobsToEvents";
 import { useToast } from "@/hooks/use-toast";
 
-export type CalendarView = "month" | "week" | "day";
+export type CalendarView = "month" | "week" | "day" | "agenda";
 
 export type CalendarEventCategory = 
   | "task" 
@@ -351,6 +352,12 @@ export default function Calendar() {
           )}
           {view === "day" && (
             <CalendarDay 
+              currentDate={currentDate} 
+              events={filteredEvents} 
+            />
+          )}
+          {view === "agenda" && (
+            <CalendarAgenda 
               currentDate={currentDate} 
               events={filteredEvents} 
             />

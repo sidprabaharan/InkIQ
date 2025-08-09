@@ -32,7 +32,7 @@ export function CalendarHeader({
   const navigatePrevious = () => {
     if (view === "month") {
       onDateChange(addMonths(currentDate, -1));
-    } else if (view === "week") {
+    } else if (view === "week" || view === "agenda") {
       onDateChange(addWeeks(currentDate, -1));
     } else {
       onDateChange(addDays(currentDate, -1));
@@ -42,7 +42,7 @@ export function CalendarHeader({
   const navigateNext = () => {
     if (view === "month") {
       onDateChange(addMonths(currentDate, 1));
-    } else if (view === "week") {
+    } else if (view === "week" || view === "agenda") {
       onDateChange(addWeeks(currentDate, 1));
     } else {
       onDateChange(addDays(currentDate, 1));
@@ -52,7 +52,7 @@ export function CalendarHeader({
   const getHeaderTitle = () => {
     if (view === "month") {
       return format(currentDate, "MMMM yyyy");
-    } else if (view === "week") {
+    } else if (view === "week" || view === "agenda") {
       const start = startOfWeek(currentDate);
       const end = addDays(start, 6);
       if (format(start, "MMM") === format(end, "MMM")) {
@@ -146,6 +146,17 @@ export function CalendarHeader({
           onClick={() => onViewChange("month")}
         >
           Month
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className={cn(
+            "rounded-none",
+            view === "agenda" && "bg-primary text-primary-foreground"
+          )}
+          onClick={() => onViewChange("agenda")}
+        >
+          Agenda
         </Button>
       </div>
     </header>
