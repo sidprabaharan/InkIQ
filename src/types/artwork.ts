@@ -54,6 +54,7 @@ export interface ArtworkFile {
   uploadedBy: string;
   version: number;
   isLatest: boolean;
+  colors?: string; // For mockups with color variants
 }
 
 export interface ArtworkFolder {
@@ -197,7 +198,8 @@ export const mockSharedImprints: SharedImprint[] = [
         uploadedAt: new Date("2024-01-03"),
         uploadedBy: "design@company.com",
         version: 1,
-        isLatest: true
+        isLatest: true,
+        colors: "Red, White, Blue (Traditional American Flag)"
       },
       {
         id: "flag-mockup-2",
@@ -210,7 +212,22 @@ export const mockSharedImprints: SharedImprint[] = [
         uploadedAt: new Date("2024-01-04"),
         uploadedBy: "design@company.com",
         version: 1,
-        isLatest: true
+        isLatest: true,
+        colors: "Black, Gray, White (Monochrome Flag)"
+      },
+      {
+        id: "flag-mockup-3",
+        name: "polo-sleeve-flag-alt-mockup.jpg",
+        originalName: "polo-flag-alt-mockup.jpg",
+        url: "/lovable-uploads/polo-flag-alt-mockup.jpg",
+        type: "image/jpeg",
+        sizeBytes: 1300000,
+        category: "mockups",
+        uploadedAt: new Date("2024-01-05"),
+        uploadedBy: "design@company.com",
+        version: 1,
+        isLatest: true,
+        colors: "Navy, Gold, Cream (Vintage Flag)"
       }
     ],
     usageCount: 15,

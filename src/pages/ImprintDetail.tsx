@@ -282,6 +282,13 @@ export default function ImprintDetail() {
                       <div className="text-xs text-muted-foreground">
                         {formatFileSize(file.sizeBytes)} • {formatDate(file.uploadedAt)}
                       </div>
+                      {file.colors && (
+                        <div className="mt-1">
+                          <Badge variant="outline" className="text-xs">
+                            {file.colors}
+                          </Badge>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

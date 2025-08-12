@@ -2,19 +2,14 @@ import React, { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Search, FileImage, Eye, Check, ArrowLeft } from 'lucide-react';
-import { mockArtworkLibrary, MasterArtwork, ArtworkVariation } from '@/types/artwork';
-import { ImprintItem } from '@/types/imprint';
+import { Search, FileImage } from 'lucide-react';
+import { MasterArtwork, CustomerArtworkLibrary, ArtworkVariation, mockArtworkLibrary } from "@/types/artwork";
+import { MockupSelectionDialog } from "./MockupSelectionDialog";
 import { IMPRINT_METHODS } from '@/types/imprint';
-import { toast } from 'sonner';
 
 interface ArtworkSelectionDialogProps {
   open: boolean;
@@ -29,24 +24,16 @@ export function ArtworkSelectionDialog({
   onSelectArtwork,
   customerId
 }: ArtworkSelectionDialogProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCustomer, setSelectedCustomer] = useState<string>(customerId || 'all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState<string>("");
   const [selectedArtwork, setSelectedArtwork] = useState<MasterArtwork | null>(null);
-  const [showVariationForm, setShowVariationForm] = useState(false);
-  
-  // Variation form state
-  const [variation, setVariation] = useState({
-    location: '',
-    colors: '',
-    placement: '',
-    specialInstructions: ''
-  });
+  const [mockupSelectionOpen, setMockupSelectionOpen] = useState(false);
 
   // Get unique customers for filter
   const customers = useMemo(() => {
     return mockArtworkLibrary.map(lib => ({
-      id: lib.customerId,
-      name: lib.customerName
+      customerId: lib.customerId,
+      customerName: lib.customerName
     }));
   }, []);
 
@@ -56,11 +43,13 @@ export function ArtworkSelectionDialog({
     
     // Flatten all artwork from all customers
     mockArtworkLibrary.forEach(library => {
-      allArtwork.push(...library.masterArtworks);
+      library.folders.forEach(folder => {
+        allArtwork.push(...folder.artworks);
+      });
     });
 
     // Apply filters
-    if (selectedCustomer !== 'all') {
+    if (selectedCustomer) {
       allArtwork = allArtwork.filter(art => art.customerId === selectedCustomer);
     }
 
@@ -77,55 +66,21 @@ export function ArtworkSelectionDialog({
 
   const handleArtworkSelect = (artwork: MasterArtwork) => {
     setSelectedArtwork(artwork);
-    setShowVariationForm(true);
-    // Pre-fill common variation data
-    setVariation({
-      location: '',
-      colors: '',
-      placement: '',
-      specialInstructions: ''
-    });
+    setMockupSelectionOpen(true);
   };
 
-  const handleBackToSelection = () => {
-    setShowVariationForm(false);
+  const handleBackToArtworkSelection = () => {
+    setMockupSelectionOpen(false);
     setSelectedArtwork(null);
-    setVariation({
-      location: '',
-      colors: '',
-      placement: '',
-      specialInstructions: ''
-    });
   };
 
-  const handleConfirmSelection = () => {
-    if (!selectedArtwork) return;
-
-    // Validate required variation fields
-    if (!variation.location.trim()) {
-      toast.error('Please specify the imprint location');
-      return;
-    }
-
-    // Create variation object
-    const artworkVariation: ArtworkVariation = {
-      id: `var-${Math.random().toString(36).substring(2, 9)}`,
-      masterArtworkId: selectedArtwork.id,
-      location: variation.location,
-      colors: variation.colors || undefined,
-      placement: variation.placement || undefined,
-      specialInstructions: variation.specialInstructions || undefined,
-      createdAt: new Date(),
-      createdBy: 'current-user'
-    };
-
-    onSelectArtwork(selectedArtwork, artworkVariation);
+  const handleMockupSelection = (artwork: MasterArtwork, variation: ArtworkVariation) => {
+    onSelectArtwork(artwork, variation);
     
     // Reset state
-    handleBackToSelection();
+    setMockupSelectionOpen(false);
+    setSelectedArtwork(null);
     onOpenChange(false);
-    
-    toast.success(`Selected "${selectedArtwork.designName}" for ${variation.location}`);
   };
 
   const formatFileSize = (bytes: number) => {
@@ -145,230 +100,109 @@ export function ArtworkSelectionDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[900px] h-[80vh]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            {showVariationForm && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleBackToSelection}
-                className="h-8 w-8 p-0"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-            )}
-            {showVariationForm ? 'Configure Artwork Variation' : 'Select from Artwork Library'}
-          </DialogTitle>
-        </DialogHeader>
+    <>
+      <Dialog open={open && !mockupSelectionOpen} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Select Artwork from Library</DialogTitle>
+          </DialogHeader>
 
-        {!showVariationForm ? (
-          // Artwork Selection View
-          <div className="space-y-4 flex-1 overflow-hidden">
-            {/* Search and Filters */}
-            <div className="flex gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <div className="space-y-4">
+            {/* Search and Filter Section */}
+            <div className="space-y-3">
+              <div className="flex gap-2">
                 <Input
-                  placeholder="Search artwork by name, customer, or tags..."
+                  placeholder="Search artwork..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9"
+                  className="flex-1"
                 />
+                <Select value={selectedCustomer} onValueChange={setSelectedCustomer}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="All Customers" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Customers</SelectItem>
+                    {customers.map((customer) => (
+                      <SelectItem key={customer.customerId} value={customer.customerId}>
+                        {customer.customerName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <Select value={selectedCustomer} onValueChange={setSelectedCustomer}>
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="All Customers" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Customers</SelectItem>
-                  {customers.map((customer) => (
-                    <SelectItem key={customer.id} value={customer.id}>
-                      {customer.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
 
-            {/* Results */}
-            <div className="text-sm text-muted-foreground">
-              {filteredArtwork.length} artwork file{filteredArtwork.length !== 1 ? 's' : ''} found
-            </div>
-
-            <ScrollArea className="flex-1">
-              <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {/* Artwork Grid */}
+            <ScrollArea className="h-[400px] pr-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {filteredArtwork.map((artwork) => (
                   <Card 
                     key={artwork.id} 
                     className="cursor-pointer hover:shadow-md transition-shadow"
                     onClick={() => handleArtworkSelect(artwork)}
                   >
-                    <CardHeader className="pb-2">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 min-w-0">
-                          <CardTitle className="text-sm truncate">{artwork.designName}</CardTitle>
-                          <CardDescription className="text-xs truncate">{artwork.customerName}</CardDescription>
-                        </div>
-                        <FileImage className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="text-xs">
-                          {IMPRINT_METHODS.find(m => m.value === artwork.method)?.label || artwork.method}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {artwork.size.width}" × {artwork.size.height}"
-                        </span>
-                      </div>
-                      
-                      {artwork.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {artwork.tags.slice(0, 2).map((tag) => (
-                            <Badge key={tag} variant="outline" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                          {artwork.tags.length > 2 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{artwork.tags.length - 2}
-                            </Badge>
+                    <CardContent className="p-4">
+                      <div className="flex gap-3">
+                        <div className="w-16 h-16 bg-muted rounded-lg overflow-hidden flex-shrink-0">
+                          {artwork.customerArt.length > 0 ? (
+                            <img 
+                              src={artwork.customerArt[0].url} 
+                              alt={artwork.designName}
+                              className="w-full h-full object-contain"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <FileImage className="h-6 w-6 text-muted-foreground" />
+                            </div>
                           )}
                         </div>
-                      )}
-
-                      <div className="grid grid-cols-3 gap-1 text-xs text-muted-foreground">
-                        <div className="text-center">
-                          <div className="font-medium">{artwork.customerArt.length}</div>
-                          <div>Art</div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm truncate">{artwork.designName}</h3>
+                          <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                            {artwork.description}
+                          </p>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant="secondary" className="text-xs">{artwork.method}</Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {artwork.size.width}" × {artwork.size.height}"
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>{artwork.customerName}</span>
+                            <span>{formatDate(artwork.updatedAt)}</span>
+                          </div>
                         </div>
-                        <div className="text-center">
-                          <div className="font-medium">{artwork.productionFiles.length}</div>
-                          <div>Prod</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-medium">{artwork.mockups.length}</div>
-                          <div>Mock</div>
-                        </div>
-                      </div>
-
-                      <div className="text-xs text-muted-foreground">
-                        Used {artwork.usageCount} times
                       </div>
                     </CardContent>
                   </Card>
                 ))}
               </div>
+              
+              {filteredArtwork.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  <FileImage className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No artwork found matching your search criteria</p>
+                </div>
+              )}
             </ScrollArea>
           </div>
-        ) : (
-          // Variation Configuration View
-          <div className="space-y-4 flex-1">
-            {selectedArtwork && (
-              <Card>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12">
-                      <AvatarFallback>
-                        {selectedArtwork.designName.slice(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">{selectedArtwork.designName}</CardTitle>
-                      <CardDescription>{selectedArtwork.customerName}</CardDescription>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="secondary">
-                          {IMPRINT_METHODS.find(m => m.value === selectedArtwork.method)?.label || selectedArtwork.method}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {selectedArtwork.size.width}" × {selectedArtwork.size.height}"
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
-            )}
 
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="location" className="text-sm font-medium">
-                  Imprint Location *
-                </Label>
-                <Input
-                  id="location"
-                  value={variation.location}
-                  onChange={(e) => setVariation(prev => ({ ...prev, location: e.target.value }))}
-                  placeholder="e.g., Front chest, Back, Left sleeve"
-                  className="mt-1"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="colors" className="text-sm font-medium">
-                  Colors or Thread Colors
-                </Label>
-                <Input
-                  id="colors"
-                  value={variation.colors}
-                  onChange={(e) => setVariation(prev => ({ ...prev, colors: e.target.value }))}
-                  placeholder="e.g., Black, White, Navy Blue | Thread: 5563, 5606"
-                  className="mt-1"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Specify if different from original artwork colors
-                </p>
-              </div>
-
-              <div>
-                <Label htmlFor="placement" className="text-sm font-medium">
-                  Placement Details
-                </Label>
-                <Input
-                  id="placement"
-                  value={variation.placement}
-                  onChange={(e) => setVariation(prev => ({ ...prev, placement: e.target.value }))}
-                  placeholder="e.g., Centered, 2 inches from collar"
-                  className="mt-1"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="instructions" className="text-sm font-medium">
-                  Special Instructions
-                </Label>
-                <Textarea
-                  id="instructions"
-                  value={variation.specialInstructions}
-                  onChange={(e) => setVariation(prev => ({ ...prev, specialInstructions: e.target.value }))}
-                  placeholder="Any special requirements or modifications..."
-                  className="mt-1 min-h-[80px]"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        <DialogFooter>
-          {!showVariationForm ? (
+          <DialogFooter>
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-          ) : (
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={handleBackToSelection}>
-                Back
-              </Button>
-              <Button onClick={handleConfirmSelection} className="gap-2">
-                <Check className="h-4 w-4" />
-                Use This Artwork
-              </Button>
-            </div>
-          )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <MockupSelectionDialog
+        open={mockupSelectionOpen}
+        onOpenChange={setMockupSelectionOpen}
+        artwork={selectedArtwork}
+        onSelectMockup={handleMockupSelection}
+        onBack={handleBackToArtworkSelection}
+      />
+    </>
   );
 }
