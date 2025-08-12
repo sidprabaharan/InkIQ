@@ -5,8 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { QuoteSummaryCard } from "@/components/quotes/QuoteSummaryCard";
+import { QuotationTable } from "@/components/quotes/QuotationTable";
 import { 
-  Search, Plus, ArrowLeft, Mail, Phone, FileText, Calendar, MessageSquare, 
+  Search, Plus, ArrowLeft, Mail, Phone, FileText, Calendar as CalendarIcon, MessageSquare, 
   File, Image, Folder, Code, PenTool, ShoppingCart, FileCheck, UserPlus,
   Edit, MapPin, ClipboardList, Upload, Grid, List, FileImage, Download, 
   Eye, MoreVertical, User, Tag, Layers
@@ -29,6 +34,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 // Unified imprint type for customer-specific artwork
 interface UnifiedImprint {
@@ -71,7 +78,21 @@ export default function Customers() {
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [folderViewOpen, setFolderViewOpen] = useState(false);
 
-  const selectedCustomer = selectedCustomerId 
+  // Quote filters
+  const [quoteDateFrom, setQuoteDateFrom] = useState<Date>();
+  const [quoteDateTo, setQuoteDateTo] = useState<Date>();
+  const [quoteStatusFilter, setQuoteStatusFilter] = useState<string>("all");
+  const [quoteOwnerFilter, setQuoteOwnerFilter] = useState<string>("all");
+  const [quotePaymentFilter, setQuotePaymentFilter] = useState<string>("all");
+
+  // Order filters
+  const [orderDateFrom, setOrderDateFrom] = useState<Date>();
+  const [orderDateTo, setOrderDateTo] = useState<Date>();
+  const [orderStatusFilter, setOrderStatusFilter] = useState<string>("all");
+  const [orderOwnerFilter, setOrderOwnerFilter] = useState<string>("all");
+  const [orderPaymentFilter, setOrderPaymentFilter] = useState<string>("all");
+
+  const selectedCustomer = selectedCustomerId
     ? customers.find(c => c.id === selectedCustomerId) 
     : null;
 
@@ -309,6 +330,116 @@ export default function Customers() {
       items: "Hoodies (80), Tote Bags (100)"
     }
   ];
+
+  // Mock functions to calculate filtered totals for customer quotes and orders
+  const getCustomerQuoteFilteredTotals = () => {
+    const baseAmounts = {
+      totalOpportunity: 6630,
+      quotesSent: 3450,
+      approvalSent: 2450,
+      approved: 3200
+    };
+    
+    const filterMultiplier = (quoteDateFrom || quoteDateTo || quoteStatusFilter !== "all" || quoteOwnerFilter !== "all" || quotePaymentFilter !== "all") ? 0.7 : 1;
+    
+    return {
+      totalOpportunity: Math.round(baseAmounts.totalOpportunity * filterMultiplier),
+      quotesSent: Math.round(baseAmounts.quotesSent * filterMultiplier),
+      approvalSent: Math.round(baseAmounts.approvalSent * filterMultiplier),
+      approved: Math.round(baseAmounts.approved * filterMultiplier)
+    };
+  };
+
+  const getCustomerOrderFilteredTotals = () => {
+    const baseAmounts = {
+      total: 4125,
+      completed: 4125,
+      processing: 0,
+      pending: 0
+    };
+    
+    const filterMultiplier = (orderDateFrom || orderDateTo || orderStatusFilter !== "all" || orderOwnerFilter !== "all" || orderPaymentFilter !== "all") ? 0.7 : 1;
+    
+    return {
+      total: Math.round(baseAmounts.total * filterMultiplier),
+      completed: Math.round(baseAmounts.completed * filterMultiplier),
+      processing: Math.round(baseAmounts.processing * filterMultiplier),
+      pending: Math.round(baseAmounts.pending * filterMultiplier)
+    };
+  };
+
+  const customerQuoteTotals = getCustomerQuoteFilteredTotals();
+  const customerOrderTotals = getCustomerOrderFilteredTotals();
+
+  const customerQuoteSummaryCards = [
+    {
+      title: "Total Opportunity",
+      amount: `$${customerQuoteTotals.totalOpportunity.toLocaleString()}`,
+      percentage: 40,
+      period: "last month"
+    },
+    {
+      title: "Quotes Sent",
+      amount: `$${customerQuoteTotals.quotesSent.toLocaleString()}`,
+      percentage: 25,
+      period: "last month"
+    },
+    {
+      title: "Quote Approval Sent",
+      amount: `$${customerQuoteTotals.approvalSent.toLocaleString()}`,
+      percentage: 35,
+      period: "last month"
+    },
+    {
+      title: "Quote Approved",
+      amount: `$${customerQuoteTotals.approved.toLocaleString()}`,
+      percentage: 18,
+      period: "last month"
+    }
+  ];
+
+  const customerOrderSummaryCards = [
+    {
+      title: "Total Orders",
+      amount: `$${customerOrderTotals.total.toLocaleString()}`,
+      percentage: 32,
+      period: "last month"
+    },
+    {
+      title: "Completed Orders",
+      amount: `$${customerOrderTotals.completed.toLocaleString()}`,
+      percentage: 28,
+      period: "last month"
+    },
+    {
+      title: "Processing Orders",
+      amount: `$${customerOrderTotals.processing.toLocaleString()}`,
+      percentage: 12,
+      period: "last month"
+    },
+    {
+      title: "Pending Orders",
+      amount: `$${customerOrderTotals.pending.toLocaleString()}`,
+      percentage: 8,
+      period: "last month"
+    }
+  ];
+
+  const clearQuoteFilters = () => {
+    setQuoteDateFrom(undefined);
+    setQuoteDateTo(undefined);
+    setQuoteStatusFilter("all");
+    setQuoteOwnerFilter("all");
+    setQuotePaymentFilter("all");
+  };
+
+  const clearOrderFilters = () => {
+    setOrderDateFrom(undefined);
+    setOrderDateTo(undefined);
+    setOrderStatusFilter("all");
+    setOrderOwnerFilter("all");
+    setOrderPaymentFilter("all");
+  };
 
   // Utility functions for artwork tab
   const formatFileSize = (bytes: number) => {
@@ -684,108 +815,312 @@ export default function Customers() {
                 </Card>
               </TabsContent>
               
-              <TabsContent value="quotes">
-                <Card>
-                  <CardHeader className="pb-0">
-                    <div className="flex justify-between items-center">
-                      <CardTitle>Customer Quotes</CardTitle>
-                      <Button variant="outline" size="sm" className="text-blue-600">
-                        <Plus className="h-4 w-4 mr-2" />
-                        New Quote
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-[100px]">Quote ID</TableHead>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Items</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead className="text-right">Amount</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {customerQuotes.map((quote) => (
-                          <TableRow key={quote.id} className="cursor-pointer hover:bg-gray-50">
-                            <TableCell className="font-medium">#{quote.id}</TableCell>
-                            <TableCell>{quote.date}</TableCell>
-                            <TableCell>{quote.items}</TableCell>
-                            <TableCell>
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                quote.status === 'Approved' 
-                                  ? 'bg-green-100 text-green-800'
-                                  : quote.status === 'Draft'
-                                    ? 'bg-gray-100 text-gray-800'
-                                    : 'bg-yellow-100 text-yellow-800'
-                              }`}>
-                                {quote.status}
-                              </span>
-                            </TableCell>
-                            <TableCell className="text-right">{quote.total}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+              <TabsContent value="quotes" className="p-6 bg-gray-50 min-h-full">
+                <div className="mb-6 flex justify-between items-center">
+                  <h2 className="text-xl font-semibold">Customer Quotes</h2>
+                  <Button 
+                    className="bg-inkiq-primary hover:bg-inkiq-primary/90"
+                    onClick={() => navigate("/quotes/new")}
+                  >
+                    New Quote for Customer
+                  </Button>
+                </div>
+
+                {/* Filter Controls */}
+                <div className="mb-6 p-4 bg-white rounded-lg border">
+                  <div className="flex items-center gap-4 flex-wrap">
                     
-                    <div className="flex justify-center mt-6">
-                      <Button variant="outline" className="text-blue-600">
-                        <FileCheck className="h-4 w-4 mr-2" />
-                        View All Quotes
-                      </Button>
+                    {/* Date From */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600">From:</span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-[140px] justify-start text-left font-normal",
+                              !quoteDateFrom && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {quoteDateFrom ? format(quoteDateFrom, "MMM dd") : "Select"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={quoteDateFrom}
+                            onSelect={setQuoteDateFrom}
+                            initialFocus
+                            className="p-3 pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
-                  </CardContent>
-                </Card>
+
+                    {/* Date To */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600">To:</span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-[140px] justify-start text-left font-normal",
+                              !quoteDateTo && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {quoteDateTo ? format(quoteDateTo, "MMM dd") : "Select"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={quoteDateTo}
+                            onSelect={setQuoteDateTo}
+                            initialFocus
+                            className="p-3 pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    {/* Status Filter */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600">Status:</span>
+                      <Select value={quoteStatusFilter} onValueChange={setQuoteStatusFilter}>
+                        <SelectTrigger className="w-[140px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Statuses</SelectItem>
+                          <SelectItem value="artwork">Artwork</SelectItem>
+                          <SelectItem value="production">Production</SelectItem>
+                          <SelectItem value="shipping">Shipping</SelectItem>
+                          <SelectItem value="complete">Complete</SelectItem>
+                          <SelectItem value="onhold">On Hold</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Owner Filter */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600">Owner:</span>
+                      <Select value={quoteOwnerFilter} onValueChange={setQuoteOwnerFilter}>
+                        <SelectTrigger className="w-[140px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Owners</SelectItem>
+                          <SelectItem value="shahid">Shahid Raja</SelectItem>
+                          <SelectItem value="kiri">Kiri</SelectItem>
+                          <SelectItem value="jhon">Jhon</SelectItem>
+                          <SelectItem value="kamelia">Kamelia</SelectItem>
+                          <SelectItem value="picanto">Picanto</SelectItem>
+                          <SelectItem value="helper">Helper</SelectItem>
+                          <SelectItem value="jessica">Jessica</SelectItem>
+                          <SelectItem value="michael">Michael</SelectItem>
+                          <SelectItem value="emma">Emma</SelectItem>
+                          <SelectItem value="tim">Tim</SelectItem>
+                          <SelectItem value="sarah">Sarah</SelectItem>
+                          <SelectItem value="kiriakos">Kiriakos</SelectItem>
+                          <SelectItem value="noraiz">Noraiz shahid</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Payment Status Filter */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600">Payment:</span>
+                      <Select value={quotePaymentFilter} onValueChange={setQuotePaymentFilter}>
+                        <SelectTrigger className="w-[140px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Payments</SelectItem>
+                          <SelectItem value="paid">Paid</SelectItem>
+                          <SelectItem value="unpaid">Unpaid</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Clear Filters */}
+                    {(quoteDateFrom || quoteDateTo || quoteStatusFilter !== "all" || quoteOwnerFilter !== "all" || quotePaymentFilter !== "all") && (
+                      <Button variant="outline" size="sm" onClick={clearQuoteFilters}>
+                        Clear Filters
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                  {customerQuoteSummaryCards.map((card, index) => (
+                    <QuoteSummaryCard
+                      key={index}
+                      title={card.title}
+                      amount={card.amount}
+                      percentage={card.percentage}
+                      period={card.period}
+                    />
+                  ))}
+                </div>
+
+                <QuotationTable />
               </TabsContent>
               
-              <TabsContent value="orders">
-                <Card>
-                  <CardHeader className="pb-0">
-                    <div className="flex justify-between items-center">
-                      <CardTitle>Customer Orders</CardTitle>
-                      <Button variant="outline" size="sm" className="text-blue-600">
-                        <Plus className="h-4 w-4 mr-2" />
-                        New Order
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-[100px]">Order ID</TableHead>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Items</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead className="text-right">Amount</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {customerOrders.map((order) => (
-                          <TableRow key={order.id} className="cursor-pointer hover:bg-gray-50">
-                            <TableCell className="font-medium">#{order.id}</TableCell>
-                            <TableCell>{order.date}</TableCell>
-                            <TableCell>{order.items}</TableCell>
-                            <TableCell>
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                {order.status}
-                              </span>
-                            </TableCell>
-                            <TableCell className="text-right">{order.total}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+              <TabsContent value="orders" className="p-6 bg-gray-50 min-h-full">
+                <div className="mb-6 flex justify-between items-center">
+                  <h2 className="text-xl font-semibold">Customer Orders</h2>
+                  <Button 
+                    className="bg-inkiq-primary hover:bg-inkiq-primary/90"
+                    onClick={() => navigate("/quotes/new")}
+                  >
+                    New Order for Customer
+                  </Button>
+                </div>
+
+                {/* Filter Controls */}
+                <div className="mb-6 p-4 bg-white rounded-lg border">
+                  <div className="flex items-center gap-4 flex-wrap">
                     
-                    <div className="flex justify-center mt-6">
-                      <Button variant="outline" className="text-blue-600">
-                        <ShoppingCart className="h-4 w-4 mr-2" />
-                        View All Orders
-                      </Button>
+                    {/* Date From */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600">From:</span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-[140px] justify-start text-left font-normal",
+                              !orderDateFrom && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {orderDateFrom ? format(orderDateFrom, "MMM dd") : "Select"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={orderDateFrom}
+                            onSelect={setOrderDateFrom}
+                            initialFocus
+                            className="p-3 pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
-                  </CardContent>
-                </Card>
+
+                    {/* Date To */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600">To:</span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-[140px] justify-start text-left font-normal",
+                              !orderDateTo && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {orderDateTo ? format(orderDateTo, "MMM dd") : "Select"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={orderDateTo}
+                            onSelect={setOrderDateTo}
+                            initialFocus
+                            className="p-3 pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    {/* Status Filter */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600">Status:</span>
+                      <Select value={orderStatusFilter} onValueChange={setOrderStatusFilter}>
+                        <SelectTrigger className="w-[140px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Statuses</SelectItem>
+                          <SelectItem value="artwork">Artwork</SelectItem>
+                          <SelectItem value="production">Production</SelectItem>
+                          <SelectItem value="shipping">Shipping</SelectItem>
+                          <SelectItem value="complete">Complete</SelectItem>
+                          <SelectItem value="onhold">On Hold</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Owner Filter */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600">Owner:</span>
+                      <Select value={orderOwnerFilter} onValueChange={setOrderOwnerFilter}>
+                        <SelectTrigger className="w-[140px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Owners</SelectItem>
+                          <SelectItem value="shahid">Shahid Raja</SelectItem>
+                          <SelectItem value="kiri">Kiri</SelectItem>
+                          <SelectItem value="jhon">Jhon</SelectItem>
+                          <SelectItem value="kamelia">Kamelia</SelectItem>
+                          <SelectItem value="picanto">Picanto</SelectItem>
+                          <SelectItem value="helper">Helper</SelectItem>
+                          <SelectItem value="jessica">Jessica</SelectItem>
+                          <SelectItem value="michael">Michael</SelectItem>
+                          <SelectItem value="emma">Emma</SelectItem>
+                          <SelectItem value="tim">Tim</SelectItem>
+                          <SelectItem value="sarah">Sarah</SelectItem>
+                          <SelectItem value="kiriakos">Kiriakos</SelectItem>
+                          <SelectItem value="noraiz">Noraiz shahid</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Payment Status Filter */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600">Payment:</span>
+                      <Select value={orderPaymentFilter} onValueChange={setOrderPaymentFilter}>
+                        <SelectTrigger className="w-[140px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Payments</SelectItem>
+                          <SelectItem value="paid">Paid</SelectItem>
+                          <SelectItem value="unpaid">Unpaid</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Clear Filters */}
+                    {(orderDateFrom || orderDateTo || orderStatusFilter !== "all" || orderOwnerFilter !== "all" || orderPaymentFilter !== "all") && (
+                      <Button variant="outline" size="sm" onClick={clearOrderFilters}>
+                        Clear Filters
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                  {customerOrderSummaryCards.map((card, index) => (
+                    <QuoteSummaryCard
+                      key={index}
+                      title={card.title}
+                      amount={card.amount}
+                      percentage={card.percentage}
+                      period={card.period}
+                    />
+                  ))}
+                </div>
+
+                <QuotationTable isInvoicesPage={true} />
               </TabsContent>
               
               <TabsContent value="artwork">
