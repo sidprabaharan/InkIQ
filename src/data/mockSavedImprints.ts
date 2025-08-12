@@ -1,5 +1,7 @@
 import { SavedImprint } from '../types/saved-imprint';
 
+console.log("mockSavedImprints: Loading mock data file");
+
 export const mockSavedImprints: SavedImprint[] = [
   {
     id: "si-001",
@@ -15,7 +17,7 @@ export const mockSavedImprints: SavedImprint[] = [
         {
           id: "ca-001",
           name: "TechCorp_Logo_Vector.ai",
-          url: "/public/lovable-uploads/tech-logo-4.jpg",
+          url: "/lovable-uploads/tech-logo-4.jpg",
           type: "ai",
           category: "customerArt"
         }
@@ -24,7 +26,7 @@ export const mockSavedImprints: SavedImprint[] = [
         {
           id: "pf-001",
           name: "TechCorp_Screen_Ready.eps",
-          url: "/public/lovable-uploads/tech-logo-4.jpg",
+          url: "/lovable-uploads/tech-logo-4.jpg",
           type: "eps",
           category: "productionFiles"
         }
@@ -112,7 +114,7 @@ export const mockSavedImprints: SavedImprint[] = [
         {
           id: "ca-003",
           name: "Mountain_Logo.png",
-          url: "/public/lovable-uploads/restaurant-logo-3.jpg",
+          url: "/lovable-uploads/restaurant-logo-3.jpg",
           type: "png",
           category: "customerArt"
         }
@@ -121,7 +123,7 @@ export const mockSavedImprints: SavedImprint[] = [
         {
           id: "pf-003",
           name: "Mountain_Embroidery.dst",
-          url: "/public/lovable-uploads/restaurant-logo-3.jpg",
+          url: "/lovable-uploads/restaurant-logo-3.jpg",
           type: "dst",
           category: "productionFiles"
         }
@@ -157,7 +159,7 @@ export const mockSavedImprints: SavedImprint[] = [
         {
           id: "ca-004",
           name: "Adventure_Logo_RGB.png",
-          url: "/public/lovable-uploads/outdoor-logo-2.jpg",
+          url: "/lovable-uploads/outdoor-logo-2.jpg",
           type: "png",
           category: "customerArt"
         }
@@ -166,7 +168,7 @@ export const mockSavedImprints: SavedImprint[] = [
         {
           id: "pf-004",
           name: "Adventure_DTG_Ready.png",
-          url: "/public/lovable-uploads/outdoor-logo-2.jpg",
+          url: "/lovable-uploads/outdoor-logo-2.jpg",
           type: "png",
           category: "productionFiles"
         }
@@ -209,7 +211,7 @@ export const mockSavedImprints: SavedImprint[] = [
         {
           id: "ca-005",
           name: "TechCorp_Logo_Embroidery.ai",
-          url: "/public/lovable-uploads/tech-logo-4.jpg",
+          url: "/lovable-uploads/tech-logo-4.jpg",
           type: "ai",
           category: "customerArt"
         }
@@ -218,7 +220,7 @@ export const mockSavedImprints: SavedImprint[] = [
         {
           id: "pf-005",
           name: "TechCorp_Embroidery.dst",
-          url: "/public/lovable-uploads/tech-logo-4.jpg",
+          url: "/lovable-uploads/tech-logo-4.jpg",
           type: "dst",
           category: "productionFiles"
         }

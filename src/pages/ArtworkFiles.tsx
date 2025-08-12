@@ -32,6 +32,10 @@ export default function ArtworkFiles() {
     return matchesSearch && matchesMethod && matchesCustomer && matchesTags;
   });
 
+  console.log("ArtworkFiles: filteredImprints", filteredImprints.length);
+  console.log("ArtworkFiles: selectedMethod", selectedMethod);
+  console.log("ArtworkFiles: selectedCustomer", selectedCustomer);
+
   const handleTagToggle = (tag: string) => {
     setSelectedTags(prev => 
       prev.includes(tag) 
