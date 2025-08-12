@@ -108,7 +108,7 @@ export function EquipmentMappingForm({ equipmentMapping, onUpdate }: EquipmentMa
               <SelectValue placeholder="Select fallback equipment type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">None</SelectItem>
+              <SelectItem value="">None</SelectItem>
               {EQUIPMENT_TYPES.map((type) => (
                 <SelectItem key={type} value={type}>
                   {type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}

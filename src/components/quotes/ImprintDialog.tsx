@@ -5,13 +5,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Upload, Trash2, X, FileText, Image as ImageIcon, Library } from "lucide-react";
+import { Plus, Upload, Trash2, X, FileText, Image as ImageIcon } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EnhancedMockupUploadDialog } from "./EnhancedMockupUploadDialog";
-import { ArtworkLibraryBrowser } from "../artwork/ArtworkLibraryBrowser";
 import { ImprintItem, ImprintFile, IMPRINT_METHODS, getMethodConfig } from "@/types/imprint";
-import { SavedImprint } from "@/types/saved-imprint";
 import { toast } from "sonner";
 
 interface ImprintDialogProps {
@@ -24,7 +22,6 @@ interface ImprintDialogProps {
 export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = [] }: ImprintDialogProps) {
   const [imprints, setImprints] = useState<ImprintItem[]>([]);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
-  const [libraryBrowserOpen, setLibraryBrowserOpen] = useState(false);
   const [currentImprintIndex, setCurrentImprintIndex] = useState<number | null>(null);
   const [currentUploadCategory, setCurrentUploadCategory] = useState<'customerArt' | 'productionFiles' | 'proofMockup'>('customerArt');
   
@@ -125,25 +122,6 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
     });
   };
 
-  const handleSelectFromLibrary = (savedImprint: SavedImprint) => {
-    const newImprint: ImprintItem = {
-      id: `imprint-${Math.random().toString(36).substring(2, 9)}`,
-      method: savedImprint.decorationMethod,
-      location: savedImprint.location,
-      width: savedImprint.dimensions.width,
-      height: savedImprint.dimensions.height,
-      colorsOrThreads: savedImprint.colors,
-      notes: savedImprint.notes,
-      customerArt: savedImprint.files.customerArt,
-      productionFiles: savedImprint.files.productionFiles,
-      proofMockup: savedImprint.files.proofMockup
-    };
-    
-    setImprints(prev => [...prev, newImprint]);
-    setLibraryBrowserOpen(false);
-    toast.success(`Added ${savedImprint.name} from library`);
-  };
-
   const handleSave = () => {
     // Validate required fields
     const hasErrors = imprints.some(imprint => 
@@ -170,17 +148,6 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
           <DialogHeader>
             <DialogTitle>Imprint</DialogTitle>
           </DialogHeader>
-
-          <div className="flex gap-2 mb-4">
-            <Button onClick={addNewImprint} variant="outline" className="flex-1">
-              <Plus className="h-4 w-4 mr-2" />
-              Add New Imprint
-            </Button>
-            <Button onClick={() => setLibraryBrowserOpen(true)} variant="outline" className="flex-1">
-              <Library className="h-4 w-4 mr-2" />
-              Select from Library
-            </Button>
-          </div>
           
           <ScrollArea className="max-h-[70vh] pr-4">
             {imprints.map((imprint, index) => {
@@ -456,12 +423,6 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
         onUpload={handleUploadComplete}
         category={currentUploadCategory}
         multiple={currentUploadCategory === 'productionFiles'}
-      />
-
-      <ArtworkLibraryBrowser
-        open={libraryBrowserOpen}
-        onOpenChange={setLibraryBrowserOpen}
-        onSelectImprint={handleSelectFromLibrary}
       />
     </>
   );

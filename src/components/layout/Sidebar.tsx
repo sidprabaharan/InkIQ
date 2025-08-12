@@ -22,7 +22,6 @@ import {
   Package2,
   Truck,
   Network,
-  Image,
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -89,11 +88,6 @@ export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
       name: 'Emails',
       icon: Mail,
       path: '/messages',
-    },
-    {
-      name: 'Artwork Files',
-      icon: Image,
-      path: '/artwork-files',
     },
     {
       name: 'Expenses',
