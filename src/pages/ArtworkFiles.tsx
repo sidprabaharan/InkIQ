@@ -48,15 +48,13 @@ export default function ArtworkFiles() {
                 folder.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 library.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 folder.artworks.some(art => 
-                  art.designName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                  art.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+                  art.designName.toLowerCase().includes(searchTerm.toLowerCase())
                 )) {
               folders.push({
                 ...folder,
                 artworks: folder.artworks.filter(art => {
                   if (searchTerm) {
-                    return art.designName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           art.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+                    return art.designName.toLowerCase().includes(searchTerm.toLowerCase());
                   }
                   return true;
                 })
@@ -176,7 +174,7 @@ export default function ArtworkFiles() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search artwork by name, customer, or tags..."
+                placeholder="Search artwork by name or customer..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9"
@@ -366,21 +364,6 @@ export default function ArtworkFiles() {
                           {artwork.size.width}" × {artwork.size.height}"
                         </span>
                       </div>
-                      
-                      {artwork.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {artwork.tags.slice(0, 3).map((tag) => (
-                            <Badge key={tag} variant="outline" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                          {artwork.tags.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{artwork.tags.length - 3}
-                            </Badge>
-                          )}
-                        </div>
-                      )}
 
                       <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
                         <div className="text-center">
