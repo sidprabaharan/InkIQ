@@ -1,14 +1,15 @@
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
   Search, Plus, ArrowLeft, Mail, Phone, FileText, Calendar, MessageSquare, 
   File, Image, Folder, Code, PenTool, ShoppingCart, FileCheck, UserPlus,
-  Edit, MapPin, ClipboardList
+  Edit, MapPin, ClipboardList, Upload, Grid, List, FileImage, Download, 
+  Eye, MoreVertical, User, Tag, Layers
 } from "lucide-react";
 import { CustomerDialog } from "@/components/quotes/CustomerDialog";
 import { useCustomers } from "@/context/CustomersContext";
@@ -20,9 +21,33 @@ import { EditContactDialog } from "@/components/customers/EditContactDialog";
 import { EditCompanyDialog, CompanyFormValues } from "@/components/customers/EditCompanyDialog";
 import { EditAddressDialog, AddressFormValues } from "@/components/customers/EditAddressDialog";
 import { EditTaxInfoDialog, TaxInfoFormValues } from "@/components/customers/EditTaxInfoDialog";
+import { mockArtworkLibrary, ArtworkFile } from "@/types/artwork";
+import { IMPRINT_METHODS } from "@/types/imprint";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
 
+// Unified imprint type for customer-specific artwork
+interface UnifiedImprint {
+  id: string;
+  designName: string;
+  imprintMethod: string;
+  associatedCustomers: Array<{ id: string; name: string }>;
+  customerArt: ArtworkFile[];
+  productionFiles: ArtworkFile[];
+  mockups: ArtworkFile[];
+  fileCount: number;
+  totalSizeBytes: number;
+  createdAt: Date;
+  updatedAt: Date;
+  notes?: string;
+}
+
 export default function Customers() {
+  const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
   const [openContactDialog, setOpenContactDialog] = useState(false);
   const { customers, addContactToCustomer, updateCustomer, updateCustomerContact } = useCustomers();
@@ -36,10 +61,93 @@ export default function Customers() {
   const [editShippingAddressDialog, setEditShippingAddressDialog] = useState(false);
   const [editTaxInfoDialog, setEditTaxInfoDialog] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  
+  // Artwork & Files tab states
+  const [artworkSearchTerm, setArtworkSearchTerm] = useState('');
+  const [selectedMethod, setSelectedMethod] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selectedArtwork, setSelectedArtwork] = useState<UnifiedImprint | null>(null);
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+  const [folderViewOpen, setFolderViewOpen] = useState(false);
 
   const selectedCustomer = selectedCustomerId 
     ? customers.find(c => c.id === selectedCustomerId) 
     : null;
+
+  // Get customer-specific artwork data
+  const customerArtworkLibrary = useMemo(() => {
+    if (!selectedCustomerId) return null;
+    return mockArtworkLibrary.find(lib => lib.customerId === selectedCustomerId);
+  }, [selectedCustomerId]);
+
+  // Create unified imprints list for selected customer
+  const customerImprints = useMemo(() => {
+    if (!customerArtworkLibrary) return [];
+    
+    const imprints: UnifiedImprint[] = [];
+    customerArtworkLibrary.folders.forEach(folder => {
+      folder.artworks.forEach(artwork => {
+        imprints.push({
+          id: artwork.id,
+          designName: artwork.designName,
+          imprintMethod: artwork.method,
+          associatedCustomers: [{ id: customerArtworkLibrary.customerId, name: customerArtworkLibrary.customerName }],
+          customerArt: artwork.customerArt,
+          productionFiles: artwork.productionFiles,
+          mockups: artwork.mockups,
+          fileCount: artwork.fileCount,
+          totalSizeBytes: artwork.totalSizeBytes,
+          createdAt: artwork.createdAt,
+          updatedAt: artwork.updatedAt,
+          notes: artwork.description
+        });
+      });
+    });
+    return imprints;
+  }, [customerArtworkLibrary]);
+
+  // Group customer imprints by method to create folders
+  const customerImprintFolders = useMemo(() => {
+    const folders = new Map<string, UnifiedImprint[]>();
+    
+    customerImprints.forEach(imprint => {
+      // Apply method filter
+      if (selectedMethod !== 'all' && imprint.imprintMethod !== selectedMethod) {
+        return;
+      }
+
+      // Apply search filter
+      if (artworkSearchTerm) {
+        const searchLower = artworkSearchTerm.toLowerCase();
+        const matchesSearch = (
+          imprint.designName.toLowerCase().includes(searchLower) ||
+          (imprint.notes && imprint.notes.toLowerCase().includes(searchLower))
+        );
+        if (!matchesSearch) return;
+      }
+
+      const method = imprint.imprintMethod;
+      if (!folders.has(method)) {
+        folders.set(method, []);
+      }
+      folders.get(method)!.push(imprint);
+    });
+
+    return Array.from(folders.entries()).map(([method, imprints]) => ({
+      method,
+      imprints,
+      count: imprints.length,
+      totalSize: imprints.reduce((sum, imprint) => sum + imprint.totalSizeBytes, 0)
+    }));
+  }, [customerImprints, artworkSearchTerm, selectedMethod]);
+
+  // Get imprints for selected folder
+  const folderImprints = useMemo(() => {
+    if (!selectedFolder) return [];
+    const folder = customerImprintFolders.find(f => f.method === selectedFolder);
+    return folder ? folder.imprints : [];
+  }, [selectedFolder, customerImprintFolders]);
 
   const filteredCustomers = customers.filter(customer => 
     customer.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -202,25 +310,39 @@ export default function Customers() {
     }
   ];
 
-  const artworkFiles = {
-    mockups: [
-      { name: "Tshirt-Front-Design.png", date: "2023-08-01", size: "2.4 MB" },
-      { name: "Hoodie-Back-Logo.png", date: "2023-06-15", size: "1.8 MB" }
-    ],
-    logoFiles: [
-      { name: "Company-Logo-Vector.ai", date: "2023-01-10", size: "4.2 MB" },
-      { name: "Logo-White-Version.png", date: "2023-01-10", size: "1.1 MB" }
-    ],
-    colorSeparations: [
-      { name: "Logo-4Color-Sep.pdf", date: "2023-02-20", size: "5.6 MB" }
-    ],
-    digitizedLogos: [
-      { name: "Logo-Digitized-3Inches.dst", date: "2023-03-05", size: "156 KB" },
-      { name: "Logo-Digitized-5Inches.dst", date: "2023-03-05", size: "220 KB" }
-    ],
-    dtfGangSheets: [
-      { name: "Small-Logos-Gang-Sheet.pdf", date: "2023-07-12", size: "8.2 MB" }
-    ]
+  // Utility functions for artwork tab
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    }).format(date);
+  };
+
+  const handlePreviewArtwork = (artwork: UnifiedImprint) => {
+    setSelectedArtwork(artwork);
+    setPreviewDialogOpen(true);
+  };
+
+  const handleFolderClick = (method: string) => {
+    setSelectedFolder(method);
+    setFolderViewOpen(true);
+  };
+
+  const getCustomerArtworkStats = () => {
+    const totalImprints = customerImprints.length;
+    const totalSize = customerImprints.reduce((sum, imprint) => sum + imprint.totalSizeBytes, 0);
+    const totalFolders = customerImprintFolders.length;
+    
+    return { totalImprints, totalSize, totalFolders };
   };
 
   return (
@@ -668,211 +790,420 @@ export default function Customers() {
               
               <TabsContent value="artwork">
                 <div className="space-y-6">
+                  {/* Customer Artwork Header and Stats */}
+                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <h3 className="text-xl font-semibold">Customer Artwork Library</h3>
+                      <p className="text-muted-foreground">
+                        Manage artwork files and imprints for {selectedCustomer?.companyName}
+                      </p>
+                    </div>
+                    <Button className="gap-2">
+                      <Upload className="h-4 w-4" />
+                      Upload Artwork
+                    </Button>
+                  </div>
+
+                  {/* Stats Cards */}
+                  {(() => {
+                    const stats = getCustomerArtworkStats();
+                    return (
+                      <div className="grid gap-4 md:grid-cols-3">
+                        <Card>
+                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Total Imprints</CardTitle>
+                            <FileImage className="h-4 w-4 text-muted-foreground" />
+                          </CardHeader>
+                          <CardContent>
+                            <div className="text-2xl font-bold">{stats.totalImprints}</div>
+                            <p className="text-xs text-muted-foreground">
+                              Across {stats.totalFolders} method folders
+                            </p>
+                          </CardContent>
+                        </Card>
+                        <Card>
+                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Storage Used</CardTitle>
+                            <Layers className="h-4 w-4 text-muted-foreground" />
+                          </CardHeader>
+                          <CardContent>
+                            <div className="text-2xl font-bold">{formatFileSize(stats.totalSize)}</div>
+                            <p className="text-xs text-muted-foreground">
+                              Production files & mockups
+                            </p>
+                          </CardContent>
+                        </Card>
+                        <Card>
+                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Method Folders</CardTitle>
+                            <Folder className="h-4 w-4 text-muted-foreground" />
+                          </CardHeader>
+                          <CardContent>
+                            <div className="text-2xl font-bold">{stats.totalFolders}</div>
+                            <p className="text-xs text-muted-foreground">
+                              Imprint methods used
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Filters */}
                   <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <Image className="h-5 w-5 mr-2" />
-                        Mockups
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>File Name</TableHead>
-                            <TableHead>Date Added</TableHead>
-                            <TableHead>Size</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {artworkFiles.mockups.map((file, index) => (
-                            <TableRow key={index}>
-                              <TableCell className="font-medium flex items-center">
-                                <Image className="h-4 w-4 mr-2 text-blue-500" />
-                                {file.name}
-                              </TableCell>
-                              <TableCell>{file.date}</TableCell>
-                              <TableCell>{file.size}</TableCell>
-                              <TableCell className="text-right">
-                                <Button variant="ghost" size="sm">
-                                  View
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  Download
-                                </Button>
-                              </TableCell>
-                            </TableRow>
+                    <CardContent className="pt-6">
+                      <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-6">
+                        <div className="relative flex-1">
+                          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                          <Input
+                            placeholder="Search customer imprints by name or notes..."
+                            value={artworkSearchTerm}
+                            onChange={(e) => setArtworkSearchTerm(e.target.value)}
+                            className="pl-9"
+                          />
+                        </div>
+                        <select 
+                          value={selectedMethod} 
+                          onChange={(e) => setSelectedMethod(e.target.value)}
+                          className="w-[180px] h-10 px-3 py-2 border border-input rounded-md bg-background text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        >
+                          <option value="all">All Methods</option>
+                          {IMPRINT_METHODS.map((method) => (
+                            <option key={method.value} value={method.value}>
+                              {method.label}
+                            </option>
                           ))}
-                        </TableBody>
-                      </Table>
+                        </select>
+                        <div className="flex gap-1">
+                          <Button
+                            variant={viewMode === 'grid' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setViewMode('grid')}
+                          >
+                            <Grid className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant={viewMode === 'list' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setViewMode('list')}
+                          >
+                            <List className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
-                  
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <File className="h-5 w-5 mr-2" />
-                        Logo Files
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>File Name</TableHead>
-                            <TableHead>Date Added</TableHead>
-                            <TableHead>Size</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {artworkFiles.logoFiles.map((file, index) => (
-                            <TableRow key={index}>
-                              <TableCell className="font-medium flex items-center">
-                                <File className="h-4 w-4 mr-2 text-blue-500" />
-                                {file.name}
-                              </TableCell>
-                              <TableCell>{file.date}</TableCell>
-                              <TableCell>{file.size}</TableCell>
-                              <TableCell className="text-right">
-                                <Button variant="ghost" size="sm">
-                                  View
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  Download
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <PenTool className="h-5 w-5 mr-2" />
-                        Colour Separations
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>File Name</TableHead>
-                            <TableHead>Date Added</TableHead>
-                            <TableHead>Size</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {artworkFiles.colorSeparations.map((file, index) => (
-                            <TableRow key={index}>
-                              <TableCell className="font-medium flex items-center">
-                                <FileText className="h-4 w-4 mr-2 text-blue-500" />
-                                {file.name}
-                              </TableCell>
-                              <TableCell>{file.date}</TableCell>
-                              <TableCell>{file.size}</TableCell>
-                              <TableCell className="text-right">
-                                <Button variant="ghost" size="sm">
-                                  View
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  Download
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <Code className="h-5 w-5 mr-2" />
-                        Digitized Logos
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>File Name</TableHead>
-                            <TableHead>Date Added</TableHead>
-                            <TableHead>Size</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {artworkFiles.digitizedLogos.map((file, index) => (
-                            <TableRow key={index}>
-                              <TableCell className="font-medium flex items-center">
-                                <Code className="h-4 w-4 mr-2 text-blue-500" />
-                                {file.name}
-                              </TableCell>
-                              <TableCell>{file.date}</TableCell>
-                              <TableCell>{file.size}</TableCell>
-                              <TableCell className="text-right">
-                                <Button variant="ghost" size="sm">
-                                  View
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  Download
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <Folder className="h-5 w-5 mr-2" />
-                        DTF Gang Sheets
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>File Name</TableHead>
-                            <TableHead>Date Added</TableHead>
-                            <TableHead>Size</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {artworkFiles.dtfGangSheets.map((file, index) => (
-                            <TableRow key={index}>
-                              <TableCell className="font-medium flex items-center">
-                                <Folder className="h-4 w-4 mr-2 text-blue-500" />
-                                {file.name}
-                              </TableCell>
-                              <TableCell>{file.date}</TableCell>
-                              <TableCell>{file.size}</TableCell>
-                              <TableCell className="text-right">
-                                <Button variant="ghost" size="sm">
-                                  View
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  Download
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
+
+                  {/* Results Summary */}
+                  {!folderViewOpen ? (
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-muted-foreground">
+                        {customerImprintFolders.length} folder{customerImprintFolders.length !== 1 ? 's' : ''} found
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => {
+                            setFolderViewOpen(false);
+                            setSelectedFolder(null);
+                          }}
+                          className="gap-2"
+                        >
+                          ← Back to Folders
+                        </Button>
+                        <span className="text-muted-foreground">/</span>
+                        <span className="font-medium">
+                          {IMPRINT_METHODS.find(m => m.value === selectedFolder)?.label || selectedFolder}
+                        </span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {folderImprints.length} imprint{folderImprints.length !== 1 ? 's' : ''} in folder
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Main Content: Folder View vs Imprints View */}
+                  {!folderViewOpen ? (
+                    // Folders Grid
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                      {customerImprintFolders.map((folder) => (
+                        <Card 
+                          key={folder.method} 
+                          className="group cursor-pointer hover:shadow-md transition-shadow"
+                          onClick={() => handleFolderClick(folder.method)}
+                        >
+                          <CardHeader className="pb-2">
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <div className="p-2 bg-muted rounded-lg">
+                                  <Layers className="h-8 w-8 text-primary" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <CardTitle className="text-lg truncate">
+                                    {IMPRINT_METHODS.find(m => m.value === folder.method)?.label || folder.method}
+                                  </CardTitle>
+                                  <CardDescription className="truncate">
+                                    {folder.count} imprint{folder.count !== 1 ? 's' : ''}
+                                  </CardDescription>
+                                </div>
+                              </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem>
+                                    <Upload className="h-4 w-4 mr-2" />
+                                    Upload Files
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem>
+                                    <Download className="h-4 w-4 mr-2" />
+                                    Download All
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-3">
+                            <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                              <div className="text-center">
+                                <div className="font-medium">{folder.count}</div>
+                                <div>Imprints</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="font-medium">{formatFileSize(folder.totalSize)}</div>
+                                <div>Size</div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                      {customerImprintFolders.length === 0 && (
+                        <div className="col-span-full">
+                          <Card>
+                            <CardContent className="p-6 text-center">
+                              <FileImage className="h-16 w-16 mx-auto mb-4 opacity-40" />
+                              <p className="text-lg text-muted-foreground">No artwork files found</p>
+                              <p className="text-sm text-muted-foreground">Upload some artwork to get started</p>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    // Imprints Grid/List within folder
+                    viewMode === 'grid' ? (
+                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {folderImprints.map((imprint) => (
+                          <Card 
+                            key={imprint.id} 
+                            className="group cursor-pointer hover:shadow-md transition-shadow"
+                            onClick={() => navigate(`/imprint/${imprint.id}`)}
+                          >
+                            <CardHeader className="pb-2">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1 min-w-0">
+                                  <CardTitle className="text-lg truncate">{imprint.designName}</CardTitle>
+                                  <CardDescription className="truncate">
+                                    {imprint.fileCount} files • {formatFileSize(imprint.totalSizeBytes)}
+                                  </CardDescription>
+                                </div>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                      <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={(e) => {
+                                      e.stopPropagation();
+                                      handlePreviewArtwork(imprint);
+                                    }}>
+                                      <Eye className="h-4 w-4 mr-2" />
+                                      Preview
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={(e) => {
+                                      e.stopPropagation();
+                                      navigate(`/imprint/${imprint.id}`);
+                                    }}>
+                                      <FileImage className="h-4 w-4 mr-2" />
+                                      View Details
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                      <Download className="h-4 w-4 mr-2" />
+                                      Download
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                              <div className="text-xs space-y-1">
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Customer Art:</span>
+                                  <span>{imprint.customerArt.length}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Production:</span>
+                                  <span>{imprint.productionFiles.length}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Mockups:</span>
+                                  <span>{imprint.mockups.length}</span>
+                                </div>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Last updated: {formatDate(imprint.updatedAt)}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    ) : (
+                      // List view
+                      <Card>
+                        <CardContent className="p-0">
+                          <div className="divide-y">
+                            {folderImprints.map((imprint) => (
+                              <div 
+                                key={imprint.id} 
+                                className="p-4 hover:bg-muted/50 cursor-pointer transition-colors"
+                                onClick={() => navigate(`/imprint/${imprint.id}`)}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                                    <div className="p-2 bg-muted rounded-lg">
+                                      <FileImage className="h-6 w-6 text-primary" />
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                      <h4 className="font-medium truncate">{imprint.designName}</h4>
+                                      <p className="text-sm text-muted-foreground">
+                                        {imprint.fileCount} files • {formatFileSize(imprint.totalSizeBytes)} • 
+                                        Updated {formatDate(imprint.updatedAt)}
+                                      </p>
+                                      <div className="flex gap-2 mt-1">
+                                        <Badge variant="secondary" className="text-xs">
+                                          {imprint.customerArt.length} Customer Art
+                                        </Badge>
+                                        <Badge variant="secondary" className="text-xs">
+                                          {imprint.productionFiles.length} Production
+                                        </Badge>
+                                        <Badge variant="secondary" className="text-xs">
+                                          {imprint.mockups.length} Mockups
+                                        </Badge>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                        <MoreVertical className="h-4 w-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      <DropdownMenuItem onClick={(e) => {
+                                        e.stopPropagation();
+                                        handlePreviewArtwork(imprint);
+                                      }}>
+                                        <Eye className="h-4 w-4 mr-2" />
+                                        Preview
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate(`/imprint/${imprint.id}`);
+                                      }}>
+                                        <FileImage className="h-4 w-4 mr-2" />
+                                        View Details
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem>
+                                        <Download className="h-4 w-4 mr-2" />
+                                        Download
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )
+                  )}
                 </div>
+
+                {/* Preview Dialog */}
+                <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
+                  <DialogContent className="max-w-4xl max-h-[80vh]">
+                    <DialogHeader>
+                      <DialogTitle>{selectedArtwork?.designName}</DialogTitle>
+                    </DialogHeader>
+                    <ScrollArea className="max-h-[60vh]">
+                      {selectedArtwork && (
+                        <Tabs defaultValue="customerArt" className="w-full">
+                          <TabsList className="grid w-full grid-cols-3">
+                            <TabsTrigger value="customerArt">Customer Art ({selectedArtwork.customerArt.length})</TabsTrigger>
+                            <TabsTrigger value="production">Production ({selectedArtwork.productionFiles.length})</TabsTrigger>
+                            <TabsTrigger value="mockups">Mockups ({selectedArtwork.mockups.length})</TabsTrigger>
+                          </TabsList>
+                          
+                          <TabsContent value="customerArt" className="space-y-4">
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                              {selectedArtwork.customerArt.map((file) => (
+                                <Card key={file.id} className="p-4">
+                                  <div className="aspect-square bg-muted rounded-lg mb-2 flex items-center justify-center">
+                                    <FileImage className="h-8 w-8 text-muted-foreground" />
+                                  </div>
+                                  <h4 className="font-medium text-sm truncate">{file.name}</h4>
+                                  <p className="text-xs text-muted-foreground">
+                                    {formatFileSize(file.sizeBytes)}
+                                  </p>
+                                </Card>
+                              ))}
+                            </div>
+                          </TabsContent>
+                          
+                          <TabsContent value="production" className="space-y-4">
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                              {selectedArtwork.productionFiles.map((file) => (
+                                <Card key={file.id} className="p-4">
+                                  <div className="aspect-square bg-muted rounded-lg mb-2 flex items-center justify-center">
+                                    <File className="h-8 w-8 text-muted-foreground" />
+                                  </div>
+                                  <h4 className="font-medium text-sm truncate">{file.name}</h4>
+                                  <p className="text-xs text-muted-foreground">
+                                    {formatFileSize(file.sizeBytes)}
+                                  </p>
+                                </Card>
+                              ))}
+                            </div>
+                          </TabsContent>
+                          
+                          <TabsContent value="mockups" className="space-y-4">
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                              {selectedArtwork.mockups.map((file) => (
+                                <Card key={file.id} className="p-4">
+                                  <div className="aspect-square bg-muted rounded-lg mb-2 flex items-center justify-center">
+                                    <Image className="h-8 w-8 text-muted-foreground" />
+                                  </div>
+                                  <h4 className="font-medium text-sm truncate">{file.name}</h4>
+                                  <p className="text-xs text-muted-foreground">
+                                    {formatFileSize(file.sizeBytes)}
+                                  </p>
+                                </Card>
+                              ))}
+                            </div>
+                          </TabsContent>
+                        </Tabs>
+                      )}
+                    </ScrollArea>
+                  </DialogContent>
+                </Dialog>
               </TabsContent>
               
               <TabsContent value="activities">
