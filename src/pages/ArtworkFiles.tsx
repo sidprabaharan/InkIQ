@@ -26,7 +26,7 @@ interface UnifiedImprint {
   totalSizeBytes: number;
   createdAt: Date;
   updatedAt: Date;
-  tags: string[];
+  notes?: string;
 }
 
 export default function ArtworkFiles() {
@@ -60,7 +60,7 @@ export default function ArtworkFiles() {
             totalSizeBytes: artwork.totalSizeBytes,
             createdAt: artwork.createdAt,
             updatedAt: artwork.updatedAt,
-            tags: artwork.tags || []
+            notes: "Sample notes for this imprint design"
           });
         });
       });
@@ -84,7 +84,7 @@ export default function ArtworkFiles() {
           .reduce((sum, file) => sum + file.sizeBytes, 0),
         createdAt: sharedImprint.createdAt,
         updatedAt: sharedImprint.updatedAt,
-        tags: sharedImprint.tags || []
+        notes: "Shared imprint design notes"
       });
     });
 
@@ -124,7 +124,7 @@ export default function ArtworkFiles() {
         const matchesSearch = (
           imprint.designName.toLowerCase().includes(searchLower) ||
           imprint.associatedCustomers.some(c => c.name.toLowerCase().includes(searchLower)) ||
-          imprint.tags.some(tag => tag.toLowerCase().includes(searchLower))
+          (imprint.notes && imprint.notes.toLowerCase().includes(searchLower))
         );
         if (!matchesSearch) return;
       }
@@ -250,7 +250,7 @@ export default function ArtworkFiles() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search imprints by name, customer, or tags..."
+                placeholder="Search imprints by name, customer, or notes..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9"
@@ -480,19 +480,10 @@ export default function ArtworkFiles() {
 
                   <div className="space-y-1">
                     <div className="text-xs text-muted-foreground">
-                      <span className="font-medium">Associated Customers:</span>
+                      <span className="font-medium">Notes:</span>
                     </div>
-                    <div className="flex flex-wrap gap-1">
-                      {imprint.associatedCustomers.slice(0, 2).map((customer) => (
-                        <Badge key={customer.id} variant="outline" className="text-xs">
-                          {customer.name}
-                        </Badge>
-                      ))}
-                      {imprint.associatedCustomers.length > 2 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{imprint.associatedCustomers.length - 2} more
-                        </Badge>
-                      )}
+                    <div className="text-xs text-muted-foreground p-2 bg-muted/30 rounded">
+                      {imprint.notes || "No notes available"}
                     </div>
                   </div>
                 </CardContent>
@@ -542,17 +533,8 @@ export default function ArtworkFiles() {
                           }
                         </span>
                       </div>
-                      <div className="flex flex-wrap gap-1">
-                        {imprint.associatedCustomers.slice(0, 3).map((customer) => (
-                          <Badge key={customer.id} variant="outline" className="text-xs">
-                            {customer.name}
-                          </Badge>
-                        ))}
-                        {imprint.associatedCustomers.length > 3 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{imprint.associatedCustomers.length - 3} more
-                          </Badge>
-                        )}
+                      <div className="text-xs text-muted-foreground truncate max-w-[200px]">
+                        <span className="font-medium">Notes:</span> {imprint.notes || "No notes"}
                       </div>
                     </div>
 
