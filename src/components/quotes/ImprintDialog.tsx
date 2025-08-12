@@ -5,11 +5,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Upload, Trash2, X, FileText, Image as ImageIcon } from "lucide-react";
+import { Plus, Upload, Trash2, X, FileText, Image as ImageIcon, Library } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EnhancedMockupUploadDialog } from "./EnhancedMockupUploadDialog";
+import { ArtworkSelectionDialog } from "./ArtworkSelectionDialog";
 import { ImprintItem, ImprintFile, IMPRINT_METHODS, getMethodConfig } from "@/types/imprint";
+import { MasterArtwork, ArtworkVariation } from "@/types/artwork";
 import { toast } from "sonner";
 
 interface ImprintDialogProps {
@@ -22,6 +24,7 @@ interface ImprintDialogProps {
 export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = [] }: ImprintDialogProps) {
   const [imprints, setImprints] = useState<ImprintItem[]>([]);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [artworkSelectionOpen, setArtworkSelectionOpen] = useState(false);
   const [currentImprintIndex, setCurrentImprintIndex] = useState<number | null>(null);
   const [currentUploadCategory, setCurrentUploadCategory] = useState<'customerArt' | 'productionFiles' | 'proofMockup'>('customerArt');
   
@@ -122,6 +125,47 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
     });
   };
 
+  const handleSelectFromLibrary = () => {
+    setArtworkSelectionOpen(true);
+  };
+
+  const handleArtworkSelected = (artwork: MasterArtwork, variation: ArtworkVariation) => {
+    // Create a new imprint from the selected artwork and variation
+    const newImprint: ImprintItem = {
+      id: `imprint-${Math.random().toString(36).substring(2, 9)}`,
+      method: artwork.method,
+      location: variation.location,
+      width: artwork.size.width,
+      height: artwork.size.height,
+      colorsOrThreads: variation.colors || '',
+      notes: variation.specialInstructions || '',
+      customerArt: artwork.customerArt.map(file => ({
+        id: file.id,
+        name: file.name,
+        url: file.url,
+        type: file.type,
+        category: 'customerArt' as const
+      })),
+      productionFiles: artwork.productionFiles.map(file => ({
+        id: file.id,
+        name: file.name,
+        url: file.url,
+        type: file.type,
+        category: 'productionFiles' as const
+      })),
+      proofMockup: artwork.mockups.map(file => ({
+        id: file.id,
+        name: file.name,
+        url: file.url,
+        type: file.type,
+        category: 'proofMockup' as const
+      }))
+    };
+
+    setImprints(prev => [...prev, newImprint]);
+    setArtworkSelectionOpen(false);
+  };
+
   const handleSave = () => {
     // Validate required fields
     const hasErrors = imprints.some(imprint => 
@@ -146,7 +190,18 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[625px]">
           <DialogHeader>
-            <DialogTitle>Imprint</DialogTitle>
+            <DialogTitle className="flex items-center justify-between">
+              Imprint
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSelectFromLibrary}
+                className="gap-2"
+              >
+                <Library className="h-4 w-4" />
+                Select from Library
+              </Button>
+            </DialogTitle>
           </DialogHeader>
           
           <ScrollArea className="max-h-[70vh] pr-4">
@@ -423,6 +478,12 @@ export function ImprintDialog({ open, onOpenChange, onSave, initialImprints = []
         onUpload={handleUploadComplete}
         category={currentUploadCategory}
         multiple={currentUploadCategory === 'productionFiles'}
+      />
+
+      <ArtworkSelectionDialog
+        open={artworkSelectionOpen}
+        onOpenChange={setArtworkSelectionOpen}
+        onSelectArtwork={handleArtworkSelected}
       />
     </>
   );

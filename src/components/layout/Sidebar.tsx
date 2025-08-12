@@ -90,6 +90,11 @@ export function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
       path: '/messages',
     },
     {
+      name: 'Artwork Files',
+      icon: FileText,
+      path: '/artwork-files',
+    },
+    {
       name: 'Expenses',
       icon: DollarSign,
       path: '/expenses',
