@@ -593,41 +593,59 @@ export default function Customers() {
           </div>
         </>
       ) : (
-        <div className="flex gap-6">
-          <div className="w-1/3">
-            <Button 
-              variant="ghost" 
-              className="mb-4 text-gray-500"
-              onClick={() => setSelectedCustomerId(null)}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Customers
-            </Button>
-            
-            <Card>
-              <CardContent className="p-6 flex flex-col items-center text-center">
-                <div className="flex justify-end w-full">
+        <div className="space-y-6">
+          {/* Back button */}
+          <Button 
+            variant="ghost" 
+            className="text-gray-500"
+            onClick={() => setSelectedCustomerId(null)}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Customers
+          </Button>
+
+          {/* Full-width Customer Card */}
+          <Card className="w-full">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarFallback className="bg-primary text-primary-foreground text-xl">
+                      {getInitials(selectedCustomer.companyName)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <CardTitle className="text-2xl">{selectedCustomer.companyName}</CardTitle>
+                    <CardDescription className="text-lg">
+                      {selectedCustomer.firstName} {selectedCustomer.lastName}
+                    </CardDescription>
+                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-4 w-4" />
+                        <span>{selectedCustomer.email}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4" />
+                        <span>{selectedCustomer.phoneNumber}</span>
+                      </div>
+                      {selectedCustomer.industry && (
+                        <div className="flex items-center gap-2">
+                          <Layers className="h-4 w-4" />
+                          <span>{getIndustryName(selectedCustomer.industry)}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
                   <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-8 w-8 p-0"
+                    variant="outline" 
+                    size="sm"
                     onClick={() => setEditCompanyDialog(true)}
                   >
-                    <Edit className="h-4 w-4" />
-                    <span className="sr-only">Edit company</span>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Company
                   </Button>
-                </div>
-                
-                <Avatar className="h-24 w-24 my-4 bg-blue-100 text-blue-600">
-                  <AvatarFallback className="text-2xl">
-                    {getInitials(selectedCustomer.companyName)}
-                  </AvatarFallback>
-                </Avatar>
-                
-                <h2 className="text-2xl font-bold mt-2">{selectedCustomer.companyName}</h2>
-                <p className="text-gray-500 mb-6">{getIndustryName(selectedCustomer.industry)}</p>
-                
-                <div className="flex flex-wrap justify-center gap-4 mb-6">
                   <Button variant="outline" size="sm" className="flex items-center gap-2">
                     <Mail className="h-4 w-4" />
                     Email
@@ -636,40 +654,116 @@ export default function Customers() {
                     <Phone className="h-4 w-4" />
                     Call
                   </Button>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    Notes
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Meeting
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4" />
-                    Message
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <ClipboardList className="h-4 w-4" />
-                    Task
-                  </Button>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-          
-          <div className="w-2/3">
-            <h1 className="text-2xl font-semibold mb-6">Customer Detail</h1>
-            
-            <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="mb-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-3 gap-6">
+                {/* Billing Address */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-sm text-gray-700">Billing Address</h3>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setEditBillingAddressDialog(true)}
+                    >
+                      <Edit className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  {selectedCustomer.billingAddress ? (
+                    <div className="text-sm text-gray-600">
+                      <div>{selectedCustomer.billingAddress.address1}</div>
+                      {selectedCustomer.billingAddress.address2 && (
+                        <div>{selectedCustomer.billingAddress.address2}</div>
+                      )}
+                      <div>
+                        {selectedCustomer.billingAddress.city}, {selectedCustomer.billingAddress.stateProvince} {selectedCustomer.billingAddress.zipCode}
+                      </div>
+                      <div>{selectedCustomer.billingAddress.country}</div>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-400">No billing address on file</div>
+                  )}
+                </div>
+
+                {/* Shipping Address */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-sm text-gray-700">Shipping Address</h3>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setEditShippingAddressDialog(true)}
+                    >
+                      <Edit className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  {selectedCustomer.shippingAddress ? (
+                    <div className="text-sm text-gray-600">
+                      <div>{selectedCustomer.shippingAddress.address1}</div>
+                      {selectedCustomer.shippingAddress.address2 && (
+                        <div>{selectedCustomer.shippingAddress.address2}</div>
+                      )}
+                      <div>
+                        {selectedCustomer.shippingAddress.city}, {selectedCustomer.shippingAddress.stateProvince} {selectedCustomer.shippingAddress.zipCode}
+                      </div>
+                      <div>{selectedCustomer.shippingAddress.country}</div>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-400">No shipping address on file</div>
+                  )}
+                </div>
+
+                {/* Company & Tax Info */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-sm text-gray-700">Company Details</h3>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setEditTaxInfoDialog(true)}
+                    >
+                      <Edit className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <div className="space-y-1 text-sm text-gray-600">
+                    {selectedCustomer.industry && (
+                      <div>
+                        <span className="text-gray-500">Industry:</span>
+                        <span className="ml-2">{getIndustryName(selectedCustomer.industry)}</span>
+                      </div>
+                    )}
+                    {selectedCustomer.taxInfo?.taxId && (
+                      <div>
+                        <span className="text-gray-500">Tax ID:</span>
+                        <span className="ml-2">{selectedCustomer.taxInfo.taxId}</span>
+                      </div>
+                    )}
+                    {selectedCustomer.taxInfo?.taxRate && (
+                      <div>
+                        <span className="text-gray-500">Tax Rate:</span>
+                        <span className="ml-2">{selectedCustomer.taxInfo.taxRate}%</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Full-width Tabs */}
+          <div className="w-full">
+            <Tabs defaultValue="contacts" className="w-full">
+              <TabsList className="grid w-full grid-cols-5">
+                <TabsTrigger value="contacts">Contacts</TabsTrigger>
                 <TabsTrigger value="quotes">Quotes</TabsTrigger>
                 <TabsTrigger value="orders">Orders</TabsTrigger>
+                <TabsTrigger value="tasks">Tasks</TabsTrigger>
                 <TabsTrigger value="artwork">Artwork & Files</TabsTrigger>
-                <TabsTrigger value="activities">Activities</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="overview" className="space-y-6">
+              <TabsContent value="contacts" className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle>Data Highlights</CardTitle>
@@ -1541,12 +1635,12 @@ export default function Customers() {
                 </Dialog>
               </TabsContent>
               
-              <TabsContent value="activities">
+              <TabsContent value="tasks">
                 <Card>
                   <CardContent className="p-6 min-h-[200px] flex items-center justify-center">
                     <div className="text-center text-gray-500">
-                      <Calendar className="h-16 w-16 mx-auto mb-4 opacity-40" />
-                      <p className="text-lg">No activity data to show yet.</p>
+                      <ClipboardList className="h-16 w-16 mx-auto mb-4 opacity-40" />
+                      <p className="text-lg">No tasks assigned to this customer yet.</p>
                     </div>
                   </CardContent>
                 </Card>
