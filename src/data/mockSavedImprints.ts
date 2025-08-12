@@ -33,14 +33,14 @@ export const mockSavedImprints: SavedImprint[] = [
         {
           id: "pm-001",
           name: "TechCorp_Polo_Mockup.jpg",
-          url: "/public/lovable-uploads/polo-navy.jpg",
+          url: "/lovable-uploads/a3c6309c-2b25-460d-b162-012808bc9c81.png",
           type: "jpg",
           category: "proofMockup"
         },
         {
           id: "pm-002",
           name: "TechCorp_Tshirt_Mockup.jpg",
-          url: "/public/lovable-uploads/tshirt-white.jpg",
+          url: "/lovable-uploads/4b14e34b-748e-45d1-9671-629495df105d.png",
           type: "jpg",
           category: "proofMockup"
         }
@@ -67,7 +67,7 @@ export const mockSavedImprints: SavedImprint[] = [
         {
           id: "ca-002",
           name: "TechCorp_Logo_Large.ai",
-          url: "/public/lovable-uploads/tech-logo-4.jpg",
+          url: "/lovable-uploads/77e97aa8-3c5c-4ff6-8bcd-c7423ad1ba9c.png",
           type: "ai",
           category: "customerArt"
         }
@@ -76,7 +76,7 @@ export const mockSavedImprints: SavedImprint[] = [
         {
           id: "pf-002",
           name: "TechCorp_Large_Screen.eps",
-          url: "/public/lovable-uploads/tech-logo-4.jpg",
+          url: "/lovable-uploads/77e97aa8-3c5c-4ff6-8bcd-c7423ad1ba9c.png",
           type: "eps",
           category: "productionFiles"
         }
@@ -85,7 +85,7 @@ export const mockSavedImprints: SavedImprint[] = [
         {
           id: "pm-003",
           name: "TechCorp_Back_Mockup.jpg",
-          url: "/public/lovable-uploads/tshirt-white.jpg",
+          url: "/lovable-uploads/4916f36f-5c0f-4f85-b192-02a45d68a412.png",
           type: "jpg",
           category: "proofMockup"
         }
@@ -130,7 +130,7 @@ export const mockSavedImprints: SavedImprint[] = [
         {
           id: "pm-004",
           name: "Mountain_Polo_Embroidered.jpg",
-          url: "/public/lovable-uploads/polo-navy.jpg",
+          url: "/lovable-uploads/71710901-a739-4cf1-9473-259d48df2dfe.png",
           type: "jpg",
           category: "proofMockup"
         }
@@ -175,14 +175,14 @@ export const mockSavedImprints: SavedImprint[] = [
         {
           id: "pm-005",
           name: "Adventure_Tshirt_DTG.jpg",
-          url: "/public/lovable-uploads/tshirt-white.jpg",
+          url: "/lovable-uploads/9a2abfa2-77b1-4f22-b100-c9d9c1653a71.png",
           type: "jpg",
           category: "proofMockup"
         },
         {
           id: "pm-006",
           name: "Adventure_Hoodie_DTG.jpg",
-          url: "/public/lovable-uploads/hoodie-black.jpg",
+          url: "/lovable-uploads/2436aa64-1e48-430d-a686-cc02950cceb4.png",
           type: "jpg",
           category: "proofMockup"
         }
@@ -227,7 +227,7 @@ export const mockSavedImprints: SavedImprint[] = [
         {
           id: "pm-007",
           name: "TechCorp_Executive_Polo.jpg",
-          url: "/public/lovable-uploads/polo-navy.jpg",
+          url: "/lovable-uploads/c67f3c35-f254-4d8a-8de3-9e877d37d2d6.png",
           type: "jpg",
           category: "proofMockup"
         }
