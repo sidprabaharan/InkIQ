@@ -402,6 +402,11 @@ export default function ImprintDetail() {
                           </Badge>
                         </div>
                       )}
+                      {file.notes && (
+                        <div className="mt-1 text-xs text-muted-foreground">
+                          {file.notes}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
