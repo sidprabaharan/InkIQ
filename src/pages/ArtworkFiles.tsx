@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Upload, Filter, Grid, List, FolderOpen, FileImage, Download, Eye, MoreVertical, Calendar, User, Tag, Layers } from 'lucide-react';
+import { Search, Upload, Filter, Grid, List, FolderOpen, FileImage, Download, Eye, MoreVertical, Calendar, User, Tag, Layers, Folder } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { mockArtworkLibrary, CustomerArtworkLibrary, MasterArtwork, ArtworkFile } from '@/types/artwork';
+import { mockArtworkLibrary, CustomerArtworkLibrary, MasterArtwork, ArtworkFile, ArtworkFolder } from '@/types/artwork';
 import { IMPRINT_METHODS } from '@/types/imprint';
 
 export default function ArtworkFiles() {
@@ -21,6 +21,8 @@ export default function ArtworkFiles() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedArtwork, setSelectedArtwork] = useState<MasterArtwork | null>(null);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const [selectedFolder, setSelectedFolder] = useState<ArtworkFolder | null>(null);
+  const [folderViewOpen, setFolderViewOpen] = useState(false);
 
   // Get unique customers for filter
   const customers = useMemo(() => {
@@ -31,34 +33,48 @@ export default function ArtworkFiles() {
     return uniqueCustomers;
   }, []);
 
-  // Filter artwork
-  const filteredArtwork = useMemo(() => {
-    let allArtwork: MasterArtwork[] = [];
+  // Get folders organized by method
+  const methodFolders = useMemo(() => {
+    const folders: ArtworkFolder[] = [];
     
-    // Flatten all artwork from all customers
     mockArtworkLibrary.forEach(library => {
-      allArtwork.push(...library.masterArtworks);
+      library.folders.forEach(folder => {
+        // Apply customer filter
+        if (selectedCustomer === 'all' || library.customerId === selectedCustomer) {
+          // Apply method filter
+          if (selectedMethod === 'all' || folder.method === selectedMethod) {
+            // Apply search filter
+            if (!searchTerm || 
+                folder.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                library.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                folder.artworks.some(art => 
+                  art.designName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  art.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+                )) {
+              folders.push({
+                ...folder,
+                artworks: folder.artworks.filter(art => {
+                  if (searchTerm) {
+                    return art.designName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           art.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+                  }
+                  return true;
+                })
+              });
+            }
+          }
+        }
+      });
     });
-
-    // Apply filters
-    if (selectedCustomer !== 'all') {
-      allArtwork = allArtwork.filter(art => art.customerId === selectedCustomer);
-    }
-
-    if (selectedMethod !== 'all') {
-      allArtwork = allArtwork.filter(art => art.method === selectedMethod);
-    }
-
-    if (searchTerm) {
-      allArtwork = allArtwork.filter(art => 
-        art.designName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        art.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        art.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
-    }
-
-    return allArtwork;
+    
+    return folders;
   }, [searchTerm, selectedCustomer, selectedMethod]);
+
+  // Filter artwork (for when viewing folder contents)
+  const filteredArtwork = useMemo(() => {
+    if (!selectedFolder) return [];
+    return selectedFolder.artworks;
+  }, [selectedFolder]);
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
@@ -81,12 +97,18 @@ export default function ArtworkFiles() {
     setPreviewDialogOpen(true);
   };
 
+  const handleFolderClick = (folder: ArtworkFolder) => {
+    setSelectedFolder(folder);
+    setFolderViewOpen(true);
+  };
+
   const getTotalStats = () => {
+    const totalFolders = mockArtworkLibrary.reduce((sum, lib) => sum + lib.folders.length, 0);
     const totalArtwork = mockArtworkLibrary.reduce((sum, lib) => sum + lib.artworkCount, 0);
     const totalSize = mockArtworkLibrary.reduce((sum, lib) => sum + lib.totalSizeBytes, 0);
     const totalCustomers = mockArtworkLibrary.length;
     
-    return { totalArtwork, totalSize, totalCustomers };
+    return { totalFolders, totalArtwork, totalSize, totalCustomers };
   };
 
   const stats = getTotalStats();
@@ -208,140 +230,234 @@ export default function ArtworkFiles() {
 
       {/* Results */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            {filteredArtwork.length} artwork file{filteredArtwork.length !== 1 ? 's' : ''} found
-          </p>
-        </div>
+        {!folderViewOpen ? (
+          <>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                {methodFolders.length} folder{methodFolders.length !== 1 ? 's' : ''} found
+              </p>
+            </div>
 
-        {viewMode === 'grid' ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredArtwork.map((artwork) => (
-              <Card key={artwork.id} className="group cursor-pointer hover:shadow-md transition-shadow">
-                <CardHeader className="pb-2">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="text-lg truncate">{artwork.designName}</CardTitle>
-                      <CardDescription className="truncate">{artwork.customerName}</CardDescription>
-                    </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handlePreviewArtwork(artwork)}>
-                          <Eye className="h-4 w-4 mr-2" />
-                          Preview
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Download className="h-4 w-4 mr-2" />
-                          Download
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary">
-                      {IMPRINT_METHODS.find(m => m.value === artwork.method)?.label || artwork.method}
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">
-                      {artwork.size.width}" × {artwork.size.height}"
-                    </span>
-                  </div>
-                  
-                  {artwork.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {artwork.tags.slice(0, 3).map((tag) => (
-                        <Badge key={tag} variant="outline" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                      {artwork.tags.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{artwork.tags.length - 3}
-                        </Badge>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
-                    <div className="text-center">
-                      <div className="font-medium">{artwork.customerArt.length}</div>
-                      <div>Customer</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="font-medium">{artwork.productionFiles.length}</div>
-                      <div>Production</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="font-medium">{artwork.mockups.length}</div>
-                      <div>Mockups</div>
-                    </div>
-                  </div>
-
-                  <div className="text-xs text-muted-foreground space-y-1">
-                    <div>Last used: {artwork.lastUsedAt ? formatDate(artwork.lastUsedAt) : 'Never'}</div>
-                    <div>Used {artwork.usageCount} times</div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <Card>
-            <CardContent className="p-0">
-              <div className="divide-y">
-                {filteredArtwork.map((artwork) => (
-                  <div key={artwork.id} className="flex items-center gap-4 p-4 hover:bg-muted/50">
-                    <Avatar className="h-12 w-12">
-                      <AvatarFallback>
-                        {artwork.designName.slice(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    
-                    <div className="flex-1 min-w-0 space-y-1">
+            {/* Folder View */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {methodFolders.map((folder) => {
+                const customer = mockArtworkLibrary.find(lib => 
+                  lib.folders.some(f => f.id === folder.id)
+                );
+                return (
+                  <Card 
+                    key={folder.id} 
+                    className="group cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => handleFolderClick(folder)}
+                  >
+                    <CardHeader className="pb-2">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="p-2 bg-muted rounded-lg">
+                            <Folder className="h-8 w-8 text-primary" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <CardTitle className="text-lg truncate">{folder.name}</CardTitle>
+                            <CardDescription className="truncate">{customer?.customerName}</CardDescription>
+                          </div>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                              <Upload className="h-4 w-4 mr-2" />
+                              Upload Files
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Download className="h-4 w-4 mr-2" />
+                              Download All
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold truncate">{artwork.designName}</h3>
+                        <Badge variant="secondary">
+                          {IMPRINT_METHODS.find(m => m.value === folder.method)?.label || folder.method}
+                        </Badge>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                        <div className="text-center">
+                          <div className="font-medium">{folder.artworkCount}</div>
+                          <div>Artwork{folder.artworkCount !== 1 ? 's' : ''}</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="font-medium">{formatFileSize(folder.totalSizeBytes)}</div>
+                          <div>Size</div>
+                        </div>
+                      </div>
+
+                      <div className="text-xs text-muted-foreground">
+                        <div>Last updated: {formatDate(folder.lastUpdatedAt)}</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setFolderViewOpen(false)}
+                  className="gap-2"
+                >
+                  <Folder className="h-4 w-4" />
+                  Back to Folders
+                </Button>
+                <span className="text-muted-foreground">/</span>
+                <span className="font-medium">{selectedFolder?.name}</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {filteredArtwork.length} artwork file{filteredArtwork.length !== 1 ? 's' : ''} in folder
+              </p>
+            </div>
+
+            {viewMode === 'grid' ? (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {filteredArtwork.map((artwork) => (
+                  <Card key={artwork.id} className="group cursor-pointer hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <CardTitle className="text-lg truncate">{artwork.designName}</CardTitle>
+                          <CardDescription className="truncate">{artwork.customerName}</CardDescription>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handlePreviewArtwork(artwork)}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              Preview
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Download className="h-4 w-4 mr-2" />
+                              Download
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center gap-2">
                         <Badge variant="secondary">
                           {IMPRINT_METHODS.find(m => m.value === artwork.method)?.label || artwork.method}
                         </Badge>
+                        <span className="text-sm text-muted-foreground">
+                          {artwork.size.width}" × {artwork.size.height}"
+                        </span>
                       </div>
-                      <p className="text-sm text-muted-foreground truncate">{artwork.customerName}</p>
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <span>{artwork.size.width}" × {artwork.size.height}"</span>
-                        <span>{artwork.fileCount} files</span>
-                        <span>{formatFileSize(artwork.totalSizeBytes)}</span>
-                        <span>Used {artwork.usageCount} times</span>
-                      </div>
-                    </div>
+                      
+                      {artwork.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {artwork.tags.slice(0, 3).map((tag) => (
+                            <Badge key={tag} variant="outline" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                          {artwork.tags.length > 3 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{artwork.tags.length - 3}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
 
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => handlePreviewArtwork(artwork)}>
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Download className="h-4 w-4 mr-2" />
-                            Download All
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
+                      <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
+                        <div className="text-center">
+                          <div className="font-medium">{artwork.customerArt.length}</div>
+                          <div>Customer</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="font-medium">{artwork.productionFiles.length}</div>
+                          <div>Production</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="font-medium">{artwork.mockups.length}</div>
+                          <div>Mockups</div>
+                        </div>
+                      </div>
+
+                      <div className="text-xs text-muted-foreground space-y-1">
+                        <div>Last used: {artwork.lastUsedAt ? formatDate(artwork.lastUsedAt) : 'Never'}</div>
+                        <div>Used {artwork.usageCount} times</div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            ) : (
+              <Card>
+                <CardContent className="p-0">
+                  <div className="divide-y">
+                    {filteredArtwork.map((artwork) => (
+                      <div key={artwork.id} className="flex items-center gap-4 p-4 hover:bg-muted/50">
+                        <Avatar className="h-12 w-12">
+                          <AvatarFallback>
+                            {artwork.designName.slice(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        
+                        <div className="flex-1 min-w-0 space-y-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold truncate">{artwork.designName}</h3>
+                            <Badge variant="secondary">
+                              {IMPRINT_METHODS.find(m => m.value === artwork.method)?.label || artwork.method}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground truncate">{artwork.customerName}</p>
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span>{artwork.size.width}" × {artwork.size.height}"</span>
+                            <span>{artwork.fileCount} files</span>
+                            <span>{formatFileSize(artwork.totalSizeBytes)}</span>
+                            <span>Used {artwork.usageCount} times</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => handlePreviewArtwork(artwork)}>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem>
+                                <Download className="h-4 w-4 mr-2" />
+                                Download All
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </>
         )}
       </div>
 
