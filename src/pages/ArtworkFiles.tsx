@@ -386,34 +386,6 @@ export default function ArtworkFiles() {
                     <div>Size</div>
                   </div>
                 </div>
-
-                {/* Preview of first few imprints */}
-                <div className="space-y-1">
-                  <div className="text-xs text-muted-foreground font-medium">Preview:</div>
-                  <div className="space-y-1">
-                    {folder.imprints.slice(0, 3).map((imprint) => (
-                      <div key={imprint.id} className="flex items-center gap-2 text-xs">
-                        <div className="w-6 h-6 bg-muted rounded flex-shrink-0 flex items-center justify-center">
-                          {imprint.customerArt.length > 0 ? (
-                            <img 
-                              src={imprint.customerArt[0].url} 
-                              alt={imprint.designName}
-                              className="w-full h-full object-contain rounded"
-                            />
-                          ) : (
-                            <FileImage className="h-3 w-3" />
-                          )}
-                        </div>
-                        <span className="truncate">{imprint.designName}</span>
-                      </div>
-                    ))}
-                    {folder.count > 3 && (
-                      <div className="text-xs text-muted-foreground">
-                        +{folder.count - 3} more...
-                      </div>
-                    )}
-                  </div>
-                </div>
               </CardContent>
             </Card>
           ))}
