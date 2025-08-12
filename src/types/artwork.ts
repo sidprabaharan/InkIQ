@@ -55,6 +55,7 @@ export interface ArtworkFile {
   version: number;
   isLatest: boolean;
   colors?: string; // For mockups with color variants
+  notes?: string; // For mockup notes
 }
 
 export interface ArtworkFolder {
@@ -199,7 +200,8 @@ export const mockSharedImprints: SharedImprint[] = [
         uploadedBy: "design@company.com",
         version: 1,
         isLatest: true,
-        colors: "Red, White, Blue (Traditional American Flag)"
+        colors: "1147, 1000, 1076",
+        notes: "Standard polo sleeve placement on navy fabric"
       },
       {
         id: "flag-mockup-2",
@@ -213,7 +215,8 @@ export const mockSharedImprints: SharedImprint[] = [
         uploadedBy: "design@company.com",
         version: 1,
         isLatest: true,
-        colors: "Black, Gray, White (Monochrome Flag)"
+        colors: "5012, 5005, 1000",
+        notes: "Windbreaker jacket with sleeve embroidery"
       },
       {
         id: "flag-mockup-3",
@@ -227,7 +230,8 @@ export const mockSharedImprints: SharedImprint[] = [
         uploadedBy: "design@company.com",
         version: 1,
         isLatest: true,
-        colors: "Navy, Gold, Cream (Vintage Flag)"
+        colors: "1134, 1142, 1082",
+        notes: "Vintage color palette on cream polo shirt"
       }
     ],
     usageCount: 15,
