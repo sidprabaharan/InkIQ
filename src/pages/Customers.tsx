@@ -757,7 +757,7 @@ export default function Customers() {
           <div className="w-full">
             <Tabs defaultValue="contacts" className="w-full">
               <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="contacts">Contacts</TabsTrigger>
+                <TabsTrigger value="contacts">Overview</TabsTrigger>
                 <TabsTrigger value="quotes">Quotes</TabsTrigger>
                 <TabsTrigger value="orders">Orders</TabsTrigger>
                 <TabsTrigger value="tasks">Tasks</TabsTrigger>
