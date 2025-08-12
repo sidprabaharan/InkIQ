@@ -347,6 +347,10 @@ export default function ArtworkFiles() {
                               <Eye className="h-4 w-4 mr-2" />
                               Preview
                             </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => window.location.href = `/imprint/${artwork.id}`}>
+                              <FileImage className="h-4 w-4 mr-2" />
+                              View Imprint Details
+                            </DropdownMenuItem>
                             <DropdownMenuItem>
                               <Download className="h-4 w-4 mr-2" />
                               Download

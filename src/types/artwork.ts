@@ -95,6 +95,159 @@ export interface ArtworkSearchFilters {
   hasMockups?: boolean;
 }
 
+// Shared imprints that can be reused across multiple customers
+export interface SharedImprint {
+  id: string;
+  designName: string;
+  description?: string;
+  method: string;
+  size: {
+    width: number;
+    height: number;
+    unit: 'in' | 'mm' | 'cm';
+  };
+  createdAt: Date;
+  updatedAt: Date;
+  tags: string[];
+  
+  // Files for this imprint design
+  customerArt: ArtworkFile[];
+  productionFiles: ArtworkFile[];
+  mockups: ArtworkFile[];
+  
+  // Usage tracking
+  usageCount: number;
+  lastUsedAt?: Date;
+  
+  // Customers who have used this imprint
+  associatedCustomers: CustomerImprintUsage[];
+}
+
+export interface CustomerImprintUsage {
+  customerId: string;
+  customerName: string;
+  usageCount: number;
+  lastUsedAt: Date;
+  orders?: string[]; // Order IDs where this imprint was used
+}
+
+// Mock shared imprints data
+export const mockSharedImprints: SharedImprint[] = [
+  {
+    id: "shared-flag-1",
+    designName: "American Flag",
+    description: "Classic American flag design for sleeve embroidery",
+    method: "embroidery",
+    size: { width: 3.5, height: 2.25, unit: 'in' },
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-25"),
+    tags: ["flag", "patriotic", "america", "sleeve"],
+    customerArt: [
+      {
+        id: "flag-art-1",
+        name: "american-flag.png",
+        originalName: "AMERICAN_FLAG.png",
+        url: "/lovable-uploads/1389bca3-3c1f-4978-b35f-a425ebd5abec.png",
+        type: "image/png",
+        sizeBytes: 1800000,
+        category: "customerArt",
+        uploadedAt: new Date("2024-01-01"),
+        uploadedBy: "system",
+        version: 1,
+        isLatest: true
+      }
+    ],
+    productionFiles: [
+      {
+        id: "flag-prod-1",
+        name: "american-flag-3.5x2.25.dst",
+        originalName: "flag-production.dst",
+        url: "/lovable-uploads/american-flag.dst",
+        type: "application/dst",
+        sizeBytes: 324288,
+        category: "productionFiles",
+        uploadedAt: new Date("2024-01-02"),
+        uploadedBy: "production@company.com",
+        version: 1,
+        isLatest: true
+      },
+      {
+        id: "flag-prod-2",
+        name: "american-flag-color-map.pdf",
+        originalName: "flag-color-guide.pdf",
+        url: "/lovable-uploads/flag-color-map.pdf",
+        type: "application/pdf",
+        sizeBytes: 512000,
+        category: "productionFiles",
+        uploadedAt: new Date("2024-01-02"),
+        uploadedBy: "production@company.com",
+        version: 1,
+        isLatest: true
+      }
+    ],
+    mockups: [
+      {
+        id: "flag-mockup-1",
+        name: "polo-sleeve-flag-mockup.jpg",
+        originalName: "polo-flag-mockup.jpg",
+        url: "/lovable-uploads/polo-flag-mockup.jpg",
+        type: "image/jpeg",
+        sizeBytes: 1200000,
+        category: "mockups",
+        uploadedAt: new Date("2024-01-03"),
+        uploadedBy: "design@company.com",
+        version: 1,
+        isLatest: true
+      },
+      {
+        id: "flag-mockup-2",
+        name: "jacket-sleeve-flag-mockup.jpg",
+        originalName: "jacket-flag-mockup.jpg",
+        url: "/lovable-uploads/jacket-flag-mockup.jpg",
+        type: "image/jpeg",
+        sizeBytes: 1400000,
+        category: "mockups",
+        uploadedAt: new Date("2024-01-04"),
+        uploadedBy: "design@company.com",
+        version: 1,
+        isLatest: true
+      }
+    ],
+    usageCount: 15,
+    lastUsedAt: new Date("2024-01-25"),
+    associatedCustomers: [
+      {
+        customerId: "cust-1",
+        customerName: "Tech Solutions Inc",
+        usageCount: 3,
+        lastUsedAt: new Date("2024-01-15"),
+        orders: ["order-1", "order-2", "order-3"]
+      },
+      {
+        customerId: "cust-2",
+        customerName: "Outdoor Adventures LLC",
+        usageCount: 5,
+        lastUsedAt: new Date("2024-01-20"),
+        orders: ["order-4", "order-5", "order-6", "order-7", "order-8"]
+      },
+      {
+        customerId: "cust-3",
+        customerName: "Local Fire Department",
+        usageCount: 4,
+        lastUsedAt: new Date("2024-01-25"),
+        orders: ["order-9", "order-10", "order-11", "order-12"]
+      },
+      {
+        customerId: "cust-4",
+        customerName: "Veterans Association",
+        usageCount: 3,
+        lastUsedAt: new Date("2024-01-22"),
+        orders: ["order-13", "order-14", "order-15"]
+      }
+    ]
+  }
+];
+
 // Mock data for development
 export const mockArtworkLibrary: CustomerArtworkLibrary[] = [
   {
