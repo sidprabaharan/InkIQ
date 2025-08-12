@@ -1,19 +1,33 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Upload, Filter, Grid, List, FolderOpen, FileImage, Download, Eye, MoreVertical, Calendar, User, Tag, Layers, Folder } from 'lucide-react';
+import { Search, Upload, Grid, List, FileImage, Download, Eye, MoreVertical, User, Tag, Layers } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { mockArtworkLibrary, mockSharedImprints, CustomerArtworkLibrary, MasterArtwork, ArtworkFile, ArtworkFolder, SharedImprint } from '@/types/artwork';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { mockArtworkLibrary, mockSharedImprints, ArtworkFile } from '@/types/artwork';
 import { IMPRINT_METHODS } from '@/types/imprint';
 import { useNavigate } from 'react-router-dom';
+
+// Unified imprint type that combines MasterArtwork and SharedImprint
+interface UnifiedImprint {
+  id: string;
+  designName: string;
+  imprintMethod: string;
+  associatedCustomers: Array<{ id: string; name: string }>;
+  customerArt: ArtworkFile[];
+  productionFiles: ArtworkFile[];
+  mockups: ArtworkFile[];
+  fileCount: number;
+  totalSizeBytes: number;
+  createdAt: Date;
+  updatedAt: Date;
+  tags: string[];
+}
 
 export default function ArtworkFiles() {
   const navigate = useNavigate();
@@ -21,61 +35,98 @@ export default function ArtworkFiles() {
   const [selectedCustomer, setSelectedCustomer] = useState<string>('all');
   const [selectedMethod, setSelectedMethod] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [selectedArtwork, setSelectedArtwork] = useState<MasterArtwork | null>(null);
+  const [selectedArtwork, setSelectedArtwork] = useState<UnifiedImprint | null>(null);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
-  const [selectedFolder, setSelectedFolder] = useState<ArtworkFolder | null>(null);
-  const [folderViewOpen, setFolderViewOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'folders' | 'shared'>('folders');
 
-  // Get unique customers for filter
-  const customers = useMemo(() => {
-    const uniqueCustomers = mockArtworkLibrary.map(lib => ({
-      id: lib.customerId,
-      name: lib.customerName
-    }));
-    return uniqueCustomers;
-  }, []);
-
-  // Get folders organized by method
-  const methodFolders = useMemo(() => {
-    const folders: ArtworkFolder[] = [];
+  // Create unified imprints list from both sources
+  const unifiedImprints = useMemo(() => {
+    const imprints: UnifiedImprint[] = [];
     
+    // Add imprints from customer artwork libraries
     mockArtworkLibrary.forEach(library => {
       library.folders.forEach(folder => {
-        // Apply customer filter
-        if (selectedCustomer === 'all' || library.customerId === selectedCustomer) {
-          // Apply method filter
-          if (selectedMethod === 'all' || folder.method === selectedMethod) {
-            // Apply search filter
-            if (!searchTerm || 
-                folder.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                library.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                folder.artworks.some(art => 
-                  art.designName.toLowerCase().includes(searchTerm.toLowerCase())
-                )) {
-              folders.push({
-                ...folder,
-                artworks: folder.artworks.filter(art => {
-                  if (searchTerm) {
-                    return art.designName.toLowerCase().includes(searchTerm.toLowerCase());
-                  }
-                  return true;
-                })
-              });
-            }
-          }
-        }
+        folder.artworks.forEach(artwork => {
+          imprints.push({
+            id: artwork.id,
+            designName: artwork.designName,
+            imprintMethod: artwork.method,
+            associatedCustomers: [{ id: library.customerId, name: library.customerName }],
+            customerArt: artwork.customerArt,
+            productionFiles: artwork.productionFiles,
+            mockups: artwork.mockups,
+            fileCount: artwork.fileCount,
+            totalSizeBytes: artwork.totalSizeBytes,
+            createdAt: artwork.createdAt,
+            updatedAt: artwork.updatedAt,
+            tags: artwork.tags || []
+          });
+        });
       });
     });
-    
-    return folders;
-  }, [searchTerm, selectedCustomer, selectedMethod]);
 
-  // Filter artwork (for when viewing folder contents)
-  const filteredArtwork = useMemo(() => {
-    if (!selectedFolder) return [];
-    return selectedFolder.artworks;
-  }, [selectedFolder]);
+    // Add shared imprints
+    mockSharedImprints.forEach(sharedImprint => {
+      imprints.push({
+        id: sharedImprint.id,
+        designName: sharedImprint.designName,
+        imprintMethod: sharedImprint.method,
+        associatedCustomers: sharedImprint.associatedCustomers.map(usage => ({
+          id: usage.customerId,
+          name: usage.customerName
+        })),
+        customerArt: sharedImprint.customerArt,
+        productionFiles: sharedImprint.productionFiles,
+        mockups: sharedImprint.mockups,
+        fileCount: sharedImprint.customerArt.length + sharedImprint.productionFiles.length + sharedImprint.mockups.length,
+        totalSizeBytes: [...sharedImprint.customerArt, ...sharedImprint.productionFiles, ...sharedImprint.mockups]
+          .reduce((sum, file) => sum + file.sizeBytes, 0),
+        createdAt: sharedImprint.createdAt,
+        updatedAt: sharedImprint.updatedAt,
+        tags: sharedImprint.tags || []
+      });
+    });
+
+    return imprints;
+  }, []);
+
+  // Get unique customers for filter (from unified imprints)
+  const customers = useMemo(() => {
+    const customerMap = new Map();
+    unifiedImprints.forEach(imprint => {
+      imprint.associatedCustomers.forEach(customer => {
+        customerMap.set(customer.id, customer);
+      });
+    });
+    return Array.from(customerMap.values());
+  }, [unifiedImprints]);
+
+  // Filter imprints based on search and filters
+  const filteredImprints = useMemo(() => {
+    return unifiedImprints.filter(imprint => {
+      // Customer filter
+      if (selectedCustomer !== 'all') {
+        const hasCustomer = imprint.associatedCustomers.some(c => c.id === selectedCustomer);
+        if (!hasCustomer) return false;
+      }
+
+      // Method filter
+      if (selectedMethod !== 'all' && imprint.imprintMethod !== selectedMethod) {
+        return false;
+      }
+
+      // Search filter
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        return (
+          imprint.designName.toLowerCase().includes(searchLower) ||
+          imprint.associatedCustomers.some(c => c.name.toLowerCase().includes(searchLower)) ||
+          imprint.tags.some(tag => tag.toLowerCase().includes(searchLower))
+        );
+      }
+
+      return true;
+    });
+  }, [unifiedImprints, searchTerm, selectedCustomer, selectedMethod]);
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
@@ -93,23 +144,17 @@ export default function ArtworkFiles() {
     }).format(date);
   };
 
-  const handlePreviewArtwork = (artwork: MasterArtwork) => {
+  const handlePreviewArtwork = (artwork: UnifiedImprint) => {
     setSelectedArtwork(artwork);
     setPreviewDialogOpen(true);
   };
 
-  const handleFolderClick = (folder: ArtworkFolder) => {
-    setSelectedFolder(folder);
-    setFolderViewOpen(true);
-  };
-
   const getTotalStats = () => {
-    const totalFolders = mockArtworkLibrary.reduce((sum, lib) => sum + lib.folders.length, 0);
-    const totalArtwork = mockArtworkLibrary.reduce((sum, lib) => sum + lib.artworkCount, 0);
-    const totalSize = mockArtworkLibrary.reduce((sum, lib) => sum + lib.totalSizeBytes, 0);
-    const totalCustomers = mockArtworkLibrary.length;
+    const totalImprints = unifiedImprints.length;
+    const totalSize = unifiedImprints.reduce((sum, imprint) => sum + imprint.totalSizeBytes, 0);
+    const totalCustomers = customers.length;
     
-    return { totalFolders, totalArtwork, totalSize, totalCustomers };
+    return { totalImprints, totalSize, totalCustomers };
   };
 
   const stats = getTotalStats();
@@ -119,9 +164,9 @@ export default function ArtworkFiles() {
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Artwork Files</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Imprint Library</h1>
           <p className="text-muted-foreground">
-            Manage customer artwork, production files, and mockups
+            Manage all imprints, artwork files, and associated customers
           </p>
         </div>
         <Button className="gap-2">
@@ -134,11 +179,11 @@ export default function ArtworkFiles() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Artwork</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Imprints</CardTitle>
             <FileImage className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalArtwork}</div>
+            <div className="text-2xl font-bold">{stats.totalImprints}</div>
             <p className="text-xs text-muted-foreground">
               Across {stats.totalCustomers} customers
             </p>
@@ -158,7 +203,7 @@ export default function ArtworkFiles() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Customers</CardTitle>
+            <CardTitle className="text-sm font-medium">Associated Customers</CardTitle>
             <User className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -177,7 +222,7 @@ export default function ArtworkFiles() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search artwork by name or customer..."
+                placeholder="Search imprints by name, customer, or tags..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9"
@@ -229,313 +274,133 @@ export default function ArtworkFiles() {
         </CardContent>
       </Card>
 
-      {/* Main Content Tabs */}
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'folders' | 'shared')} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="folders">Customer Folders</TabsTrigger>
-          <TabsTrigger value="shared">Shared Imprints</TabsTrigger>
-        </TabsList>
+      {/* Results Summary */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          {filteredImprints.length} imprint{filteredImprints.length !== 1 ? 's' : ''} found
+        </p>
+      </div>
 
-        <TabsContent value="folders" className="space-y-4">
-        {!folderViewOpen ? (
-          <>
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">
-                {methodFolders.length} folder{methodFolders.length !== 1 ? 's' : ''} found
-              </p>
-            </div>
+      {/* Imprints Grid/List */}
+      {viewMode === 'grid' ? (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredImprints.map((imprint) => (
+            <Card 
+              key={imprint.id} 
+              className="group cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => navigate(`/imprint/${imprint.id}`)}
+            >
+              <CardHeader className="pb-2">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-lg truncate">{imprint.designName}</CardTitle>
+                    <CardDescription className="truncate">
+                      {imprint.associatedCustomers.length === 1 
+                        ? imprint.associatedCustomers[0].name
+                        : `${imprint.associatedCustomers.length} customers`
+                      }
+                    </CardDescription>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handlePreviewArtwork(imprint)}>
+                        <Eye className="h-4 w-4 mr-2" />
+                        Preview
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate(`/imprint/${imprint.id}`)}>
+                        <FileImage className="h-4 w-4 mr-2" />
+                        View Details
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Download className="h-4 w-4 mr-2" />
+                        Download
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {/* Image Preview */}
+                <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+                  {imprint.customerArt.length > 0 ? (
+                    <img 
+                      src={imprint.customerArt[0].url} 
+                      alt={imprint.designName}
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        target.nextElementSibling?.classList.remove('hidden');
+                      }}
+                    />
+                  ) : null}
+                  <div className={`flex flex-col items-center text-muted-foreground ${imprint.customerArt.length > 0 ? 'hidden' : ''}`}>
+                    <FileImage className="h-8 w-8 mb-2" />
+                    <span className="text-xs">No Preview</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">
+                    {IMPRINT_METHODS.find(m => m.value === imprint.imprintMethod)?.label || imprint.imprintMethod}
+                  </Badge>
+                  {imprint.associatedCustomers.length > 1 && (
+                    <Badge variant="outline">
+                      Shared
+                    </Badge>
+                  )}
+                </div>
 
-            {/* Folder View */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {methodFolders.map((folder) => {
-                const customer = mockArtworkLibrary.find(lib => 
-                  lib.folders.some(f => f.id === folder.id)
-                );
-                return (
-                  <Card 
-                    key={folder.id} 
-                    className="group cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => handleFolderClick(folder)}
-                  >
-                    <CardHeader className="pb-2">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="p-2 bg-muted rounded-lg">
-                            <Folder className="h-8 w-8 text-primary" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <CardTitle className="text-lg truncate">{folder.name}</CardTitle>
-                            <CardDescription className="truncate">{customer?.customerName}</CardDescription>
-                          </div>
-                        </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                              <Upload className="h-4 w-4 mr-2" />
-                              Upload Files
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Download className="h-4 w-4 mr-2" />
-                              Download All
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary">
-                          {IMPRINT_METHODS.find(m => m.value === folder.method)?.label || folder.method}
-                        </Badge>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                        <div className="text-center">
-                          <div className="font-medium">{folder.artworkCount}</div>
-                          <div>Artwork{folder.artworkCount !== 1 ? 's' : ''}</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-medium">{formatFileSize(folder.totalSizeBytes)}</div>
-                          <div>Size</div>
-                        </div>
-                      </div>
+                <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
+                  <div className="text-center">
+                    <div className="font-medium">{imprint.customerArt.length}</div>
+                    <div>Customer</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-medium">{imprint.productionFiles.length}</div>
+                    <div>Production</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-medium">{imprint.mockups.length}</div>
+                    <div>Mockups</div>
+                  </div>
+                </div>
 
-                      <div className="text-xs text-muted-foreground">
-                        <div>Last updated: {formatDate(folder.lastUpdatedAt)}</div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => setFolderViewOpen(false)}
-                  className="gap-2"
-                >
-                  <Folder className="h-4 w-4" />
-                  Back to Folders
-                </Button>
-                <span className="text-muted-foreground">/</span>
-                <span className="font-medium">{selectedFolder?.name}</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {filteredArtwork.length} artwork file{filteredArtwork.length !== 1 ? 's' : ''} in folder
-              </p>
-            </div>
-
-            {viewMode === 'grid' ? (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {filteredArtwork.map((artwork) => (
-                  <Card 
-                    key={artwork.id} 
-                    className="group cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => navigate(`/imprint/${artwork.id}`)}
-                  >
-                    <CardHeader className="pb-2">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 min-w-0">
-                          <CardTitle className="text-lg truncate">{artwork.designName}</CardTitle>
-                          <CardDescription className="truncate">{artwork.customerName}</CardDescription>
-                        </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handlePreviewArtwork(artwork)}>
-                              <Eye className="h-4 w-4 mr-2" />
-                              Preview
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => navigate(`/imprint/${artwork.id}`)}>
-                              <FileImage className="h-4 w-4 mr-2" />
-                              View Imprint Details
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Download className="h-4 w-4 mr-2" />
-                              Download
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      {/* Image Preview */}
-                      <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
-                        {artwork.customerArt.length > 0 ? (
-                          <img 
-                            src={artwork.customerArt[0].url} 
-                            alt={artwork.designName}
-                            className="w-full h-full object-contain"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                              target.nextElementSibling?.classList.remove('hidden');
-                            }}
-                          />
-                        ) : null}
-                        <div className={`flex flex-col items-center text-muted-foreground ${artwork.customerArt.length > 0 ? 'hidden' : ''}`}>
-                          <FileImage className="h-8 w-8 mb-2" />
-                          <span className="text-xs">No Preview</span>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary">
-                          {IMPRINT_METHODS.find(m => m.value === artwork.method)?.label || artwork.method}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {artwork.size.width}" × {artwork.size.height}"
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
-                        <div className="text-center">
-                          <div className="font-medium">{artwork.customerArt.length}</div>
-                          <div>Customer</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-medium">{artwork.productionFiles.length}</div>
-                          <div>Production</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-medium">{artwork.mockups.length}</div>
-                          <div>Mockups</div>
-                        </div>
-                      </div>
-
-                      <div className="text-xs text-muted-foreground space-y-1">
-                        <div>Last used: {artwork.lastUsedAt ? formatDate(artwork.lastUsedAt) : 'Never'}</div>
-                        <div>Used {artwork.usageCount} times</div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <Card>
-                <CardContent className="p-0">
-                  <div className="divide-y">
-                    {filteredArtwork.map((artwork) => (
-                      <div key={artwork.id} className="flex items-center gap-4 p-4 hover:bg-muted/50">
-                        {/* Image Preview */}
-                        <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
-                          {artwork.customerArt.length > 0 ? (
-                            <img 
-                              src={artwork.customerArt[0].url} 
-                              alt={artwork.designName}
-                              className="w-full h-full object-contain"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.style.display = 'none';
-                                target.nextElementSibling?.classList.remove('hidden');
-                              }}
-                            />
-                          ) : null}
-                          <div className={`flex flex-col items-center text-muted-foreground text-xs ${artwork.customerArt.length > 0 ? 'hidden' : ''}`}>
-                            <FileImage className="h-6 w-6" />
-                          </div>
-                        </div>
-                        
-                        <div className="flex-1 min-w-0 space-y-1">
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold truncate">{artwork.designName}</h3>
-                            <Badge variant="secondary">
-                              {IMPRINT_METHODS.find(m => m.value === artwork.method)?.label || artwork.method}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground truncate">{artwork.customerName}</p>
-                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span>{artwork.size.width}" × {artwork.size.height}"</span>
-                            <span>{artwork.fileCount} files</span>
-                            <span>{formatFileSize(artwork.totalSizeBytes)}</span>
-                            <span>Used {artwork.usageCount} times</span>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm" onClick={() => handlePreviewArtwork(artwork)}>
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem>
-                                <Download className="h-4 w-4 mr-2" />
-                                Download All
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </div>
+                <div className="space-y-1">
+                  <div className="text-xs text-muted-foreground">
+                    <span className="font-medium">Associated Customers:</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {imprint.associatedCustomers.slice(0, 2).map((customer, index) => (
+                      <Badge key={customer.id} variant="outline" className="text-xs">
+                        {customer.name}
+                      </Badge>
                     ))}
+                    {imprint.associatedCustomers.length > 2 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{imprint.associatedCustomers.length - 2} more
+                      </Badge>
+                    )}
                   </div>
-                </CardContent>
-              </Card>
-            )}
-          </>
-        )}
-        </TabsContent>
-
-        <TabsContent value="shared" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              {mockSharedImprints.length} shared imprint{mockSharedImprints.length !== 1 ? 's' : ''} available
-            </p>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {mockSharedImprints.map((imprint) => (
-              <Card 
-                key={imprint.id} 
-                className="group cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => navigate(`/imprint/${imprint.id}`)}
-              >
-                <CardHeader className="pb-2">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="text-lg truncate">{imprint.designName}</CardTitle>
-                      <CardDescription className="truncate">{imprint.description}</CardDescription>
-                    </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => navigate(`/imprint/${imprint.id}`)}>
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Download className="h-4 w-4 mr-2" />
-                          Download All
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Card>
+          <CardContent className="p-0">
+            <div className="divide-y">
+              {filteredImprints.map((imprint) => (
+                <div key={imprint.id} className="flex items-center gap-4 p-4 hover:bg-muted/50 cursor-pointer"
+                     onClick={() => navigate(`/imprint/${imprint.id}`)}>
                   {/* Image Preview */}
-                  <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+                  <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                     {imprint.customerArt.length > 0 ? (
                       <img 
                         src={imprint.customerArt[0].url} 
@@ -548,41 +413,72 @@ export default function ArtworkFiles() {
                         }}
                       />
                     ) : null}
-                    <div className={`flex flex-col items-center text-muted-foreground ${imprint.customerArt.length > 0 ? 'hidden' : ''}`}>
-                      <FileImage className="h-8 w-8 mb-2" />
-                      <span className="text-xs">No Preview</span>
+                    <div className={`flex flex-col items-center text-muted-foreground text-xs ${imprint.customerArt.length > 0 ? 'hidden' : ''}`}>
+                      <FileImage className="h-6 w-6" />
                     </div>
                   </div>
                   
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold truncate">{imprint.designName}</h3>
+                      <Badge variant="secondary">
+                        {IMPRINT_METHODS.find(m => m.value === imprint.imprintMethod)?.label || imprint.imprintMethod}
+                      </Badge>
+                      {imprint.associatedCustomers.length > 1 && (
+                        <Badge variant="outline">Shared</Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      <span>{imprint.fileCount} files</span>
+                      <span>{formatFileSize(imprint.totalSizeBytes)}</span>
+                      <span>
+                        {imprint.associatedCustomers.length === 1 
+                          ? imprint.associatedCustomers[0].name
+                          : `${imprint.associatedCustomers.length} customers`
+                        }
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {imprint.associatedCustomers.slice(0, 3).map((customer) => (
+                        <Badge key={customer.id} variant="outline" className="text-xs">
+                          {customer.name}
+                        </Badge>
+                      ))}
+                      {imprint.associatedCustomers.length > 3 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{imprint.associatedCustomers.length - 3} more
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary">
-                      {IMPRINT_METHODS.find(m => m.value === imprint.method)?.label || imprint.method}
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">
-                      {imprint.size.width}" × {imprint.size.height}"
-                    </span>
+                    <Button variant="ghost" size="sm" onClick={(e) => {
+                      e.stopPropagation();
+                      handlePreviewArtwork(imprint);
+                    }}>
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                        <Button variant="ghost" size="sm">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>
+                          <Download className="h-4 w-4 mr-2" />
+                          Download All
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                    <div className="text-center">
-                      <div className="font-medium">{imprint.associatedCustomers.length}</div>
-                      <div>Customers</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="font-medium">{imprint.usageCount}</div>
-                      <div>Uses</div>
-                    </div>
-                  </div>
-
-                  <div className="text-xs text-muted-foreground space-y-1">
-                    <div>Last used: {imprint.lastUsedAt ? formatDate(imprint.lastUsedAt) : 'Never'}</div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Preview Dialog */}
       <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
@@ -594,25 +490,31 @@ export default function ArtworkFiles() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="font-medium">Customer:</span> {selectedArtwork.customerName}
-                </div>
-                <div>
                   <span className="font-medium">Method:</span>{' '}
-                  {IMPRINT_METHODS.find(m => m.value === selectedArtwork.method)?.label || selectedArtwork.method}
-                </div>
-                <div>
-                  <span className="font-medium">Size:</span> {selectedArtwork.size.width}" × {selectedArtwork.size.height}"
+                  {IMPRINT_METHODS.find(m => m.value === selectedArtwork.imprintMethod)?.label || selectedArtwork.imprintMethod}
                 </div>
                 <div>
                   <span className="font-medium">Files:</span> {selectedArtwork.fileCount}
                 </div>
+                <div>
+                  <span className="font-medium">Associated Customers:</span>{' '}
+                  {selectedArtwork.associatedCustomers.length}
+                </div>
+                <div>
+                  <span className="font-medium">Size:</span> {formatFileSize(selectedArtwork.totalSizeBytes)}
+                </div>
               </div>
               
-              {selectedArtwork.description && (
-                <div>
-                  <span className="font-medium">Description:</span> {selectedArtwork.description}
+              <div>
+                <span className="font-medium">Customers:</span>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {selectedArtwork.associatedCustomers.map((customer) => (
+                    <Badge key={customer.id} variant="outline">
+                      {customer.name}
+                    </Badge>
+                  ))}
                 </div>
-              )}
+              </div>
 
               <Tabs defaultValue="customer-art" className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
