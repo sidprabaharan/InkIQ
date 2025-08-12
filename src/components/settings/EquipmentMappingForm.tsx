@@ -101,14 +101,14 @@ export function EquipmentMappingForm({ equipmentMapping, onUpdate }: EquipmentMa
         <div className="space-y-2">
           <Label>Fallback Equipment Type</Label>
           <Select
-            value={equipmentMapping.fallbackEquipmentType || ''}
-            onValueChange={(value) => updateMapping({ fallbackEquipmentType: value })}
+            value={equipmentMapping.fallbackEquipmentType || 'none'}
+            onValueChange={(value) => updateMapping({ fallbackEquipmentType: value === "none" ? "" : value })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select fallback equipment type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">None</SelectItem>
+              <SelectItem value="none">None</SelectItem>
               {EQUIPMENT_TYPES.map((type) => (
                 <SelectItem key={type} value={type}>
                   {type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}

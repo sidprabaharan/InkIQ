@@ -25,7 +25,7 @@ export function ArtworkSelectionDialog({
   customerId
 }: ArtworkSelectionDialogProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState<string>("");
+  const [selectedCustomer, setSelectedCustomer] = useState<string>("all");
   const [selectedArtwork, setSelectedArtwork] = useState<MasterArtwork | null>(null);
   const [mockupSelectionOpen, setMockupSelectionOpen] = useState(false);
 
@@ -49,7 +49,7 @@ export function ArtworkSelectionDialog({
     });
 
     // Apply filters
-    if (selectedCustomer) {
+    if (selectedCustomer && selectedCustomer !== "all") {
       allArtwork = allArtwork.filter(art => art.customerId === selectedCustomer);
     }
 
@@ -122,7 +122,7 @@ export function ArtworkSelectionDialog({
                     <SelectValue placeholder="All Customers" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Customers</SelectItem>
+                    <SelectItem value="all">All Customers</SelectItem>
                     {customers.map((customer) => (
                       <SelectItem key={customer.customerId} value={customer.customerId}>
                         {customer.customerName}
