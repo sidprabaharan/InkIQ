@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Download, Eye, FileImage, Users, Calendar, Tag, Layers, MoreVertical } from 'lucide-react';
+import { ArrowLeft, Download, Eye, FileImage, Users, Calendar, Tag, Layers, MoreVertical, Package, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +13,54 @@ import { SharedImprint, ArtworkFile } from '@/types/artwork';
 import { IMPRINT_METHODS } from '@/types/imprint';
 import { useNavigate, useParams } from 'react-router-dom';
 import { mockSharedImprints } from '@/types/artwork';
+
+// Mock orders data
+const mockOrders = [
+  {
+    id: "Q-3042",
+    orderNumber: "Q-3042",
+    customerName: "Acme Corporation",
+    status: "Production",
+    orderDate: new Date("2024-03-10"),
+    dueDate: new Date("2024-03-24"),
+    totalItems: 150,
+    value: 2247.50,
+    garmentTypes: ["Polo Shirts", "T-Shirts"]
+  },
+  {
+    id: "Q-3089", 
+    orderNumber: "Q-3089",
+    customerName: "Tech Solutions Ltd",
+    status: "Quote",
+    orderDate: new Date("2024-03-15"),
+    dueDate: new Date("2024-03-29"),
+    totalItems: 75,
+    value: 1123.75,
+    garmentTypes: ["Hoodies"]
+  },
+  {
+    id: "Q-3156",
+    orderNumber: "Q-3156", 
+    customerName: "Green Valley School",
+    status: "Completed",
+    orderDate: new Date("2024-02-20"),
+    dueDate: new Date("2024-03-05"),
+    totalItems: 200,
+    value: 1800.00,
+    garmentTypes: ["T-Shirts", "Caps"]
+  },
+  {
+    id: "Q-3201",
+    orderNumber: "Q-3201",
+    customerName: "Mountain Adventures",
+    status: "Shipped", 
+    orderDate: new Date("2024-03-08"),
+    dueDate: new Date("2024-03-22"),
+    totalItems: 100,
+    value: 1650.00,
+    garmentTypes: ["Jackets", "Beanies"]
+  }
+];
 
 export default function ImprintDetail() {
   const navigate = useNavigate();
@@ -59,6 +107,21 @@ export default function ImprintDetail() {
   };
 
   const methodLabel = IMPRINT_METHODS.find(m => m.value === imprint.method)?.label || imprint.method;
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case "Completed":
+        return "default";
+      case "Production": 
+        return "destructive";
+      case "Shipped":
+        return "secondary";
+      case "Quote":
+        return "outline";
+      default:
+        return "outline";
+    }
+  };
 
   return (
     <div className="flex-1 space-y-6 p-6 md:p-8">
@@ -180,6 +243,56 @@ export default function ImprintDetail() {
                 </div>
                 <div className="text-sm text-muted-foreground">
                   Last: {formatDate(customer.lastUsedAt)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Associated Orders */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Package className="h-5 w-5" />
+            Associated Orders ({mockOrders.length})
+          </CardTitle>
+          <CardDescription>
+            Orders that include this imprint
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {mockOrders.map((order) => (
+              <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                      <Package className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <div className="font-medium">{order.orderNumber}</div>
+                      <div className="text-sm text-muted-foreground">{order.customerName}</div>
+                    </div>
+                  </div>
+                  <div className="hidden md:flex items-center gap-4">
+                    <div className="text-sm">
+                      <div className="font-medium">{order.totalItems} items</div>
+                      <div className="text-muted-foreground">{order.garmentTypes.join(", ")}</div>
+                    </div>
+                    <div className="text-sm">
+                      <div className="font-medium">${order.value.toFixed(2)}</div>
+                      <div className="text-muted-foreground">Due: {formatDate(order.dueDate)}</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Badge variant={getStatusBadgeVariant(order.status)}>
+                    {order.status}
+                  </Badge>
+                  <Button variant="ghost" size="sm" onClick={() => navigate(`/quotes/${order.id.split('-')[1]}/edit`)}>
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             ))}
