@@ -141,19 +141,12 @@ export default function ImprintDetail() {
             </div>
           </div>
           
-          {imprint.tags.length > 0 && (
-            <div className="mt-4">
-              <div className="text-sm font-medium mb-2">Tags</div>
-              <div className="flex flex-wrap gap-2">
-                {imprint.tags.map((tag, index) => (
-                  <Badge key={index} variant="outline" className="text-xs">
-                    <Tag className="h-3 w-3 mr-1" />
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
+          <div className="mt-4">
+            <div className="text-sm font-medium mb-2">Notes</div>
+            <div className="p-3 bg-muted/30 rounded-lg text-sm text-muted-foreground">
+              {imprint.description || "No additional notes available for this imprint."}
             </div>
-          )}
+          </div>
         </CardContent>
       </Card>
 
