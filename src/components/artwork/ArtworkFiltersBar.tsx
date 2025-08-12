@@ -37,12 +37,15 @@ export function ArtworkFiltersBar({
 
   const clearFilters = () => {
     onSearchChange('');
-    onMethodChange('');
-    onCustomerChange('');
+    onMethodChange('all');
+    onCustomerChange('all');
     selectedTags.forEach(tag => onTagToggle(tag));
   };
 
-  const hasActiveFilters = searchQuery || selectedMethod || selectedCustomer || selectedTags.length > 0;
+  const hasActiveFilters = searchQuery || 
+    (selectedMethod && selectedMethod !== 'all') || 
+    (selectedCustomer && selectedCustomer !== 'all') || 
+    selectedTags.length > 0;
 
   return (
     <div className="space-y-4">
@@ -97,7 +100,7 @@ export function ArtworkFiltersBar({
             <SelectValue placeholder="All Methods" />
           </SelectTrigger>
           <SelectContent className="bg-background border shadow-md">
-            <SelectItem value="">All Methods</SelectItem>
+            <SelectItem value="all">All Methods</SelectItem>
             {IMPRINT_METHODS.map(method => (
               <SelectItem key={method.value} value={method.value}>
                 {method.label}
@@ -111,7 +114,7 @@ export function ArtworkFiltersBar({
             <SelectValue placeholder="All Customers" />
           </SelectTrigger>
           <SelectContent className="bg-background border shadow-md">
-            <SelectItem value="">All Customers</SelectItem>
+            <SelectItem value="all">All Customers</SelectItem>
             {uniqueCustomers.map(customer => (
               <SelectItem key={customer} value={customer}>
                 {customer}

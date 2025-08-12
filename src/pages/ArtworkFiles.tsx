@@ -10,8 +10,8 @@ import { useToast } from "../hooks/use-toast";
 
 export default function ArtworkFiles() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedMethod, setSelectedMethod] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState("");
+  const [selectedMethod, setSelectedMethod] = useState("all");
+  const [selectedCustomer, setSelectedCustomer] = useState("all");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   
@@ -24,8 +24,8 @@ export default function ArtworkFiles() {
       imprint.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       imprint.description?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesMethod = !selectedMethod || imprint.decorationMethod === selectedMethod;
-    const matchesCustomer = !selectedCustomer || imprint.customerName === selectedCustomer;
+    const matchesMethod = selectedMethod === 'all' || imprint.decorationMethod === selectedMethod;
+    const matchesCustomer = selectedCustomer === 'all' || imprint.customerName === selectedCustomer;
     const matchesTags = selectedTags.length === 0 || 
       selectedTags.some(tag => imprint.tags.includes(tag));
 
@@ -149,8 +149,8 @@ export default function ArtworkFiles() {
             </p>
             <Button onClick={() => {
               setSearchQuery("");
-              setSelectedMethod("");
-              setSelectedCustomer("");
+              setSelectedMethod("all");
+              setSelectedCustomer("all");
               setSelectedTags([]);
             }}>
               Clear Filters
