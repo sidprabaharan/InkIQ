@@ -662,15 +662,8 @@ export default function Customers() {
               <div className="grid grid-cols-3 gap-6">
                 {/* Billing Address */}
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div>
                     <h3 className="font-medium text-sm text-gray-700">Billing Address</h3>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => setEditBillingAddressOpen(true)}
-                    >
-                      <Edit className="h-3 w-3" />
-                    </Button>
                   </div>
                   {selectedCustomer.billingAddress ? (
                     <div className="text-sm text-gray-600">
@@ -690,15 +683,8 @@ export default function Customers() {
 
                 {/* Shipping Address */}
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div>
                     <h3 className="font-medium text-sm text-gray-700">Shipping Address</h3>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => setEditShippingAddressOpen(true)}
-                    >
-                      <Edit className="h-3 w-3" />
-                    </Button>
                   </div>
                   {selectedCustomer.shippingAddress ? (
                     <div className="text-sm text-gray-600">
@@ -718,15 +704,8 @@ export default function Customers() {
 
                 {/* Company & Tax Info */}
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div>
                     <h3 className="font-medium text-sm text-gray-700">Company Details</h3>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => setEditTaxInfoOpen(true)}
-                    >
-                      <Edit className="h-3 w-3" />
-                    </Button>
                   </div>
                   <div className="space-y-1 text-sm text-gray-600">
                     {selectedCustomer.industry && (
