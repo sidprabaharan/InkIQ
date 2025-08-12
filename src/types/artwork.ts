@@ -199,7 +199,7 @@ export const mockSharedImprints: SharedImprint[] = [
         uploadedBy: "design@company.com",
         version: 1,
         isLatest: true,
-        colors: "1147, 1000, 1134"
+        colors: "Red, White, Blue (Traditional American Flag)"
       },
       {
         id: "flag-mockup-2",
@@ -213,7 +213,7 @@ export const mockSharedImprints: SharedImprint[] = [
         uploadedBy: "design@company.com",
         version: 1,
         isLatest: true,
-        colors: "1000, 1175, 1001"
+        colors: "Black, Gray, White (Monochrome Flag)"
       },
       {
         id: "flag-mockup-3",
@@ -227,7 +227,7 @@ export const mockSharedImprints: SharedImprint[] = [
         uploadedBy: "design@company.com",
         version: 1,
         isLatest: true,
-        colors: "1134, 1142, 1055"
+        colors: "Navy, Gold, Cream (Vintage Flag)"
       }
     ],
     usageCount: 15,
@@ -260,182 +260,6 @@ export const mockSharedImprints: SharedImprint[] = [
         usageCount: 3,
         lastUsedAt: new Date("2024-01-22"),
         orders: ["order-13", "order-14", "order-15"]
-      }
-    ]
-  },
-  {
-    id: "shared-eagle-1",
-    designName: "Golden Eagle",
-    description: "Majestic eagle design for back embroidery",
-    method: "embroidery",
-    size: { width: 4.0, height: 4.5, unit: 'in' },
-    createdAt: new Date("2024-01-05"),
-    updatedAt: new Date("2024-01-20"),
-    tags: ["eagle", "patriotic", "bird", "back"],
-    customerArt: [
-      {
-        id: "eagle-art-1",
-        name: "golden-eagle.png",
-        originalName: "GOLDEN_EAGLE.png",
-        url: "/lovable-uploads/2436aa64-1e48-430d-a686-cc02950cceb4.png",
-        type: "image/png",
-        sizeBytes: 2100000,
-        category: "customerArt",
-        uploadedAt: new Date("2024-01-05"),
-        uploadedBy: "system",
-        version: 1,
-        isLatest: true
-      }
-    ],
-    productionFiles: [
-      {
-        id: "eagle-prod-1",
-        name: "golden-eagle-4x4.5.dst",
-        originalName: "eagle-production.dst",
-        url: "/lovable-uploads/golden-eagle.dst",
-        type: "application/dst",
-        sizeBytes: 456288,
-        category: "productionFiles",
-        uploadedAt: new Date("2024-01-06"),
-        uploadedBy: "production@company.com",
-        version: 1,
-        isLatest: true
-      }
-    ],
-    mockups: [
-      {
-        id: "eagle-mockup-1",
-        name: "jacket-back-eagle-mockup.jpg",
-        originalName: "jacket-eagle-mockup.jpg",
-        url: "/lovable-uploads/jacket-eagle-mockup.jpg",
-        type: "image/jpeg",
-        sizeBytes: 1500000,
-        category: "mockups",
-        uploadedAt: new Date("2024-01-07"),
-        uploadedBy: "design@company.com",
-        version: 1,
-        isLatest: true,
-        colors: "1142, 1038, 1175"
-      },
-      {
-        id: "eagle-mockup-2",
-        name: "hoodie-back-eagle-mockup.jpg",
-        originalName: "hoodie-eagle-mockup.jpg",
-        url: "/lovable-uploads/hoodie-eagle-mockup.jpg",
-        type: "image/jpeg",
-        sizeBytes: 1600000,
-        category: "mockups",
-        uploadedAt: new Date("2024-01-08"),
-        uploadedBy: "design@company.com",
-        version: 1,
-        isLatest: true,
-        colors: "1142, 1000, 1130"
-      }
-    ],
-    usageCount: 8,
-    lastUsedAt: new Date("2024-01-20"),
-    associatedCustomers: [
-      {
-        customerId: "cust-2",
-        customerName: "Outdoor Adventures LLC",
-        usageCount: 4,
-        lastUsedAt: new Date("2024-01-20"),
-        orders: ["order-16", "order-17", "order-18", "order-19"]
-      },
-      {
-        customerId: "cust-5",
-        customerName: "Mountain Gear Co",
-        usageCount: 4,
-        lastUsedAt: new Date("2024-01-18"),
-        orders: ["order-20", "order-21", "order-22", "order-23"]
-      }
-    ]
-  },
-  {
-    id: "shared-compass-1",
-    designName: "Compass Rose",
-    description: "Nautical compass design for chest embroidery",
-    method: "embroidery",
-    size: { width: 3.0, height: 3.0, unit: 'in' },
-    createdAt: new Date("2024-01-10"),
-    updatedAt: new Date("2024-01-18"),
-    tags: ["compass", "nautical", "navigation", "chest"],
-    customerArt: [
-      {
-        id: "compass-art-1",
-        name: "compass-rose.png",
-        originalName: "COMPASS_ROSE.png",
-        url: "/lovable-uploads/3341acd9-99bb-4638-8a1d-d74e7a28f2e5.png",
-        type: "image/png",
-        sizeBytes: 1900000,
-        category: "customerArt",
-        uploadedAt: new Date("2024-01-10"),
-        uploadedBy: "system",
-        version: 1,
-        isLatest: true
-      }
-    ],
-    productionFiles: [
-      {
-        id: "compass-prod-1",
-        name: "compass-rose-3x3.dst",
-        originalName: "compass-production.dst",
-        url: "/lovable-uploads/compass-rose.dst",
-        type: "application/dst",
-        sizeBytes: 298288,
-        category: "productionFiles",
-        uploadedAt: new Date("2024-01-11"),
-        uploadedBy: "production@company.com",
-        version: 1,
-        isLatest: true
-      }
-    ],
-    mockups: [
-      {
-        id: "compass-mockup-1",
-        name: "polo-chest-compass-mockup.jpg",
-        originalName: "polo-compass-mockup.jpg",
-        url: "/lovable-uploads/polo-compass-mockup.jpg",
-        type: "image/jpeg",
-        sizeBytes: 1100000,
-        category: "mockups",
-        uploadedAt: new Date("2024-01-12"),
-        uploadedBy: "design@company.com",
-        version: 1,
-        isLatest: true,
-        colors: "1134, 1142, 1000"
-      },
-      {
-        id: "compass-mockup-2",
-        name: "tshirt-chest-compass-mockup.jpg",
-        originalName: "tshirt-compass-mockup.jpg",
-        url: "/lovable-uploads/tshirt-compass-mockup.jpg",
-        type: "image/jpeg",
-        sizeBytes: 1200000,
-        category: "mockups",
-        uploadedAt: new Date("2024-01-13"),
-        uploadedBy: "design@company.com",
-        version: 1,
-        isLatest: true,
-        colors: "1147, 1001, 1038"
-      }
-    ],
-    usageCount: 12,
-    lastUsedAt: new Date("2024-01-18"),
-    associatedCustomers: [
-      {
-        customerId: "cust-6",
-        customerName: "Marine Supply Co",
-        usageCount: 6,
-        lastUsedAt: new Date("2024-01-18"),
-        orders: ["order-24", "order-25", "order-26", "order-27", "order-28", "order-29"]
-      },
-      {
-        customerId: "cust-7",
-        customerName: "Sailing Club",
-        usageCount: 6,
-        lastUsedAt: new Date("2024-01-16"),
-        orders: ["order-30", "order-31", "order-32", "order-33", "order-34", "order-35"]
       }
     ]
   }
