@@ -11,10 +11,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { mockArtworkLibrary, CustomerArtworkLibrary, MasterArtwork, ArtworkFile, ArtworkFolder } from '@/types/artwork';
+import { mockArtworkLibrary, mockSharedImprints, CustomerArtworkLibrary, MasterArtwork, ArtworkFile, ArtworkFolder, SharedImprint } from '@/types/artwork';
 import { IMPRINT_METHODS } from '@/types/imprint';
+import { useNavigate } from 'react-router-dom';
 
 export default function ArtworkFiles() {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<string>('all');
   const [selectedMethod, setSelectedMethod] = useState<string>('all');
@@ -23,6 +25,7 @@ export default function ArtworkFiles() {
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState<ArtworkFolder | null>(null);
   const [folderViewOpen, setFolderViewOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'folders' | 'shared'>('folders');
 
   // Get unique customers for filter
   const customers = useMemo(() => {
@@ -226,8 +229,14 @@ export default function ArtworkFiles() {
         </CardContent>
       </Card>
 
-      {/* Results */}
-      <div className="space-y-4">
+      {/* Main Content Tabs */}
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'folders' | 'shared')} className="space-y-4">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="folders">Customer Folders</TabsTrigger>
+          <TabsTrigger value="shared">Shared Imprints</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="folders" className="space-y-4">
         {!folderViewOpen ? (
           <>
             <div className="flex items-center justify-between">
@@ -329,7 +338,11 @@ export default function ArtworkFiles() {
             {viewMode === 'grid' ? (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {filteredArtwork.map((artwork) => (
-                  <Card key={artwork.id} className="group cursor-pointer hover:shadow-md transition-shadow">
+                  <Card 
+                    key={artwork.id} 
+                    className="group cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => navigate(`/imprint/${artwork.id}`)}
+                  >
                     <CardHeader className="pb-2">
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
@@ -347,7 +360,7 @@ export default function ArtworkFiles() {
                               <Eye className="h-4 w-4 mr-2" />
                               Preview
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => window.location.href = `/imprint/${artwork.id}`}>
+                            <DropdownMenuItem onClick={() => navigate(`/imprint/${artwork.id}`)}>
                               <FileImage className="h-4 w-4 mr-2" />
                               View Imprint Details
                             </DropdownMenuItem>
@@ -479,7 +492,97 @@ export default function ArtworkFiles() {
             )}
           </>
         )}
-      </div>
+        </TabsContent>
+
+        <TabsContent value="shared" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              {mockSharedImprints.length} shared imprint{mockSharedImprints.length !== 1 ? 's' : ''} available
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {mockSharedImprints.map((imprint) => (
+              <Card 
+                key={imprint.id} 
+                className="group cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => navigate(`/imprint/${imprint.id}`)}
+              >
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-lg truncate">{imprint.designName}</CardTitle>
+                      <CardDescription className="truncate">{imprint.description}</CardDescription>
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => navigate(`/imprint/${imprint.id}`)}>
+                          <Eye className="h-4 w-4 mr-2" />
+                          View Details
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Download className="h-4 w-4 mr-2" />
+                          Download All
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {/* Image Preview */}
+                  <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+                    {imprint.customerArt.length > 0 ? (
+                      <img 
+                        src={imprint.customerArt[0].url} 
+                        alt={imprint.designName}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          target.nextElementSibling?.classList.remove('hidden');
+                        }}
+                      />
+                    ) : null}
+                    <div className={`flex flex-col items-center text-muted-foreground ${imprint.customerArt.length > 0 ? 'hidden' : ''}`}>
+                      <FileImage className="h-8 w-8 mb-2" />
+                      <span className="text-xs">No Preview</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary">
+                      {IMPRINT_METHODS.find(m => m.value === imprint.method)?.label || imprint.method}
+                    </Badge>
+                    <span className="text-sm text-muted-foreground">
+                      {imprint.size.width}" × {imprint.size.height}"
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                    <div className="text-center">
+                      <div className="font-medium">{imprint.associatedCustomers.length}</div>
+                      <div>Customers</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="font-medium">{imprint.usageCount}</div>
+                      <div>Uses</div>
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    <div>Last used: {imprint.lastUsedAt ? formatDate(imprint.lastUsedAt) : 'Never'}</div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Preview Dialog */}
       <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
