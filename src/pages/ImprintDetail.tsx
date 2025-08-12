@@ -140,7 +140,7 @@ export default function ImprintDetail() {
           <Separator orientation="vertical" className="h-6" />
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{imprint.designName}</h1>
-            <p className="text-muted-foreground">Logo #{imprint.id.replace('shared-', '').toUpperCase()}</p>
+            <p className="text-muted-foreground">#34675</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -169,7 +169,7 @@ export default function ImprintDetail() {
               </div>
               <div>
                 <CardTitle className="text-xl">{imprint.designName}</CardTitle>
-                <div className="text-sm text-muted-foreground mt-1">Logo #{imprint.id.replace('shared-', '').toUpperCase()}</div>
+                <div className="text-sm text-muted-foreground mt-1">#34675</div>
                 <div className="flex items-center gap-4 mt-3">
                   <Badge variant="secondary">{methodLabel}</Badge>
                   <span className="text-sm text-muted-foreground">
