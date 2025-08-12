@@ -61,13 +61,14 @@ export default function Customers() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   
-  // Edit dialog states
+  // Edit dialog states  
   const [editContactDialog, setEditContactDialog] = useState(false);
-  const [editCompanyDialog, setEditCompanyDialog] = useState(false);
-  const [editBillingAddressDialog, setEditBillingAddressDialog] = useState(false);
-  const [editShippingAddressDialog, setEditShippingAddressDialog] = useState(false);
-  const [editTaxInfoDialog, setEditTaxInfoDialog] = useState(false);
+  const [editCompanyOpen, setEditCompanyOpen] = useState(false);
+  const [editBillingAddressOpen, setEditBillingAddressOpen] = useState(false);
+  const [editShippingAddressOpen, setEditShippingAddressOpen] = useState(false);
+  const [editTaxInfoOpen, setEditTaxInfoOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [activeTab, setActiveTab] = useState("contacts");
   
   // Artwork & Files tab states
   const [artworkSearchTerm, setArtworkSearchTerm] = useState('');
@@ -279,7 +280,7 @@ export default function Customers() {
       };
       
       // We'll reuse the company dialog since it contains these fields
-      setEditCompanyDialog(true);
+      setEditCompanyOpen(true);
     }
   };
 
@@ -641,7 +642,7 @@ export default function Customers() {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => setEditCompanyDialog(true)}
+                    onClick={() => setEditCompanyOpen(true)}
                   >
                     <Edit className="h-4 w-4 mr-2" />
                     Edit Company
@@ -666,7 +667,7 @@ export default function Customers() {
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      onClick={() => setEditBillingAddressDialog(true)}
+                      onClick={() => setEditBillingAddressOpen(true)}
                     >
                       <Edit className="h-3 w-3" />
                     </Button>
@@ -694,7 +695,7 @@ export default function Customers() {
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      onClick={() => setEditShippingAddressDialog(true)}
+                      onClick={() => setEditShippingAddressOpen(true)}
                     >
                       <Edit className="h-3 w-3" />
                     </Button>
@@ -722,7 +723,7 @@ export default function Customers() {
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      onClick={() => setEditTaxInfoDialog(true)}
+                      onClick={() => setEditTaxInfoOpen(true)}
                     >
                       <Edit className="h-3 w-3" />
                     </Button>
@@ -825,7 +826,7 @@ export default function Customers() {
                         variant="ghost" 
                         size="sm" 
                         className="h-8 w-8 p-0"
-                        onClick={() => setEditBillingAddressDialog(true)}
+                        onClick={() => setEditBillingAddressOpen(true)}
                       >
                         <Edit className="h-4 w-4" />
                         <span className="sr-only">Edit billing address</span>
@@ -854,7 +855,7 @@ export default function Customers() {
                         variant="ghost" 
                         size="sm" 
                         className="h-8 w-8 p-0"
-                        onClick={() => setEditShippingAddressDialog(true)}
+                        onClick={() => setEditShippingAddressOpen(true)}
                       >
                         <Edit className="h-4 w-4" />
                         <span className="sr-only">Edit shipping address</span>
@@ -884,7 +885,7 @@ export default function Customers() {
                       variant="ghost" 
                       size="sm" 
                       className="h-8 w-8 p-0"
-                      onClick={() => setEditTaxInfoDialog(true)}
+                      onClick={() => setEditTaxInfoOpen(true)}
                     >
                       <Edit className="h-4 w-4" />
                       <span className="sr-only">Edit tax information</span>
@@ -1676,31 +1677,31 @@ export default function Customers() {
           {selectedCustomer && (
             <>
               <EditCompanyDialog 
-                open={editCompanyDialog}
-                onOpenChange={setEditCompanyDialog}
+                open={editCompanyOpen}
+                onOpenChange={setEditCompanyOpen}
                 onUpdateCompany={handleEditCompany}
                 customer={selectedCustomer}
               />
               
               <EditAddressDialog 
-                open={editBillingAddressDialog}
-                onOpenChange={setEditBillingAddressDialog}
+                open={editBillingAddressOpen}
+                onOpenChange={setEditBillingAddressOpen}
                 onUpdateAddress={handleEditBillingAddress}
                 address={selectedCustomer.billingAddress}
                 title="Billing Address"
               />
               
               <EditAddressDialog 
-                open={editShippingAddressDialog}
-                onOpenChange={setEditShippingAddressDialog}
+                open={editShippingAddressOpen}
+                onOpenChange={setEditShippingAddressOpen}
                 onUpdateAddress={handleEditShippingAddress}
                 address={selectedCustomer.shippingAddress}
                 title="Shipping Address"
               />
               
               <EditTaxInfoDialog 
-                open={editTaxInfoDialog}
-                onOpenChange={setEditTaxInfoDialog}
+                open={editTaxInfoOpen}
+                onOpenChange={setEditTaxInfoOpen}
                 onUpdateTaxInfo={handleEditTaxInfo}
                 taxInfo={selectedCustomer.taxInfo}
               />

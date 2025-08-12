@@ -94,7 +94,7 @@ const sampleContacts: Contact[] = [
   }
 ];
 
-// Example customers data
+// Example customers data  
 const exampleCustomers: Customer[] = [
   {
     id: "customer-1",
