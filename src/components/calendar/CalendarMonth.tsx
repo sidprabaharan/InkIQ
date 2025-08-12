@@ -13,7 +13,6 @@ import {
   getDate
 } from "date-fns";
 import { CalendarEvent } from "@/pages/Calendar";
-import { EventCard } from "./EventCard";
 import { cn } from "@/lib/utils";
 
 interface CalendarMonthProps {
@@ -58,32 +57,33 @@ export function CalendarMonth({ currentDate, events }: CalendarMonthProps) {
             <div 
               key={i} 
               className={cn(
-                "min-h-[140px] p-1 relative flex flex-col",
+                "min-h-[120px] p-1 relative",
                 !isCurrentMonth && "bg-gray-50 text-gray-400",
                 isToday(day) && "bg-blue-50"
               )}
             >
               <div className={cn(
-                "h-6 w-6 flex items-center justify-center text-sm rounded-full mb-1",
+                "h-6 w-6 flex items-center justify-center text-sm rounded-full",
                 isToday(day) && "bg-blue-600 text-white font-medium"
               )}>
                 {getDate(day)}
               </div>
               
-              <div className="flex-1 overflow-y-auto space-y-0.5">
+              <div className="mt-1 overflow-y-auto max-h-[80px] space-y-1">
                 {dayEvents.map((event) => (
                   <div 
                     key={event.id}
-                    className="text-xs px-1 py-0.5 rounded cursor-pointer hover:opacity-80 truncate"
+                    className="text-xs p-1 rounded truncate"
                     style={{ 
-                      backgroundColor: `${event.color || "#3b82f6"}33`,
-                      color: event.color || "#3b82f6",
-                      borderLeft: `3px solid ${event.color || "#3b82f6"}`
+                      backgroundColor: `${event.color}33`, // Add transparency
+                      color: event.color,
+                      borderLeft: `3px solid ${event.color}`
                     }}
-                    title={`${event.title}${event.location ? ` - ${event.location}` : ''}${!event.allDay ? ` (${format(new Date(event.start), "h:mm a")})` : ''}`}
                   >
                     {!event.allDay && (
-                      <span className="mr-1">{format(new Date(event.start), "h:mm")}</span>
+                      <span className="mr-1 font-medium">
+                        {format(new Date(event.start), 'h:mm a')}
+                      </span>
                     )}
                     {event.title}
                   </div>

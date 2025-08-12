@@ -42,65 +42,157 @@ export function CalendarDay({ currentDate, events }: CalendarDayProps) {
     };
   };
   
-  // Calculate event row position for clean stacking like month view
-  const getEventRowPosition = (event: CalendarEvent): number => {
-    const eventsAtSameTime = filteredEvents.filter(e => {
+  // Determine if events overlap
+  const getEventWidth = (event: CalendarEvent, index: number) => {
+    const overlappingEvents = filteredEvents.filter(e => {
+      if (e.id === event.id) return false;
+      
       const eventStart = new Date(event.start);
+      const eventEnd = new Date(event.end);
       const eStart = new Date(e.start);
-      return Math.abs(eventStart.getTime() - eStart.getTime()) < 900000; // Within 15 minutes
-    }).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+      const eEnd = new Date(e.end);
+      
+      return (
+        isWithinInterval(eStart, { start: eventStart, end: eventEnd }) ||
+        isWithinInterval(eEnd, { start: eventStart, end: eventEnd }) ||
+        isWithinInterval(eventStart, { start: eStart, end: eEnd })
+      );
+    });
     
-    return eventsAtSameTime.findIndex(e => e.id === event.id);
+    if (overlappingEvents.length === 0) return '98%';
+    
+    // Find position in overlapping group
+    let position = 0;
+    overlappingEvents.forEach(e => {
+      if (new Date(e.start) < new Date(event.start)) position++;
+    });
+    
+    const width = 95 / (overlappingEvents.length + 1);
+    const left = position * width;
+    
+    return `${width}%`;
+  };
+  
+  const getEventLeft = (event: CalendarEvent, index: number) => {
+    const overlappingEvents = filteredEvents.filter(e => {
+      if (e.id === event.id) return false;
+      
+      const eventStart = new Date(event.start);
+      const eventEnd = new Date(event.end);
+      const eStart = new Date(e.start);
+      const eEnd = new Date(e.end);
+      
+      return (
+        isWithinInterval(eStart, { start: eventStart, end: eventEnd }) ||
+        isWithinInterval(eEnd, { start: eventStart, end: eventEnd }) ||
+        isWithinInterval(eventStart, { start: eStart, end: eEnd })
+      );
+    });
+    
+    if (overlappingEvents.length === 0) return '1%';
+    
+    // Find position in overlapping group
+    let position = 0;
+    overlappingEvents.forEach(e => {
+      if (new Date(e.start) < new Date(event.start)) position++;
+    });
+    
+    const width = 95 / (overlappingEvents.length + 1);
+    const left = position * width;
+    
+    return `${left + 1}%`;
   };
   
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <div className="sticky top-0 z-10 bg-background border-b px-4 py-3">
-        <h2 className="text-2xl font-semibold text-foreground">
+    <div className="flex flex-col h-full overflow-auto">
+      <div className="sticky top-0 z-10 bg-white border-b px-4 py-2">
+        <h2 className="text-2xl font-semibold">
           {format(currentDate, 'EEEE, MMMM d, yyyy')}
         </h2>
       </div>
       
-      <div className="flex-1 overflow-auto p-4">
-        {/* Events stacked with no spacing */}
-        <div className="space-y-0">
-          {/* All-day events first */}
-          {filteredEvents
-            .filter(e => e.allDay)
-            .map((event) => (
-              <div
-                key={event.id}
-                className="text-xs px-1 py-0.5 rounded cursor-pointer hover:opacity-80 truncate"
-                style={{
-                  backgroundColor: `${event.color || "#3b82f6"}33`,
-                  color: event.color || "#3b82f6",
-                  borderLeft: `3px solid ${event.color || "#3b82f6"}`
-                }}
-                title={`${event.title}${event.location ? ` - ${event.location}` : ''}`}
-              >
-                {event.title}
+      <div className="flex flex-1 overflow-auto">
+        {/* Time column */}
+        <div className="w-16 flex-shrink-0 border-r text-right">
+          {hours.map(hour => (
+            <div key={hour} className="h-[60px] relative">
+              <div className="absolute -top-[9px] right-2 text-xs text-gray-500">
+                {hour === 0 ? null : (
+                  <div>
+                    {hour % 12 === 0 ? '12' : hour % 12}:00 {hour >= 12 ? 'PM' : 'AM'}
+                  </div>
+                )}
               </div>
-            ))}
+            </div>
+          ))}
+        </div>
+        
+        {/* Events column */}
+        <div className="flex-1 relative">
+          {/* Hour divisions */}
+          {hours.map(hour => (
+            <div key={hour} className="h-[60px] border-t border-gray-200 relative">
+              {/* No additional inner divider needed as we're using border-t */}
+            </div>
+          ))}
           
-          {/* Timed events sorted by start time */}
+          {/* All-day events */}
+          {filteredEvents.filter(e => e.allDay).length > 0 && (
+            <div className="absolute top-0 left-0 right-0 bg-gray-50 border-b">
+              <div className="p-1 flex flex-wrap gap-1">
+                {filteredEvents
+                  .filter(e => e.allDay)
+                  .map((event, index) => (
+                    <div
+                      key={event.id}
+                      className="text-xs p-1 rounded-sm truncate m-1"
+                      style={{
+                        backgroundColor: `${event.color}33`,
+                        color: event.color,
+                        borderLeft: `3px solid ${event.color}`,
+                        width: 'calc(100% - 10px)'
+                      }}
+                    >
+                      {event.title}
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Timed events */}
           {filteredEvents
             .filter(e => !e.allDay)
-            .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
-            .map((event) => (
-              <div
-                key={event.id}
-                className="text-xs px-1 py-0.5 rounded cursor-pointer hover:opacity-80 truncate"
-                style={{
-                  backgroundColor: `${event.color || "#3b82f6"}33`,
-                  color: event.color || "#3b82f6",
-                  borderLeft: `3px solid ${event.color || "#3b82f6"}`
-                }}
-                title={`${event.title}${event.location ? ` - ${event.location}` : ''} (${format(new Date(event.start), "h:mm a")})`}
-              >
-                <span className="mr-1">{format(new Date(event.start), "h:mm")}</span>
-                {event.title}
-              </div>
-            ))}
+            .map((event, index) => {
+              const { top, height } = getEventPosition(event);
+              const width = getEventWidth(event, index);
+              const left = getEventLeft(event, index);
+              
+              return (
+                <div
+                  key={event.id}
+                  className="absolute p-1 rounded truncate shadow-sm text-xs hover:z-10"
+                  style={{
+                    top,
+                    height,
+                    width,
+                    left,
+                    backgroundColor: `${event.color}33`,
+                    color: event.color,
+                    borderLeft: `3px solid ${event.color}`,
+                    overflow: 'hidden'
+                  }}
+                >
+                  <div className="font-semibold">
+                    {format(new Date(event.start), 'h:mm a')} - {format(new Date(event.end), 'h:mm a')}
+                  </div>
+                  <div className="truncate">{event.title}</div>
+                  {event.location && (
+                    <div className="text-xs opacity-75 truncate">{event.location}</div>
+                  )}
+                </div>
+              );
+            })}
         </div>
       </div>
     </div>

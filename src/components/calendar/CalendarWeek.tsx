@@ -93,36 +93,67 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
     });
   };
   
-  // Calculate event stacking for clean row display like month view
-  const getEventRowPosition = (event: CalendarEvent, day: Date, events: CalendarEvent[]): number => {
+  // Calculate width and left position for overlapping events
+  const getEventWidthAndLeft = (event: CalendarEvent, day: Date, events: CalendarEvent[]) => {
     const eventsOnSameDay = events.filter(e => {
-      const eventStart = new Date(e.start);
-      const eventEnd = new Date(e.end);
+      if (e.id === event.id) return false;
+      
+      const eventStart = new Date(event.start);
+      const eventEnd = new Date(event.end);
+      const eStart = new Date(e.start);
+      const eEnd = new Date(e.end);
+      
+      // Check for time overlap
       return (
-        isSameDay(eventStart, day) || isSameDay(eventEnd, day) ||
-        (eventStart < day && eventEnd > day)
+        isWithinInterval(eStart, { start: eventStart, end: eventEnd }) ||
+        isWithinInterval(eEnd, { start: eventStart, end: eventEnd }) ||
+        isWithinInterval(eventStart, { start: eStart, end: eEnd })
       );
-    }).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+    });
     
-    return eventsOnSameDay.findIndex(e => e.id === event.id);
+    if (eventsOnSameDay.length === 0) {
+      return { width: '95%', left: '2%' };
+    }
+    
+    // Find position in overlapping group
+    const totalEvents = eventsOnSameDay.length + 1;
+    let position = 0;
+    
+    eventsOnSameDay.forEach(e => {
+      if (new Date(e.start) < new Date(event.start)) position++;
+    });
+    
+    const width = 95 / totalEvents;
+    const left = 2 + position * width;
+    
+    return { 
+      width: `${width}%`, 
+      left: `${left}%` 
+    };
   };
   
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      {/* Week header - using CSS grid for perfect alignment */}
-      <div className="grid grid-cols-7 border-b sticky top-0 bg-background z-10">
+    <div className="flex flex-col h-full overflow-auto">
+      {/* Week header */}
+      <div className="grid grid-cols-8 border-b sticky top-0 bg-white z-10">
+        <div className="p-2 border-r text-center text-xs font-medium text-gray-500">
+          GMT-5
+        </div>
         {days.map((day, i) => {
           const isToday = isSameDay(day, new Date());
+          
           return (
-            <div key={i} className="p-3 text-center border-r last:border-r-0">
-              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                {format(day, 'EEE')}
-              </div>
+            <div 
+              key={i} 
+              className={cn(
+                "p-2 text-center",
+                isToday && "bg-blue-50"
+              )}
+            >
+              <div className="text-xs font-medium">{format(day, 'EEE')}</div>
               <div className={cn(
-                "text-lg font-semibold mt-1",
-                isToday 
-                  ? "text-primary bg-primary/10 rounded-full w-8 h-8 flex items-center justify-center mx-auto" 
-                  : "text-foreground"
+                "text-lg inline-flex h-10 w-10 items-center justify-center rounded-full",
+                isToday && "bg-blue-600 text-white font-medium"
               )}>
                 {format(day, 'd')}
               </div>
@@ -130,36 +161,87 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
           );
         })}
       </div>
-
-      {/* Main calendar grid - no time column, just day columns */}
-      <div className="flex-1 overflow-auto">
-        <div className="grid grid-cols-7 h-full">
-          {/* Day columns */}
+      
+      {/* Week grid */}
+      <div className="flex flex-1 overflow-auto">
+        {/* Time column */}
+        <div className="w-16 flex-shrink-0 border-r text-right">
+          {hours.map(hour => (
+            <div key={hour} className="h-[60px] relative">
+              <div className="absolute -top-[9px] right-2 text-xs text-gray-500">
+                {hour === 0 ? null : (
+                  <div>
+                    {hour % 12 === 0 ? '12' : hour % 12}:00 {hour >= 12 ? 'PM' : 'AM'}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Days columns with events */}
+        <div className="flex-1 grid grid-cols-7">
           {days.map((day, dayIndex) => {
             const dayEvents = getEventsForDay(day);
             
             return (
-              <div key={dayIndex} className="border-r last:border-r-0 p-2">
-                {/* Events for this day - stacked with no spacing */}
-                <div className="space-y-0">
-                  {dayEvents.map((event, eventIndex) => (
+              <div key={dayIndex} className="relative border-r">
+                {/* Hour divisions */}
+                {hours.map(hour => (
+                  <div key={hour} className="h-[60px] border-t border-gray-200 relative">
+                    {/* No additional inner divider needed as we're using border-t */}
+                  </div>
+                ))}
+                
+                {/* Events */}
+                {dayEvents.map((event, eventIndex) => {
+                  const position = getEventPositionForDay(event, day);
+                  if (!position) return null;
+                  
+                  const { width, left } = getEventWidthAndLeft(event, day, dayEvents);
+                  const isAllDay = event.allDay;
+                  
+                  if (isAllDay) {
+                    return (
+                      <div
+                        key={event.id}
+                        className="absolute top-0 left-0 right-0 h-6 px-1 text-xs truncate z-10"
+                        style={{
+                          backgroundColor: `${event.color}33`,
+                          color: event.color,
+                          borderLeft: `3px solid ${event.color}`
+                        }}
+                      >
+                        {event.title}
+                      </div>
+                    );
+                  }
+                  
+                  return (
                     <div
                       key={event.id}
-                      className="text-xs px-1 py-0.5 rounded cursor-pointer hover:opacity-80 truncate"
+                      className="absolute px-1 rounded-sm truncate text-xs hover:z-20"
                       style={{
-                        backgroundColor: `${event.color || "#3b82f6"}33`,
-                        color: event.color || "#3b82f6",
-                        borderLeft: `3px solid ${event.color || "#3b82f6"}`
+                        top: `${position.top}px`,
+                        height: `${position.height}px`,
+                        width,
+                        left,
+                        backgroundColor: `${event.color}33`,
+                        color: event.color,
+                        borderLeft: `3px solid ${event.color}`,
+                        overflow: 'hidden'
                       }}
-                      title={`${event.title}${event.location ? ` - ${event.location}` : ''}${!event.allDay ? ` (${format(new Date(event.start), "h:mm a")})` : ''}`}
                     >
-                      {!event.allDay && (
-                        <span className="mr-1">{format(new Date(event.start), "h:mm")}</span>
+                      <div className="text-xs font-medium">
+                        {format(new Date(event.start), 'h:mm')}
+                      </div>
+                      <div className="truncate">{event.title}</div>
+                      {event.location && (
+                        <div className="text-xs opacity-75 truncate">{event.location}</div>
                       )}
-                      {event.title}
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
             );
           })}
