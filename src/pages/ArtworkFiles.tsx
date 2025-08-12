@@ -356,6 +356,26 @@ export default function ArtworkFiles() {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-3">
+                      {/* Image Preview */}
+                      <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+                        {artwork.customerArt.length > 0 ? (
+                          <img 
+                            src={artwork.customerArt[0].url} 
+                            alt={artwork.designName}
+                            className="w-full h-full object-contain"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              target.nextElementSibling?.classList.remove('hidden');
+                            }}
+                          />
+                        ) : null}
+                        <div className={`flex flex-col items-center text-muted-foreground ${artwork.customerArt.length > 0 ? 'hidden' : ''}`}>
+                          <FileImage className="h-8 w-8 mb-2" />
+                          <span className="text-xs">No Preview</span>
+                        </div>
+                      </div>
+                      
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary">
                           {IMPRINT_METHODS.find(m => m.value === artwork.method)?.label || artwork.method}
@@ -394,11 +414,24 @@ export default function ArtworkFiles() {
                   <div className="divide-y">
                     {filteredArtwork.map((artwork) => (
                       <div key={artwork.id} className="flex items-center gap-4 p-4 hover:bg-muted/50">
-                        <Avatar className="h-12 w-12">
-                          <AvatarFallback>
-                            {artwork.designName.slice(0, 2).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
+                        {/* Image Preview */}
+                        <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {artwork.customerArt.length > 0 ? (
+                            <img 
+                              src={artwork.customerArt[0].url} 
+                              alt={artwork.designName}
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                target.nextElementSibling?.classList.remove('hidden');
+                              }}
+                            />
+                          ) : null}
+                          <div className={`flex flex-col items-center text-muted-foreground text-xs ${artwork.customerArt.length > 0 ? 'hidden' : ''}`}>
+                            <FileImage className="h-6 w-6" />
+                          </div>
+                        </div>
                         
                         <div className="flex-1 min-w-0 space-y-1">
                           <div className="flex items-center gap-2">
