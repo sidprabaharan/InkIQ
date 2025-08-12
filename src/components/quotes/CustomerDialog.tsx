@@ -12,6 +12,16 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X } from "lucide-react";
 import { useCustomers } from "@/context/CustomersContext";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 
 interface CustomerDialogProps {
@@ -20,8 +30,10 @@ interface CustomerDialogProps {
 }
 
 export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
-  const { addCustomer, selectCustomer } = useCustomers();
+  const { customers, addCustomer, selectCustomer } = useCustomers();
   const [step, setStep] = useState<number>(1);
+  const [duplicateOpen, setDuplicateOpen] = useState(false);
+  const [existingCustomerId, setExistingCustomerId] = useState<string | null>(null);
   
   // Form state
   const [companyName, setCompanyName] = useState("");
@@ -82,7 +94,14 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
   };
   
   const submitCustomerForm = () => {
-    // Create the new customer
+    const normalized = companyName.trim().toLowerCase();
+    const existing = customers.find(c => c.companyName.trim().toLowerCase() === normalized);
+    if (existing) {
+      setExistingCustomerId(existing.id);
+      setDuplicateOpen(true);
+      return;
+    }
+
     const newCustomer = addCustomer({
       companyName,
       email,
@@ -116,15 +135,10 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
         taxExemptionNumber,
       }
     });
-    
-    // Automatically select the new customer to populate billing and shipping forms
+
     selectCustomer(newCustomer.id);
-    
-    // Reset form and close dialog
     resetForm();
     onOpenChange(false);
-    
-    // Show success message
     toast.success("Customer added successfully");
   };
   
@@ -429,6 +443,7 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
   };
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
@@ -465,5 +480,73 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    <AlertDialog open={duplicateOpen} onOpenChange={setDuplicateOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Duplicate company name</AlertDialogTitle>
+          <AlertDialogDescription>
+            A customer with the same company name already exists. Do you want to use the existing record instead, or create a separate customer with the same name?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={() => setDuplicateOpen(false)}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              if (existingCustomerId) {
+                selectCustomer(existingCustomerId);
+              }
+              setDuplicateOpen(false);
+              onOpenChange(false);
+              toast.message("Using existing customer");
+            }}
+          >
+            Use existing
+          </AlertDialogAction>
+          <AlertDialogAction
+            onClick={() => {
+              setDuplicateOpen(false);
+              // Proceed with creation ignoring duplicate
+              const newCustomer = addCustomer({
+                companyName,
+                email,
+                firstName,
+                lastName,
+                phoneNumber,
+                faxNumber,
+                industry,
+                invoiceOwner,
+                jobTitle,
+                department,
+                billingAddress: {
+                  address1: billingAddress1,
+                  address2: billingAddress2,
+                  city: billingCity,
+                  stateProvince: billingStateProvince,
+                  zipCode: billingZipCode,
+                  country: billingCountry,
+                },
+                shippingAddress: {
+                  address1: shippingAddress1,
+                  address2: shippingAddress2,
+                  city: shippingCity,
+                  stateProvince: shippingStateProvince,
+                  zipCode: shippingZipCode,
+                  country: shippingCountry,
+                },
+                taxInfo: { taxId, taxRate, taxExemptionNumber },
+              });
+              selectCustomer(newCustomer.id);
+              resetForm();
+              onOpenChange(false);
+              toast.success("Customer added successfully");
+            }}
+          >
+            Create separate
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }

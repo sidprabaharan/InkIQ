@@ -1,11 +1,12 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Search, ChevronDown, ChevronRight } from "lucide-react";
 import { QuotationStatusBadge } from "./QuotationStatusBadge";
 import { PaymentStatusBadge } from "./PaymentStatusBadge";
 import { StatusDropdown } from "./StatusDropdown";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import supabase from "@/lib/supabaseClient";
 import {
   Collapsible,
   CollapsibleContent,
@@ -33,150 +34,12 @@ interface Quotation {
   lineItems?: LineItem[];
 }
 
-// Define which statuses belong to quotes vs invoices
-const quoteStatuses = ["Quote", "Quote Approval Sent", "Quote Approved"];
-
-// Sample data for both quotes and invoices
-const allQuotationsData: Quotation[] = [
-  // Quotes data - will show on Quotes page
-  {
-    id: "3046",
-    customer: "Western Alliance Transport",
-    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-CA'),
-    owner: "Kiriakos",
-    total: "$8,344.31",
-    outstanding: "$8,344.31",
-    status: "Quote",
-    isPaid: false,
-  },
-  {
-    id: "3032",
-    norisId: "Noris shahid",
-    customer: "Project Care",
-    dueDate: "24-12-2024",
-    owner: "Noraiz shahid",
-    total: "$278",
-    outstanding: "$24",
-    status: "Quote",
-    isPaid: false,
-  },
-  {
-    id: "3039",
-    norisId: "Noris shahid",
-    customer: "Care Pharmacy",
-    dueDate: "24-12-2024",
-    owner: "Tim",
-    total: "$12382",
-    outstanding: "$82",
-    status: "Quote Approval Sent",
-    isPaid: true,
-  },
-  {
-    id: "3045",
-    customer: "Montreal University",
-    dueDate: "15-01-2025",
-    owner: "Sarah",
-    total: "$3,450",
-    outstanding: "$3,450",
-    status: "Quote Approved",
-    isPaid: false,
-  },
-  
-  // Invoices data - will show on Invoices page
-  {
-    id: "3033",
-    customer: "Cinemania",
-    dueDate: "24-12-2024",
-    owner: "Shahid Raja",
-    total: "$9102",
-    outstanding: "$992",
-    status: "Purchase Orders",
-    isPaid: true,
-  },
-  {
-    id: "3034",
-    norisId: "Noris shahid",
-    customer: "McGill Investment Club",
-    dueDate: "24-12-2024",
-    owner: "Kiri",
-    total: "$1292",
-    outstanding: "$241",
-    status: "Production",
-    isPaid: false,
-  },
-  {
-    id: "3035",
-    customer: "Peer Support system",
-    dueDate: "24-12-2024",
-    owner: "Jhon",
-    total: "$777.28",
-    outstanding: "$0.000",
-    status: "Production",
-    isPaid: true,
-  },
-  {
-    id: "3036",
-    norisId: "Noris shahid",
-    customer: "Qubic Inc",
-    dueDate: "24-12-2024",
-    owner: "Kamelia",
-    total: "$939.92",
-    outstanding: "$424.92",
-    status: "Artwork",
-    isPaid: false,
-  },
-  {
-    id: "3037",
-    customer: "Custom shirts",
-    dueDate: "24-12-2024",
-    owner: "Picanto",
-    total: "$1,892",
-    outstanding: "$1.21",
-    status: "On Hold",
-    isPaid: false,
-  },
-  {
-    id: "3038",
-    norisId: "Noris shahid",
-    customer: "Design & Co",
-    dueDate: "24-12-2024",
-    owner: "Helper",
-    total: "$9,9282",
-    outstanding: "$2,421",
-    status: "Artwork",
-    isPaid: true,
-  },
-  {
-    id: "3040",
-    customer: "ABC Print Shop",
-    dueDate: "30-11-2024",
-    owner: "Jessica",
-    total: "$4,590",
-    outstanding: "$0",
-    status: "Complete",
-    isPaid: true,
-  },
-  {
-    id: "3041",
-    customer: "Tech Innovators",
-    dueDate: "15-12-2024",
-    owner: "Michael",
-    total: "$2,750",
-    outstanding: "$1,250",
-    status: "Production",
-    isPaid: false,
-  },
-  {
-    id: "3042",
-    customer: "Global Retail Solutions",
-    dueDate: "05-01-2025",
-    owner: "Emma",
-    total: "$8,325",
-    outstanding: "$4,125",
-    status: "Shipping",
-    isPaid: false,
-  },
-];
+// Helper to format currency
+function money(value: number | string | null | undefined): string {
+  const n = typeof value === 'string' ? Number(value) : (value ?? 0);
+  if (Number.isNaN(n)) return '$0.00';
+  return n.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+}
 
 interface QuotationTableProps {
   isInvoicesPage?: boolean;
@@ -186,19 +49,49 @@ export function QuotationTable({ isInvoicesPage = false }: QuotationTableProps) 
   const navigate = useNavigate();
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [lineItemStatuses, setLineItemStatuses] = useState<{[key: string]: string}>({});
-  
-  // Filter data based on whether we're on the Quotes or Invoices page
-  const quotationsData = allQuotationsData
-    .filter(quotation => {
-      if (isInvoicesPage) {
-        // For invoices page, show everything that's NOT a quote status
-        return !quoteStatuses.includes(quotation.status);
-      } else {
-        // For quotes page, only show quote statuses
-        return quoteStatuses.includes(quotation.status);
+  const [rows, setRows] = useState<Quotation[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      // Load latest quotes (limit for performance)
+      const { data: quotes } = await supabase
+        .from('quotes')
+        .select('id, quote_number, customer_id, owner_id, total_amount, amount_outstanding, quote_status, payment_due_date')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      const customerIds = Array.from(new Set((quotes ?? []).map(q => q.customer_id).filter(Boolean)));
+      let customerMap: Record<string, string> = {};
+      if (customerIds.length > 0) {
+        const { data: customers } = await supabase
+          .from('customers')
+          .select('id, company_name, name')
+          .in('id', customerIds);
+        for (const c of customers ?? []) {
+          customerMap[c.id] = c.company_name ?? c.name ?? '';
+        }
       }
-    })
-    .sort((a, b) => parseInt(b.id) - parseInt(a.id)); // Sort by ID descending
+
+      const mapped: Quotation[] = (quotes ?? []).map(q => ({
+        id: q.quote_number ?? q.id, // navigate using quote_number when available
+        customer: customerMap[q.customer_id] ?? '',
+        dueDate: q.payment_due_date ?? '',
+        owner: q.owner_id ?? '',
+        total: money(q.total_amount ?? 0),
+        outstanding: money(q.amount_outstanding ?? 0),
+        status: q.quote_status === 'quote_approval_sent' ? 'Quote Approval Sent' : 'Quote',
+        isPaid: (Number(q.amount_outstanding ?? 0) === 0)
+      }));
+
+      if (isMounted) setRows(mapped);
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+  
+  const quotationsData = rows;
   
   const handleRowClick = (quotationId: string) => {
     navigate(`/quotes/${quotationId}`);

@@ -6,15 +6,23 @@ import { CompanyInfoCard } from "@/components/quotes/CompanyInfoCard";
 import { QuoteDetailsCard } from "@/components/quotes/QuoteDetailsCard";
 import { CustomerInfoCard } from "@/components/quotes/CustomerInfoCard";
 import { QuoteItemsTable } from "@/components/quotes/QuoteItemsTable";
-import { getQuoteById } from "@/components/quotes/QuoteData";
 import { NotesCard } from "@/components/quotes/NotesCard";
 import { InvoiceSummaryCard } from "@/components/quotes/InvoiceSummaryCard";
-import { quotationData } from "@/components/quotes/QuoteData";
+import { quotationData, getQuoteById } from "@/components/quotes/QuoteData";
+import { useEffect, useState } from "react";
+import { getQuoteByIdFromDb } from "@/lib/quoteService";
 
 export default function QuoteDetail() {
   const { id } = useParams();
   const quoteId = id || "3032";
-  const quote = getQuoteById(quoteId) || quotationData;
+  const [quote, setQuote] = useState(getQuoteById(quoteId) || quotationData);
+
+  useEffect(() => {
+    (async () => {
+      const dbQuote = await getQuoteByIdFromDb(quoteId);
+      if (dbQuote) setQuote(dbQuote);
+    })();
+  }, [quoteId]);
   
   // Simplify the artwork status if needed
   const status = quote.status.toLowerCase().includes('artwork') ? 'Artwork' : quote.status;
