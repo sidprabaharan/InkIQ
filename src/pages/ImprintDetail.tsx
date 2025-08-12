@@ -203,13 +203,6 @@ export default function ImprintDetail() {
               <div className="text-sm text-muted-foreground">Mockups</div>
             </div>
           </div>
-          
-          <div className="mt-4">
-            <div className="text-sm font-medium mb-2">Notes</div>
-            <div className="p-3 bg-muted/30 rounded-lg text-sm text-muted-foreground">
-              {imprint.description || "No additional notes available for this imprint."}
-            </div>
-          </div>
         </CardContent>
       </Card>
 
