@@ -262,34 +262,22 @@ export default function ImprintDetail() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
+          <div className="grid gap-3 md:grid-cols-2">
             {mockOrders.map((order) => (
-              <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                      <Package className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <div className="font-medium">{order.orderNumber}</div>
-                      <div className="text-sm text-muted-foreground">{order.customerName}</div>
-                    </div>
+              <div key={order.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <Package className="h-5 w-5 text-primary" />
                   </div>
-                  <div className="hidden md:flex items-center gap-4">
-                    <div className="text-sm">
-                      <div className="font-medium">{order.totalItems} items</div>
-                      <div className="text-muted-foreground">{order.garmentTypes.join(", ")}</div>
-                    </div>
-                    <div className="text-sm">
-                      <div className="font-medium">${order.value.toFixed(2)}</div>
-                      <div className="text-muted-foreground">Due: {formatDate(order.dueDate)}</div>
-                    </div>
+                  <div>
+                    <div className="font-medium">{order.orderNumber}</div>
+                    <div className="text-sm text-muted-foreground">{order.customerName}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Badge variant={getStatusBadgeVariant(order.status)}>
-                    {order.status}
-                  </Badge>
+                  <div className="text-sm text-muted-foreground text-right">
+                    {formatDate(order.orderDate)}
+                  </div>
                   <Button variant="ghost" size="sm" onClick={() => navigate(`/quotes/${order.id.split('-')[1]}/edit`)}>
                     <ExternalLink className="h-4 w-4" />
                   </Button>
@@ -503,6 +491,18 @@ export default function ImprintDetail() {
                     <div className="font-medium">Category</div>
                     <div className="text-muted-foreground capitalize">{selectedFile.category}</div>
                   </div>
+                  {selectedFile.colors && (
+                    <div>
+                      <div className="font-medium">Colors</div>
+                      <div className="text-muted-foreground">{selectedFile.colors}</div>
+                    </div>
+                  )}
+                  {selectedFile.notes && (
+                    <div>
+                      <div className="font-medium">Notes</div>
+                      <div className="text-muted-foreground">{selectedFile.notes}</div>
+                    </div>
+                  )}
                 </div>
               </>
             )}
