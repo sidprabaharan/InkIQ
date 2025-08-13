@@ -525,15 +525,6 @@ export default function Customers() {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-semibold">Customers</h1>
             <div className="flex items-center gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                <Input 
-                  placeholder="Search" 
-                  className="pl-9 w-[250px]"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
               <Button variant="outline">Delete</Button>
               <Button variant="outline">Export</Button>
               <Button 
@@ -546,67 +537,69 @@ export default function Customers() {
             </div>
           </div>
 
-          <div className="bg-white rounded-md border">
+          <div className="bg-white rounded-lg border overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-xl font-semibold">Customer Directory</h2>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <input
+                  type="text"
+                  placeholder="Search customers..."
+                  className="pl-9 pr-4 py-2 border rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-inkiq-primary focus:border-transparent"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="w-full">
+                <thead className="bg-gray-50 text-left">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-sm font-medium text-gray-600">
                       <input type="checkbox" className="h-4 w-4 rounded" />
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Company
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      City
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Country
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      No. of Orders Placed
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Sales volume
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Industry
-                    </th>
+                    <th className="px-4 py-3 text-sm font-medium text-gray-600">Company</th>
+                    <th className="px-4 py-3 text-sm font-medium text-gray-600">City</th>
+                    <th className="px-4 py-3 text-sm font-medium text-gray-600">Country</th>
+                    <th className="px-4 py-3 text-sm font-medium text-gray-600">No. of Orders Placed</th>
+                    <th className="px-4 py-3 text-sm font-medium text-gray-600">Sales Volume</th>
+                    <th className="px-4 py-3 text-sm font-medium text-gray-600">Industry</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody>
                   {filteredCustomers.map((customer) => (
                     <tr 
                       key={customer.id} 
-                      className="hover:bg-gray-50 cursor-pointer"
+                      className="border-b hover:bg-gray-50 transition-colors cursor-pointer"
                       onClick={() => setSelectedCustomerId(customer.id)}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 py-3 text-sm">
                         <input type="checkbox" className="h-4 w-4 rounded" onClick={(e) => e.stopPropagation()} />
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 py-3 text-sm">
                         {customer.companyName}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 py-3 text-sm text-gray-500">
                         {customer.billingAddress.city}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 py-3 text-sm text-gray-500">
                         {customer.billingAddress.country}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 py-3 text-sm text-gray-500">
                         0
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 py-3 text-sm text-gray-500">
                         $0
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 py-3 text-sm text-gray-500">
                         {getIndustryName(customer.industry)}
                       </td>
                     </tr>
                   ))}
                   {filteredCustomers.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                      <td colSpan={7} className="px-4 py-8 text-center text-gray-500 text-sm">
                         No customers found. Add a new customer to get started.
                       </td>
                     </tr>
@@ -614,9 +607,10 @@ export default function Customers() {
                 </tbody>
               </table>
             </div>
+            
             {filteredCustomers.length > 0 && (
-              <div className="flex items-center justify-between px-6 py-4 border-t">
-                <div>
+              <div className="flex items-center justify-between px-4 py-3 border-t bg-gray-50">
+                <div className="text-sm text-gray-500">
                   Showing {filteredCustomers.length} of {customers.length} results
                 </div>
                 <div className="flex items-center gap-2">
