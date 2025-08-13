@@ -8,4 +8,5 @@ export interface Contact {
   jobTitle?: string;
   department?: string;
   contactOwner?: string;
+  linkedinProfile?: string;
 }

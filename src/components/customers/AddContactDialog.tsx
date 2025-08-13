@@ -39,6 +39,7 @@ const contactSchema = z.object({
   jobTitle: z.string().optional(),
   department: z.string().optional(),
   contactOwner: z.string().optional(),
+  linkedinProfile: z.string().url("Invalid LinkedIn URL").optional().or(z.literal("")),
 });
 
 export type ContactFormValues = z.infer<typeof contactSchema>;
@@ -75,6 +76,7 @@ export function AddContactDialog({
       jobTitle: "",
       department: "",
       contactOwner: "",
+      linkedinProfile: "",
     },
   });
 
@@ -205,6 +207,20 @@ export function AddContactDialog({
                       ))}
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="linkedinProfile"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>LinkedIn Profile</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://linkedin.com/in/..." {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

@@ -215,7 +215,48 @@ export default function Customers() {
 
   const handleEditCompany = (data: CompanyFormValues) => {
     if (selectedCustomerId) {
-      updateCustomer(selectedCustomerId, data);
+      // Transform form data to match Customer interface
+      const updatedCustomerData = {
+        companyName: data.companyName,
+        industry: data.industry,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        faxNumber: data.faxNumber || "",
+        invoiceOwner: data.invoiceOwner || "",
+        companySize: data.companySize || undefined,
+        estimatedAnnualMerchSpend: data.estimatedAnnualMerchSpend || undefined,
+        socialMedia: {
+          linkedin: data.linkedinUrl || undefined,
+          facebook: data.facebookUrl || undefined,
+          twitter: data.twitterUrl || undefined,
+          website: data.websiteUrl || undefined,
+        },
+        billingAddress: {
+          address1: data.billingAddress1,
+          address2: data.billingAddress2 || "",
+          city: data.billingCity,
+          stateProvince: data.billingStateProvince,
+          zipCode: data.billingZipCode,
+          country: data.billingCountry,
+        },
+        shippingAddress: {
+          address1: data.shippingAddress1,
+          address2: data.shippingAddress2 || "",
+          city: data.shippingCity,
+          stateProvince: data.shippingStateProvince,
+          zipCode: data.shippingZipCode,
+          country: data.shippingCountry,
+        },
+        taxInfo: {
+          taxId: data.taxId || "",
+          taxRate: data.taxRate || "",
+          taxExemptionNumber: data.taxExemptionNumber || "",
+        },
+      };
+      
+      updateCustomer(selectedCustomerId, updatedCustomerData);
       toast.success("Company information updated successfully");
     }
   };
@@ -712,6 +753,65 @@ export default function Customers() {
                       <div>
                         <span className="text-gray-500">Industry:</span>
                         <span className="ml-2">{getIndustryName(selectedCustomer.industry)}</span>
+                      </div>
+                    )}
+                    {selectedCustomer.companySize && (
+                      <div>
+                        <span className="text-gray-500">Company Size:</span>
+                        <span className="ml-2">{selectedCustomer.companySize}</span>
+                      </div>
+                    )}
+                    {selectedCustomer.estimatedAnnualMerchSpend && (
+                      <div>
+                        <span className="text-gray-500">Est. Annual Spend:</span>
+                        <span className="ml-2">{selectedCustomer.estimatedAnnualMerchSpend}</span>
+                      </div>
+                    )}
+                    {selectedCustomer.socialMedia && (
+                      <div>
+                        <span className="text-gray-500">Social Media:</span>
+                        <div className="ml-2 flex flex-wrap gap-2 mt-1">
+                          {selectedCustomer.socialMedia.linkedin && (
+                            <a 
+                              href={selectedCustomer.socialMedia.linkedin} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 text-xs underline"
+                            >
+                              LinkedIn
+                            </a>
+                          )}
+                          {selectedCustomer.socialMedia.facebook && (
+                            <a 
+                              href={selectedCustomer.socialMedia.facebook} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 text-xs underline"
+                            >
+                              Facebook
+                            </a>
+                          )}
+                          {selectedCustomer.socialMedia.twitter && (
+                            <a 
+                              href={selectedCustomer.socialMedia.twitter} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 text-xs underline"
+                            >
+                              Twitter
+                            </a>
+                          )}
+                          {selectedCustomer.socialMedia.website && (
+                            <a 
+                              href={selectedCustomer.socialMedia.website} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 text-xs underline"
+                            >
+                              Website
+                            </a>
+                          )}
+                        </div>
                       </div>
                     )}
                     {selectedCustomer.taxInfo?.taxId && (

@@ -3,7 +3,7 @@ import React from "react";
 import { Contact } from "@/types/customer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Mail, Phone, Briefcase, Building, UserCog, Edit } from "lucide-react";
+import { Mail, Phone, Briefcase, Building, UserCog, Edit, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ContactsListProps {
@@ -145,6 +145,20 @@ export function ContactsList({
                     <Phone className="h-4 w-4 text-gray-500" />
                     <span>{contact.phoneNumber}</span>
                   </div>
+                  {contact.linkedinProfile && (
+                    <div className="flex items-center gap-2">
+                      <Linkedin className="h-4 w-4 text-gray-500" />
+                      <a 
+                        href={contact.linkedinProfile} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        LinkedIn Profile
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

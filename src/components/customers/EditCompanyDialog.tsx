@@ -42,6 +42,13 @@ const companySchema = z.object({
   phoneNumber: z.string().min(1, "Phone number is required"),
   faxNumber: z.string().optional(),
   invoiceOwner: z.string().optional(),
+  companySize: z.string().optional(),
+  estimatedAnnualMerchSpend: z.string().optional(),
+  // Social media fields
+  linkedinUrl: z.string().url("Invalid LinkedIn URL").optional().or(z.literal("")),
+  facebookUrl: z.string().url("Invalid Facebook URL").optional().or(z.literal("")),
+  twitterUrl: z.string().url("Invalid Twitter URL").optional().or(z.literal("")),
+  websiteUrl: z.string().url("Invalid website URL").optional().or(z.literal("")),
   // Billing address fields
   billingAddress1: z.string().min(1, "Billing address is required"),
   billingAddress2: z.string().optional(),
@@ -81,6 +88,16 @@ const industries = [
   { id: "ecommerce", name: "Ecommerce" },
 ];
 
+// Company size options
+const companySizes = [
+  { id: "1-10", name: "1-10 employees" },
+  { id: "11-50", name: "11-50 employees" },
+  { id: "51-100", name: "51-100 employees" },
+  { id: "100-500", name: "100-500 employees" },
+  { id: "500+", name: "500+ employees" },
+  { id: "1000+", name: "1000+ employees" },
+];
+
 // Mock data for sales representatives (invoice owners)
 const salesReps = [
   { id: "rep1", name: "John Doe" },
@@ -106,6 +123,12 @@ export function EditCompanyDialog({
       phoneNumber: customer.phoneNumber,
       faxNumber: customer.faxNumber,
       invoiceOwner: customer.invoiceOwner,
+      companySize: customer.companySize || "",
+      estimatedAnnualMerchSpend: customer.estimatedAnnualMerchSpend || "",
+      linkedinUrl: customer.socialMedia?.linkedin || "",
+      facebookUrl: customer.socialMedia?.facebook || "",
+      twitterUrl: customer.socialMedia?.twitter || "",
+      websiteUrl: customer.socialMedia?.website || "",
       // Billing address
       billingAddress1: customer.billingAddress.address1,
       billingAddress2: customer.billingAddress.address2,
@@ -289,6 +312,106 @@ export function EditCompanyDialog({
                     </FormItem>
                   )}
                 />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="companySize"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Company Size</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select company size" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {companySizes.map((size) => (
+                              <SelectItem key={size.id} value={size.name}>
+                                {size.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="estimatedAnnualMerchSpend"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Est. Annual Merch Spend</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., $50K annually" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium">Social Media & Website</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="linkedinUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>LinkedIn URL</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://linkedin.com/company/..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="facebookUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Facebook URL</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://facebook.com/..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="twitterUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Twitter URL</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://twitter.com/..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="websiteUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Website URL</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://example.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
               </TabsContent>
               
               <TabsContent value="billing" className="space-y-4 mt-4">

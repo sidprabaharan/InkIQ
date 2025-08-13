@@ -15,6 +15,14 @@ export interface Customer {
   invoiceOwner: string;
   jobTitle?: string;
   department?: string;
+  companySize?: string;
+  estimatedAnnualMerchSpend?: string;
+  socialMedia?: {
+    linkedin?: string;
+    facebook?: string;
+    twitter?: string;
+    website?: string;
+  };
   contacts: Contact[];
   billingAddress: {
     address1: string;
@@ -60,7 +68,8 @@ const sampleContacts: Contact[] = [
     phoneNumber: "+92 302658976",
     jobTitle: "Marketing Director",
     department: "Marketing",
-    contactOwner: "Robert Que"
+    contactOwner: "Robert Que",
+    linkedinProfile: "https://linkedin.com/in/noraiz-shahid"
   },
   {
     id: "contact-2",
@@ -70,7 +79,8 @@ const sampleContacts: Contact[] = [
     phoneNumber: "+1 (416) 555-4321",
     jobTitle: "Procurement Manager",
     department: "Purchasing",
-    contactOwner: "Robert Que"
+    contactOwner: "Robert Que",
+    linkedinProfile: "https://linkedin.com/in/sarah-johnson-procurement"
   },
   {
     id: "contact-3",
@@ -80,7 +90,8 @@ const sampleContacts: Contact[] = [
     phoneNumber: "+44 20 7946 1234",
     jobTitle: "CEO",
     department: "Executive",
-    contactOwner: "Robert Que"
+    contactOwner: "Robert Que",
+    linkedinProfile: "https://linkedin.com/in/michael-chen-ceo"
   },
   {
     id: "contact-4",
@@ -106,6 +117,13 @@ const exampleCustomers: Customer[] = [
     faxNumber: "+1 (416) 555-1235",
     industry: "tech",
     invoiceOwner: "Finance Department",
+    companySize: "500+ employees",
+    estimatedAnnualMerchSpend: "$50K annually",
+    socialMedia: {
+      linkedin: "https://linkedin.com/company/nestle-print",
+      facebook: "https://facebook.com/nestleprint",
+      website: "https://nestleprint.com"
+    },
     contacts: [sampleContacts[0], sampleContacts[1]],
     billingAddress: {
       address1: "123 Print Avenue",
@@ -139,6 +157,12 @@ const exampleCustomers: Customer[] = [
     faxNumber: "+1 (415) 555-7891",
     industry: "tech",
     invoiceOwner: "Accounts Payable",
+    companySize: "100-500 employees",
+    estimatedAnnualMerchSpend: "$25K annually",
+    socialMedia: {
+      linkedin: "https://linkedin.com/company/tech-innovators",
+      website: "https://techinnovators.com"
+    },
     contacts: [sampleContacts[3]],
     billingAddress: {
       address1: "456 Innovation Drive",
@@ -172,6 +196,12 @@ const exampleCustomers: Customer[] = [
     faxNumber: "+44 20 7946 0959",
     industry: "retail",
     invoiceOwner: "Finance",
+    companySize: "1000+ employees",
+    estimatedAnnualMerchSpend: "$100K annually",
+    socialMedia: {
+      linkedin: "https://linkedin.com/company/global-retail-solutions",
+      twitter: "https://twitter.com/globalretailsol"
+    },
     contacts: [sampleContacts[2]],
     billingAddress: {
       address1: "789 Retail Row",
