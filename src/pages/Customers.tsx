@@ -14,7 +14,8 @@ import {
   Search, Plus, ArrowLeft, Mail, Phone, FileText, Calendar as CalendarIcon, MessageSquare, 
   File, Image, Folder, Code, PenTool, ShoppingCart, FileCheck, UserPlus,
   Edit, MapPin, ClipboardList, Upload, Grid, List, FileImage, Download, 
-  Eye, MoreVertical, User, Tag, Layers
+  Eye, MoreVertical, User, Tag, Layers, Globe, Linkedin, Facebook, Twitter,
+  Building, Users, DollarSign
 } from "lucide-react";
 import { CustomerDialog } from "@/components/quotes/CustomerDialog";
 import { useCustomers } from "@/context/CustomersContext";
@@ -693,131 +694,106 @@ export default function Customers() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-3 gap-6">
-                {/* Billing Address */}
-                <div className="space-y-2">
-                  <div>
-                    <h3 className="font-medium text-sm text-gray-700">Billing Address</h3>
-                  </div>
-                  {selectedCustomer.billingAddress ? (
-                    <div className="text-sm text-gray-600">
-                      <div>{selectedCustomer.billingAddress.address1}</div>
-                      {selectedCustomer.billingAddress.address2 && (
-                        <div>{selectedCustomer.billingAddress.address2}</div>
-                      )}
-                      <div>
-                        {selectedCustomer.billingAddress.city}, {selectedCustomer.billingAddress.stateProvince} {selectedCustomer.billingAddress.zipCode}
-                      </div>
-                      <div>{selectedCustomer.billingAddress.country}</div>
-                    </div>
-                  ) : (
-                    <div className="text-sm text-gray-400">No billing address on file</div>
-                  )}
-                </div>
-
-                {/* Shipping Address */}
-                <div className="space-y-2">
-                  <div>
-                    <h3 className="font-medium text-sm text-gray-700">Shipping Address</h3>
-                  </div>
-                  {selectedCustomer.shippingAddress ? (
-                    <div className="text-sm text-gray-600">
-                      <div>{selectedCustomer.shippingAddress.address1}</div>
-                      {selectedCustomer.shippingAddress.address2 && (
-                        <div>{selectedCustomer.shippingAddress.address2}</div>
-                      )}
-                      <div>
-                        {selectedCustomer.shippingAddress.city}, {selectedCustomer.shippingAddress.stateProvince} {selectedCustomer.shippingAddress.zipCode}
-                      </div>
-                      <div>{selectedCustomer.shippingAddress.country}</div>
-                    </div>
-                  ) : (
-                    <div className="text-sm text-gray-400">No shipping address on file</div>
-                  )}
-                </div>
-
-                {/* Company & Tax Info */}
-                <div className="space-y-2">
-                  <div>
-                    <h3 className="font-medium text-sm text-gray-700">Company Details</h3>
-                  </div>
-                  <div className="space-y-1 text-sm text-gray-600">
+            <CardContent className="p-6">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Company Details</h3>
+                  
+                  <div className="grid grid-cols-2 gap-6">
+                    {/* Industry */}
                     {selectedCustomer.industry && (
-                      <div>
-                        <span className="text-gray-500">Industry:</span>
-                        <span className="ml-2">{getIndustryName(selectedCustomer.industry)}</span>
-                      </div>
-                    )}
-                    {selectedCustomer.companySize && (
-                      <div>
-                        <span className="text-gray-500">Company Size:</span>
-                        <span className="ml-2">{selectedCustomer.companySize}</span>
-                      </div>
-                    )}
-                    {selectedCustomer.estimatedAnnualMerchSpend && (
-                      <div>
-                        <span className="text-gray-500">Est. Annual Spend:</span>
-                        <span className="ml-2">{selectedCustomer.estimatedAnnualMerchSpend}</span>
-                      </div>
-                    )}
-                    {selectedCustomer.socialMedia && (
-                      <div>
-                        <span className="text-gray-500">Social Media:</span>
-                        <div className="ml-2 flex flex-wrap gap-2 mt-1">
-                          {selectedCustomer.socialMedia.linkedin && (
-                            <a 
-                              href={selectedCustomer.socialMedia.linkedin} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 text-xs underline"
-                            >
-                              LinkedIn
-                            </a>
-                          )}
-                          {selectedCustomer.socialMedia.facebook && (
-                            <a 
-                              href={selectedCustomer.socialMedia.facebook} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 text-xs underline"
-                            >
-                              Facebook
-                            </a>
-                          )}
-                          {selectedCustomer.socialMedia.twitter && (
-                            <a 
-                              href={selectedCustomer.socialMedia.twitter} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 text-xs underline"
-                            >
-                              Twitter
-                            </a>
-                          )}
-                          {selectedCustomer.socialMedia.website && (
-                            <a 
-                              href={selectedCustomer.socialMedia.website} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 text-xs underline"
-                            >
-                              Website
-                            </a>
-                          )}
+                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                        <div className="flex-shrink-0">
+                          <Building className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">Industry</p>
+                          <p className="text-sm text-gray-600">{getIndustryName(selectedCustomer.industry)}</p>
                         </div>
                       </div>
                     )}
-                    {selectedCustomer.taxInfo?.taxId && (
-                      <div>
-                        <span className="text-gray-500">Tax ID:</span>
-                        <span className="ml-2">{selectedCustomer.taxInfo.taxId}</span>
+
+                    {/* Company Size */}
+                    {selectedCustomer.companySize && (
+                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                        <div className="flex-shrink-0">
+                          <Users className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">Company Size</p>
+                          <p className="text-sm text-gray-600">{selectedCustomer.companySize}</p>
+                        </div>
                       </div>
                     )}
-                    {selectedCustomer.taxInfo?.taxRate && (
-                      <div>
-                        <span className="text-gray-500">Tax Rate:</span>
-                        <span className="ml-2">{selectedCustomer.taxInfo.taxRate}%</span>
+
+                    {/* Estimated Annual Spend */}
+                    {selectedCustomer.estimatedAnnualMerchSpend && (
+                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                        <div className="flex-shrink-0">
+                          <DollarSign className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">Estimated Annual Spend</p>
+                          <p className="text-sm text-gray-600">{selectedCustomer.estimatedAnnualMerchSpend}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Social Media & Website */}
+                    {selectedCustomer.socialMedia && (Object.values(selectedCustomer.socialMedia).some(url => url)) && (
+                      <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                        <div className="flex-shrink-0">
+                          <Globe className="h-5 w-5 text-primary" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-gray-900 mb-2">Online Presence</p>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedCustomer.socialMedia.website && (
+                              <a 
+                                href={selectedCustomer.socialMedia.website} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-gray-200 rounded-md text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                              >
+                                <Globe className="h-3 w-3" />
+                                Website
+                              </a>
+                            )}
+                            {selectedCustomer.socialMedia.linkedin && (
+                              <a 
+                                href={selectedCustomer.socialMedia.linkedin} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-gray-200 rounded-md text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                              >
+                                <Linkedin className="h-3 w-3" />
+                                LinkedIn
+                              </a>
+                            )}
+                            {selectedCustomer.socialMedia.facebook && (
+                              <a 
+                                href={selectedCustomer.socialMedia.facebook} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-gray-200 rounded-md text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                              >
+                                <Facebook className="h-3 w-3" />
+                                Facebook
+                              </a>
+                            )}
+                            {selectedCustomer.socialMedia.twitter && (
+                              <a 
+                                href={selectedCustomer.socialMedia.twitter} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-gray-200 rounded-md text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-400 transition-colors"
+                              >
+                                <Twitter className="h-3 w-3" />
+                                Twitter
+                              </a>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
