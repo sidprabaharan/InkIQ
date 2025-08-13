@@ -5,8 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Plus, Check } from 'lucide-react';
+import { ArrowLeft, Plus, Check, Upload } from 'lucide-react';
 import { MasterArtwork, ArtworkFile, ArtworkVariation } from '@/types/artwork';
+import { EnhancedMockupUploadDialog } from './EnhancedMockupUploadDialog';
 
 interface MockupSelectionDialogProps {
   open: boolean;
@@ -14,6 +15,12 @@ interface MockupSelectionDialogProps {
   artwork: MasterArtwork | null;
   onSelectMockup: (artwork: MasterArtwork, variation: ArtworkVariation, selectedMockup?: ArtworkFile) => void;
   onBack: () => void;
+}
+
+interface VariationFormData {
+  location: string;
+  colors: string;
+  notes: string;
 }
 
 export function MockupSelectionDialog({ 
@@ -25,11 +32,12 @@ export function MockupSelectionDialog({
 }: MockupSelectionDialogProps) {
   const [selectedMockup, setSelectedMockup] = useState<ArtworkFile | null>(null);
   const [showVariationForm, setShowVariationForm] = useState(false);
-  const [variation, setVariation] = useState<Partial<ArtworkVariation>>({
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [uploadedMockupFile, setUploadedMockupFile] = useState<File | null>(null);
+  const [variation, setVariation] = useState<VariationFormData>({
     location: '',
     colors: '',
-    placement: '',
-    specialInstructions: ''
+    notes: ''
   });
 
   const handleMockupSelect = (mockup: ArtworkFile) => {
@@ -64,9 +72,9 @@ export function MockupSelectionDialog({
     setVariation({
       location: '',
       colors: '',
-      placement: '',
-      specialInstructions: ''
+      notes: ''
     });
+    setUploadedMockupFile(null);
   };
 
   const handleConfigureSelection = () => {
@@ -86,8 +94,8 @@ export function MockupSelectionDialog({
       masterArtworkId: artwork.id,
       location: variation.location || '',
       colors: variation.colors || '',
-      placement: variation.placement || '',
-      specialInstructions: variation.specialInstructions || '',
+      placement: '',
+      specialInstructions: variation.notes || '',
       createdAt: new Date(),
       createdBy: 'current-user'
     };
@@ -100,14 +108,22 @@ export function MockupSelectionDialog({
     setVariation({
       location: '',
       colors: '',
-      placement: '',
-      specialInstructions: ''
+      notes: ''
     });
+    setUploadedMockupFile(null);
   };
 
   const handleBackToMockups = () => {
     setShowVariationForm(false);
     setSelectedMockup(null);
+    setUploadedMockupFile(null);
+  };
+
+  const handleMockupUpload = (files: File[]) => {
+    if (files.length > 0) {
+      setUploadedMockupFile(files[0]);
+    }
+    setShowUploadDialog(false);
   };
 
   if (!artwork) return null;
@@ -275,24 +291,35 @@ export function MockupSelectionDialog({
                 </div>
 
                 <div>
-                  <Label htmlFor="placement">Placement Details</Label>
-                  <Input
-                    id="placement"
-                    value={variation.placement || ''}
-                    onChange={(e) => setVariation(prev => ({ ...prev, placement: e.target.value }))}
-                    placeholder="e.g., Centered, 2 inches from seam"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="instructions">Special Instructions</Label>
+                  <Label htmlFor="notes">Notes</Label>
                   <Textarea
-                    id="instructions"
-                    value={variation.specialInstructions || ''}
-                    onChange={(e) => setVariation(prev => ({ ...prev, specialInstructions: e.target.value }))}
+                    id="notes"
+                    value={variation.notes || ''}
+                    onChange={(e) => setVariation(prev => ({ ...prev, notes: e.target.value }))}
                     placeholder="Any special requirements or notes..."
                     className="min-h-[80px]"
                   />
+                </div>
+
+                <div className="border-t pt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <Label>Mockup Image (Optional)</Label>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowUploadDialog(true)}
+                      className="gap-2"
+                    >
+                      <Upload className="h-4 w-4" />
+                      Upload Mockup
+                    </Button>
+                  </div>
+                  {uploadedMockupFile && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Check className="h-4 w-4 text-green-600" />
+                      {uploadedMockupFile.name}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -333,6 +360,17 @@ export function MockupSelectionDialog({
           )}
         </DialogFooter>
       </DialogContent>
+
+      <EnhancedMockupUploadDialog
+        open={showUploadDialog}
+        onOpenChange={setShowUploadDialog}
+        onUpload={handleMockupUpload}
+        allowedFileTypes={['image/jpeg', 'image/png', 'image/webp']}
+        category="proofMockup"
+        multiple={false}
+        title="Upload Mockup Image"
+        description="Upload an image of the mockup for this imprint configuration"
+      />
     </Dialog>
   );
 }
