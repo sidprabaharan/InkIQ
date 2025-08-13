@@ -38,6 +38,38 @@ export function MockupSelectionDialog({
       ...prev,
       colors: mockup.colors || ''
     }));
+    // Don't automatically show variation form - let user choose
+  };
+
+  const handleUseExistingMockup = () => {
+    if (!artwork || !selectedMockup) return;
+
+    // Create a variation with the existing mockup's properties
+    const finalVariation: ArtworkVariation = {
+      id: `var-${Math.random().toString(36).substring(2, 9)}`,
+      masterArtworkId: artwork.id,
+      location: selectedMockup.colors || 'Standard placement',
+      colors: selectedMockup.colors || '',
+      placement: 'As shown in mockup',
+      specialInstructions: '',
+      createdAt: new Date(),
+      createdBy: 'current-user'
+    };
+
+    onSelectMockup(artwork, finalVariation, selectedMockup);
+    
+    // Reset state
+    setSelectedMockup(null);
+    setShowVariationForm(false);
+    setVariation({
+      location: '',
+      colors: '',
+      placement: '',
+      specialInstructions: ''
+    });
+  };
+
+  const handleConfigureSelection = () => {
     setShowVariationForm(true);
   };
 
@@ -278,12 +310,25 @@ export function MockupSelectionDialog({
             >
               Use This Configuration
             </Button>
+          ) : selectedMockup ? (
+            <div className="flex gap-2">
+              <Button 
+                variant="outline"
+                onClick={handleConfigureSelection}
+              >
+                Configure Details
+              </Button>
+              <Button 
+                onClick={handleUseExistingMockup}
+              >
+                Use This Mockup
+              </Button>
+            </div>
           ) : (
             <Button 
-              onClick={() => setShowVariationForm(true)}
-              disabled={!selectedMockup && artwork.mockups.length > 0}
+              onClick={handleCreateNew}
             >
-              {selectedMockup ? 'Configure Selection' : 'Continue'}
+              Continue
             </Button>
           )}
         </DialogFooter>
