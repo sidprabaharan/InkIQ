@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useQuotes } from "@/context/QuotesContext";
 import {
   Sheet,
   SheetContent,
@@ -28,7 +29,8 @@ import { DecoratorSelectionDialog } from "./DecoratorSelectionDialog";
 // Production scheduling functionality moved to PrintavoPowerScheduler
 
 interface QuoteDetailHeaderProps {
-  quoteId: string;
+  quoteId: string; // UUID for database operations
+  quoteNumber?: string; // Display number for header
   status: string;
   customerInfo?: any;
   items?: any[];
@@ -36,12 +38,14 @@ interface QuoteDetailHeaderProps {
 
 export function QuoteDetailHeader({ 
   quoteId, 
+  quoteNumber,
   status: initialStatus, 
   customerInfo, 
   items = [] 
 }: QuoteDetailHeaderProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { deleteQuote } = useQuotes();
   const [status, setStatus] = useState(initialStatus);
   const [packingSlipOpen, setPackingSlipOpen] = useState(false);
   const [shippingLabelOpen, setShippingLabelOpen] = useState(false);
@@ -104,7 +108,7 @@ export function QuoteDetailHeader({
     window.open(workOrderUrl, '_blank');
     toast({
       title: "Work Order",
-      description: `Work order for ${documentType.toLowerCase()} #${quoteId} opened in new tab`,
+      description: `Work order for ${documentType.toLowerCase()} #${quoteNumber || quoteId} opened in new tab`,
     });
   };
   
@@ -122,23 +126,76 @@ export function QuoteDetailHeader({
   const handlePaymentExpenses = () => {
     toast({
       title: "Payment/Expenses",
-      description: `Managing payment and expenses for ${documentType.toLowerCase()} #${quoteId}`,
+      description: `Managing payment and expenses for ${documentType.toLowerCase()} #${quoteNumber || quoteId}`,
     });
   };
   
   const handleApproval = () => {
     toast({
       title: "Approval",
-      description: `Processing approval for ${documentType.toLowerCase()} #${quoteId}`,
+      description: `Processing approval for ${documentType.toLowerCase()} #${quoteNumber || quoteId}`,
     });
   };
   
-  const handleDelete = () => {
-    toast({
-      title: `${documentType} deleted`,
-      description: `The ${documentType.toLowerCase()} has been deleted`,
-    });
-    navigate("/quotes");
+  const handleDelete = async () => {
+    console.log('🔍 [DEBUG] HandleDelete - Starting delete process');
+    console.log('🔍 [DEBUG] HandleDelete - QuoteId:', quoteId);
+    console.log('🔍 [DEBUG] HandleDelete - Status:', status);
+    console.log('🔍 [DEBUG] HandleDelete - DocumentType:', documentType);
+    
+    // Only allow deletion of draft quotes
+    if (status !== 'draft') {
+      console.log('🔍 [DEBUG] HandleDelete - Status is not draft, blocking deletion');
+      toast({
+        title: "Cannot delete quote",
+        description: "Only draft quotes can be deleted",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Show confirmation dialog
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${documentType} #${quoteNumber || quoteId}? This action cannot be undone.`
+    );
+    
+    if (!confirmed) {
+      console.log('🔍 [DEBUG] HandleDelete - User cancelled confirmation');
+      return;
+    }
+
+    console.log('🔍 [DEBUG] HandleDelete - User confirmed, calling deleteQuote');
+    try {
+      const result = await deleteQuote(quoteId);
+      console.log('🔍 [DEBUG] HandleDelete - DeleteQuote result:', result);
+      
+      if (result.success) {
+        console.log('🔍 [DEBUG] HandleDelete - Delete successful, navigating to quotes');
+        toast({
+          title: `${documentType} deleted`,
+          description: `${documentType} #${quoteNumber || quoteId} has been successfully deleted`,
+        });
+        
+        // Add small delay to allow component cleanup
+        setTimeout(() => {
+          navigate("/quotes");
+        }, 100);
+      } else {
+        console.log('🔍 [DEBUG] HandleDelete - Delete failed:', result.error);
+        toast({
+          title: "Failed to delete quote",
+          description: result.error || "An unknown error occurred",
+          variant: "destructive"
+        });
+      }
+    } catch (err) {
+      console.log('🔍 [DEBUG] HandleDelete - Exception caught:', err);
+      toast({
+        title: "Error deleting quote",
+        description: "An unexpected error occurred while deleting the quote",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleScheduleProduction = () => {
@@ -160,7 +217,7 @@ export function QuoteDetailHeader({
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="flex gap-4 items-center">
-        <h1 className="text-2xl font-semibold">{documentType} #{quoteId}</h1>
+        <h1 className="text-2xl font-semibold">{documentType} #{quoteNumber || quoteId}</h1>
         
         <Button 
           variant="outline" 
@@ -181,7 +238,7 @@ export function QuoteDetailHeader({
           </SheetTrigger>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Messages for {documentType} #{quoteId}</SheetTitle>
+              <SheetTitle>Messages for {documentType} #{quoteNumber || quoteId}</SheetTitle>
               <SheetDescription>
                 Communicate with your customer about this {documentType.toLowerCase()}.
               </SheetDescription>
@@ -257,10 +314,12 @@ export function QuoteDetailHeader({
               <Copy className="h-4 w-4 mr-2" />
               Duplicate
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDelete} className="text-red-600">
-              <Trash className="h-4 w-4 mr-2" />
-              Delete {documentType}
-            </DropdownMenuItem>
+            {status === 'draft' && (
+              <DropdownMenuItem onClick={handleDelete} className="text-red-600 focus:text-red-600 focus:bg-red-50">
+                <Trash className="h-4 w-4 mr-2" />
+                Delete {documentType}
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

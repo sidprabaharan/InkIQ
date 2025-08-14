@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -21,9 +21,15 @@ import { cn } from "@/lib/utils";
 
 interface QuotationDetailsSectionProps {
   quoteData?: any;
+  onDatesChange?: (dates: {
+    productionDueDate?: Date;
+    customerDueDate?: Date;
+    paymentDueDate?: Date;
+    invoiceDate?: Date;
+  }) => void;
 }
 
-export function QuotationDetailsSection({ quoteData }: QuotationDetailsSectionProps) {
+export function QuotationDetailsSection({ quoteData, onDatesChange }: QuotationDetailsSectionProps) {
   // Helper function to safely create dates
   const createSafeDate = (dateValue: any): Date | undefined => {
     if (!dateValue) return undefined;
@@ -46,6 +52,18 @@ export function QuotationDetailsSection({ quoteData }: QuotationDetailsSectionPr
   const [invoiceDate, setInvoiceDate] = useState<Date | undefined>(
     createSafeDate(quoteData?.details?.invoiceDate)
   );
+
+  // Notify parent when dates change
+  useEffect(() => {
+    if (onDatesChange) {
+      onDatesChange({
+        productionDueDate,
+        customerDueDate,
+        paymentDueDate,
+        invoiceDate,
+      });
+    }
+  }, [productionDueDate, customerDueDate, paymentDueDate, invoiceDate, onDatesChange]);
 
   return (
     <div className="space-y-4">
@@ -74,7 +92,7 @@ export function QuotationDetailsSection({ quoteData }: QuotationDetailsSectionPr
             </SelectContent>
           </Select>
         </div>
-        <Input placeholder="PO Number" value={quoteData?.details?.poNumber || ""} />
+        <Input placeholder="PO Number" defaultValue={quoteData?.details?.poNumber || ""} />
         
         {/* Created Date Picker */}
         <Popover>

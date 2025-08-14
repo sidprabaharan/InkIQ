@@ -81,51 +81,60 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
     }
   };
   
-  const submitCustomerForm = () => {
-    // Create the new customer
-    const newCustomer = addCustomer({
-      companyName,
-      email,
-      firstName,
-      lastName,
-      phoneNumber,
-      faxNumber,
-      industry,
-      invoiceOwner,
-      jobTitle,
-      department,
-      billingAddress: {
-        address1: billingAddress1,
-        address2: billingAddress2,
-        city: billingCity,
-        stateProvince: billingStateProvince,
-        zipCode: billingZipCode,
-        country: billingCountry,
-      },
-      shippingAddress: {
-        address1: shippingAddress1,
-        address2: shippingAddress2,
-        city: shippingCity,
-        stateProvince: shippingStateProvince,
-        zipCode: shippingZipCode,
-        country: shippingCountry,
-      },
-      taxInfo: {
-        taxId,
-        taxRate,
-        taxExemptionNumber,
-      }
-    });
-    
-    // Automatically select the new customer to populate billing and shipping forms
-    selectCustomer(newCustomer.id);
-    
-    // Reset form and close dialog
-    resetForm();
-    onOpenChange(false);
-    
-    // Show success message
-    toast.success("Customer added successfully");
+  const submitCustomerForm = async () => {
+    try {
+      console.log('🔍 [DEBUG] CustomerDialog - submitting customer form');
+      
+      // Create the new customer
+      const newCustomer = await addCustomer({
+        companyName,
+        email,
+        firstName,
+        lastName,
+        phoneNumber,
+        faxNumber,
+        industry,
+        invoiceOwner,
+        jobTitle,
+        department,
+        billingAddress: {
+          address1: billingAddress1,
+          address2: billingAddress2,
+          city: billingCity,
+          stateProvince: billingStateProvince,
+          zipCode: billingZipCode,
+          country: billingCountry,
+        },
+        shippingAddress: {
+          address1: shippingAddress1,
+          address2: shippingAddress2,
+          city: shippingCity,
+          stateProvince: shippingStateProvince,
+          zipCode: shippingZipCode,
+          country: shippingCountry,
+        },
+        taxInfo: {
+          taxId,
+          taxRate: '8', // Default tax rate
+          taxExemptionNumber,
+        }
+      });
+      
+      console.log('🔍 [DEBUG] CustomerDialog - customer created:', newCustomer);
+      
+      // Automatically select the new customer to populate billing and shipping forms
+      selectCustomer(newCustomer.id);
+      
+      // Reset form and close dialog
+      resetForm();
+      onOpenChange(false);
+      
+      // Show success message
+      toast.success("Customer added successfully");
+    } catch (error) {
+      console.error('🔍 [DEBUG] CustomerDialog - Error creating customer:', error);
+      toast.error("Failed to create customer. Please try again.");
+    }
   };
   
   const resetForm = () => {

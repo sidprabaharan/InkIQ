@@ -25,8 +25,14 @@ import ArtworkFiles from "@/pages/ArtworkFiles";
 import ImprintDetail from "@/pages/ImprintDetail";
 
 import NotFound from "@/pages/NotFound";
+import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
 import { CustomersProvider } from "./context/CustomersContext";
 import { CartManagerProvider } from "./context/CartManagerContext";
+import { AuthProvider } from "./context/AuthContext";
+import { OrganizationProvider } from "./context/OrganizationContext";
+import { QuotesProvider } from "./context/QuotesContext";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 import "./App.css";
 
@@ -36,35 +42,46 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <BrowserRouter>
-          <CustomersProvider>
-            <CartManagerProvider>
-              <Routes>
-                <Route path="/" element={<AppLayout><Index /></AppLayout>} />
-                <Route path="/quotes" element={<AppLayout><Quotes /></AppLayout>} />
-                <Route path="/quotes/new" element={<AppLayout><NewQuote /></AppLayout>} />
-                <Route path="/quotes/:id/edit" element={<AppLayout><NewQuote /></AppLayout>} />
-                <Route path="/quotes/:id" element={<AppLayout><QuoteDetail /></AppLayout>} />
-                <Route path="/work-orders/:id" element={<WorkOrder />} />
-                <Route path="/invoices" element={<AppLayout><Invoices /></AppLayout>} />
-                <Route path="/customers" element={<AppLayout><Customers /></AppLayout>} />
-                
-                <Route path="/leads" element={<AppLayout><Leads /></AppLayout>} />
-                <Route path="/tasks" element={<AppLayout><Tasks /></AppLayout>} />
-                <Route path="/messages" element={<AppLayout><Emails /></AppLayout>} />
-                <Route path="/calendar" element={<AppLayout><Calendar /></AppLayout>} />
-                <Route path="/products" element={<AppLayout><Products /></AppLayout>} />
-                <Route path="/purchase-orders" element={<AppLayout><PurchaseOrders /></AppLayout>} />
-                <Route path="/production" element={<AppLayout><Production /></AppLayout>} />
-                <Route path="/artwork-files" element={<AppLayout><ArtworkFiles /></AppLayout>} />
-                <Route path="/imprint/:imprintId" element={<AppLayout><ImprintDetail /></AppLayout>} />
-                
-                <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
-                <Route path="*" element={<AppLayout><NotFound /></AppLayout>} />
-              </Routes>
-            </CartManagerProvider>
-          </CustomersProvider>
-        </BrowserRouter>
+        <AuthProvider>
+          <BrowserRouter>
+            <OrganizationProvider>
+              <CustomersProvider>
+                <CartManagerProvider>
+                  <QuotesProvider>
+                  <Routes>
+                  {/* Authentication Routes */}
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<Signup />} />
+                  
+                  {/* Protected App Routes */}
+                  <Route path="/" element={<ProtectedRoute><AppLayout><Index /></AppLayout></ProtectedRoute>} />
+                  <Route path="/quotes" element={<ProtectedRoute><AppLayout><Quotes /></AppLayout></ProtectedRoute>} />
+                  <Route path="/quotes/new" element={<ProtectedRoute><AppLayout><NewQuote /></AppLayout></ProtectedRoute>} />
+                  <Route path="/quotes/:id/edit" element={<ProtectedRoute><AppLayout><NewQuote /></AppLayout></ProtectedRoute>} />
+                  <Route path="/quotes/:id" element={<ProtectedRoute><AppLayout><QuoteDetail /></AppLayout></ProtectedRoute>} />
+                  <Route path="/work-orders/:id" element={<ProtectedRoute><WorkOrder /></ProtectedRoute>} />
+                  <Route path="/invoices" element={<ProtectedRoute><AppLayout><Invoices /></AppLayout></ProtectedRoute>} />
+                  <Route path="/customers" element={<ProtectedRoute><AppLayout><Customers /></AppLayout></ProtectedRoute>} />
+                  
+                  <Route path="/leads" element={<ProtectedRoute><AppLayout><Leads /></AppLayout></ProtectedRoute>} />
+                  <Route path="/tasks" element={<ProtectedRoute><AppLayout><Tasks /></AppLayout></ProtectedRoute>} />
+                  <Route path="/messages" element={<ProtectedRoute><AppLayout><Emails /></AppLayout></ProtectedRoute>} />
+                  <Route path="/calendar" element={<ProtectedRoute><AppLayout><Calendar /></AppLayout></ProtectedRoute>} />
+                  <Route path="/products" element={<ProtectedRoute><AppLayout><Products /></AppLayout></ProtectedRoute>} />
+                  <Route path="/purchase-orders" element={<ProtectedRoute><AppLayout><PurchaseOrders /></AppLayout></ProtectedRoute>} />
+                  <Route path="/production" element={<ProtectedRoute><AppLayout><Production /></AppLayout></ProtectedRoute>} />
+                  <Route path="/artwork-files" element={<ProtectedRoute><AppLayout><ArtworkFiles /></AppLayout></ProtectedRoute>} />
+                  <Route path="/imprint/:imprintId" element={<ProtectedRoute><AppLayout><ImprintDetail /></AppLayout></ProtectedRoute>} />
+                  
+                  <Route path="/settings" element={<ProtectedRoute><AppLayout><Settings /></AppLayout></ProtectedRoute>} />
+                  <Route path="*" element={<ProtectedRoute><AppLayout><NotFound /></AppLayout></ProtectedRoute>} />
+                </Routes>
+                  </QuotesProvider>
+              </CartManagerProvider>
+            </CustomersProvider>
+            </OrganizationProvider>
+          </BrowserRouter>
+        </AuthProvider>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

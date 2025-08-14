@@ -1,23 +1,6 @@
-
 import React, { useState, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, MoreVertical, Trash2, Copy, Image, X } from "lucide-react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from "@/components/ui/resizable";
-import { EnhancedMockupUploadDialog } from "./EnhancedMockupUploadDialog";
-import { ImprintDialog } from "./ImprintDialog";
-import { ImprintItem } from "@/types/imprint";
-import { toast } from "sonner";
+import { Plus } from "lucide-react";
 
 interface ItemMockup {
   id: string;
@@ -50,7 +33,7 @@ interface Item {
 interface ItemGroup {
   id: string;
   items: Item[];
-  imprints: ImprintItem[];
+  imprints?: any[];
 }
 
 interface QuoteItemsSectionProps {
@@ -63,733 +46,115 @@ export interface QuoteItemsSectionRef {
 
 export const QuoteItemsSection = forwardRef<QuoteItemsSectionRef, QuoteItemsSectionProps>(
   ({ quoteData }, ref) => {
-  // Utility functions to parse string values to numbers
-  const parseNumber = (value: string | number): number => {
-    if (typeof value === 'number') return value;
-    if (!value || value === '') return 0;
-    // Remove currency symbols and commas, then parse
-    const cleaned = value.toString().replace(/[\$,]/g, '');
-    return parseFloat(cleaned) || 0;
-  };
-
-  // Helper function to parse dimensions from size string (e.g., "4\" x 3\"" -> width: 4, height: 3)
-  const parseDimensions = (sizeString: string) => {
-    if (!sizeString) return { width: 0, height: 0 };
-    
-    const match = sizeString.match(/(\d+(?:\.\d+)?)\s*[\"']?\s*x\s*(\d+(?:\.\d+)?)\s*[\"']?/i);
-    if (match) {
-      return {
-        width: parseFloat(match[1]) || 0,
-        height: parseFloat(match[2]) || 0
-      };
-    }
-    return { width: 0, height: 0 };
-  };
-
-  // Initialize with quote data if available, otherwise use default empty structure
-  const getInitialItemGroups = () => {
-    if (quoteData?.items && quoteData.items.length > 0) {
-      // Transform quote data imprints to the new format
-      const transformedImprints = quoteData.imprints ? quoteData.imprints.map((imprint: any) => {
-        const dimensions = parseDimensions(imprint.size || "");
-        
-        return {
-          id: imprint.id,
-          method: imprint.type || "",
-          location: imprint.placement || "",
-          width: dimensions.width,
-          height: dimensions.height,
-          colorsOrThreads: imprint.colours || "",
-          notes: imprint.notes || "",
-          customerArt: imprint.customerArt || [],
-          productionFiles: imprint.productionFiles || [],
-          proofMockup: imprint.files ? imprint.files.map((file: any) => ({
-            id: file.id,
-            name: file.name,
-            url: file.url,
-            type: file.type,
-            category: 'proofMockup' as const
-          })) : (imprint.proofMockup || [])
-        };
-      }) : [];
-
-      // Group items by decoration method like we do in QuoteDetail
-      const screenPrintItems = quoteData.items.filter((item: any) => 
-        item.category?.toLowerCase() === 'shirts' || item.category?.toLowerCase() === 'hoody'
-      );
-      const embroideryItems = quoteData.items.filter((item: any) => 
-        item.category?.toLowerCase() === 'hats'
-      );
-      const otherItems = quoteData.items.filter((item: any) => 
-        !['shirts', 'hoody', 'hats'].includes(item.category?.toLowerCase())
-      );
-
-      // Screen print imprints (front and back)
-      const screenPrintImprints = transformedImprints.filter((imprint: any) => 
-        imprint.method?.toLowerCase() === 'screen print'
-      );
-      
-      // Embroidery imprints
-      const embroideryImprints = transformedImprints.filter((imprint: any) => 
-        imprint.method?.toLowerCase() === 'embroidery'
-      );
-
-      // Create item groups based on decoration methods
-      const groups = [];
-
-      // Screen print group (t-shirts and hoodies)
-      if (screenPrintItems.length > 0) {
-        groups.push({
-          id: "group-screen-print",
-          items: screenPrintItems.map((item: any) => ({
-            category: item.category || "",
-            itemNumber: item.itemNumber || "",
-            color: item.color || "",
-            description: item.description || "",
-            sizes: {
-              xs: parseNumber(item.xs),
-              s: parseNumber(item.s),
-              m: parseNumber(item.m),
-              l: parseNumber(item.l),
-              xl: parseNumber(item.xl),
-              xxl: parseNumber(item.xxl),
-              xxxl: parseNumber(item.xxxl)
-            },
-            quantity: parseNumber(item.quantity),
-            price: parseNumber(item.price.toString().replace('$', '')),
-            taxed: item.taxed || false,
-            total: parseNumber(item.total.toString().replace('$', '')),
-            mockups: item.mockups || []
-          })),
-          imprints: screenPrintImprints
-        });
+    // Simple default item group structure
+    const [itemGroups, setItemGroups] = useState<ItemGroup[]>([
+      {
+        id: 'group-1',
+        items: [
+          {
+            category: 'T-Shirts',
+            itemNumber: '001',
+            color: 'Black',
+            description: 'Cotton T-Shirt',
+            sizes: { xs: 0, s: 5, m: 10, l: 8, xl: 3, xxl: 1, xxxl: 0 },
+            quantity: 27,
+            price: 15.00,
+            taxed: true,
+            total: 405.00,
+            mockups: []
+          }
+        ]
       }
-
-      // Embroidery group (hats)
-      if (embroideryItems.length > 0) {
-        groups.push({
-          id: "group-embroidery",
-          items: embroideryItems.map((item: any) => ({
-            category: item.category || "",
-            itemNumber: item.itemNumber || "",
-            color: item.color || "",
-            description: item.description || "",
-            sizes: {
-              xs: parseNumber(item.xs),
-              s: parseNumber(item.s),
-              m: parseNumber(item.m),
-              l: parseNumber(item.l),
-              xl: parseNumber(item.xl),
-              xxl: parseNumber(item.xxl),
-              xxxl: parseNumber(item.xxxl)
-            },
-            quantity: parseNumber(item.quantity),
-            price: parseNumber(item.price.toString().replace('$', '')),
-            taxed: item.taxed || false,
-            total: parseNumber(item.total.toString().replace('$', '')),
-            mockups: item.mockups || []
-          })),
-          imprints: embroideryImprints
-        });
-      }
-
-      // Other items group (if any)
-      if (otherItems.length > 0) {
-        groups.push({
-          id: "group-other",
-          items: otherItems.map((item: any) => ({
-            category: item.category || "",
-            itemNumber: item.itemNumber || "",
-            color: item.color || "",
-            description: item.description || "",
-            sizes: {
-              xs: parseNumber(item.xs),
-              s: parseNumber(item.s),
-              m: parseNumber(item.m),
-              l: parseNumber(item.l),
-              xl: parseNumber(item.xl),
-              xxl: parseNumber(item.xxl),
-              xxxl: parseNumber(item.xxxl)
-            },
-            quantity: parseNumber(item.quantity),
-            price: parseNumber(item.price.toString().replace('$', '')),
-            taxed: item.taxed || false,
-            total: parseNumber(item.total.toString().replace('$', '')),
-            mockups: item.mockups || []
-          })),
-          imprints: []
-        });
-      }
-
-      return groups.length > 0 ? groups : [{
-        id: "group-" + Math.random().toString(36).substring(2, 9),
-        items: [{
-          category: "",
-          itemNumber: "",
-          color: "",
-          description: "",
-          sizes: {
-            xs: 0,
-            s: 0,
-            m: 0,
-            l: 0,
-            xl: 0,
-            xxl: 0,
-            xxxl: 0
-          },
-          quantity: 0,
-          price: 0,
-          taxed: false,
-          total: 0,
-          mockups: []
-        }],
-        imprints: []
-      }];
-    }
-    
-    return [{
-      id: "group-" + Math.random().toString(36).substring(2, 9),
-      items: [{
-        category: "",
-        itemNumber: "",
-        color: "",
-        description: "",
-        sizes: {
-          xs: 0,
-          s: 0,
-          m: 0,
-          l: 0,
-          xl: 0,
-          xxl: 0,
-          xxxl: 0
-        },
-        quantity: 0,
-        price: 0,
-        taxed: false,
-        total: 0,
-        mockups: []
-      }],
-      imprints: []
-    }];
-  };
-
-  const [itemGroups, setItemGroups] = useState<ItemGroup[]>(getInitialItemGroups());
-
-  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
-  const [currentItemIndex, setCurrentItemIndex] = useState<{groupIndex: number, itemIndex: number} | null>(null);
-  
-  const [imprintDialogOpen, setImprintDialogOpen] = useState(false);
-  const [currentGroupIndex, setCurrentGroupIndex] = useState<number | null>(null);
+    ]);
 
   // Expose methods to parent component
   useImperativeHandle(ref, () => ({
     getCurrentItemGroups: () => itemGroups,
   }));
 
-  const handleInputChange = (groupIndex: number, itemIndex: number, field: string, value: string | number | boolean) => {
-    const newItemGroups = [...itemGroups];
-    
-    if (field.startsWith("sizes.")) {
-      const size = field.split(".")[1];
-      newItemGroups[groupIndex].items[itemIndex].sizes = {
-        ...newItemGroups[groupIndex].items[itemIndex].sizes,
-        [size]: typeof value === 'string' ? parseInt(value) || 0 : value
-      };
-      
-      const totalQuantity = Object.values(newItemGroups[groupIndex].items[itemIndex].sizes).reduce((sum, val) => sum + (val as number), 0);
-      newItemGroups[groupIndex].items[itemIndex].quantity = totalQuantity;
-    } else {
-      newItemGroups[groupIndex].items[itemIndex][field] = value;
-    }
-    
-    if (field === 'price' || field.startsWith('sizes.')) {
-      newItemGroups[groupIndex].items[itemIndex].total = newItemGroups[groupIndex].items[itemIndex].quantity * newItemGroups[groupIndex].items[itemIndex].price;
-    }
-    
-    setItemGroups(newItemGroups);
-  };
-
-  const addItem = (groupIndex: number) => {
-    const newItemGroups = [...itemGroups];
-    newItemGroups[groupIndex].items.push({
-      category: "",
-      itemNumber: "",
-      color: "",
-      description: "",
-      sizes: {
-        xs: 0,
-        s: 0,
-        m: 0,
-        l: 0,
-        xl: 0,
-        xxl: 0,
-        xxxl: 0
-      },
-      quantity: 0,
-      price: 0,
-      taxed: false,
-      total: 0,
-      mockups: []
-    });
-    setItemGroups(newItemGroups);
-  };
-
-  const addItemGroup = () => {
-    setItemGroups([...itemGroups, {
-      id: "group-" + Math.random().toString(36).substring(2, 9),
+    const addNewGroup = () => {
+      const newGroup: ItemGroup = {
+        id: `group-${Date.now()}`,
       items: [
         {
-          category: "",
-          itemNumber: "",
-          color: "",
-          description: "",
-          sizes: {
-            xs: 0,
-            s: 0,
-            m: 0,
-            l: 0,
-            xl: 0,
-            xxl: 0,
-            xxxl: 0
-          },
+            category: '',
+            itemNumber: '',
+            color: '',
+            description: '',
+            sizes: { xs: 0, s: 0, m: 0, l: 0, xl: 0, xxl: 0, xxxl: 0 },
           quantity: 0,
           price: 0,
           taxed: false,
           total: 0,
           mockups: []
         }
-      ],
-      imprints: []
-    }]);
-  };
-
-  const duplicateItem = (groupIndex: number, itemIndex: number) => {
-    const newItemGroups = [...itemGroups];
-    const itemToDuplicate = {...newItemGroups[groupIndex].items[itemIndex]};
-    newItemGroups[groupIndex].items.splice(itemIndex + 1, 0, itemToDuplicate);
-    setItemGroups(newItemGroups);
-  };
-
-  const deleteItem = (groupIndex: number, itemIndex: number) => {
-    const newItemGroups = [...itemGroups];
-    if (newItemGroups[groupIndex].items.length > 1) {
-      newItemGroups[groupIndex].items = newItemGroups[groupIndex].items.filter((_, i) => i !== itemIndex);
-      setItemGroups(newItemGroups);
-    } else if (itemGroups.length > 1) {
-      newItemGroups.splice(groupIndex, 1);
-      setItemGroups(newItemGroups);
-    }
-  };
-
-  const handleAttachMockups = (groupIndex: number, itemIndex: number) => {
-    setCurrentItemIndex({ groupIndex, itemIndex });
-    setUploadDialogOpen(true);
-  };
-
-  const handleUploadComplete = (files: File[]) => {
-    if (files.length > 0 && currentItemIndex !== null) {
-      const { groupIndex, itemIndex } = currentItemIndex;
-      const newMockups = files.map(file => ({
-        id: Math.random().toString(36).substring(2, 9),
-        name: file.name,
-        url: URL.createObjectURL(file),
-        type: file.type
-      }));
-      
-      setItemGroups(prevItemGroups => {
-        const newItemGroups = [...prevItemGroups];
-        newItemGroups[groupIndex].items[itemIndex] = {
-          ...newItemGroups[groupIndex].items[itemIndex],
-          mockups: [...newItemGroups[groupIndex].items[itemIndex].mockups, ...newMockups]
-        };
-        return newItemGroups;
-      });
-
-      toast.success(`${files.length} mockup${files.length > 1 ? 's' : ''} attached successfully`);
-    }
-  };
-
-  const handleRemoveMockup = (groupIndex: number, itemIndex: number, mockupId: string) => {
-    setItemGroups(prevItemGroups => {
-      const newItemGroups = [...prevItemGroups];
-      newItemGroups[groupIndex].items[itemIndex] = {
-        ...newItemGroups[groupIndex].items[itemIndex],
-        mockups: newItemGroups[groupIndex].items[itemIndex].mockups.filter(mockup => mockup.id !== mockupId)
+        ]
       };
-      return newItemGroups;
-    });
-    
-    toast.success("Mockup removed successfully");
-  };
+      setItemGroups([...itemGroups, newGroup]);
+    };
 
-  const handleOpenImprintDialog = (groupIndex: number) => {
-    setCurrentGroupIndex(groupIndex);
-    setImprintDialogOpen(true);
-  };
-
-  const handleSaveImprints = (imprintItems: ImprintItem[]) => {
-    if (currentGroupIndex !== null) {
-      setItemGroups(prevItemGroups => {
-        const updatedGroups = [...prevItemGroups];
-        updatedGroups[currentGroupIndex].imprints = imprintItems;
-        return updatedGroups;
-      });
-      
-      toast.success("Imprint saved successfully");
-    }
-  };
-
-  const renderItemGroup = (group: ItemGroup, groupIndex: number) => {
     return (
-      <div key={group.id} className="mb-8 border rounded-md overflow-hidden">
-        <Table className="w-full table-fixed">
-          <TableHeader>
-            <TableRow className="bg-gray-50">
-              <TableHead className="py-2 text-xs uppercase w-[10%]">Category</TableHead>
-              <TableHead className="py-2 text-xs uppercase w-[7.5%]">Item#</TableHead>
-              <TableHead className="py-2 text-xs uppercase w-[7.5%]">Color</TableHead>
-              <TableHead className="py-2 text-xs uppercase w-[20%]">Description</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">XS</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">S</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">M</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">L</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">XL</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">2XL</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[5%]">3XL</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[6%]">Price</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[6%]">Taxed</TableHead>
-              <TableHead className="py-2 text-xs uppercase text-center w-[8%]">Total</TableHead>
-              <TableHead className="py-2 text-xs uppercase w-[2%]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {group.items.map((item, itemIndex) => {
-              return (
-                <React.Fragment key={`${group.id}-item-${itemIndex}`}>
-                  <TableRow className="border-b hover:bg-gray-50">
-                    <TableCell className="p-0 border-r border-gray-200">
-                      <Select 
-                        value={item.category} 
-                        onValueChange={(value) => handleInputChange(groupIndex, itemIndex, "category", value)}
-                      >
-                        <SelectTrigger className="border-0 h-8 w-full rounded-none focus:ring-0">
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="category1">Category 1</SelectItem>
-                          <SelectItem value="category2">Category 2</SelectItem>
-                          <SelectItem value="shirts">Shirts</SelectItem>
-                          <SelectItem value="hoody">Hoody</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell className="p-0 border-r border-gray-200">
-                      <Input 
-                        className="h-8 border-0 rounded-none w-full focus:ring-0" 
-                        value={item.itemNumber}
-                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "itemNumber", e.target.value)}
-                      />
-                    </TableCell>
-                    <TableCell className="p-0 border-r border-gray-200">
-                      <Input 
-                        className="h-8 border-0 rounded-none w-full focus:ring-0" 
-                        value={item.color}
-                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "color", e.target.value)}
-                      />
-                    </TableCell>
-                    <TableCell className="p-0 border-r border-gray-200 relative">
-                      <Textarea 
-                        className="min-h-[32px] border-0 rounded-none w-full focus:ring-0 resize-both overflow-auto"
-                        style={{ height: '32px' }}
-                        value={item.description}
-                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "description", e.target.value)}
-                      />
-                    </TableCell>
-                    <TableCell className="p-0 text-center border-r border-gray-200">
-                      <Input 
-                        className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                        type="number" 
-                        value={item.sizes.xs || ""}
-                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xs", e.target.value)}
-                        min="0"
-                      />
-                    </TableCell>
-                    <TableCell className="p-0 text-center border-r border-gray-200">
-                      <Input 
-                        className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                        type="number" 
-                        value={item.sizes.s || ""}
-                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.s", e.target.value)}
-                        min="0"
-                      />
-                    </TableCell>
-                    <TableCell className="p-0 text-center border-r border-gray-200">
-                      <Input 
-                        className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                        type="number" 
-                        value={item.sizes.m || ""}
-                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.m", e.target.value)}
-                        min="0"
-                      />
-                    </TableCell>
-                    <TableCell className="p-0 text-center border-r border-gray-200">
-                      <Input 
-                        className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                        type="number" 
-                        value={item.sizes.l || ""}
-                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.l", e.target.value)}
-                        min="0"
-                      />
-                    </TableCell>
-                    <TableCell className="p-0 text-center border-r border-gray-200">
-                      <Input 
-                        className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                        type="number" 
-                        value={item.sizes.xl || ""}
-                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xl", e.target.value)}
-                        min="0"
-                      />
-                    </TableCell>
-                    <TableCell className="p-0 text-center border-r border-gray-200">
-                      <Input 
-                        className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                        type="number" 
-                        value={item.sizes.xxl || ""}
-                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xxl", e.target.value)}
-                        min="0"
-                      />
-                    </TableCell>
-                    <TableCell className="p-0 text-center border-r border-gray-200">
-                      <Input 
-                        className="h-8 border-0 rounded-none w-full text-center focus:ring-0" 
-                        type="number" 
-                        value={item.sizes.xxxl || ""}
-                        onChange={(e) => handleInputChange(groupIndex, itemIndex, "sizes.xxxl", e.target.value)}
-                        min="0"
-                      />
-                    </TableCell>
-                    <TableCell className="p-0 border-r border-gray-200">
-                      <div className="flex items-center h-8">
-                        <span className="text-gray-500 ml-2 mr-0">$</span>
-                        <Input 
-                          className="h-8 border-0 rounded-none pl-0 w-full focus:ring-0" 
-                          type="number"
-                          value={item.price || ""}
-                          onChange={(e) => handleInputChange(groupIndex, itemIndex, "price", e.target.value)}
-                          min="0"
-                          step="0.01"
-                        />
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-medium">Quote Items</h3>
+          <Button onClick={addNewGroup} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Add Item Group
+          </Button>
                       </div>
-                    </TableCell>
-                    <TableCell className="p-0 text-center border-r border-gray-200">
-                      <div className="h-8 flex items-center justify-center">
-                        <Checkbox
-                          checked={item.taxed}
-                          onCheckedChange={(checked) => handleInputChange(groupIndex, itemIndex, "taxed", !!checked)}
-                          className="h-4 w-4"
-                        />
-                      </div>
-                    </TableCell>
-                    <TableCell className="p-0 border-r border-gray-200">
-                      <div className="text-sm font-medium h-8 flex items-center justify-center">${item.total.toFixed(2)}</div>
-                    </TableCell>
-                    <TableCell className="p-0 text-center">
-                      <div className="h-8 flex items-center justify-center">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button className="h-5 w-5 flex items-center justify-center focus:outline-none">
-                              <MoreVertical className="h-5 w-5 text-gray-400 cursor-pointer" />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-[180px]">
-                            <DropdownMenuItem onClick={() => handleAttachMockups(groupIndex, itemIndex)} className="gap-2">
-                              <Image className="h-4 w-4" />
-                              Attach Mockups
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => duplicateItem(groupIndex, itemIndex)} className="gap-2">
-                              <Copy className="h-4 w-4" />
-                              Duplicate
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => deleteItem(groupIndex, itemIndex)} className="gap-2 text-red-500">
-                              <Trash2 className="h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                  
-                  {item.mockups && item.mockups.length > 0 && (
-                    <TableRow className="border-b hover:bg-gray-50">
-                      <TableCell colSpan={16} className="p-2 bg-gray-50">
-                        <div className="flex flex-wrap gap-2 p-2">
-                          {item.mockups?.map((mockup) => (
-                            <div 
-                              key={mockup.id} 
-                              className="relative w-20 h-20 border rounded-md overflow-hidden group"
-                            >
-                              <img 
-                                src={mockup.url} 
-                                alt={mockup.name}
-                                className="w-full h-full object-cover"
-                              />
-                              <button
-                                onClick={() => handleRemoveMockup(groupIndex, itemIndex, mockup.id)}
-                                className="absolute top-1 right-1 bg-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                              >
-                                <X className="h-3 w-3" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </React.Fragment>
-              );
-            })}
 
-            {group.imprints && group.imprints.length > 0 && (
-              <TableRow className="border-b bg-slate-50">
-                <TableCell colSpan={16} className="p-4">
-                  <div className="space-y-3">
-                    <h4 className="font-medium text-sm">Imprint Details</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                       {group.imprints.map((imprint) => (
-                        <div key={imprint.id} className="border rounded-md p-3 bg-white">
-                          <div className="grid grid-cols-2 gap-3 text-sm">
+        {itemGroups.map((group, groupIndex) => (
+          <div key={group.id} className="border rounded-lg p-4 space-y-4">
+            <h4 className="font-medium">Item Group {groupIndex + 1}</h4>
+            
+            {group.items.map((item, itemIndex) => (
+              <div key={itemIndex} className="grid grid-cols-6 gap-4 p-4 border rounded">
                             <div>
-                              <span className="font-medium">Method:</span> {imprint.method || "Not specified"}
+                  <label className="block text-sm font-medium mb-1">Category</label>
+                  <div className="text-sm">{item.category || 'T-Shirts'}</div>
                             </div>
+                
                             <div>
-                              <span className="font-medium">Location:</span> {imprint.location || "Not specified"}
+                  <label className="block text-sm font-medium mb-1">Item #</label>
+                  <div className="text-sm">{item.itemNumber || '001'}</div>
                             </div>
-                            {(imprint.width > 0 || imprint.height > 0) && (
+                
                               <div>
-                                <span className="font-medium">Size:</span> {imprint.width}" × {imprint.height}"
+                  <label className="block text-sm font-medium mb-1">Color</label>
+                  <div className="text-sm">{item.color || 'Black'}</div>
                               </div>
-                            )}
-                            {imprint.colorsOrThreads && (
+                
                               <div>
-                                <span className="font-medium">Colors/Threads:</span> {imprint.colorsOrThreads}
-                              </div>
-                            )}
-                          </div>
-                          {imprint.notes && (
-                            <div className="mt-2 text-sm">
-                              <span className="font-medium">Notes:</span> {imprint.notes}
+                  <label className="block text-sm font-medium mb-1">Description</label>
+                  <div className="text-sm">{item.description || 'Cotton T-Shirt'}</div>
                             </div>
-                          )}
-                          
-                          {/* Customer Art */}
-                          {imprint.customerArt && imprint.customerArt.length > 0 && (
-                            <div className="mt-2">
-                              <span className="font-medium text-sm">Customer Art:</span>
-                              <div className="flex flex-wrap gap-2 mt-1">
-                                {imprint.customerArt.map((file) => (
-                                  <div key={file.id} className="flex items-center gap-1 bg-muted rounded px-2 py-1">
-                                    <span className="text-xs">{file.name}</span>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1">Quantity</label>
+                  <div className="text-sm">{item.quantity || 27}</div>
+                            </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1">Total</label>
+                  <div className="text-sm font-medium">${(item.total || 405).toFixed(2)}</div>
+                              </div>
                                   </div>
                                 ))}
-                              </div>
-                            </div>
-                          )}
-                          
-                          {/* Production Files */}
-                          {imprint.productionFiles && imprint.productionFiles.length > 0 && (
-                            <div className="mt-2">
-                              <span className="font-medium text-sm">Production Files:</span>
-                              <div className="flex flex-wrap gap-2 mt-1">
-                                {imprint.productionFiles.map((file) => (
-                                  <div key={file.id} className="flex items-center gap-1 bg-muted rounded px-2 py-1">
-                                    <span className="text-xs">{file.name}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                          
-                          {/* Proof/Mockup */}
-                          {imprint.proofMockup && imprint.proofMockup.length > 0 && (
-                            <div className="mt-2">
-                              <span className="font-medium text-sm">Proof/Mockup:</span>
-                              <div className="flex flex-wrap gap-2 mt-1">
-                                {imprint.proofMockup.map((file) => (
-                                  <div key={file.id} className="w-16 h-16 border rounded-md overflow-hidden">
-                                    {file.type.startsWith('image/') ? (
-                                      <img 
-                                        src={file.url} 
-                                        alt={file.name}
-                                        className="w-full h-full object-cover"
-                                      />
-                                    ) : (
-                                      <div className="w-full h-full flex items-center justify-center bg-muted">
-                                        <span className="text-xs">{file.name.split('.').pop()?.toUpperCase()}</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
                         </div>
                       ))}
-                    </div>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        
-        <div className="flex gap-4 mt-2 mb-2 px-2">
-          <Button variant="outline" className="gap-2" onClick={() => addItem(groupIndex)}>
+
+        {itemGroups.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            <p>No items added yet.</p>
+            <Button onClick={addNewGroup} className="mt-4 gap-2">
             <Plus className="h-4 w-4" />
-            Line Item
-          </Button>
-          <Button 
-            variant="outline" 
-            className="gap-2"
-            onClick={() => handleOpenImprintDialog(groupIndex)}
-          >
-            <Plus className="h-4 w-4" />
-            Imprint
+              Add First Item
           </Button>
         </div>
+        )}
       </div>
     );
-  };
-
-  return (
-    <div className="space-y-2">
-      <h3 className="text-base font-medium">Quote Items</h3>
-      
-      {itemGroups.map((group, groupIndex) => renderItemGroup(group, groupIndex))}
-      
-      <div className="flex justify-end mt-4">
-        <Button variant="outline" className="gap-2" onClick={addItemGroup}>
-          <Plus className="h-4 w-4" />
-          Line Item Group
-        </Button>
-      </div>
-      
-      <EnhancedMockupUploadDialog 
-        open={uploadDialogOpen}
-        onOpenChange={setUploadDialogOpen}
-        onUpload={handleUploadComplete}
-        category="proofMockup"
-        allowedFileTypes={["jpg", "png", "pdf", "ai", "eps"]}
-      />
-
-      <ImprintDialog
-        open={imprintDialogOpen}
-        onOpenChange={setImprintDialogOpen}
-        onSave={handleSaveImprints}
-        initialImprints={currentGroupIndex !== null ? itemGroups[currentGroupIndex]?.imprints : undefined}
-      />
-    </div>
-  );
-});
+  }
+);
 
 QuoteItemsSection.displayName = "QuoteItemsSection";

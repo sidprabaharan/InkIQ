@@ -21,8 +21,10 @@ interface CustomerSectionProps {
 
 export function CustomerSection({ leadData, quoteData }: CustomerSectionProps) {
   const [openDialog, setOpenDialog] = useState(false);
-  const { customers, selectedCustomer, selectCustomer } = useCustomers();
+  const { customers, selectedCustomer, selectCustomer, loading, error } = useCustomers();
   const navigate = useNavigate();
+
+  // Debug logging (removed to prevent infinite loop)
 
   // Auto-select customer if quote data has customer info and no customer is selected
   React.useEffect(() => {

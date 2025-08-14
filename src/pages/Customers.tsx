@@ -15,10 +15,11 @@ import {
   File, Image, Folder, Code, PenTool, ShoppingCart, FileCheck, UserPlus,
   Edit, MapPin, ClipboardList, Upload, Grid, List, FileImage, Download, 
   Eye, MoreVertical, User, Tag, Layers, Globe, Linkedin, Facebook, Twitter,
-  Building, Users, DollarSign
+  Building, Users, DollarSign, Trash
 } from "lucide-react";
 import { CustomerDialog } from "@/components/quotes/CustomerDialog";
 import { useCustomers } from "@/context/CustomersContext";
+import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AddContactDialog, ContactFormValues } from "@/components/customers/AddContactDialog";
 import { ContactsList } from "@/components/customers/ContactsList";
@@ -56,9 +57,10 @@ interface UnifiedImprint {
 
 export default function Customers() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [openDialog, setOpenDialog] = useState(false);
   const [openContactDialog, setOpenContactDialog] = useState(false);
-  const { customers, addContactToCustomer, updateCustomer, updateCustomerContact } = useCustomers();
+  const { customers, addContactToCustomer, updateCustomer, updateCustomerContact, deleteCustomer } = useCustomers();
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   
@@ -70,6 +72,43 @@ export default function Customers() {
   const [editTaxInfoOpen, setEditTaxInfoOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [activeTab, setActiveTab] = useState("contacts");
+
+  // Delete customer handler
+  const handleDeleteCustomer = async (customerId: string, customerName: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${customerName}"? This action cannot be undone.`
+    );
+    
+    if (!confirmed) return;
+
+    try {
+      const result = await deleteCustomer(customerId);
+      
+      if (result.success) {
+        toast({
+          title: "Customer deleted",
+          description: `${customerName} has been successfully deleted`,
+        });
+        
+        // Clear selection if deleted customer was selected
+        if (selectedCustomerId === customerId) {
+          setSelectedCustomerId(null);
+        }
+      } else {
+        toast({
+          title: "Failed to delete customer",
+          description: result.error || "An unknown error occurred",
+          variant: "destructive"
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Error deleting customer",
+        description: "An unexpected error occurred while deleting the customer",
+        variant: "destructive"
+      });
+    }
+  };
   
   // Artwork & Files tab states
   const [artworkSearchTerm, setArtworkSearchTerm] = useState('');
@@ -566,6 +605,7 @@ export default function Customers() {
                     <th className="px-4 py-3 text-sm font-medium text-gray-600">No. of Orders Placed</th>
                     <th className="px-4 py-3 text-sm font-medium text-gray-600">Sales Volume</th>
                     <th className="px-4 py-3 text-sm font-medium text-gray-600">Industry</th>
+                    <th className="px-4 py-3 text-sm font-medium text-gray-600 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -596,11 +636,24 @@ export default function Customers() {
                       <td className="px-4 py-3 text-sm text-gray-500">
                         {getIndustryName(customer.industry)}
                       </td>
+                      <td className="px-4 py-3 text-sm text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteCustomer(customer.id, customer.companyName);
+                          }}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </td>
                     </tr>
                   ))}
                   {filteredCustomers.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="px-4 py-8 text-center text-gray-500 text-sm">
+                      <td colSpan={8} className="px-4 py-8 text-center text-gray-500 text-sm">
                         No customers found. Add a new customer to get started.
                       </td>
                     </tr>

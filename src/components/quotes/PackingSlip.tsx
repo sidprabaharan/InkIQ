@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Package, Printer, Save, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +28,7 @@ interface PackingSlipProps {
     country: string;
     phone?: string;
     email?: string;
-  };
+  } | null;
   items: Array<{
     description: string;
     itemNumber: string;
@@ -56,10 +56,30 @@ export function PackingSlip({
   const [isEditing, setIsEditing] = useState(false);
   const [currentBox, setCurrentBox] = useState("1");
   const [totalBoxes, setTotalBoxes] = useState("1");
-  const [editedCustomerInfo, setEditedCustomerInfo] = useState(customerInfo);
+  
+  // Provide default values if customerInfo is null
+  const defaultCustomerInfo = {
+    name: "No Customer",
+    companyName: "",
+    address1: "No Address",
+    address2: "",
+    city: "No City",
+    stateProvince: "No State",
+    zipCode: "00000",
+    country: "N/A",
+    phone: "",
+    email: ""
+  };
+  
+  const [editedCustomerInfo, setEditedCustomerInfo] = useState(customerInfo || defaultCustomerInfo);
   const [editedItems, setEditedItems] = useState(items);
   const [editedShipDate, setEditedShipDate] = useState(shipDate);
   const [shippingNotes, setShippingNotes] = useState("Please verify contents before shipping. Contact customer for any discrepancies.");
+
+  // Update edited customer info when customerInfo prop changes
+  useEffect(() => {
+    setEditedCustomerInfo(customerInfo || defaultCustomerInfo);
+  }, [customerInfo]);
 
   const handlePrint = () => {
     const printContents = document.getElementById("packing-slip")?.innerHTML;

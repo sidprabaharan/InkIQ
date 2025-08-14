@@ -1,9 +1,10 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { QuoteSummaryCard } from "@/components/quotes/QuoteSummaryCard";
 import { QuotationTable } from "@/components/quotes/QuotationTable";
 import { useNavigate } from "react-router-dom";
+import { useQuotes } from "@/context/QuotesContext";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -13,11 +14,18 @@ import { cn } from "@/lib/utils";
 
 export default function Quotes() {
   const navigate = useNavigate();
+  const { getQuotes } = useQuotes();
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [ownerFilter, setOwnerFilter] = useState<string>("all");
   const [paymentFilter, setPaymentFilter] = useState<string>("all");
+  
+  // Refresh quotes when component mounts
+  useEffect(() => {
+    console.log('🔍 [DEBUG] Quotes page - Refreshing quotes on mount');
+    getQuotes();
+  }, []); // Empty dependency array - only run on mount
   
   // Mock function to calculate filtered totals based on date range and status
   const getFilteredTotals = () => {

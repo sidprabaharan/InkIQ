@@ -1,16 +1,10 @@
 
-import React, { useState } from "react";
-import { Search, ChevronDown, ChevronRight } from "lucide-react";
+import React from "react";
+import { Search } from "lucide-react";
 import { QuotationStatusBadge } from "./QuotationStatusBadge";
-import { PaymentStatusBadge } from "./PaymentStatusBadge";
-import { StatusDropdown } from "./StatusDropdown";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { useQuotes } from "@/context/QuotesContext";
 
 interface LineItem {
   id: string;
@@ -34,7 +28,8 @@ interface Quotation {
 }
 
 // Define which statuses belong to quotes vs invoices
-const quoteStatuses = ["Quote", "Quote Approval Sent", "Quote Approved"];
+// Updated to match the actual database statuses
+const quoteStatuses = ["draft", "sent", "pending_approval", "approved", "rejected", "expired"];
 
 // Sample data for both quotes and invoices
 const allQuotationsData: Quotation[] = [
@@ -184,11 +179,10 @@ interface QuotationTableProps {
 
 export function QuotationTable({ isInvoicesPage = false }: QuotationTableProps) {
   const navigate = useNavigate();
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-  const [lineItemStatuses, setLineItemStatuses] = useState<{[key: string]: string}>({});
+  const { quotes, loading, error } = useQuotes();
   
   // Filter data based on whether we're on the Quotes or Invoices page
-  const quotationsData = allQuotationsData
+  const quotationsData = quotes
     .filter(quotation => {
       if (isInvoicesPage) {
         // For invoices page, show everything that's NOT a quote status
@@ -198,31 +192,46 @@ export function QuotationTable({ isInvoicesPage = false }: QuotationTableProps) 
         return quoteStatuses.includes(quotation.status);
       }
     })
-    .sort((a, b) => parseInt(b.id) - parseInt(a.id)); // Sort by ID descending
-  
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()); // Sort by creation date descending
+
   const handleRowClick = (quotationId: string) => {
     navigate(`/quotes/${quotationId}`);
   };
 
-  const toggleRowExpansion = (quotationId: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-    setExpandedRows(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(quotationId)) {
-        newSet.delete(quotationId);
-      } else {
-        newSet.add(quotationId);
-      }
-      return newSet;
-    });
-  };
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg border overflow-hidden">
+        <div className="flex justify-between items-center p-4 border-b">
+          <h2 className="text-xl font-semibold">{isInvoicesPage ? "Invoices" : "Quotations"}</h2>
+        </div>
+        <div className="p-8 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-inkiq-primary mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading quotes...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const handleLineItemStatusChange = (lineItemId: string, newStatus: string) => {
-    setLineItemStatuses(prev => ({
-      ...prev,
-      [lineItemId]: newStatus
-    }));
-  };
+  // Show error state
+  if (error) {
+    return (
+      <div className="bg-white rounded-lg border overflow-hidden">
+        <div className="flex justify-between items-center p-4 border-b">
+          <h2 className="text-xl font-semibold">{isInvoicesPage ? "Invoices" : "Quotations"}</h2>
+        </div>
+        <div className="p-8 text-center">
+          <p className="text-red-600">Error loading quotes: {error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-2 px-4 py-2 bg-inkiq-primary text-white rounded hover:bg-inkiq-primary/90"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg border overflow-hidden">
@@ -239,118 +248,76 @@ export function QuotationTable({ isInvoicesPage = false }: QuotationTableProps) 
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50 text-left">
+        <table className="min-w-full">
+          <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-sm font-medium text-gray-600">ID.</th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-600">Customer</th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-600">Due Date</th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-600">Owner</th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-600">Total</th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-600">Outstanding</th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-600">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                ID
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Customer
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Due Date
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Owner
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Total
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Outstanding
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+
             </tr>
           </thead>
-          <tbody>
+          <tbody className="bg-white divide-y divide-gray-200">
             {quotationsData.map((quotation) => (
               <React.Fragment key={quotation.id}>
-                <tr className="border-b hover:bg-gray-50 transition-colors cursor-pointer">
-                  <td className="px-4 py-3 text-sm text-gray-500">
-                    <div className="flex items-center gap-2">
-                      {isInvoicesPage && quotation.lineItems && (
-                        <button
-                          onClick={(e) => toggleRowExpansion(quotation.id, e)}
-                          className="hover:bg-gray-200 rounded p-1"
-                        >
-                          {expandedRows.has(quotation.id) ? (
-                            <ChevronDown className="h-4 w-4" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4" />
-                          )}
-                        </button>
-                      )}
-                      <div>
-                        {quotation.id}
-                        {quotation.norisId && (
-                          <div className="text-xs text-gray-400">{quotation.norisId}</div>
-                        )}
-                      </div>
+                <tr 
+                  className="hover:bg-gray-50 cursor-pointer" 
+                  onClick={() => handleRowClick(quotation.id)}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">
+                      {quotation.quote_number}
                     </div>
                   </td>
-                  <td 
-                    className="px-4 py-3 text-sm"
-                    onClick={() => handleRowClick(quotation.id)}
-                  >
-                    {quotation.customer}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{quotation.customer_name || 'Unknown Customer'}</div>
                   </td>
-                  <td 
-                    className="px-4 py-3 text-sm text-gray-500"
-                    onClick={() => handleRowClick(quotation.id)}
-                  >
-                    {quotation.dueDate}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {quotation.valid_until ? new Date(quotation.valid_until).toLocaleDateString() : 'N/A'}
+                    </div>
                   </td>
-                  <td 
-                    className="px-4 py-3 text-sm text-gray-500"
-                    onClick={() => handleRowClick(quotation.id)}
-                  >
-                    {quotation.owner}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{quotation.created_by_full_name || 'N/A'}</div>
                   </td>
-                  <td 
-                    className="px-4 py-3 text-sm"
-                    onClick={() => handleRowClick(quotation.id)}
-                  >
-                    {quotation.total}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">${quotation.final_amount?.toFixed(2) || '0.00'}</div>
                   </td>
-                  <td 
-                    className="px-4 py-3 text-sm"
-                    onClick={() => handleRowClick(quotation.id)}
-                  >
-                    {quotation.outstanding}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">${quotation.final_amount?.toFixed(2) || '0.00'}</div>
                   </td>
-                  <td 
-                    className="px-4 py-3 space-x-2"
-                    onClick={() => handleRowClick(quotation.id)}
-                  >
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <QuotationStatusBadge status={quotation.status} />
-                    <PaymentStatusBadge isPaid={quotation.isPaid} />
                   </td>
                 </tr>
-                
-                {/* Expandable Line Items Row */}
-                {isInvoicesPage && quotation.lineItems && expandedRows.has(quotation.id) && (
-                  <tr className="bg-gray-50">
-                    <td colSpan={7} className="px-4 py-0">
-                      <div className="py-4">
-                        <h4 className="text-sm font-medium text-gray-700 mb-3">Line Items</h4>
-                        <div className="space-y-2">
-                          {quotation.lineItems.map((lineItem) => (
-                            <div 
-                              key={lineItem.id} 
-                              className="flex items-center justify-between p-3 bg-white rounded border"
-                            >
-                              <div className="flex-1">
-                                <div className="text-sm font-medium">{lineItem.description}</div>
-                                <div className="text-xs text-gray-500">
-                                  Qty: {lineItem.quantity} × {lineItem.price}
-                                </div>
-                              </div>
-                              <div className="ml-4">
-                                <StatusDropdown
-                                  currentStatus={lineItemStatuses[lineItem.id] || lineItem.status}
-                                  onStatusChange={(newStatus) => handleLineItemStatusChange(lineItem.id, newStatus)}
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
               </React.Fragment>
             ))}
           </tbody>
         </table>
+
+        {quotationsData.length === 0 && (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No {isInvoicesPage ? 'invoices' : 'quotes'} found.</p>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center justify-between p-4 border-t">
@@ -384,6 +351,8 @@ export function QuotationTable({ isInvoicesPage = false }: QuotationTableProps) 
           <Button variant="outline" className="border-gray-300">Next</Button>
         </div>
       </div>
+
+
     </div>
   );
 }

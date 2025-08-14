@@ -45,22 +45,16 @@ export function QuoteHeader({
   };
 
   const handleSave = () => {
+    console.log("🔍 [DEBUG] QuoteHeader - handleSave called");
+    console.log("🔍 [DEBUG] QuoteHeader - onSave prop:", onSave);
+    console.log("🔍 [DEBUG] QuoteHeader - typeof onSave:", typeof onSave);
+    
     if (onSave) {
+      console.log("🔍 [DEBUG] QuoteHeader - Calling onSave prop");
       onSave();
       
-      // Show success toast
-      toast({
-        title: `${documentType} saved successfully`,
-        description: isNewQuote ? `New ${documentType.toLowerCase()} has been created` : `${documentType} has been updated`,
-      });
-      
-      // Navigate to the quote detail page if we have a quoteId
-      if (quoteId) {
-        navigate(`/quotes/${quoteId}`);
-      } else {
-        // For demo purposes, navigate to a default quote id
-        navigate("/quotes/3032");
-      }
+      // When onSave is provided, let the parent component handle navigation
+      // Don't navigate here to avoid conflicts
     } else {
       // Show success toast
       toast({
