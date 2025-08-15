@@ -1,8 +1,7 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, ArrowLeft } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import {
   Breadcrumb,
@@ -69,7 +68,19 @@ export function QuoteHeader({
   
   return (
     <div className="flex justify-between items-center p-4 border-b bg-white">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
+        {/* Back Button */}
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate("/quotes")}
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Quotes
+        </Button>
+        
+        {/* Breadcrumb */}
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -77,9 +88,7 @@ export function QuoteHeader({
                 {isInvoice ? "Invoices" : "Quotes"}
               </BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbSeparator>
-              <ChevronRight className="h-4 w-4 text-gray-400" />
-            </BreadcrumbSeparator>
+            <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbPage className="text-sm">
                 {isNewQuote ? `Create ${documentType}` : `Edit ${documentType} #${quoteId}`}

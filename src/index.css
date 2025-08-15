@@ -177,3 +177,8 @@ button input[type="time"]:focus {
 .rdp-nav_button {
   pointer-events: auto !important;
 }
+
+/* Quote Items Table Grid Layout */
+.grid-cols-15 {
+  grid-template-columns: repeat(15, minmax(0, 1fr));
+}

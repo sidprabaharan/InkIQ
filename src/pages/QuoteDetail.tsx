@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { QuoteHeader } from "@/components/quotes/QuoteHeader";
 import { QuoteDetailHeader } from "@/components/quotes/QuoteDetailHeader";
 import { CompanyInfoCard } from "@/components/quotes/CompanyInfoCard";
@@ -11,9 +11,12 @@ import { InvoiceSummaryCard } from "@/components/quotes/InvoiceSummaryCard";
 import { useQuotes } from "@/context/QuotesContext";
 import { useCustomers } from "@/context/CustomersContext";
 import { useAuth } from "@/context/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 export default function QuoteDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { getQuote } = useQuotes();
   const { customers, fetchCustomers } = useCustomers();
   const { user } = useAuth();
@@ -253,6 +256,17 @@ export default function QuoteDetail() {
           customerInfo={customerInfoForPacking}
           items={quote.items || []}
         />
+
+        {/* Create New Quote Button */}
+        <div className="flex justify-end">
+          <Button 
+            onClick={() => navigate("/quotes/new")}
+            className="bg-inkiq-primary hover:bg-inkiq-primary/90 gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Create New Quote
+          </Button>
+        </div>
 
         <div className="space-y-6">
           {/* Company and Quote Details - top row */}

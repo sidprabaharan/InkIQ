@@ -217,3 +217,4 @@ CREATE INDEX IF NOT EXISTS idx_audit_log_created_at ON public.audit_log(created_
 
 -- Note: This baseline represents the current state of your database
 -- Future migrations should be incremental changes from this point forward
+
