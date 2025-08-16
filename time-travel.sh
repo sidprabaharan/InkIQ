@@ -26,3 +26,9 @@ npx supabase db seed
 echo "✅ Now running code + DB at $tag"
 echo "💡 Run 'git checkout main' to return to the latest version"
 
+
+
+
+
+
+

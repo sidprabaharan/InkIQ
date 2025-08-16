@@ -106,8 +106,13 @@ export function QuoteHeader({
             Preview
           </Button>
         )}
+        {isNewQuote && (
+          <Button variant="outline" className="border-inkiq-primary text-inkiq-primary" onClick={handleSave}>
+            Save Draft
+          </Button>
+        )}
         {isNewQuote ? (
-          <Button className="bg-inkiq-primary hover:bg-inkiq-primary/90 text-white" onClick={handleSave}>
+          <Button className="bg-inkiq-primary hover:bg-inkiq-primary/90 text-white" onClick={onPreview}>
             Save & Finish
           </Button>
         ) : (

@@ -277,8 +277,8 @@ export function QuotationTable({ isInvoicesPage = false }: QuotationTableProps) 
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {quotationsData.map((quotation) => (
-              <React.Fragment key={quotation.id}>
                 <tr 
+                  key={quotation.id}
                   className="hover:bg-gray-50 cursor-pointer" 
                   onClick={() => handleRowClick(quotation.id)}
                 >
@@ -308,7 +308,6 @@ export function QuotationTable({ isInvoicesPage = false }: QuotationTableProps) 
                     <QuotationStatusBadge status={quotation.status} />
                   </td>
                 </tr>
-              </React.Fragment>
             ))}
           </tbody>
         </table>

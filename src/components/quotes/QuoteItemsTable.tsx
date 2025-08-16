@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ImprintItem, ImprintFile } from "@/types/imprint";
 import { GarmentDetails, GarmentStatus, GarmentIssue } from "@/types/garment";
 import { GarmentStatusDropdown } from "@/components/garment/GarmentStatusDropdown";
@@ -61,6 +62,14 @@ export function QuoteItemsTable({ itemGroups, quoteId }: QuoteItemsTableProps) {
   const [issueDialogOpen, setIssueDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<QuoteItem | null>(null);
   const [garmentDetailsMap, setGarmentDetailsMap] = useState<Record<string, GarmentDetails>>({});
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  const [lightboxTitle, setLightboxTitle] = useState<string>("");
+
+  // Debug: render context
+  useEffect(() => {
+    console.debug("[QuoteItemsTable] mount - itemGroups:", itemGroups?.length || 0);
+  }, [itemGroups]);
 
   // Helper function to get total quantity for an item
   const getTotalQuantity = (sizes: QuoteItem['sizes']) => {
@@ -244,6 +253,13 @@ export function QuoteItemsTable({ itemGroups, quoteId }: QuoteItemsTableProps) {
     });
   };
 
+  const openLightbox = (url: string, name: string) => {
+    console.debug("[QuoteItemsTable] openLightbox", { url, name });
+    setLightboxSrc(url);
+    setLightboxTitle(name);
+    setIsLightboxOpen(true);
+  };
+
   const handleRemoveIssue = (item: QuoteItem, issueId: string) => {
     const currentDetails = getGarmentDetails(item);
     
@@ -286,6 +302,12 @@ export function QuoteItemsTable({ itemGroups, quoteId }: QuoteItemsTableProps) {
   const renderItemGroup = (group: ItemGroup, groupIndex: number) => {
     return (
       <div key={group.id} className="mb-8 border rounded-md overflow-hidden">
+        {/* Group Title */}
+        {itemGroups.length > 1 && (
+          <div className="bg-blue-50 px-4 py-2 border-b">
+            <h4 className="font-medium text-blue-900">Group {groupIndex + 1}</h4>
+          </div>
+        )}
         <Table className="w-full table-fixed">
           <TableHeader>
             <TableRow className="bg-gray-50">
@@ -299,6 +321,7 @@ export function QuoteItemsTable({ itemGroups, quoteId }: QuoteItemsTableProps) {
               <TableHead className="py-2 text-xs uppercase text-center w-[4%]">L</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[4%]">XL</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[4%]">2XL</TableHead>
+              <TableHead className="py-2 text-xs uppercase text-center w-[4%]">3XL</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[4%]">QTY</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">Price</TableHead>
               <TableHead className="py-2 text-xs uppercase text-center w-[5%]">Taxed</TableHead>
@@ -344,7 +367,10 @@ export function QuoteItemsTable({ itemGroups, quoteId }: QuoteItemsTableProps) {
                       <div className="text-sm">{item.sizes.xxl || 0}</div>
                     </TableCell>
                     <TableCell className="p-2 text-center border-r border-gray-200">
-                      <div className="text-sm">{item.category === 'Hats' ? totalQuantity : '0'}</div>
+                      <div className="text-sm">{item.sizes.xxxl || 0}</div>
+                    </TableCell>
+                    <TableCell className="p-2 text-center border-r border-gray-200">
+                      <div className="text-sm">{totalQuantity}</div>
                     </TableCell>
                     <TableCell className="p-2 border-r border-gray-200">
                       <div className="text-sm">${typeof item.price === 'number' ? item.price.toFixed(2) : parseFloat(item.price.toString().replace(/[$,]/g, '')).toFixed(2)}</div>
@@ -372,30 +398,11 @@ export function QuoteItemsTable({ itemGroups, quoteId }: QuoteItemsTableProps) {
                   </TableRow>
               ];
               
-              if ((item.mockups && item.mockups.length > 0) || getGarmentDetails(item).stockIssues.length > 0) {
+              if (getGarmentDetails(item).stockIssues.length > 0) {
                 rows.push(
                   <TableRow key={`${group.id}-item-${itemIndex}-details`} className="border-b hover:bg-gray-50">
                     <TableCell colSpan={15} className="p-2 bg-gray-50">
                       <div className="space-y-4">
-                        {item.mockups && item.mockups.length > 0 && (
-                          <div>
-                            <h5 className="font-medium text-sm mb-2">Mockups</h5>
-                            <div className="flex flex-wrap gap-2">
-                              {item.mockups.map((mockup) => (
-                                <div 
-                                  key={mockup.id} 
-                                  className="w-20 h-20 border rounded-md overflow-hidden"
-                                >
-                                  <img 
-                                    src={mockup.url} 
-                                    alt={mockup.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
                         <GarmentIssuesList 
                           issues={getGarmentDetails(item).stockIssues}
                           onResolveIssue={(issueId) => handleResolveIssue(item, issueId)}
@@ -412,127 +419,101 @@ export function QuoteItemsTable({ itemGroups, quoteId }: QuoteItemsTableProps) {
             })}
 
             {group.imprints && group.imprints.length > 0 && (
-              <TableRow className="border-b bg-slate-50">
-                <TableCell colSpan={15} className="p-4">
-                    <div className="space-y-3">
-                    <h4 className="font-medium text-sm">Imprint Details</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {group.imprints.map((imprint) => (
-                        <div key={imprint.id} className="border rounded-md p-3 bg-white">
-                          <div className="grid grid-cols-2 gap-3 text-sm">
-                            <div>
-                              <span className="font-medium">Method:</span> {imprint.method || "Not specified"}
-                            </div>
-                            <div>
-                              <span className="font-medium">Location:</span> {imprint.location || "Not specified"}
-                            </div>
-                            {(imprint.width > 0 || imprint.height > 0) && (
+              <TableRow className="border-b">
+                <TableCell colSpan={16} className="p-6 bg-gray-50">
+                  <div className="space-y-6">
+                    <div className="border-b pb-4">
+                      <h3 className="text-lg font-semibold text-gray-900">Imprint Details</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        {group.imprints.map((imprint) => (
+                          <div key={imprint.id} className="border rounded-md p-3 bg-white">
+                            <div className="grid grid-cols-2 gap-3 text-sm">
                               <div>
-                                <span className="font-medium">Size:</span> {imprint.width}" × {imprint.height}"
+                                <span className="font-medium">Method:</span> {imprint.method || '—'}
+                              </div>
+                              <div>
+                                <span className="font-medium">Location:</span> {imprint.location || '—'}
+                              </div>
+                              <div>
+                                <span className="font-medium">Size:</span> {(imprint.width || 0) > 0 || (imprint.height || 0) > 0 ? `${imprint.width}" × ${imprint.height}"` : '—'}
+                              </div>
+                              {imprint.colorsOrThreads && (
+                                <div>
+                                  <span className="font-medium">Colors/Threads:</span> {imprint.colorsOrThreads}
+                                </div>
+                              )}
+                            </div>
+                            {imprint.notes && (
+                              <div className="mt-2 text-sm">
+                                <span className="font-medium">Notes:</span> {imprint.notes}
                               </div>
                             )}
-                            {imprint.colorsOrThreads && (
-                              <div>
-                                <span className="font-medium">Colors/Threads:</span> {imprint.colorsOrThreads}
+
+                            {/* Customer Art */}
+                            {imprint.customerArt && imprint.customerArt.length > 0 && (
+                              <div className="mt-2">
+                                <span className="font-medium text-sm">Customer Art:</span>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                  {imprint.customerArt.map((f: any, idx: number) => (
+                                    <div key={`ca-${imprint.id}-${idx}`} className="w-16 h-16 border rounded-md overflow-hidden flex items-center justify-center bg-white">
+                                      {typeof f.url === 'string' && (f.type?.startsWith('image/') || /\.(png|jpg|jpeg|gif|webp)$/i.test(f.name || f.file_name || '')) ? (
+                                        <img src={f.url} alt={f.name || f.file_name} className="w-full h-full object-cover cursor-pointer" onClick={() => openLightbox(f.url, f.name || f.file_name || '')} />
+                                      ) : (
+                                        <span className="text-xs">{(f.name || f.file_name || 'file').split('.').pop()?.toUpperCase()}</span>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Production Files */}
+                            {imprint.productionFiles && imprint.productionFiles.length > 0 && (
+                              <div className="mt-2">
+                                <span className="font-medium text-sm">Production Files:</span>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                  {imprint.productionFiles.map((f: any, idx: number) => (
+                                    <div key={`pf-${imprint.id}-${idx}`} className="w-16 h-16 border rounded-md overflow-hidden flex items-center justify-center bg-white">
+                                      {typeof f.url === 'string' && (f.type?.startsWith('image/') || /\.(png|jpg|jpeg|gif|webp)$/i.test(f.name || f.file_name || '')) ? (
+                                        <img src={f.url} alt={f.name || f.file_name} className="w-full h-full object-cover cursor-pointer" onClick={() => openLightbox(f.url, f.name || f.file_name || '')} />
+                                      ) : (
+                                        <span className="text-xs">{(f.name || f.file_name || 'file').split('.').pop()?.toUpperCase()}</span>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Proof/Mockup */}
+                            {imprint.proofMockup && imprint.proofMockup.length > 0 && (
+                              <div className="mt-2">
+                                <span className="font-medium text-sm">Proof/Mockup:</span>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                  {imprint.proofMockup.map((f: any, idx: number) => (
+                                    <div key={`pm-${imprint.id}-${idx}`} className="w-16 h-16 border rounded-md overflow-hidden flex items-center justify-center bg-white">
+                                      {typeof f.url === 'string' && (f.type?.startsWith('image/') || /\.(png|jpg|jpeg|gif|webp)$/i.test(f.name || f.file_name || '')) ? (
+                                        <img src={f.url} alt={f.name || f.file_name} className="w-full h-full object-cover cursor-pointer" onClick={() => openLightbox(f.url, f.name || f.file_name || '')} />
+                                      ) : (
+                                        <span className="text-xs">{(f.name || f.file_name || 'file').split('.').pop()?.toUpperCase()}</span>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
                             )}
                           </div>
-                          {imprint.notes && (
-                            <div className="mt-2 text-sm">
-                              <span className="font-medium">Notes:</span> {imprint.notes}
-                            </div>
-                          )}
-                          
-                          {/* Customer Art */}
-                          {imprint.customerArt && imprint.customerArt.length > 0 && (
-                            <div className="mt-2">
-                              <span className="font-medium text-sm">Customer Art:</span>
-                              <div className="flex flex-wrap gap-2 mt-1">
-                                {imprint.customerArt.map((file) => (
-                                  <div key={file.id} className="w-16 h-16 border rounded-md overflow-hidden">
-                                    {file.type.startsWith('image/') ? (
-                                      <img 
-                                        src={file.url} 
-                                        alt={file.name}
-                                        className="w-full h-full object-cover cursor-pointer"
-                                        onClick={() => window.open(file.url, '_blank')}
-                                        title={file.name}
-                                      />
-                                    ) : (
-                                      <div 
-                                        className="w-full h-full flex flex-col items-center justify-center bg-muted cursor-pointer hover:bg-muted/80 transition-colors"
-                                        onClick={() => window.open(file.url, '_blank')}
-                                        title={file.name}
-                                      >
-                                        <span className="text-xs">{file.name.split('.').pop()?.toUpperCase()}</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                          
-                          {/* Production Files */}
-                          {imprint.productionFiles && imprint.productionFiles.length > 0 && (
-                            <div className="mt-2">
-                              <span className="font-medium text-sm">Production Files:</span>
-                              <div className="flex flex-wrap gap-2 mt-1">
-                                {imprint.productionFiles.map((file) => (
-                                  <div key={file.id} className="w-16 h-16 border rounded-md overflow-hidden">
-                                    {file.type.startsWith('image/') ? (
-                                      <img 
-                                        src={file.url} 
-                                        alt={file.name}
-                                        className="w-full h-full object-cover cursor-pointer"
-                                        onClick={() => window.open(file.url, '_blank')}
-                                        title={file.name}
-                                      />
-                                    ) : (
-                                      <div 
-                                        className="w-full h-full flex flex-col items-center justify-center bg-muted cursor-pointer hover:bg-muted/80 transition-colors"
-                                        onClick={() => window.open(file.url, '_blank')}
-                                        title={file.name}
-                                      >
-                                        <span className="text-xs">{file.name.split('.').pop()?.toUpperCase()}</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                          
-                          {/* Proof/Mockup */}
-                          {imprint.proofMockup && imprint.proofMockup.length > 0 && (
-                            <div className="mt-2">
-                              <span className="font-medium text-sm">Proof/Mockup:</span>
-                              <div className="flex flex-wrap gap-2 mt-1">
-                                {imprint.proofMockup.map((file) => (
-                                  <div key={file.id} className="w-16 h-16 border rounded-md overflow-hidden">
-                                    {file.type.startsWith('image/') ? (
-                                      <img 
-                                        src={file.url} 
-                                        alt={file.name}
-                                        className="w-full h-full object-cover"
-                                      />
-                                    ) : (
-                                      <div className="w-full h-full flex items-center justify-center bg-muted">
-                                        <span className="text-xs">{file.name.split('.').pop()?.toUpperCase()}</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </TableCell>
               </TableRow>
             )}
+
+            {/* Note: second, aggregated imprint block removed to keep correct order: 
+                item rows → per-item mockups → group imprint details → next group. */}
+
           </TableBody>
         </Table>
       </div>
@@ -550,6 +531,17 @@ export function QuoteItemsTable({ itemGroups, quoteId }: QuoteItemsTableProps) {
         onSubmit={handleIssueSubmit}
         maxQuantity={selectedItem ? getTotalQuantity(selectedItem.sizes) : 1}
       />
+      {/* Lightbox Modal */}
+      <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogTitle>{lightboxTitle}</DialogTitle>
+          {lightboxSrc && (
+            <div className="w-full">
+              <img src={lightboxSrc} alt={lightboxTitle} className="w-full h-auto object-contain" />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

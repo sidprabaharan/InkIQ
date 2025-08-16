@@ -19,7 +19,7 @@ export function PerformanceMetrics({ timeRange }: PerformanceMetricsProps) {
   return (
     <div className="space-y-3">
       {metrics.map((metric, index) => (
-        <React.Fragment key={metric.name}>
+        <div key={metric.name}>
           <div className="flex justify-between items-start">
             <div>
               <div className="text-sm font-medium">{metric.name}</div>
@@ -33,7 +33,7 @@ export function PerformanceMetrics({ timeRange }: PerformanceMetricsProps) {
             </div>
           </div>
           {index < metrics.length - 1 && <Separator />}
-        </React.Fragment>
+        </div>
       ))}
     </div>
   );

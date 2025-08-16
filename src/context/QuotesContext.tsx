@@ -171,14 +171,23 @@ export const QuotesProvider: React.FC<QuotesProviderProps> = ({ children }) => {
   // Get a single quote with items
   const getQuote = async (quoteId: string): Promise<Quote | null> => {
     try {
-      const { data, error } = await supabase.rpc('get_quote', {
-        p_quote_id: quoteId
-      });
-
-      if (error) throw error;
-      return data;
+      const { data, error } = await supabase.rpc('get_quote', { p_quote_id: quoteId });
+      if (!error && data) return data as Quote;
     } catch (err) {
-      console.error('Error fetching quote:', err);
+      console.warn('RPC get_quote failed, falling back to direct select:', err);
+    }
+
+    try {
+      // Fallback: select directly from tables with embedded items
+      const { data, error } = await supabase
+        .from('quotes')
+        .select('*, items:quote_items(*)')
+        .eq('id', quoteId)
+        .single();
+      if (error) throw error;
+      return data as unknown as Quote;
+    } catch (err) {
+      console.error('Error fetching quote (fallback):', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch quote');
       return null;
     }
@@ -186,13 +195,25 @@ export const QuotesProvider: React.FC<QuotesProviderProps> = ({ children }) => {
 
   // Create a new quote
   const createQuote = async (quoteData: CreateQuoteData) => {
-    console.log("🔍 [DEBUG] QuotesContext - createQuote called with:", quoteData);
+
     try {
       // Pass items as array, not stringified JSON
       const itemsArray = quoteData.items || [];
-      console.log("🔍 [DEBUG] QuotesContext - itemsArray:", itemsArray);
 
-      const { data, error } = await supabase.rpc('create_quote_with_items', {
+      console.debug('🔍 [DEBUG] QuotesContext - createQuote payload', {
+        customer_id: quoteData.customer_id,
+        subject: quoteData.subject,
+        description: quoteData.description,
+        tax_rate: quoteData.tax_rate,
+        discount_percentage: quoteData.discount_percentage,
+        valid_until_days: quoteData.valid_until_days,
+        items_count: itemsArray.length
+      });
+
+      // Primary path: try v1 first (more likely to be in schema cache), then v2
+      let data: any = null;
+      let error: any = null;
+      ({ data, error } = await supabase.rpc('create_quote_with_items', {
         customer_id: quoteData.customer_id,
         quote_subject: quoteData.subject,
         quote_description: quoteData.description,
@@ -201,31 +222,130 @@ export const QuotesProvider: React.FC<QuotesProviderProps> = ({ children }) => {
         valid_until_days: quoteData.valid_until_days || 30,
         notes: quoteData.notes,
         terms_conditions: quoteData.terms_conditions,
-        production_due_date: quoteData.production_due_date,
-        customer_due_date: quoteData.customer_due_date,
-        payment_due_date: quoteData.payment_due_date,
-        invoice_date: quoteData.invoice_date,
+        production_due_date: quoteData.production_due_date || null,
+        customer_due_date: quoteData.customer_due_date || null,
+        payment_due_date: quoteData.payment_due_date || null,
+        invoice_date: quoteData.invoice_date || null,
         items: itemsArray
-      });
-
-      console.log("🔍 [DEBUG] QuotesContext - RPC response data:", data);
-      console.log("🔍 [DEBUG] QuotesContext - RPC response error:", error);
+      }));
 
       if (error) {
-        console.error("🔍 [DEBUG] QuotesContext - RPC error details:", error);
+        ({ data, error } = await supabase.rpc('create_quote_with_items_v2', {
+          customer_id: quoteData.customer_id,
+          quote_subject: quoteData.subject,
+          quote_description: quoteData.description,
+          tax_rate: quoteData.tax_rate || 0,
+          discount_percentage: quoteData.discount_percentage || 0,
+          valid_until_days: quoteData.valid_until_days || 30,
+          notes: quoteData.notes,
+          terms_conditions: quoteData.terms_conditions,
+          production_due_date: quoteData.production_due_date || null,
+          customer_due_date: quoteData.customer_due_date || null,
+          payment_due_date: quoteData.payment_due_date || null,
+          invoice_date: quoteData.invoice_date || null,
+          items: itemsArray
+        }));
+      }
+
+      if (error) {
+        console.error('🔍 [DEBUG] QuotesContext - RPC error details:', {
+          message: (error as any)?.message,
+          details: (error as any)?.details,
+          hint: (error as any)?.hint,
+          code: (error as any)?.code
+        });
+        // Fallback if function not in schema cache (404/PGRST202)
+        if ((error as any)?.code === 'PGRST202') {
+          console.warn('🔁 [DEBUG] Falling back to create_quote + direct inserts');
+          // 1) Create quote using simpler RPC if available
+          const { data: cqData, error: cqErr } = await supabase.rpc('create_quote', {
+            customer_id: quoteData.customer_id,
+            quote_subject: quoteData.subject,
+            quote_description: quoteData.description,
+            tax_rate: quoteData.tax_rate || 0,
+            discount_percentage: quoteData.discount_percentage || 0,
+            valid_until_days: quoteData.valid_until_days || 30,
+            notes: quoteData.notes || null,
+            terms_conditions: quoteData.terms_conditions || null,
+            production_due_date: quoteData.production_due_date || null,
+            customer_due_date: quoteData.customer_due_date || null,
+            payment_due_date: quoteData.payment_due_date || null,
+            invoice_date: quoteData.invoice_date || null
+          });
+          if (cqErr || !cqData?.quote_id) {
+            console.error('❌ [DEBUG] Fallback create_quote failed', cqErr);
+            throw cqErr || new Error('create_quote failed');
+          }
+          const newQuoteId = cqData.quote_id as string;
+
+          // 2) Bulk insert items directly (preferred)
+          const directItems = itemsArray.map((it) => ({
+            quote_id: newQuoteId,
+            product_name: it.product_name,
+            product_sku: it.product_sku || null,
+            product_description: it.product_description || null,
+            category: it.category || null,
+            item_number: it.item_number || null,
+            color: it.color || null,
+            quantity: it.quantity || 0,
+            unit_price: it.unit_price || 0,
+            total_price: it.total_price || 0,
+            xs: it.xs || 0,
+            s: it.s || 0,
+            m: it.m || 0,
+            l: it.l || 0,
+            xl: it.xl || 0,
+            xxl: it.xxl || 0,
+            xxxl: it.xxxl || 0,
+            taxed: it.taxed ?? true,
+            garment_status: it.garment_status || 'pending',
+            imprint_type: it.imprint_type || null,
+            setup_fee: it.setup_fee || 0,
+            imprint_cost: it.imprint_cost || 0,
+            notes: it.notes || null,
+            group_index: (it as any).group_index || null,
+            group_label: (it as any).group_label || null,
+          }));
+
+          const { error: bulkErr } = await supabase.from('quote_items').insert(directItems);
+          if (bulkErr) {
+            console.warn('⚠️ [DEBUG] Direct insert of items failed due to RLS. Falling back to add_quote_item RPC per item.', bulkErr);
+            // 3) Fallback per-item minimal insert via RPC
+            for (const it of itemsArray) {
+              const { error: addErr } = await supabase.rpc('add_quote_item', {
+                quote_id: newQuoteId,
+                product_name: it.product_name,
+                quantity: it.quantity || 0,
+                unit_price: it.unit_price || 0,
+                product_sku: it.product_sku || null,
+                product_description: it.product_description || null,
+                imprint_type: it.imprint_type || null,
+                setup_fee: it.setup_fee || 0,
+                imprint_cost: it.imprint_cost || 0,
+                notes: it.notes || null,
+              });
+              if (addErr) {
+                console.error('❌ [DEBUG] add_quote_item failed', addErr);
+                throw addErr;
+              }
+            }
+          }
+
+          // Done
+          await getQuotes();
+          return { success: true, quote_id: newQuoteId, quote_number: cqData.quote_number };
+        }
         throw error;
       }
 
-      console.log("🔍 [DEBUG] QuotesContext - Quote created successfully, refreshing quotes list");
-      // Refresh quotes list
+      console.log('🔍 [DEBUG] QuotesContext - Quote created successfully, refreshing quotes list');
       await getQuotes();
-
-      return { success: true, quote_id: data.quote_id, quote_number: data.quote_number };
-    } catch (err) {
+      return { success: true, quote_id: (data as any).quote_id, quote_number: (data as any).quote_number };
+    } catch (err: any) {
       console.error('Error creating quote:', err);
-      return { 
-        success: false, 
-        error: err instanceof Error ? err.message : 'Failed to create quote' 
+      return {
+        success: false,
+        error: err?.message || err?.details || 'Failed to create quote'
       };
     }
   };

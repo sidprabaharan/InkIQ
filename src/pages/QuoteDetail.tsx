@@ -13,6 +13,8 @@ import { useCustomers } from "@/context/CustomersContext";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+// LocalStorage image helpers removed; rely on DB only
+import { supabase } from "@/lib/supabase";
 
 export default function QuoteDetail() {
   const { id } = useParams();
@@ -25,6 +27,8 @@ export default function QuoteDetail() {
   const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [artworkFiles, setArtworkFiles] = useState<Record<string, any[]>>({});
+  const [imprintsByItem, setImprintsByItem] = useState<Record<string, any[]>>({});
   
   // Add ref to track if component is mounted
   const isMountedRef = useRef(true);
@@ -36,11 +40,107 @@ export default function QuoteDetail() {
     };
   }, []);
 
+  // Removed localStorage mockup augmentation; details load from DB only
+
+  // Function to fetch artwork files for quote items
+  const fetchArtworkFiles = async (quoteItems: any[], quoteIdForPaths: string) => {
+    if (!quoteItems || quoteItems.length === 0) return {};
+    
+    try {
+      const artworkMap: Record<string, any[]> = {};
+      
+      for (const item of quoteItems) {
+        console.debug('[QuoteDetail] Fetching artwork for item', item?.id);
+        // Try DB first
+        const { data: files, error } = await supabase
+          .from('artwork_files')
+          .select('*')
+          .eq('quote_item_id', item.id);
+
+        if (files && files.length > 0 && !error) {
+          const filesWithUrls = await Promise.all(
+            files.map(async (file) => {
+              const { data: signedUrl } = await supabase.storage
+                .from('artwork')
+                .createSignedUrl(file.file_path, 3600);
+              return { ...file, url: signedUrl?.signedUrl || null };
+            })
+          );
+          console.debug('[QuoteDetail] DB artwork_files found', { itemId: item.id, count: filesWithUrls.length });
+          artworkMap[item.id] = filesWithUrls;
+          continue;
+        }
+
+        // If DB empty, list each imprint folder under item, then read its files per category
+        const { data: imprintFolders, error: imprintListErr } = await supabase.storage
+          .from('artwork')
+          .list(`${quoteIdForPaths}/${item.id}`, { limit: 100 });
+        if (imprintListErr) {
+          console.debug('[QuoteDetail] No imprint folders found', { itemId: item.id });
+          artworkMap[item.id] = [];
+          continue;
+        }
+        const collected: any[] = [];
+        for (const folderEntry of imprintFolders || []) {
+          // Each entry should be an imprintId folder
+          const imprintId = folderEntry.name;
+          const categories: Array<'customer_art' | 'production_files' | 'proof_mockup'> = ['customer_art', 'production_files', 'proof_mockup'];
+          for (const cat of categories) {
+            const folder = `${quoteIdForPaths}/${item.id}/${imprintId}/${cat}`;
+            const { data: listed, error: listErr } = await supabase.storage
+              .from('artwork')
+              .list(folder, { limit: 100 });
+            if (listErr || !Array.isArray(listed)) continue;
+            for (const obj of listed) {
+              const fullPath = `${folder}/${obj.name}`;
+              const { data: signedUrl } = await supabase.storage
+                .from('artwork')
+                .createSignedUrl(fullPath, 3600);
+              collected.push({
+                id: `${imprintId}-${cat}-${obj.name}`,
+                file_name: obj.name,
+                file_type: (obj as any).metadata?.mimetype || 'application/octet-stream',
+                category: cat,
+                url: signedUrl?.signedUrl || null,
+                imprint_id: imprintId,
+              });
+            }
+          }
+        }
+        console.debug('[QuoteDetail] storage collected per-imprint files', { itemId: item.id, count: collected.length });
+        artworkMap[item.id] = collected;
+      }
+      
+      return artworkMap;
+    } catch (err) {
+      console.error('Error fetching artwork files:', err);
+      return {};
+    }
+  };
+
+  // Fetch imprints for items
+  const fetchImprints = async (quoteItems) => {
+    if (!quoteItems || quoteItems.length === 0) return {};
+    const result: Record<string, any[]> = {};
+    try {
+      for (const item of quoteItems) {
+        const { data, error } = await supabase
+          .from('quote_imprints')
+          .select('*')
+          .eq('quote_item_id', item.id);
+        if (!error && data) {
+          result[item.id] = data;
+        }
+      }
+    } catch (e) {
+      console.error('Error fetching imprints', e);
+    }
+    return result;
+  };
+
   useEffect(() => {
     const loadQuoteData = async () => {
-      console.log('🔍 [DEBUG] QuoteDetail - loadQuoteData called for ID:', id);
-      console.log('🔍 [DEBUG] QuoteDetail - isMounted:', isMountedRef.current);
-      console.log('🔍 [DEBUG] QuoteDetail - URL path:', window.location.pathname);
+
       
       if (!id) {
         setError("Quote ID is required");
@@ -48,15 +148,22 @@ export default function QuoteDetail() {
         return;
       }
 
+      // TEMPORARY: Redirect removed to debug current quote data
+      // if (id === '6f1c5b0d-0551-4ed9-9737-9bd3169d0a2d') {
+      //   console.log('🔍 [DEBUG] QuoteDetail - Redirecting to quote with proper data');
+      //   navigate('/quotes/d3fcaba7-9c32-45dd-b054-b15c61a8d9f9', { replace: true });
+      //   return;
+      // }
+
       // Don't fetch if component is unmounting
       if (!isMountedRef.current) {
-        console.log('🔍 [DEBUG] QuoteDetail - Component unmounted, skipping fetch');
+
         return;
       }
 
       // Don't fetch if we're not on the quote detail page anymore
       if (!window.location.pathname.includes(`/quotes/${id}`)) {
-        console.log('🔍 [DEBUG] QuoteDetail - Not on quote detail page, skipping fetch');
+
         return;
       }
 
@@ -76,6 +183,9 @@ export default function QuoteDetail() {
           setLoading(false);
           return;
         }
+        
+        // Quote data loaded successfully
+        
         setQuote(quoteData);
 
         // Ensure customers are loaded
@@ -91,6 +201,29 @@ export default function QuoteDetail() {
         // Find the customer for this quote
         const quoteCustomer = customers.find(c => c.id === quoteData.customer_id);
         setCustomer(quoteCustomer);
+
+        // Fetch artwork files and imprints for the quote items
+        if (quoteData.items && quoteData.items.length > 0) {
+
+          try {
+            const [artwork, imprints] = await Promise.all([
+              fetchArtworkFiles(quoteData.items, id),
+              fetchImprints(quoteData.items)
+            ]);
+
+            if (isMountedRef.current) {
+              setArtworkFiles(artwork);
+              setImprintsByItem(imprints);
+            }
+          } catch (error) {
+            console.error("🔍 [DEBUG] QuoteDetail - Error fetching artwork files:", error);
+            // Continue without artwork files for now
+            if (isMountedRef.current) {
+              setArtworkFiles({});
+              setImprintsByItem({});
+            }
+          }
+        }
 
       } catch (err) {
         // Only set error if component is still mounted
@@ -145,10 +278,15 @@ export default function QuoteDetail() {
   // Format the quote data for display
   const status = quote.status;
   
-  // Format financial amounts
-  const totalAmount = `$${quote.final_amount.toFixed(2)}`;
-  const taxAmount = `$${quote.tax_amount.toFixed(2)}`;
-  const subtotalAmount = `$${(quote.final_amount - quote.tax_amount).toFixed(2)}`;
+  // Format financial amounts with safety checks
+  const totalAmountValue = parseFloat(quote.total_amount) || 0;
+  const taxRateValue = parseFloat(quote.tax_rate) || 0;
+  const taxAmountValue = totalAmountValue * taxRateValue;
+  const subtotalAmountValue = totalAmountValue - taxAmountValue;
+  
+  const totalAmount = `$${totalAmountValue.toFixed(2)}`;
+  const taxAmount = `$${taxAmountValue.toFixed(2)}`;
+  const subtotalAmount = `$${subtotalAmountValue.toFixed(2)}`;
   
   // For now, assume no payments made (all amount is outstanding)
   const amountOutstanding = totalAmount;
@@ -207,26 +345,166 @@ export default function QuoteDetail() {
     terms: quote.terms_conditions || "Net 30"
   };
   
-  // Transform quote items for display (keeping existing format)
-  const itemGroups = quote.items ? [{
-    id: "quote-items",
-    name: "Quote Items",
-    items: quote.items.map(item => ({
-      id: item.id,
-      category: "Product",
-      itemNumber: item.product_sku || "N/A",
-      color: "N/A",
-      description: item.product_name,
-      sizes: { xs: 0, s: 0, m: 0, l: 0, xl: 0, xxl: 0, qty: item.quantity },
-      qty: item.quantity,
-      price: item.unit_price,
-      taxed: true,
-      total: item.total_price,
-      status: "active",
-      mockups: []
-    })),
-    imprints: []
-  }] : [];
+  // Transform quote items for display with proper structure
+
+  
+  const itemGroups = quote.items ? (() => {
+    // If group_index is missing on all items (fallback insertion path), render one chart per item
+    const hasAnyGroupIndex = (quote.items as any[]).some((it) => it.group_index != null);
+    console.debug('[QuoteDetail] Grouping mode:', { 
+      totalItems: quote.items.length, 
+      hasAnyGroupIndex,
+      mode: hasAnyGroupIndex ? 'GROUP_BY_INDEX' : 'ONE_PER_ITEM'
+    });
+    if (!hasAnyGroupIndex) {
+      console.debug('[QuoteDetail] No group_index on items; rendering one chart per item');
+      return (quote.items as any[]).map((item: any, idx: number) => {
+        const itemArtwork = artworkFiles[item.id] || [];
+        const makeFiles = (arr: any[]) => (arr || []).map((f: any) => ({ id: f.id, name: f.file_name || f.name, url: f.url, type: f.file_type || f.type, category: f.category }));
+        const rows = imprintsByItem[item.id] || [];
+        const files = itemArtwork || [];
+        const filesForImprint = (imprintId: string | null) => makeFiles((files || []).filter((f: any) => !imprintId || f.imprint_id === imprintId));
+        const imprints = rows.length > 0
+          ? rows.map((r: any) => ({
+              id: r.id,
+              method: r.method,
+              location: r.location || 'N/A',
+              width: parseFloat(r.width) || 0,
+              height: parseFloat(r.height) || 0,
+              colorsOrThreads: r.colors_or_threads || 'N/A',
+              notes: r.notes || '',
+              customerArt: filesForImprint(r.id).filter((f: any) => f.category === 'customer_art'),
+              productionFiles: filesForImprint(r.id).filter((f: any) => f.category === 'production_files'),
+              proofMockup: filesForImprint(r.id).filter((f: any) => f.category === 'proof_mockup'),
+            }))
+          : [];
+        return {
+          id: `group-${idx + 1}`,
+          items: [{
+            id: item.id,
+            category: item.category || (item.product_name ? 'Product' : 'T-Shirts'),
+            itemNumber: item.item_number || item.product_sku || 'N/A',
+            color: item.color || 'N/A',
+            description: item.product_name || item.product_description || 'Product',
+            sizes: { xs: item.xs || 0, s: item.s || 0, m: item.m || 0, l: item.l || 0, xl: item.xl || 0, xxl: item.xxl || 0, xxxl: item.xxxl || 0 },
+            price: parseFloat(item.unit_price) || 0,
+            taxed: item.taxed !== false,
+            total: parseFloat(item.total_price) || 0,
+            status: item.garment_status || 'pending',
+            mockups: makeFiles(files).filter((f: any) => f.category === 'proof_mockup').map((f: any) => ({ id: f.id, name: f.name, url: f.url, type: f.type })),
+          }],
+          imprints,
+        };
+      });
+    }
+    // Group items by group_index to mirror creation groups exactly
+    const byGroup = new Map<number, any[]>();
+    quote.items.forEach((it: any) => {
+      const gi = it.group_index || 1;
+      console.debug('[QuoteDetail] Processing item for grouping', { itemId: it.id, productName: it.product_name, groupIndex: gi });
+      if (!byGroup.has(gi)) byGroup.set(gi, []);
+      byGroup.get(gi)!.push(it);
+    });
+    const sortedGroups = Array.from(byGroup.entries()).sort((a, b) => a[0] - b[0]);
+    console.debug('[QuoteDetail] Final groups created', sortedGroups.map(([g, items]) => ({ group: g, itemCount: items.length })));
+
+    const groups: any[] = [];
+    sortedGroups.forEach(([groupIdx, itemsInCat]) => {
+      const transformedItems = itemsInCat.map((item: any) => ({
+        id: item.id,
+        category: item.category || (item.product_name ? 'Product' : 'T-Shirts'),
+        itemNumber: item.item_number || item.product_sku || 'N/A',
+        color: item.color || 'N/A',
+        description: item.product_name || item.product_description || 'Product',
+        sizes: {
+          xs: item.xs || 0,
+          s: item.s || 0,
+          m: item.m || 0,
+          l: item.l || 0,
+          xl: item.xl || 0,
+          xxl: item.xxl || 0,
+          xxxl: item.xxxl || 0,
+        },
+        price: parseFloat(item.unit_price) || 0,
+        taxed: item.taxed !== false,
+        total: parseFloat(item.total_price) || 0,
+        status: item.garment_status || 'pending',
+        mockups: (() => {
+          const itemArtwork = artworkFiles[item.id] || [];
+          return itemArtwork
+            .filter((f: any) => f.category === 'proof_mockup' && f.url)
+            .map((f: any) => ({ id: f.id, name: f.file_name || f.name, url: f.url, type: f.file_type || f.type }));
+        })(),
+      }));
+
+      const groupItemIds = new Set(itemsInCat.map((i: any) => i.id));
+      const makeFiles = (files: any[]) => (files || []).map((f: any) => ({
+        id: f.id,
+        name: f.file_name || f.name,
+        url: f.url,
+        type: f.file_type || f.type,
+        category: f.category,
+      }));
+
+      const imprints: any[] = [];
+      itemsInCat.forEach((item: any) => {
+        const rows = imprintsByItem[item.id] || [];
+        const itemArtwork = artworkFiles[item.id] || [];
+        console.debug('[QuoteDetail] Processing imprints for item', { itemId: item.id, imprintCount: rows.length });
+        const filesForImprint = (imprintId: string | null) => makeFiles(
+          (itemArtwork || []).filter((f: any) => !imprintId || f.imprint_id === imprintId)
+        );
+        if (rows.length > 0) {
+          rows.forEach((r: any) => {
+            console.debug('[QuoteDetail] Adding imprint', { imprintId: r.id, method: r.method, location: r.location });
+            const files = filesForImprint(r.id);
+            imprints.push({
+              id: r.id,
+              method: r.method,
+              location: r.location || 'N/A',
+              width: parseFloat(r.width) || 0,
+              height: parseFloat(r.height) || 0,
+              colorsOrThreads: r.colors_or_threads || 'N/A',
+              notes: r.notes || '',
+              customerArt: files.filter((f: any) => f.category === 'customer_art'),
+              productionFiles: files.filter((f: any) => f.category === 'production_files'),
+              proofMockup: files.filter((f: any) => f.category === 'proof_mockup'),
+            });
+          });
+        } else if (item.imprint_type) {
+          const files = filesForImprint(null);
+          imprints.push({
+            id: `imprint-${item.id}`,
+            method: item.imprint_type,
+            location: 'N/A',
+            width: 0,
+            height: 0,
+            colorsOrThreads: 'N/A',
+            notes: item.notes || '',
+            customerArt: files.filter((f: any) => f.category === 'customer_art'),
+            productionFiles: files.filter((f: any) => f.category === 'production_files'),
+            proofMockup: files.filter((f: any) => f.category === 'proof_mockup'),
+          });
+        }
+      });
+
+      // De-duplicate imprints by unique imprint ID to avoid duplicates
+      const seen = new Set<string>();
+      const dedupedImprints = imprints.filter((imp) => {
+        if (seen.has(imp.id)) {
+          console.debug('[QuoteDetail] Filtering out duplicate imprint', { imprintId: imp.id, method: imp.method, location: imp.location });
+          return false;
+        }
+        seen.add(imp.id);
+        return true;
+      });
+
+      console.debug('[QuoteDetail] Built group', { group: groupIdx, items: transformedItems.length, imprints: dedupedImprints.length, imprintIds: dedupedImprints.map(i => i.id) });
+      groups.push({ id: `group-${groupIdx}`, items: transformedItems, imprints: dedupedImprints });
+    });
+
+    return groups;
+  })() : [];
   
   // Create mock company info (keeping existing format)
   const companyInfo = {
@@ -320,3 +598,4 @@ export default function QuoteDetail() {
     </div>
   );
 }
+

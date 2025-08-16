@@ -147,47 +147,34 @@ export const CustomersProvider: React.FC<CustomersProviderProps> = ({ children }
 
   // Fetch customers from database
   const fetchCustomers = async () => {
-    console.log('🔍 [DEBUG] CustomersContext - fetchCustomers called');
     setLoading(true);
     setError(null);
-    
     try {
-      console.log('🔍 [DEBUG] CustomersContext - calling supabase.rpc("get_customers")');
-      const { data, error } = await supabase.rpc('get_customers');
-      
-      console.log('🔍 [DEBUG] CustomersContext - RPC response data:', data);
-      console.log('🔍 [DEBUG] CustomersContext - RPC response error:', error);
-      
+      // Prefer direct table query scoped by RLS to the current org
+      const { data, error } = await supabase
+        .from('customers')
+        .select('id, name, company, email, phone, address, notes, status, created_at, updated_at')
+        .order('created_at', { ascending: false });
+
       if (error) throw error;
-      
-      if (data && data.length > 0) {
-        console.log('🔍 [DEBUG] CustomersContext - processing customers data:', data[0]);
-        const customersData = data[0].customers;
-        console.log('🔍 [DEBUG] CustomersContext - extracted customers array:', customersData);
-        
-        if (customersData && Array.isArray(customersData)) {
-          console.log('🔍 [DEBUG] CustomersContext - converting customers:', customersData.length);
-          const convertedCustomers = customersData.map(convertDatabaseCustomer);
-          console.log('🔍 [DEBUG] CustomersContext - converted customers:', convertedCustomers);
-          setCustomers(convertedCustomers);
-        } else {
-          console.log('🔍 [DEBUG] CustomersContext - no customers data or not array, setting empty');
-          setCustomers([]);
-        }
-      } else {
-        console.log('🔍 [DEBUG] CustomersContext - no data returned, setting empty');
+
+      const converted = (data || []).map(convertDatabaseCustomer);
+      setCustomers(converted);
+    } catch (primaryErr) {
+      // Fallback to legacy RPC if it exists
+      console.warn('CustomersContext: primary customers fetch failed, trying legacy RPC', primaryErr);
+      try {
+        const { data: rpcData, error: rpcError } = await supabase.rpc('get_customers');
+        if (rpcError) throw rpcError;
+        const customersData = rpcData && rpcData[0] && Array.isArray(rpcData[0].customers)
+          ? rpcData[0].customers
+          : [];
+        setCustomers(customersData.map(convertDatabaseCustomer));
+      } catch (fallbackErr) {
+        console.error('CustomersContext: Error fetching customers:', fallbackErr);
+        setError(fallbackErr instanceof Error ? fallbackErr.message : 'Failed to fetch customers');
         setCustomers([]);
       }
-    } catch (err) {
-      console.error('🔍 [DEBUG] CustomersContext - Error fetching customers:', err);
-      console.error('🔍 [DEBUG] CustomersContext - Error details:', {
-        message: err instanceof Error ? err.message : 'Unknown error',
-        details: err.details || 'No details',
-        hint: err.hint || 'No hint',
-        code: err.code || 'No code'
-      });
-      setError(err instanceof Error ? err.message : 'Failed to fetch customers');
-      setCustomers([]);
     } finally {
       setLoading(false);
     }
@@ -243,8 +230,10 @@ export const CustomersProvider: React.FC<CustomersProviderProps> = ({ children }
           // Convert database customer to frontend format
           const newCustomer = convertDatabaseCustomer(customerData);
           
-          // Add to local state
+          // Add to local state and also refresh from server to keep in sync
           setCustomers(prev => [...prev, newCustomer]);
+          // Refresh list to ensure persistence is reflected immediately
+          fetchCustomers().catch(() => {});
           
           return newCustomer;
         } else {
@@ -271,6 +260,8 @@ export const CustomersProvider: React.FC<CustomersProviderProps> = ({ children }
     };
     
       setCustomers(prev => [...prev, fallbackCustomer]);
+      // Attempt to refresh from server even on fallback
+      fetchCustomers().catch(() => {});
       return fallbackCustomer;
     }
   };

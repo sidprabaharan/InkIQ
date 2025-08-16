@@ -38,3 +38,9 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "✅ Now running code + DB at $tag" -ForegroundColor Green
 Write-Host "💡 Run 'git checkout main' to return to the latest version" -ForegroundColor Gray
 
+
+
+
+
+
+
